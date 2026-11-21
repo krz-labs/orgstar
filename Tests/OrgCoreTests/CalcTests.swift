@@ -244,7 +244,8 @@ struct CalcTests {
             let ours: String
             do { ours = try Calc.evaluate(c.0, modes: modes) } catch { ours = "unsupported: \(error)" }
             if ours.hasPrefix("unsupported") {
-                skipped.append(c.0)
+                // Calc can fail too, e.g. a root whose Newton steps never settle.
+                if !expected.hasPrefix("LISP ERROR") { skipped.append(c.0) }
                 continue
             }
             #expect(ours == expected, "\(c.0) \(c.1) p\(precision)")
@@ -322,7 +323,7 @@ struct CalcTests {
                       "8^(1:3)", "1.5^3"].map { ($0, "(float 0)") }
             if precision <= 14 {
                 cases += ["sqrt(2)", "sinh(1)", "log(10,2)", "nroot(10,3)", "vgmean([1,2,3])", "exp(1)", "sin(30)", "2^0.5",
-                          "exp(1.58)", "ln(9.44)", "0.08^1.5", "0.11^1.5", "exp(8.44)", "pow(2.5,1:3)"].map { ($0, "(float 0)") }
+                          "exp(1.58)", "ln(9.44)", "0.08^1.5", "0.11^1.5", "exp(8.44)", "pow(2.5,1:3)", "(599e-2)^(5:7)"].map { ($0, "(float 0)") }
                 // exp, ln and powers round at two digits more first.
                 for _ in 0..<150 {
                     let x = "\(Int.random(in: 1...999, using: &generator))e-2"
