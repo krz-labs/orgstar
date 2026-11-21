@@ -305,6 +305,7 @@ orgstar edits UTF-8 files, with or without a byte order mark.
 - A file that is not valid UTF-8 opens read-only. Its text shows with replacement characters where bytes don't decode, the window subtitle reads =Read-only: not UTF-8=, the modeline shows =Read-only=, and commands that would change it report =This file is read-only.= orgstar never writes such a file, and refiling or archiving into it is refused.
 - A file with a UTF-8 byte order mark keeps it when saved; the modeline shows =BOM=.
 - A file containing CRLF line endings shows =CRLF= in the modeline. Existing line endings are kept.
+- LaTeX export, and =#+INCLUDE= in every export, read line endings as Emacs does: a file whose lines all end in CRLF, or all in CR, is read as LF lines; in a file with mixed endings the CRs stay in the text.
 
 orgstar does not convert between encodings or line endings.
 

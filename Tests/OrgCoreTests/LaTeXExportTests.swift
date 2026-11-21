@@ -335,6 +335,25 @@ struct LaTeXExportTests {
         #expect(body.hasPrefix("Text \\url{elisp:(+ 1 2)} and \\url{https://a.b/c d} ok."))
     }
 
+    /// Line ends as Emacs decodes the file: CRLF throughout (dos), CR only (mac), and mixed (unix, CRs kept).
+    @Test(.enabled(if: oracle))
+    func lineEndsMatchEmacs() throws {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("orgstar-crlf-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        try "Included line.\r\n\r\n- item\r\n".write(to: folder.appendingPathComponent("inc.org"), atomically: true, encoding: .utf8)
+        let docs = [
+            "#+TITLE: T\r\n* H\r\nText ok.\r\n\r\nSecond *b* paragraph.\r\n| a | b |\r\n|---+---|\r\n| 1 | 2 |\r\n",
+            "Text ok.\r\nNo final newline",
+            "Mixed\r\nends.\nhere\r\n",
+            "Old\rMac\r\rends\r",
+            "Lone\rCR\r\nin dos.\r\n",
+            "#+INCLUDE: \"\(folder.path)/inc.org\"\r\nAfter.\r\n",
+            "#+INCLUDE: \"\(folder.path)/inc.org\"\nAfter.\n",
+        ]
+        try compare(docs.map { LaTeXOracle.Case(text: $0, bodyOnly: true) }, names: docs.indices.map { "line ends \($0)" })
+    }
+
     /// What Emacs exports differently or refuses is refused, naming it.
     @Test func refusesWhatItCannotMatch() {
         func reason(_ org: String) -> String? {

@@ -116,6 +116,16 @@ public struct ExportOptions: Sendable, Equatable {
 /// What happens to the text before it's parsed for export: `#+INCLUDE` (ox.el's
 /// `org-export-expand-include-keyword`) and macros (`org-macro-replace-all`).
 public enum ExportPreprocess {
+    /// `text` with line ends as Emacs decodes the file: CRLF becomes LF when no line ends in a
+    /// bare LF (dos), CR becomes LF when there is no LF (mac); otherwise every CR stays (unix).
+    public static func decodedLineEnds(_ text: String) -> String {
+        let scalars = Array(text.unicodeScalars)
+        guard scalars.contains("\r") else { return text }
+        guard scalars.contains("\n") else { return text.replacingOccurrences(of: "\r", with: "\n") }
+        for (i, s) in scalars.enumerated() where s == "\n" && (i == 0 || scalars[i - 1] != "\r") { return text }
+        return text.replacingOccurrences(of: "\r\n", with: "\n")
+    }
+
     /// `#+INCLUDE: "file" [example|export FORMAT|src LANG] [:lines "A-B"] [:minlevel N]`, with
     /// `file::*Heading` or `file::#custom-id` for one subtree. Relative to `directory`.
     /// `includer` is the exported file's directory, `directory` at the top.
@@ -137,7 +147,7 @@ public enum ExportPreprocess {
                 target = String(spec[r.upperBound...])
             }
             let url = includeURL(file, directory: directory)
-            guard var included = try? String(contentsOf: url, encoding: .utf8) else {
+            guard var included = (try? String(contentsOf: url, encoding: .utf8)).map(decodedLineEnds) else {
                 lines.append("")
                 continue
             }

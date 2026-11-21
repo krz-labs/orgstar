@@ -44,7 +44,7 @@ public enum LaTeXExport {
         _ text: String, settings: OrgSettings = .default, path: String? = nil, now: Date = Date(), bodyOnly: Bool = false,
         author: String = "", language: String = "en", timeZone: TimeZone = .current, file: Bool = false
     ) throws -> String {
-        let text = try expanded(text, settings: settings, path: path, now: now)
+        let text = try expanded(ExportPreprocess.decodedLineEnds(text), settings: settings, path: path, now: now)
         let tree = OrgParser.parse(text, defaults: settings)
         let keywords = settings.setupKeywords.split(separator: "\n").map(String.init)
             + tree.root.descendants().filter { $0.kind == .keyword }.map { $0.text.trimmingCharacters(in: .newlines) }
@@ -269,20 +269,22 @@ final class LaTeXRenderer {
     /// `org-element-normalize-string`: one final newline, none for the empty string.
     static func normalize(_ s: String) -> String {
         guard !s.isEmpty else { return "" }
-        var end = s.endIndex
-        var cut = s.endIndex
-        while end > s.startIndex {
-            let before = s.index(before: end)
-            if s[before] == " " || s[before] == "\t" {
+        // By scalar: a CR the file kept stays, as in Emacs, where "\r\n" isn't one character.
+        let scalars = s.unicodeScalars
+        var end = scalars.endIndex
+        var cut = scalars.endIndex
+        while end > scalars.startIndex {
+            let before = scalars.index(before: end)
+            if scalars[before] == " " || scalars[before] == "\t" {
                 end = before
-            } else if s[before] == "\n" {
+            } else if scalars[before] == "\n" {
                 end = before
                 cut = before
             } else {
                 break
             }
         }
-        return String(s[..<cut]) + "\n"
+        return String(scalars[..<cut]) + "\n"
     }
 
     /// `org-trim`.
