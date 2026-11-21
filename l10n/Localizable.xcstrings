@@ -1743,6 +1743,76 @@
     "+work-home": {
       "shouldTranslate": false
     },
+    ".import into a table that doesn't exist yet": {
+      "comment": "Why an sqlite block can't run here",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ".import in eine Tabelle, die noch nicht existiert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ".import en una tabla que aún no existe"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ".import dans une table qui n’existe pas encore"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "まだ存在しないテーブルへの .import"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ".import em uma tabela que ainda não existe"
+          }
+        }
+      }
+    },
+    ".import of rows that don't fit the table": {
+      "comment": "Why an sqlite block can't run here",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ".import von Zeilen, die nicht zur Tabelle passen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ".import de filas que no encajan en la tabla"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ".import de lignes qui ne correspondent pas à la table"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テーブルに合わない行の .import"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ".import de linhas que não cabem na tabela"
+          }
+        }
+      }
+    },
     "A folder with config.toml and capture.toml, such as a synced copy of ~/.config/orgstar from your Mac. Changes to them apply as they sync.": {
       "localizations": {
         "de": {
@@ -4138,6 +4208,41 @@
         }
       }
     },
+    "BLOB values": {
+      "comment": "Why an sqlite block can't run here",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLOB-Werte"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "valores BLOB"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "valeurs BLOB"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLOB 値"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "valores BLOB"
+          }
+        }
+      }
+    },
     "Back to today (.)": {
       "localizations": {
         "de": {
@@ -4993,6 +5098,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Não é possível incluir %@."
+          }
+        }
+      }
+    },
+    "Can't open the database %@: %@. orgstar can open files only in the folders it has access to.": {
+      "comment": "An sqlite block's database that can't be opened",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Datenbank %1$@ kann nicht geöffnet werden: %2$@. orgstar kann Dateien nur in Ordnern öffnen, auf die es Zugriff hat."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede abrir la base de datos %1$@: %2$@. orgstar solo puede abrir archivos en las carpetas a las que tiene acceso."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d’ouvrir la base de données %1$@ : %2$@. orgstar ne peut ouvrir des fichiers que dans les dossiers auxquels il a accès."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "データベース %1$@ を開けません：%2$@。orgstar はアクセスできるフォルダ内のファイルしか開けません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível abrir o banco de dados %1$@: %2$@. O orgstar só pode abrir arquivos nas pastas às quais tem acesso."
           }
         }
       }
@@ -10271,6 +10411,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vence hoje"
+          }
+        }
+      }
+    },
+    "EXPLAIN statements": {
+      "comment": "Why an sqlite block can't run here",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EXPLAIN-Anweisungen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sentencias EXPLAIN"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "instructions EXPLAIN"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EXPLAIN 文"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "instruções EXPLAIN"
           }
         }
       }
@@ -31215,6 +31390,41 @@
         }
       }
     },
+    "This calc block can't be calculated here: %@.": {
+      "comment": "A calc block orgstar can't calculate",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser calc-Block kann hier nicht berechnet werden: %@."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este bloque calc no se puede calcular aquí: %@."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce bloc calc ne peut pas être calculé ici : %@."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この calc ブロックはここでは計算できません：%@。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este bloco calc não pode ser calculado aqui: %@."
+          }
+        }
+      }
+    },
     "This file isn't in one of your folders. Choose where the export goes.": {
       "comment": "Save panel for an export outside the sidebar's folders",
       "localizations": {
@@ -31246,6 +31456,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "Este arquivo não está em nenhuma das suas pastas. Escolha onde salvar a exportação."
+          }
+        }
+      }
+    },
+    "This sqlite block can't run here: %@.": {
+      "comment": "An sqlite block refused before it ran",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser sqlite-Block kann hier nicht ausgeführt werden: %@."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este bloque sqlite no se puede ejecutar aquí: %@."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce bloc sqlite ne peut pas être exécuté ici : %@."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この sqlite ブロックはここでは実行できません：%@。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este bloco sqlite não pode ser executado aqui: %@."
+          }
+        }
+      }
+    },
+    "This sqlite block can't run here: %@. The statements before it ran.": {
+      "comment": "An sqlite block refused partway",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser sqlite-Block kann hier nicht ausgeführt werden: %@. Die Anweisungen davor wurden ausgeführt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este bloque sqlite no se puede ejecutar aquí: %@. Las sentencias anteriores se ejecutaron."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce bloc sqlite ne peut pas être exécuté ici : %@. Les instructions précédentes ont été exécutées."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この sqlite ブロックはここでは実行できません：%@。それより前の文は実行されました。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este bloco sqlite não pode ser executado aqui: %@. As instruções anteriores foram executadas."
           }
         }
       }
@@ -34497,6 +34777,41 @@
         }
       }
     },
+    "control characters in values": {
+      "comment": "Why an sqlite block can't run here",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Steuerzeichen in Werten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "caracteres de control en valores"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "caractères de contrôle dans les valeurs"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "値に含まれる制御文字"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "caracteres de controle em valores"
+          }
+        }
+      }
+    },
     "date %@": {
       "localizations": {
         "de": {
@@ -34664,6 +34979,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "date-to-time de %@"
+          }
+        }
+      }
+    },
+    "dates in calc blocks": {
+      "comment": "Why a table needs Emacs",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Datumsangaben in calc-Blöcken"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "fechas en bloques calc"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "dates dans les blocs calc"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "calc ブロック内の日付"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "datas em blocos calc"
           }
         }
       }
@@ -35108,6 +35458,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "O gnuplot não gerou nenhuma imagem"
+          }
+        }
+      }
+    },
+    "header arguments with shell syntax": {
+      "comment": "Why an sqlite block can't run here",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Header-Argumente mit Shell-Syntax"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "argumentos de cabecera con sintaxis de shell"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "arguments d’en-tête avec une syntaxe de shell"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "シェル構文を含むヘッダー引数"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "argumentos de cabeçalho com sintaxe de shell"
           }
         }
       }
@@ -35622,6 +36007,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "tamanho de número %@"
+          }
+        }
+      }
+    },
+    "numeric :prologue or :epilogue": {
+      "comment": "Why a table needs Emacs",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "numerischer :prologue oder :epilogue"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ":prologue o :epilogue numérico"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ":prologue ou :epilogue numérique"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "数値の :prologue または :epilogue"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ":prologue ou :epilogue numérico"
           }
         }
       }
@@ -36660,6 +37080,41 @@
         }
       }
     },
+    "stack command %@": {
+      "comment": "Why a calc block needs Emacs: a key it runs on the stack",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stapelbefehl %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orden de pila %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "commande de pile %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スタックコマンド %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "comando de pilha %@"
+          }
+        }
+      }
+    },
     "string-width of %@": {
       "localizations": {
         "de": {
@@ -36796,6 +37251,76 @@
         }
       }
     },
+    "text other than plain ASCII in column or line mode": {
+      "comment": "Why an sqlite block can't run here",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Text außer reinem ASCII im column- oder line-Modus"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "texto que no es ASCII simple en el modo column o line"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "texte autre que de l’ASCII simple en mode column ou line"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "column または line モードでの ASCII 以外のテキスト"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "texto que não é ASCII simples no modo column ou line"
+          }
+        }
+      }
+    },
+    "text that isn't UTF-8": {
+      "comment": "Why an sqlite block can't run here",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Text, der nicht UTF-8 ist"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "texto que no es UTF-8"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "texte qui n’est pas en UTF-8"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "UTF-8 ではないテキスト"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "texto que não é UTF-8"
+          }
+        }
+      }
+    },
     "the data of this error": {
       "localizations": {
         "de": {
@@ -36826,6 +37351,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "os dados deste erro"
+          }
+        }
+      }
+    },
+    "the dot-command %@": {
+      "comment": "Why an sqlite block can't run here",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "der Punktbefehl %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "la orden de punto %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "la commande point %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ドットコマンド %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "o comando de ponto %@"
           }
         }
       }
@@ -36929,6 +37489,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "até"
+          }
+        }
+      }
+    },
+    "value of :var %@": {
+      "comment": "Why a calc block needs Emacs: a variable's value",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wert von :var %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "valor de :var %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "valeur de :var %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ":var %@ の値"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "valor de :var %@"
           }
         }
       }
