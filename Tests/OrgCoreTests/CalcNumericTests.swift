@@ -86,8 +86,38 @@ struct CalcNumericTests {
         #expect(skipped == [], "\(skipped)")
     }
 
-    /// Vector results, with and without `N`, and zero with no decimal places.
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
+    func fractionModeMatchesCalc() throws {
+        var generator = SystemRandomNumberGenerator()
+        let numbers = ["0", "1", "2", "3", "-2", "7", "10", "12", "1:2", "1:3", "-5:4", "7:2", "-3:7", "0.5", "2.5", "-1.5", "0.25", "3.", "1.2e1",
+                       "100", "0.123456789", "0."]
+        func number() -> String { numbers.randomElement(using: &generator)! }
+        func vector() -> String { "[" + (0..<Int.random(in: 1...5, using: &generator)).map { _ in number() }.joined(separator: ",") + "]" }
+        let unary = ["fact", "dfact", "abs", "floor", "ceil", "trunc", "round", "sqrt", "exp", "ln", "log10", "sin", "cos", "tan", "arcsin",
+                     "arccos", "arctan", "lnot", "percent", "float", "pfloat", "sign", "rounde", "roundu", "frac", "exp10", "sinh", "cosh",
+                     "tanh", "arcsinh", "arccosh", "arctanh", "deg", "rad"]
+        let binary = ["mod", "idiv", "max", "min", "round", "rounde", "roundu", "fdiv", "gcd", "lcm", "choose", "perm", "pow", "nroot",
+                      "hypot", "log", "arctan2", "eq", "lt", "land", "lor", "agmean"]
+        let statistics = ["vsum", "vprod", "vcount", "vmean", "vmax", "vmin", "vmedian", "vvar", "vpvar", "vsdev", "vpsdev", "vflat", "vgmean", "vhmean"]
+        var cases = ["vmedian([1,2])", "round(2.5,1)", "round(1:3,2)", "rounde(2.45,1)", "vmean([1,2])", "vmedian([1:3,1])", "7/2", "1/3+1/6",
+                     "2^-1", "0.5^-1", "(1:2)^0.5", "4^(1:2)", "8^(-1:3)", "7%2", "7\\2", "<2026-10-05 Mon>+1/2", "vsdev([1,2])",
+                     "round(3.,-2)", "round(-2.25,1)", "round(2.5,1.)", "mod(0,0.5)", "0%0.5", "vgmean([0.5])", "vgmean([1:4])"].map { ($0, "(float 12)") }
+        for _ in 0..<1500 {
+            switch Int.random(in: 0..<4, using: &generator) {
+            case 0: cases.append(("\(unary.randomElement(using: &generator)!)(\(number()))", "(float 12)"))
+            case 1: cases.append(("\(binary.randomElement(using: &generator)!)(\(number()),\(number()))", "(float 12)"))
+            case 2: cases.append(("\(statistics.randomElement(using: &generator)!)(\(vector()))", "(float 12)"))
+            default:
+                let op = ["+", "-", "*", "/", "^", "%", "\\"].randomElement(using: &generator)!
+                cases.append(("(\(number()))\(op)(\(number()))", "(float 12)"))
+            }
+        }
+        for fractions in [true, false] { _ = try CalcTests.compare(cases, fractions: fractions) }
+    }
+
+    /// Vector results, with and without `N`, zero with no decimal places, and fractions.
     static let tables = [
+        "| 1 | 2 | | |\n|---+---+---+---|\n| 2.5 | 0.25 | | |\n#+TBLFM: $3=vmedian($1..$2);F::$4=round($1,1);F\n",
         "| 1 | 2 | |\n|---+---+---|\n| 3 | x | |\n| 1.5 | 0. | |\n#+TBLFM: $3=$1..$2;N\n",
         "| 1 | 2 | |\n|---+---+---|\n| 1.5 | 0. | |\n| 1:3 | -2 | |\n#+TBLFM: $3=$1..$2\n",
         "| 1.5 | 0 | |\n|---+---+---|\n| 2 | 4 | |\n#+TBLFM: $3=$1..$2;Nf0\n",

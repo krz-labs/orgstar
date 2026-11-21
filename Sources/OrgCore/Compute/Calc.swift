@@ -746,10 +746,11 @@ public enum Calc {
         return (pow == x, sum)
     }
 
-    /// `math-round` in `math-rounding-mode` `even` or `up`.
-    static func round(_ a: Value, even: Bool) throws -> Value {
+    /// `math-round` in `math-rounding-mode` `even` or `up`, or with `away` the default mode,
+    /// which rounds halves away from zero.
+    static func round(_ a: Value, even: Bool, away: Bool = false) throws -> Value {
         if isWhole(a) { return .int(try trunc(a)) }
-        if try sign(a) < 0, even { return try negate(try round(try negate(a), even: even)) }
+        if try sign(a) < 0, even || away { return try negate(try round(try negate(a), even: even)) }
         let b = try add(a, rational(a) != nil ? .frac(1, 2) : .float(5, -1))
         var f = try floorInt(b)
         if even, isWhole(b), f % 2 != 0 { f -= 1 }
@@ -1501,6 +1502,7 @@ public enum Calc {
 
         /// `math-mod`: the remainder with the divisor's sign.
         func mod(_ a: Value, _ b: Value) throws -> Value {
+            if isZero(a) { return a }
             if case .int(let x) = a, case .int(let y) = b {
                 guard y != 0 else { throw Unsupported("division by zero") }
                 let r = x % y
@@ -1610,7 +1612,7 @@ public enum Calc {
                 if items.contains(where: { if case .date = $0 { true } else { false } }) { throw Unsupported("arguments") }
                 try items.sort { try compare($0, $1) < 0 }
                 if items.count % 2 == 1 { return items[items.count / 2] }
-                return try divide(try add(items[items.count / 2 - 1], items[items.count / 2]), .int(2))
+                return try divide(try add(items[items.count / 2 - 1], items[items.count / 2]), .int(2), fractions: modes.preferFractions)
             case "if":
                 guard args.count == 3 else { throw Unsupported("arguments") }
                 return try truth(args[0]) ? args[1] : args[2]
@@ -1662,12 +1664,15 @@ public enum Calc {
                     return .date(try call(name, [d]))
                 }
                 var x = args[0]
-                if case .frac(let n, let d) = x { x = try divide(.int(n), .int(d)) }
                 if args.count == 2 {
-                    guard case .int(let places) = args[1] else { throw Unsupported("arguments") }
-                    guard case .float(let m, let e) = x else { return x }
-                    return try makeFloat(try scaleRounding(Int128(m), e + places), -places)
+                    // As `rounde`: scaled to an integer with fractions, then scaled back.
+                    guard isWhole(args[1]), case let places = try trunc(args[1]) else { throw Unsupported("arguments") }
+                    _ = try sign(x)
+                    if places <= 0, case .int = x { return x }
+                    let rounded = try round(try scale(x, places, fractions: true), even: false, away: true)
+                    return try scale(rounded, -places, fractions: modes.preferFractions)
                 }
+                if case .frac(let n, let d) = x { x = try divide(.int(n), .int(d)) }
                 guard case .float(let m, let e) = x else { return x }
                 guard let i = Int(exactly: try scaleRounding(Int128(m), e)) else { throw Unsupported("integer size") }
                 return .int(i)
@@ -1892,6 +1897,8 @@ public enum Calc {
             case "vgmean", "vhmean":
                 let items = try elements(args)
                 guard !items.isEmpty else { throw Unsupported("empty vector") }
+                // Calc's root of one float, a power of 1:1, stays unevaluated.
+                if name == "vgmean", items.count == 1, case .float = items[0] { throw Unsupported("arguments") }
                 return try extra(2) {
                     if name == "vhmean" {
                         let inverses = try items.map { try divide(.int(1), $0, fractions: modes.preferFractions) }
