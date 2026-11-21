@@ -3,7 +3,9 @@ import Foundation
 /// Calc's arithmetic on formulas it can't reduce to a number: variables, `inf`, `uinf`, and
 /// quotients by zero. This ports `math-add`, `math-mul`, `math-div`, `math-pow` and `math-neg`
 /// with their `-symb-fancy` helpers from calc.el and calc-arith.el, as `calc-eval` runs them
-/// with `calc-simplify-mode` nil, and Calc's flat formula printer from calccomp.el. Anything
+/// with `calc-simplify-mode` nil; `math-sqrt`, `math-abs`, `math-mod`, `calcFunc-exp`, `calcFunc-ln`,
+/// `calcFunc-min`, `calcFunc-max` and the comparisons and logical functions of calc-prog.el on
+/// formulas; and Calc's flat formula printer from calccomp.el. Anything
 /// those functions would decide from declarations, units, matrices or intervals throws
 /// `Calc.Unsupported`.
 extension Calc {
@@ -163,7 +165,7 @@ extension Calc {
                 return 7
             }
             if f == "neg" { return negSigns(try signs(a1, try origin.map(neg))) }
-            let origin = origin.flatMap { zerop($0) ? nil : $0 }
+            var origin = origin.flatMap { zerop($0) ? nil : $0 }
             let zero = Term.number(.int(0))
             if f == "*" || (f == "/" && origin != nil), objectp(a1) {
                 let s = f == "*"
@@ -211,6 +213,32 @@ extension Calc {
                 case "i": return 8
                 default: return 15
                 }
+            case .op("%", let args):
+                let s2 = try signs(args[1])
+                sign = s2 >= 8 ? 7 : s2 == 2 ? 2 : [4, 6].contains(s2) ? 6 : [1, 3].contains(s2) ? 3 : 7
+            case .op("abs", let args):
+                let s1 = try signs(args[0])
+                sign = s1 == 2 ? 2 : [1, 4, 5].contains(s1) ? 4 : 6
+            case .op("exp", let args):
+                let s1 = try signs(args[0])
+                if s1 >= 8 {
+                    sign = 15
+                } else if origin == nil || negp(origin!) {
+                    sign = 4
+                } else {
+                    origin = try sub(origin!, .number(.int(1)))
+                    if zerop(origin!) { origin = nil }
+                    sign = s1
+                }
+            case .op("ln", let args):
+                sign = try knownNonneg(args[0]) ? try signs(args[0], .number(.int(1))) : 15
+            case .op("sqrt", let args):
+                let s1 = try signs(args[0])
+                sign = [2, 4, 6].contains(s1) ? s1 : 15
+            case .op(let f, _) where ["eq", "neq", "lt", "gt", "leq", "geq", "lnot", "max", "min"].contains(f):
+                sign = 7
+            // Nothing is declared about the other functions.
+            case .op(let f, _) where functions.contains(f) || f == "if": return 15
             default: throw Unsupported("function \(f ?? "")")
             }
             guard let origin else { return sign }
@@ -219,6 +247,35 @@ extension Calc {
         }
 
         static func knownNonneg(_ t: Term) throws -> Bool { [2, 4, 6].contains(try signs(t)) }
+
+        static func knownReal(_ t: Term) throws -> Bool { try signs(t) < 8 }
+
+        /// `math-known-evenp`.
+        static func knownEven(_ t: Term) throws -> Bool {
+            switch t {
+            case .number(.int(let n)): return n % 2 == 0
+            case .number(.float(let m, let e)) where e >= 0: return e > 0 || m % 2 == 0
+            case .op("*", let args):
+                if try knownEven(args[0]) { return try knownNumInteger(args[1]) }
+                return try knownNumInteger(args[0]) && knownEven(args[1])
+            case .op("+", let args), .op("-", let args):
+                return try (knownEven(args[0]) && knownEven(args[1])) || (knownOdd(args[0]) && knownOdd(args[1]))
+            case .op("neg", let args): return try knownEven(args[0])
+            default: return false
+            }
+        }
+
+        /// `math-known-oddp`.
+        static func knownOdd(_ t: Term) throws -> Bool {
+            switch t {
+            case .number(.int(let n)): return n % 2 != 0
+            case .number(.float(let m, let e)) where e >= 0: return e == 0 && m % 2 != 0
+            case .op("+", let args), .op("-", let args):
+                return try (knownEven(args[0]) && knownOdd(args[1])) || (knownOdd(args[0]) && knownEven(args[1]))
+            case .op("neg", let args): return try knownOdd(args[0])
+            default: return false
+            }
+        }
 
         /// `math-known-num-integerp`.
         static func knownNumInteger(_ t: Term) throws -> Bool {
@@ -244,8 +301,18 @@ extension Calc {
             case .number: throw Unsupported("symbolic arithmetic")
             case .variable: return 63
             case .op("neg", let args): return try possibleTypes(args[0])
-            case .op(let f, let args) where args.count == 2 && ["+", "-", "*", "/", "^"].contains(f):
-                let (t1, t2) = (try possibleTypes(args[0], num: num), try possibleTypes(args[1], num: num))
+            case .op("sqrt", let args):
+                let s1 = try signs(args[0])
+                let t = (s1 & 2 > 0 ? 3 : 0) | (s1 & 1 > 0 ? 16 : 0) | (s1 & 4 > 0 ? 15 : 0) | (s1 & 8 > 0 ? 32 : 0)
+                return t < 16 ? t : 63
+            case .op("abs", let args):
+                let t1 = try possibleTypes(args[0])
+                return t1 >= 16 ? 15 : t1
+            case .op(let f, let args) where args.count == 2 && ["+", "-", "*", "/", "^", "%"].contains(f):
+                // `%` keeps only the real bits, which the merged values above 15 don't give.
+                if f == "%", args.contains(where: { containsHead($0, "sqrt") }) { throw Unsupported("symbolic arithmetic") }
+                var (t1, t2) = (try possibleTypes(args[0], num: num), try possibleTypes(args[1], num: num))
+                if f == "%" { (t1, t2) = (t1 & 15, t2 & 15) }
                 let t12 = t1 | t2
                 if f == "^" {
                     guard t2 <= 3, try knownNonneg(args[1]), t1 < 16 else {
@@ -260,10 +327,16 @@ extension Calc {
                     return t1 == 4 || t2 == 4 || fractions ? 5 : 15
                 }
                 let mask = t12 <= 3 ? 1
-                    : ((t1 <= 3 && t2 & 3 == 0) || (t2 <= 3 && t1 & 3 == 0)) && f != "*" ? 4 : 5
+                    : ((t1 <= 3 && t2 & 3 == 0) || (t2 <= 3 && t1 & 3 == 0)) && (f == "+" || f == "-") ? 4 : 5
                 return merge(t1, t2, mask)
+            case .op(let f, _) where functions.contains(f) || f == "if": return 63
             default: throw Unsupported("function \(head(a) ?? "")")
             }
+        }
+
+        static func containsHead(_ t: Term, _ f: String) -> Bool {
+            guard case .op(let g, let args) = t else { return false }
+            return g == f || args.contains { containsHead($0, f) }
         }
 
         // MARK: Arithmetic
@@ -274,6 +347,12 @@ extension Calc {
             switch t {
             case .number(.float(let m, let e)): return .number(try makeFloat(Int128(m), e))
             case .number, .variable: return t
+            // `math-normalize-logical-op`: the branches stay as written unless the condition
+            // is a number.
+            case .op("if", let args) where args.count == 3:
+                let c = try normalize(args[0])
+                guard let v = number(c) else { return .op("if", [c, args[1], args[2]]) }
+                return try normalize(isZero(v) ? args[2] : args[1])
             case .op(let f, let args):
                 let args = try args.map(normalize)
                 do { return try apply(f, args) } catch is Rejected { return .op(f, args) }
@@ -288,7 +367,9 @@ extension Calc {
             case ("/", 2): return try div(args[0], args[1])
             case ("^", 2): return try pow(args[0], args[1])
             case ("neg", 1): return try neg(args[0])
-            default: throw Unsupported("function \(f)")
+            default:
+                guard functions.contains(f) else { throw Unsupported("function \(f)") }
+                return try function(f, args)
             }
         }
 
@@ -547,7 +628,9 @@ extension Calc {
             func split(_ t: Term) throws -> (Term, Term) {
                 var (base, power) = (t, Term.number(.int(1)))
                 if head(t) == "^", objectp(arg(t, 2)) { (base, power) = (arg(t, 1), arg(t, 2)) }
-                if head(t) == "sqrt" || head(t) == "exp" { throw Unsupported("symbolic arithmetic") }
+                if head(t) == "sqrt" { (base, power) = (arg(t, 1), .number(.frac(1, 2))) }
+                // Only in symbolic mode does `exp` of a number stay.
+                if head(t) == "exp", objectp(arg(t, 1)) { throw Unsupported("symbolic arithmetic") }
                 if case .number(.frac(let n, let d)) = base, n < d {
                     (base, power) = (try div(.number(.int(1)), base), try neg(power))
                 }
@@ -567,15 +650,20 @@ extension Calc {
                     if looksNeg(sum), ratp(baseA), posp(baseA) {
                         (baseA, sum) = (try div(.number(.int(1)), baseA), try neg(sum))
                     }
-                    if sum == .number(.frac(1, 2)) || sum == .number(.frac(-1, 2)) { throw Unsupported("symbolic arithmetic") }
-                    return try pow(baseA, sum)
+                    return try root(baseA, sum)
                 }
             }
             if powA == powB, case .number(.int(let x)) = baseA, case .number(.int(let y)) = baseB, x >= 0, y >= 0 {
-                if powA == .number(.frac(1, 2)) || powA == .number(.frac(-1, 2)) { throw Unsupported("symbolic arithmetic") }
-                return try pow(try mul(baseA, baseB), powA)
+                return try root(try mul(baseA, baseB), powA)
             }
             return nil
+        }
+
+        /// `a^p`, with Calc's square root form for a half.
+        static func root(_ a: Term, _ p: Term) throws -> Term {
+            if p == .number(.frac(1, 2)) { return .op("sqrt", [a]) }
+            if p == .number(.frac(-1, 2)) { return try div(.number(.int(1)), .op("sqrt", [a])) }
+            return try pow(a, p)
         }
 
         /// `math-pow`.
@@ -617,16 +705,19 @@ extension Calc {
                 return try mul(try pow(a1, b), try pow(try div(.number(.int(1)), a2), b))
             case "^" where try knownNumInteger(b) || knownNonneg(a1):
                 return try pow(a1, try mul(a2, b))
+            case "sqrt" where try knownNumInteger(b) || knownNonneg(a1):
+                return try pow(a1, try div(b, .number(.int(2))))
             case "^":
-                // `math-known-evenp` of an exponent with a variable is false.
-                if case .number(let n) = a2, isWhole(n), try trunc(n) % 2 == 0, let y = number(b), let q = quarter(y),
-                   (1...3).contains(q), try signs(a1) < 8 { throw Unsupported("symbolic arithmetic") }
+                if let y = number(b), let q = quarter(y), (1...3).contains(q), try knownEven(a2), try knownReal(a1) {
+                    return try absTerm(try pow(a1, try mul(a2, b)))
+                }
             default: break
             }
             if looksNeg(a), case .number(.int(let n)) = b {
                 let p = try pow(try neg(a), b)
                 return n % 2 == 0 ? p : try neg(p)
             }
+            if head(a) == "abs", try knownReal(a1), try knownEven(b) { return try pow(a1, b) }
             if let infinity = infinitep(a) {
                 if infinity == nan { return infinity }
                 if head(a) == "neg" { return try mul(try pow(.number(.int(-1)), b), try pow(a1, b)) }
@@ -647,6 +738,197 @@ extension Calc {
             return .op("^", [a, b])
         }
 
+        // MARK: Functions
+
+        /// The functions `function` applies to formulas; `%` is `math-mod`.
+        static let functions: Set<String> = ["sqrt", "abs", "exp", "ln", "min", "max", "eq", "neq", "lt", "gt", "leq", "geq",
+                                             "land", "lor", "lnot", "%"]
+
+        /// `name` of `args`, at least one a formula, as `math-normalize` calls it: simplified,
+        /// or kept with its arguments when the function rejects them.
+        static func function(_ name: String, _ args: [Term]) throws -> Term {
+            do { return try simplify(name, args) } catch is Rejected { return .op(name, args) }
+        }
+
+        static func simplify(_ name: String, _ args: [Term]) throws -> Term {
+            let kept = Term.op(name, args)
+            switch (name, args.count) {
+            case ("sqrt", 1), ("exp", 1), ("ln", 1):
+                // In symbolic mode these keep a result that isn't exact, which isn't reproduced.
+                guard !symbolicMode else { throw Unsupported("function \(name) in symbolic mode") }
+                switch name {
+                case "sqrt": return try sqrtTerm(args[0])
+                case "exp": return try expTerm(args[0])
+                default: return try lnTerm(args[0])
+                }
+            case ("abs", 1): return try absTerm(args[0])
+            case ("min", _), ("max", _):
+                // `calcFunc-min` rejects an argument that isn't a real number or an infinity.
+                guard !args.isEmpty else { throw Unsupported("arguments") }
+                guard args.allSatisfy({ objectp($0) || infinitep($0) != nil }) else { return kept }
+                return try args.dropFirst().reduce(args[0]) { best, item in
+                    switch try compareTerms(best, item) {
+                    case 2: return nan
+                    case let order: return order == (name == "max" ? -1 : 1) ? item : best
+                    }
+                }
+            case ("eq", 2), ("neq", 2), ("lt", 2), ("gt", 2), ("leq", 2), ("geq", 2):
+                let (a, b) = (args[0], args[1])
+                let order = try compareTerms(a, b)
+                if order == 2 {
+                    // Both sides negative, or zero, flip.
+                    if looksNeg(a) || zerop(a), looksNeg(b) || zerop(b) {
+                        return .op(flipped[name]!, [try neg(a), try neg(b)])
+                    }
+                    return kept
+                }
+                let holds = switch name {
+                case "eq": order == 0
+                case "neq": order != 0
+                case "lt": order == -1
+                case "gt": order == 1
+                case "leq": order != 1
+                default: order != -1
+                }
+                return .number(.int(holds ? 1 : 0))
+            case ("land", 2):
+                let (a, b) = (args[0], args[1])
+                if zerop(a) { return a }
+                if zerop(b) { return b }
+                if try isTrue(a) { return b }
+                if try isTrue(b) { return a }
+                return kept
+            case ("lor", 2):
+                let (a, b) = (args[0], args[1])
+                if zerop(a) { return b }
+                if zerop(b) { return a }
+                if try isTrue(a) { return a }
+                if try isTrue(b) { return b }
+                return kept
+            case ("lnot", 1):
+                let a = args[0]
+                if zerop(a) { return .number(.int(1)) }
+                if try isTrue(a) { return .number(.int(0)) }
+                if case .op(let f, let xs) = a, xs.count == 2, let opposite = negated[f] { return .op(opposite, xs) }
+                return kept
+            case ("%", 2): return try modTerm(args[0], args[1])
+            default: throw Unsupported("function \(name) of a formula")
+            }
+        }
+
+        /// The comparison with its sides negated, and its negation (`calc-tweak-eqn-table`).
+        static let flipped = ["eq": "eq", "neq": "neq", "lt": "gt", "gt": "lt", "leq": "geq", "geq": "leq"]
+        static let negated = ["eq": "neq", "neq": "eq", "lt": "geq", "gt": "leq", "leq": "gt", "geq": "lt"]
+
+        /// `math-is-true`.
+        static func isTrue(_ t: Term) throws -> Bool {
+            if let v = number(t) { return !isZero(v) }
+            return [1, 4, 5, 8, 9, 12, 13].contains(try signs(t))
+        }
+
+        /// `math-compare`: -1, 0 or 1, or 2 when the order isn't known.
+        static func compareTerms(_ a: Term, _ b: Term) throws -> Int {
+            if a == b {
+                switch a {
+                case .number: return 0
+                case .variable, .op("neg", _), .op("*", _), .op("/", _): return infinitep(a) != nil ? 2 : 0
+                default: return 0
+                }
+            }
+            if let x = number(a), let y = number(b) { return try Calc.compare(x, y) }
+            if case .number(.frac(let n, let d)) = a { return try compareTerms(.number(.int(n)), try mul(b, .number(.int(d)))) }
+            if case .number(.frac(let n, let d)) = b { return try compareTerms(try mul(a, .number(.int(d))), .number(.int(n))) }
+            let one = Term.number(.int(1)), minusOne = Term.number(.int(-1))
+            if let infA = infinitep(a) {
+                if a == uinf || a == nan { return 2 }
+                let dirA = try infiniteDirection(a, infA)
+                if let infB = infinitep(b) {
+                    if b == uinf || b == nan { return 2 }
+                    let dirB = try infiniteDirection(b, infB)
+                    return dirA == one && dirB == minusOne ? 1 : dirA == minusOne && dirB == one ? -1 : 2
+                }
+                return dirA == one ? 1 : dirA == minusOne ? -1 : 2
+            }
+            if let infB = infinitep(b) {
+                if b == uinf || b == nan { return 2 }
+                let dirB = try infiniteDirection(b, infB)
+                return dirB == one ? -1 : dirB == minusOne ? 1 : 2
+            }
+            let e = Term.variable("e")
+            if head(a) == "exp", head(b) == "^", arg(b, 1) == e { return try compareTerms(arg(a, 1), arg(b, 2)) }
+            if head(b) == "exp", head(a) == "^", arg(a, 1) == e { return try compareTerms(arg(a, 2), arg(b, 1)) }
+            let half: [Term] = [.number(.frac(1, 2)), .number(.float(5, -1))]
+            if (head(a) == "sqrt" && head(b) == "^" && half.contains(arg(b, 2)))
+                || (head(b) == "sqrt" && head(a) == "^" && half.contains(arg(a, 2))) {
+                return try compareTerms(arg(a, 1), arg(b, 1))
+            }
+            if case .variable = a { return 2 }
+            if case .op(let f, let xs) = a, case .op(let g, let ys) = b, f == g, xs.count == ys.count,
+               try zip(xs, ys).allSatisfy({ try compareTerms($0, $1) == 0 }) { return 0 }
+            return 2
+        }
+
+        /// `math-sqrt` of a formula.
+        static func sqrtTerm(_ a: Term) throws -> Term {
+            if let v = number(a) { return .number(try squareRoot(v)) }
+            // An imaginary result.
+            if [1, 2, 3].contains(try signs(a)) { throw Unsupported("complex result") }
+            let (a1, a2) = (arg(a, 1), arg(a, 2))
+            switch head(a) {
+            case "*" where try knownNonneg(a1) || knownNonneg(a2):
+                return try mul(try sqrtTerm(a1), try sqrtTerm(a2))
+            case "/" where try knownNonneg(a2):
+                return try div(try sqrtTerm(a1), try sqrtTerm(a2))
+            case "/" where try knownNonneg(a1) && !equalInt(a1, 1):
+                return try mul(try sqrtTerm(a1), try sqrtTerm(try div(.number(.int(1)), a2)))
+            case "^" where try knownEven(a2) && knownReal(a1):
+                return try absTerm(try pow(a1, try div(a2, .number(.int(2)))))
+            default: break
+            }
+            if let infinity = infinitep(a) { return try mul(try sqrtTerm(try infiniteDirection(a, infinity)), infinity) }
+            return .op("sqrt", [a])
+        }
+
+        /// `math-abs` of a formula.
+        static func absTerm(_ a: Term) throws -> Term {
+            if let v = number(a) { return .number(try absolute(v)) }
+            if negp(a) { return try neg(a) }
+            if looksNeg(a) { return .op("abs", [try neg(a)]) }
+            let s = try signs(a)
+            if [2, 4, 6].contains(s) { return a }
+            if [1, 3].contains(s) { return try neg(a) }
+            if let infinity = infinitep(a) { return infinity == nan ? nan : inf }
+            return .op("abs", [a])
+        }
+
+        /// `calcFunc-exp` of a formula.
+        static func expTerm(_ a: Term) throws -> Term {
+            if objectp(a) { throw Unsupported("symbolic arithmetic") }
+            if a == inf || a == nan { return a }
+            if a == .op("neg", [inf]) { return .number(.int(0)) }
+            return .op("exp", [a])
+        }
+
+        /// `calcFunc-ln` of a formula.
+        static func lnTerm(_ a: Term) throws -> Term {
+            if objectp(a) { throw Unsupported("symbolic arithmetic") }
+            if a == .variable("e") { return .number(.int(1)) }
+            if head(a) == "^", arg(a, 1) == .variable("e"), try knownReal(arg(a, 2)) { return arg(a, 2) }
+            if infinitep(a) != nil { return a == nan ? nan : inf }
+            return .op("ln", [a])
+        }
+
+        /// `math-mod` with a formula.
+        static func modTerm(_ a: Term, _ b: Term) throws -> Term {
+            if zerop(a) { return a }
+            if objectp(a), objectp(b) { throw Unsupported("symbolic arithmetic") }
+            if b == inf {
+                if posp(a) || zerop(a) { return a }
+                if negp(a) { return b }
+            }
+            return .op("%", [a, b])
+        }
+
         // MARK: Display
 
         /// `math-format-value`: `math-compose-expr` in the flat language.
@@ -659,7 +941,12 @@ extension Calc {
 
         /// Left and right precedence, from `math-standard-ops` with
         /// `calc-multiplication-has-precedence`.
-        static let operators: [String: (Int, Int)] = ["+": (180, 181), "-": (180, 181), "*": (196, 195), "/": (190, 191), "^": (201, 200)]
+        static let operators: [String: (Int, Int)] = ["+": (180, 181), "-": (180, 181), "*": (196, 195), "/": (190, 191), "^": (201, 200),
+                                                      "%": (190, 191), "eq": (160, 161), "neq": (160, 161), "lt": (160, 161),
+                                                      "gt": (160, 161), "leq": (160, 161), "geq": (160, 161), "land": (110, 111),
+                                                      "lor": (100, 101)]
+
+        static let symbols = ["eq": "=", "neq": "!=", "lt": "<", "gt": ">", "leq": "<=", "geq": ">=", "land": "&&", "lor": "||"]
 
         static func compose(_ t: Term, _ prec: Int, _ floatFormat: FloatFormat, div: Bool = false) throws -> String {
             switch t {
@@ -668,6 +955,13 @@ extension Calc {
             case .op("neg", let args):
                 if prec > 197 { return "(" + (try compose(t, 0, floatFormat)) + ")" }
                 return "-" + (try compose(args[0], 197, floatFormat))
+            case .op("lnot", let args) where args.count == 1:
+                if prec > 1000 { return "(" + (try compose(t, 0, floatFormat)) + ")" }
+                return "!" + (try compose(args[0], 1000, floatFormat))
+            case .op("if", let args) where args.count == 3:
+                if prec > 90 { return "(" + (try compose(t, 0, floatFormat)) + ")" }
+                return try compose(args[0], 91, floatFormat) + " ? " + compose(args[1], 0, floatFormat) + " : "
+                    + compose(args[2], 90, floatFormat)
             case .op(let f, let args):
                 guard let (left, right) = operators[f], args.count == 2 else {
                     return f + "(" + (try args.map { try compose($0, 0, floatFormat) }).joined(separator: ", ") + ")"
@@ -687,7 +981,7 @@ extension Calc {
                 }
                 if f == "^" { return lhs + "^" + rhs }
                 if f == "/", let x = number(args[0]), isWhole(x), case .number(.int) = args[1] { return lhs + "/" + rhs }
-                return lhs + " " + f + " " + rhs
+                return lhs + " " + (symbols[f] ?? f) + " " + rhs
             }
         }
     }

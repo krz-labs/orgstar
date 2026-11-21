@@ -388,9 +388,15 @@ sums, differences, products, quotients and powers:
 - =inf=, =-inf= and =uinf= (infinity of unknown sign) follow Calc's rules: =inf - inf= is
   =nan=, =1/inf= is =0=, =2^inf= is =inf=.
 - =vsum=, =vprod=, =vmean= and =vcount= take vectors holding such formulas.
+- =sqrt=, =abs=, =exp=, =ln=, =min=, =max=, =vmax=, =vmin= and =%= simplify a formula
+  as Calc does, or keep it: =abs(-x)= is =abs(x)=, =sqrt(4 x)= is =2 sqrt(x)=,
+  =vmax($2..$4)= over 4, =absent= and 8 is =max(max(4, absent), 8)=, and =x % 3= stays.
+- Comparisons, =&&=, =||=, =!= and =if= on a formula give a formula unless Calc can
+  decide them: =x == x= is 1, =$2 > 10= with =TBD= in =$2= is =TBD > 10=, and
+  =if($2 > 10, 1, 0)= is =TBD > 10 ? 1 : 0=.
 
-Other functions of a formula, comparisons and conditions on one, and complex results
-need Emacs.
+Other functions of a formula, =sqrt=, =exp= and =ln= of one under the =S= flag, and
+complex results such as =sqrt(-inf)= need Emacs.
 
 ** Mode flags and formats
 

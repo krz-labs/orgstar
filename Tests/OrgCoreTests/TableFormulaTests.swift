@@ -97,6 +97,11 @@ struct TableFormulaTests {
         "| r | area | half |\n|---+------+------|\n| 3 | | |\n| x | | |\n#+TBLFM: $2=$1^2*pi::$3=$2/2;S\n",
         "| a | b | c | d |\n|---+---+---+---|\n| 1 | | n/a | |\n| 2 | 3 | | |\n#+TBLFM: $4=vsum($1..$3)::@2$2=$1 + inf;S\n",
         "| a | b | c |\n|---+---+---|\n| x | 1 | |\n| | 2 | |\n#+TBLFM: $3=$1*$2;E\n",
+        // Functions of text fields.
+        "| name | q1 | q2 | q3 | best | worst |\n|------+----+----+----+------+-------|\n| ann | 5 | 7 | 6 | | |\n| bob | 4 | absent | 8 | | |\n| cy | | 2.5 | 1 | | |\n#+TBLFM: $5=vmax($2..$4)::$6=vmin($2..$4)\n",
+        "| item | qty | status | flag |\n|------+-----+--------+------|\n| a | 12 | | |\n| b | n/a | | |\n| c | 3 | | |\n| d | TBD | | |\n#+TBLFM: $3=if($2 > 10, 1, 0)::$4=$2 >= 3 && $2 != 12\n",
+        "| x | abs | root | low | mod |\n|---+-----+------+-----+-----|\n| -4 | | | | |\n| TBD | | | | |\n| 9 | | | | |\n#+TBLFM: $2=abs($1)::$3=sqrt(abs($1))::$4=min($1, 5)::$5=$1 % 4\n",
+        "| a | b | same | e | ln |\n|---+---+------+---+----|\n| N/A | N/A | | | |\n| 1 | 2 | | | |\n| x | y | | | |\n#+TBLFM: $3=$1 == $2::$4=exp($1)::$5=ln($2)\n",
         // Calc rejects a number with two points.
         "| a | b |\n|---+---|\n| 21.11.2026 | |\n| 192.168.1.1 | |\n| 1.5 | |\n#+TBLFM: $2=$1+1\n",
         "| a | b |\n|---+---|\n| 21.11.2026 | |\n#+TBLFM: $2=$1+1;T\n",

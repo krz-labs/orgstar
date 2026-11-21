@@ -415,10 +415,61 @@ struct CalcTests {
         #expect(skipped.count < cases.count / 4, "\(skipped.count) of \(cases.count) refused")
     }
 
+    /// Functions of formulas Calc simplifies, or keeps with their arguments.
+    static let symbolicFunctions = [
+        "sqrt(x)", "sqrt(4 x)", "sqrt(2 x)", "sqrt(x/4)", "sqrt(4/x)", "sqrt(x^2)", "sqrt((-x)^2)", "sqrt(inf)", "sqrt(uinf)",
+        "sqrt(x)^2", "sqrt(x)*sqrt(x)", "sqrt(x)/sqrt(x)", "x sqrt(x)", "2 sqrt(x)", "sqrt(x) + sqrt(x)", "abs(x)", "abs(-x)",
+        "abs(-2 x)", "abs(abs(x))", "abs(x)^2", "abs(x) abs(x)", "abs(-inf)", "abs(x) - abs(x)", "exp(x)", "exp(-x)",
+        "exp(inf)", "exp(-inf)", "exp(x) exp(x)", "exp(x)/exp(x)", "ln(x)", "ln(e)", "ln(e^2)", "ln(inf)", "ln(-inf)",
+        "min(x,1)", "max(x,1)", "max(1,x,2)", "max(inf,1)", "max(inf,inf)", "max(x inf, 1)", "2 max(x,1)", "-max(x,1)",
+        "x<1", "x==x", "x==y", "-x==-1", "0 < -x", "-x < -1", "x<=x", "x != x", "x != y", "1 + (x<1)", "eq(x,y)", "lt(x,1)",
+        "sqrt(x) == x^0.5", "exp(x) == e^x", "abs(x) < 0", "!x", "!(x<1)", "!(x+1)", "lnot(x>1)", "x && 1", "x || 0",
+        "x<1 && y", "x || y", "if(x,1,2)", "if(x, -3, 2.50)", "if(x, -y, 1:2)", "if(x<1,x,1)", "if(x,1,2)+1",
+        "if(inf,1,2)", "if(1,x,y)", "if(0,x,y)", "if(1,2,ln(0))", "x%2", "x%x", "(2 x)%2", "0%x", "x%0", "-1%inf",
+        "2%inf", "x%inf", "x % y % z", "(x % y) * 2", "-x % y", "vmax([x,1])", "vmin([x,1,2])", "vmax([1,2,x])",
+        "vmax([x,y],[1,2])", "vmax([x,1.23456789012345])", "vmin([inf,x])", "vmax([N/A,3,5])", "vmin([2,TBD,1])",
+    ]
+
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
+    func symbolicFunctionsMatchCalc() throws {
+        var cases = Self.symbolicFunctions.map { ($0, "(float 8)") }
+        for format in ["(fix 2)", "(sci 3)"] {
+            for e in ["sqrt(2 x)", "max(x, 2.5)", "if(x, 1.5, 2)", "x % 0.5", "vmin([x, 1:3, 0.25])"] { cases.append((e, format)) }
+        }
+        // Generated: the functions applied to formulas of a variable or two and numbers, and
+        // their results combined again. What is refused is left to Emacs.
+        var generator = SystemRandomNumberGenerator()
+        let leaves = ["x", "x", "y", "1", "2", "3", "0", "0.5", "2.5", "1:3", "-1", "-2", "4", "inf", "e", "a b", "-inf", "uinf", "nan", "0.", "1.5e3", "-x", "2 x", "pi"]
+        let unary = ["sqrt", "abs", "exp", "ln", "!"]
+        let binary = ["min", "max", "%", "<", ">", "<=", ">=", "==", "!=", "&&", "||", "+", "-", "*", "/", "^"]
+        func leaf() -> String { leaves.randomElement(using: &generator)! }
+        func expression(_ depth: Int) -> String {
+            if depth == 0 || Int.random(in: 0..<4, using: &generator) == 0 { return leaf() }
+            switch Int.random(in: 0..<10, using: &generator) {
+            case 0..<4:
+                let f = unary.randomElement(using: &generator)!
+                return f == "!" ? "!(\(expression(depth - 1)))" : "\(f)(\(expression(depth - 1)))"
+            case 4..<8:
+                let f = binary.randomElement(using: &generator)!
+                let (a, b) = (expression(depth - 1), f == "^" ? ["2", "3", "-1", "0.5", "x"].randomElement(using: &generator)! : expression(depth - 1))
+                return f.first!.isLetter ? "\(f)(\(a), \(b))" : "(\(a)) \(f) (\(b))"
+            case 8:
+                return "if(\(expression(depth - 1)), \(leaf()), \(leaf()))"
+            default:
+                let items = (0..<Int.random(in: 1...3, using: &generator)).map { _ in expression(depth - 1) }
+                return "\(["vmax", "vmin"].randomElement(using: &generator)!)([\(items.joined(separator: ", "))])"
+            }
+        }
+        for _ in 0..<4000 { cases.append((expression(4), "(float 8)")) }
+        let skipped = try Self.compare(cases)
+        #expect(Set(skipped).intersection(Self.symbolicFunctions) == [], "\(skipped)")
+        #expect(skipped.count < cases.count / 3, "\(skipped.count) of \(cases.count) refused")
+    }
+
     @Test func unsupported() throws {
         for e in ["vsum([5 kg])", "vsum([1 2])", "vcount([N A])", "vsum([2 3 4])", "vsum([1 1/2])", "vmin([3 4])",
                   "vcount([f (x)])", "vcount([1 [2]])", "vcount([(1) 2])", "vcount([1 sin (2)])", "1.2.3e5",
-                  "sqrt(x)", "vmax([x,1])", "vsum(x,1)", "x<1", "if(x,1,2)", "x%2", "x_1", "x'", "Holidays+1", "café+1",
+                  "sqrt(-inf)", "vmax([x,1],2)", "!!x", "if(x,sqrt(4),1)", "eq(x,y,z)", "vsum(x,1)", "x_1", "x'", "Holidays+1", "café+1",
                   "x+<2026-10-05 Mon>", "[x,1]", "vcount([x -1])", "(1/0)+1", "vmean([])", "(-8)^(1/3)", "vvar([5])", "1<2<3",
                   "vmax([])", "vmin([])", "vrms([1,2])", "vmeane([1,2])", "vcov([1,2],[3])", "vcov([1],[2])",
                   "fdiv(7.5,2)", "fdiv(7,0)", "perm(5,6)", "log(8,1)", "log(0,2)", "log(-8,2)", "arctanh(1)", "arccosh(0.5)",
@@ -458,7 +509,7 @@ struct CalcTests {
         for e in ["x^2/x", "x*x/x", "inf+(1/0)", "x/2", "abs(x)", "x%2", "x*x", "x x", "x*y*x"] {
             #expect(throws: Calc.Unsupported.self, "\(e)") { try Calc.evaluate(e, numeric: true) }
         }
-        for e in ["-x", "x*2", "2 x", "x*y", "x+x", "x+2-2", "nan"] {
+        for e in ["-x", "x*2", "2 x", "x*y", "x+x", "x+2-2", "nan", "x<1", "x && 1", "!x"] {
             #expect(throws: Calc.Failure("Number expected"), "\(e)") { try Calc.evaluate(e, numeric: true) }
         }
         #expect(try Calc.evaluate("x/x", numeric: true) == "1")
@@ -469,7 +520,7 @@ struct CalcTests {
         }
         var symbolic = Calc.Modes()
         symbolic.symbolic = true
-        for e in ["sqrt(2)", "2^0.5", "ln(2)", "x^0.5"] {
+        for e in ["sqrt(2)", "2^0.5", "ln(2)", "x^0.5", "sqrt(x)", "exp(x)"] {
             #expect(throws: Calc.Unsupported.self, "\(e)") { try Calc.evaluate(e, modes: symbolic) }
         }
     }
@@ -477,7 +528,7 @@ struct CalcTests {
     /// `;S`: what is computed matches; functions and powers that may not be exact are refused.
     @Test(.enabled(if: ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
     func symbolicModeMatchesCalc() throws {
-        let cases = (Self.fixed + Self.functions + Self.symbolic).map { ($0, "(float 8)") }
+        let cases = (Self.fixed + Self.functions + Self.symbolic + Self.symbolicFunctions).map { ($0, "(float 8)") }
         let skipped = try Self.compare(cases, symbolic: true)
         #expect(Set(skipped).isDisjoint(with: ["1/3", "x+5", "1/0", "2 pi", "vmean([x,2,3])", "sin(30)", "x^2", "round(2.5)"]))
         #expect(skipped.count < cases.count / 3, "\(skipped.count) of \(cases.count) refused")

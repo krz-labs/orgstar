@@ -1131,6 +1131,8 @@ public enum Calc {
 
         mutating func not() throws -> Node {
             if peek() == "!", i + 1 >= chars.count || chars[i + 1] != "=" {
+                // Calc reads `!!` as one token.
+                if i + 1 < chars.count, chars[i + 1] == "!" { throw Unsupported("formula syntax") }
                 i += 1
                 return .unary("!", try not())
             }
@@ -1418,19 +1420,31 @@ public enum Calc {
             switch node {
             case .number(let v): return v
             case .vector(let items): return .vector(try items.map(eval))
-            case .unary("!", let operand): return .int(try truth(try eval(operand)) ? 0 : 1)
+            case .unary("!", let operand):
+                let a = try eval(operand)
+                if isSymbolic(a) || a == .nan { return value(try Symbolic.function("lnot", [try term(a)])) }
+                return .int(try truth(a) ? 0 : 1)
             case .unary(_, let operand):
                 let a = try eval(operand)
                 do { return try negate(a) } catch is Rejected { return .symbolic(.op("neg", [try term(a)])) }
             case .binary(let op, let l, let r):
                 let (a, b) = (try eval(l), try eval(r))
+                if isSymbolic(a, b) || a == .nan || b == .nan, let name = Self.symbolicOperators[op] {
+                    return value(try Symbolic.function(name, [try term(a), try term(b)]))
+                }
                 do {
                     return try binary(op, a, b)
                 } catch is Rejected {
                     // `math-normalize` keeps the operation, its arguments evaluated.
-                    guard let name = ["+": "+", "-": "-", "*": "*", "/": "/", "^": "^"][op] else { throw Unsupported("division by zero") }
+                    guard let name = ["+": "+", "-": "-", "*": "*", "/": "/", "^": "^", "%": "%"][op] else { throw Unsupported("division by zero") }
                     return .symbolic(.op(name, [try term(a), try term(b)]))
                 }
+            case .call("if", let args) where args.count == 3:
+                let c = try eval(args[0])
+                // Calc keeps the branches of a formula's condition as written, and evaluates
+                // only the branch a number's condition picks.
+                if isSymbolic(c) || c == .nan { return .symbolic(.op("if", [try term(c), try literal(args[1]), try literal(args[2])])) }
+                return try eval(try truth(c) ? args[1] : args[2])
             case .call(let name, let args):
                 let values = try args.map(eval)
                 // In symbolic mode Calc keeps these unevaluated when the result isn't exact,
@@ -1438,8 +1452,21 @@ public enum Calc {
                 if modes.symbolic, Self.inexact.contains(name) || (!modes.degrees && ["sin", "cos", "tan"].contains(name)) {
                     throw Unsupported("function \(name) in symbolic mode")
                 }
-                if values.contains(where: Self.hasSymbol) {
+                // `nan` is a formula to these functions.
+                if values.contains(where: Self.hasSymbol)
+                    || ((Symbolic.functions.contains(name) || name == "vmax" || name == "vmin") && values.contains(where: Self.hasNaN)) {
                     // Calc leaves most functions of a formula alone, and simplifies some.
+                    let isVector = { (v: Value) in if case .vector = v { true } else { false } }
+                    if Symbolic.functions.contains(name), !values.contains(where: isVector) {
+                        return value(try Symbolic.function(name, try values.map(term)))
+                    }
+                    // `math-reduce-many-vecs`: `max` of the elements in turn.
+                    if name == "vmax" || name == "vmin", values.allSatisfy(isVector) {
+                        let items = try elements(values).map(term)
+                        return try extra(2) {
+                            value(try items.dropFirst().reduce(items[0]) { try Symbolic.function(name == "vmax" ? "max" : "min", [$0, $1]) })
+                        }
+                    }
                     guard ["vsum", "vprod", "vmean", "vcount"].contains(name),
                           values.allSatisfy({ if case .vector = $0 { true } else { !Self.hasSymbol($0) } }) else {
                         throw Unsupported("function \(name) of a formula")
@@ -1455,9 +1482,30 @@ public enum Calc {
             }
         }
 
+        static let symbolicOperators: [Character: String] = ["=": "eq", "≠": "neq", "<": "lt", ">": "gt", "≤": "leq", "≥": "geq",
+                                                              "&": "land", "|": "lor", "%": "%"]
+
+        /// A branch of `if` as Calc reads it, unevaluated.
+        func literal(_ node: Node) throws -> Term {
+            switch node {
+            case .number, .variable: return try term(try eval(node))
+            case .unary("-", let a): return .op("neg", [try literal(a)])
+            case .binary(let op, let a, let b) where "+-*/^".contains(op): return .op(String(op), [try literal(a), try literal(b)])
+            default: throw Unsupported("condition")
+            }
+        }
+
         static let inexact: Set<String> = ["sqrt", "exp", "ln", "log10", "log", "vsdev", "vpsdev", "vgmean", "vhmean", "vcorr",
                                            "vcov", "vpcov", "agmean", "pow", "nroot", "hypot", "sinh", "cosh", "tanh", "arcsinh",
                                            "arccosh", "arctanh", "arcsin", "arccos", "arctan", "arctan2", "fact", "dfact"]
+
+        static func hasNaN(_ v: Value) -> Bool {
+            switch v {
+            case .nan: true
+            case .vector(let items): items.contains(where: hasNaN)
+            default: false
+            }
+        }
 
         static func hasSymbol(_ v: Value) -> Bool {
             switch v {
@@ -1505,8 +1553,8 @@ public enum Calc {
 
         /// `math-mod`: the remainder with the divisor's sign.
         func mod(_ a: Value, _ b: Value) throws -> Value {
-            if isZero(a) { return a }
-            if isZero(b) { throw Unsupported("division by zero") }
+            if isZero(a), (try? sign(b)) != nil { return a }
+            if isZero(b), (try? sign(a)) != nil { throw Rejected() }
             // `math-imod` only for natural numbers; otherwise the quotient is a float without F.
             if case .int(let x) = a, case .int(let y) = b, x >= 0, y > 0 { return .int(x % y) }
             let q = try floorOf(try divide(a, b, fractions: modes.preferFractions))
@@ -1626,9 +1674,6 @@ public enum Calc {
                 try items.sort { try compare($0, $1) < 0 }
                 if items.count % 2 == 1 { return items[items.count / 2] }
                 return try divide(try add(items[items.count / 2 - 1], items[items.count / 2]), .int(2), fractions: modes.preferFractions)
-            case "if":
-                guard args.count == 3 else { throw Unsupported("arguments") }
-                return try truth(args[0]) ? args[1] : args[2]
             case "vvar", "vpvar", "vsdev", "vpsdev":
                 let variance = try covariance(try elements(args), population: name == "vpvar" || name == "vpsdev")
                 return name.hasSuffix("sdev") ? try squareRoot(variance) : variance

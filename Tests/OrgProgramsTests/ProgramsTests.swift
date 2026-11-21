@@ -23,7 +23,7 @@ struct EmacsFallbackTests {
     @Test(.enabled(if: EmacsRunner.executable() != nil && ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
     func recalculatesTablesNativeCodeCannot() async throws {
         let notes = try Folder()
-        let file = try notes.write("t.org", "* Prices\n| item | n | twice |\n|------+---+-------|\n| x | a | |\n| y | 2 | |\n#+TBLFM: $3=sqrt($2)\n")
+        let file = try notes.write("t.org", "* Prices\n| item | n | twice |\n|------+---+-------|\n| x | a | |\n| y | 2 | |\n#+TBLFM: $3=floor($2)\n")
         let session = DocumentSession(recovery: FileRecoveryStore(directory: notes.url.appendingPathComponent(".r")))
         session.open(file.path)
         let step = session.perform(TableRecalculate(all: true), path: file.path, at: 50, expect: nil)
@@ -31,11 +31,11 @@ struct EmacsFallbackTests {
             Issue.record("\(step)")
             return
         }
-        #expect(reason == "function sqrt of a formula")
+        #expect(reason == "function floor of a formula")
         #expect(!lisp)
         let message = await session.recalculateInEmacs(table: table, point: point, form: form)
         #expect(message == "Recalculated in Emacs")
-        #expect(session.document?.text == "* Prices\n| item | n | twice     |\n|------+---+-----------|\n| x    | a | sqrt(a)   |\n| y    | 2 | 1.4142136 |\n#+TBLFM: $3=sqrt($2)\n")
+        #expect(session.document?.text == "* Prices\n| item | n | twice    |\n|------+---+----------|\n| x    | a | floor(a) |\n| y    | 2 | 2        |\n#+TBLFM: $3=floor($2)\n")
     }
 
     /// `elisp:` links run in Emacs, in a copy of the file with point at the caret; in
@@ -96,7 +96,7 @@ struct EmacsFallbackTests {
     @Test(.enabled(if: EmacsRunner.executable() != nil && ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
     func cancelingARecalculationLeavesTheTable() async throws {
         let notes = try Folder()
-        let text = "| n | twice |\n|---+-------|\n| a |       |\n#+TBLFM: $2=sqrt($1)\n"
+        let text = "| n | twice |\n|---+-------|\n| a |       |\n#+TBLFM: $2=floor($1)\n"
         let file = try notes.write("t.org", text)
         let session = DocumentSession(recovery: FileRecoveryStore(directory: notes.url.appendingPathComponent(".r")))
         session.open(file.path)
