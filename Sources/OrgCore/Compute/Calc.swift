@@ -222,6 +222,9 @@ public enum Calc {
             m /= 10
             e += 1
         }
+        // Calc signals `math-overflow` and `math-underflow` here and leaves the formula alone.
+        let magnitude = e + digits(m) - 1
+        if magnitude >= 4_000_000 || magnitude <= -4_000_000 { throw Unsupported("number size") }
         guard let i = Int(exactly: m) else { throw Unsupported("calc precision") }
         return .float(i, e)
     }
@@ -1503,12 +1506,10 @@ public enum Calc {
         /// `math-mod`: the remainder with the divisor's sign.
         func mod(_ a: Value, _ b: Value) throws -> Value {
             if isZero(a) { return a }
-            if case .int(let x) = a, case .int(let y) = b {
-                guard y != 0 else { throw Unsupported("division by zero") }
-                let r = x % y
-                return .int(r != 0 && (r < 0) != (y < 0) ? r + y : r)
-            }
-            let q = try floorOf(try divide(a, b))
+            if isZero(b) { throw Unsupported("division by zero") }
+            // `math-imod` only for natural numbers; otherwise the quotient is a float without F.
+            if case .int(let x) = a, case .int(let y) = b, x >= 0, y > 0 { return .int(x % y) }
+            let q = try floorOf(try divide(a, b, fractions: modes.preferFractions))
             return try subtract(a, try multiply(b, q))
         }
 
@@ -1524,6 +1525,7 @@ public enum Calc {
 
         func floorOf(_ v: Value) throws -> Value {
             if case .int = v { return v }
+            if case .frac(let n, let d) = v { return .int(n / d - (n % d < 0 ? 1 : 0)) }
             guard let i = Int(exactly: try double(v).rounded(.down)) else { throw Unsupported("integer size") }
             return .int(i)
         }
@@ -1710,12 +1712,13 @@ public enum Calc {
                 let x = try one(args)
                 if x == .nan { return x }
                 if case .int(let i) = x, modes.degrees ? i % (name == "tan" ? 180 : 90) == 0 : i == 0 {
-                    let quarter = ((i / 90) % 4 + 4) % 4
-                    switch name {
-                    case "sin": return .int([0, 1, 0, -1][quarter])
-                    case "cos": return .int([1, 0, -1, 0][quarter])
-                    default: return .int(0)
+                    if name == "tan" { return .int(0) }
+                    // `(aref [0 1 0 -1] (math-mod (/ x 90) 4))`: a float quotient in math-mod can put
+                    // the index out of range, and Calc then leaves the call alone.
+                    guard case .int(let quarter) = try mod(.int(i / 90), .int(4)), (0...3).contains(quarter) else {
+                        throw Unsupported("number size")
                     }
+                    return .int((name == "sin" ? [0, 1, 0, -1] : [1, 0, -1, 0])[quarter])
                 }
                 return try extra(2) {
                     let r = try float(x)

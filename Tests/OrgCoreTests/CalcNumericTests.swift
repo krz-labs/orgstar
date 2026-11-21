@@ -39,7 +39,8 @@ struct CalcNumericTests {
         for precision in [3, 6, 8, 12, 14, 15, 16, 17, 18] {
             for radians in [false, true] {
                 var cases: [(String, String)] = ["sin(nan)", "cos(nan)", "arctan(nan)", "tan(180)", "tan(-360)", "tan(0)", "arcsin(0)",
-                                                 "arccos(1)", "arccos(0)", "arcsin(-1)", "arctan(1)", "sqrt(2)", "sqrt(1e-9)"].map { ($0, "(float 0)") }
+                                                 "arccos(1)", "arccos(0)", "arcsin(-1)", "arctan(1)", "sqrt(2)", "sqrt(1e-9)", "sin(-74250)", "cos(-74250)",
+                                                 "sin(-360000000000090)", "cos(-90*4000000000001)", "tan(-360000000000180)"].map { ($0, "(float 0)") }
                 for _ in 0..<500 {
                     let f = ["sin", "cos", "tan", "arcsin", "arccos", "arctan", "arctan2", "sinh", "cosh", "tanh", "sqrt"].randomElement(using: &generator)!
                     let x = switch f {
@@ -113,6 +114,30 @@ struct CalcNumericTests {
             }
         }
         for fractions in [true, false] { _ = try CalcTests.compare(cases, fractions: fractions) }
+    }
+
+    /// `math-mod` divides as a float, without F, unless both operands are natural numbers.
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
+    func modOfNegativeIntegersMatchesCalc() throws {
+        let cases = ["(-74251)%4", "mod(74251,-4)", "mod(-1234567890123457,4)", "(-1234567890123457)%7", "mod(-7,2)", "mod(7,-2)",
+                     "(-7)%(-2)", "mod(1234567890123457,4)", "(-1234567890123457)\\4", "mod(-7:2,2)", "mod(-1:3,-1:7)"].map { ($0, "(float 0)") }
+        for precision in [3, 12] {
+            for fractions in [true, false] {
+                let skipped = try CalcTests.compare(cases, precision: precision, fractions: fractions)
+                #expect(skipped == [], "p\(precision) \(skipped)")
+            }
+        }
+    }
+
+    /// Calc's `math-overflow` and `math-underflow` past an exponent of 4,000,000 leave the formula alone.
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
+    func floatOverflowIsRefusedAsCalcDoes() throws {
+        let refused = ["2.5^123456789012", "pow(-1.5,123456789012)", "pow(1e20,123456789012)", "0.4^123456789012", "2.5^(-123456789012)"]
+        let cases = (refused + ["2.5^1000000", "0.4^1000000"]).map { ($0, "(float 0)") }
+        for fractions in [true, false] {
+            let skipped = try CalcTests.compare(cases, fractions: fractions)
+            #expect(skipped == refused)
+        }
     }
 
     /// Vector results, with and without `N`, zero with no decimal places, and fractions.

@@ -686,8 +686,8 @@ what it was and the Mac recalculates the table in Emacs instead. This happens fo
   holding text;
 - Calc functions not listed above, intervals such as =[1..5]=, precisions beyond those
   given under /Mode flags and formats/, parts of the =S= flag, and the =u= flag;
-- complex results, vectors of anything but numbers, and numbers too large for 64-bit
-  integers;
+- complex results, vectors of anything but numbers, numbers too large for 64-bit
+  integers, and decimal numbers past Calc's limit of 10^±4000000;
 - Lisp functions not listed above.
 
 The echo area shows =Recalculating in Emacs (reason)…=, then =Recalculated in Emacs=.
