@@ -202,7 +202,7 @@ public struct DocumentModel: Sendable {
     }
 
     private func linkTarget(_ node: SyntaxNode) -> String {
-        if let path = node.tokens.first(where: { $0.kind == .linkPath }) { return path.text }
+        if let path = node.linkPath { return path }
         let text = node.text
         if text.hasPrefix("<"), text.hasSuffix(">") { return String(text.dropFirst().dropLast()) }
         return text

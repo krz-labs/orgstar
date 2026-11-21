@@ -1525,7 +1525,7 @@ final class LaTeXRenderer {
     // MARK: Links
 
     private func linkTarget(_ node: SyntaxNode) -> (type: String, path: String) {
-        var raw = node.tokens.first { $0.kind == .linkPath }?.text ?? node.text
+        var raw = node.linkPath ?? node.text
         if node.tokens.first(where: { $0.kind == .linkPath }) == nil, raw.hasPrefix("<"), raw.hasSuffix(">") {
             raw = String(raw.dropFirst().dropLast())
         }

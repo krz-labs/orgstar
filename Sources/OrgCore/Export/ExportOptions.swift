@@ -205,7 +205,7 @@ public enum ExportPreprocess {
                     let rebased = rebasingLinks(description.text, from: directory, to: includer, plain: true)
                     if rebased != description.text { edits.append((description.range, rebased)) }
                 }
-                if let path = node.tokens.first(where: { $0.kind == .linkPath }), let rebased = rebasedPath(path.text, from: directory, to: includer, bracket: true) {
+                if let path = node.tokens.first(where: { $0.kind == .linkPath }), let text = node.linkPath, let rebased = rebasedPath(text, from: directory, to: includer, bracket: true) {
                     edits.append((path.range, rebased))
                 }
             } else if whole.hasPrefix("<"), whole.hasSuffix(">") {

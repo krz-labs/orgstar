@@ -1244,7 +1244,7 @@ final class ASCIIRenderer {
         if node.firstChild(.linkDescription)?.descendants().contains(where: { $0.kind == .link }) == true {
             throw Unsupported(reason: "Links in link descriptions")
         }
-        let pathToken = node.tokens.first { $0.kind == .linkPath }?.text
+        let pathToken = node.linkPath
         var raw = pathToken ?? node.text
         if pathToken == nil, raw.hasPrefix("<"), raw.hasSuffix(">") { raw = String(raw.dropFirst().dropLast()) }
         var description: String? = node.firstChild(.linkDescription) == nil ? nil : try transcode(children)

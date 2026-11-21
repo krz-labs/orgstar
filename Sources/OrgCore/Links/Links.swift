@@ -136,8 +136,8 @@ public enum Links {
         guard let node = found else { return nil }
         let whole = node.text
         var link: OrgLink
-        if whole.hasPrefix("[["), let path = node.tokens.first(where: { $0.kind == .linkPath }) {
-            link = parse(bracket: path.text, abbreviations: abbreviations(in: tree.settings.setupKeywords + text))
+        if whole.hasPrefix("[["), let path = node.linkPath {
+            link = parse(bracket: path, abbreviations: abbreviations(in: tree.settings.setupKeywords + text))
         } else if whole.hasPrefix("<") && whole.hasSuffix(">") {
             link = parse(plain: String(whole.dropFirst().dropLast()))
         } else if tree.settings.radioTargets.contains(where: { words($0) == words(whole) }) {

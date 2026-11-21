@@ -1026,7 +1026,7 @@ final class ODTRenderer {
 
     /// A bracket link's path, or a plain or angle `file:` link's.
     static func linkPath(_ node: SyntaxNode) -> String? {
-        if let token = node.tokens.first(where: { $0.kind == .linkPath }) { return token.text }
+        if let path = node.linkPath { return path }
         var text = node.text
         if text.hasPrefix("<"), text.hasSuffix(">") { text = String(text.dropFirst().dropLast()) }
         return text.hasPrefix("file:") ? text : nil

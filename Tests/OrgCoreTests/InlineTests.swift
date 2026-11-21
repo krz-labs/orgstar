@@ -46,6 +46,12 @@ struct InlineTests {
         #expect(link.children.map(\.kind) == [.linkDescription])
     }
 
+    /// `org-element-link-parser`: a path may run onto the next line, read with its line break as a space.
+    @Test func linkPathsSpanLines() {
+        let links = OrgParser.parse("[[elisp:(+ 1\n 2)]] and [[a  \n\tb][c]]\n\n[[x\n\ny]]\n").root.descendants().filter { $0.kind == .link }
+        #expect(links.map(\.linkPath) == ["elisp:(+ 1 2)", "a b"])
+    }
+
     @Test func noLinksInsideLinkDescriptions() {
         let link = OrgParser.parse("[[a][see https://b.c]]\n").root.descendants().first { $0.kind == .link }!
         #expect(link.descendants().filter { $0.kind == .link }.count == 1)

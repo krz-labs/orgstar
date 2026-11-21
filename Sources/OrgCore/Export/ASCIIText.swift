@@ -461,7 +461,7 @@ struct ASCIIText {
 
     func link(_ node: SyntaxNode) -> String {
         let description = node.firstChild(.linkDescription).map { inline($0) }
-        guard let path = node.tokens.first(where: { $0.kind == .linkPath })?.text else {
+        guard let path = node.linkPath else {
             var target = node.text
             if target.hasPrefix("<"), target.hasSuffix(">") { target = String(target.dropFirst().dropLast()) }
             // A radio link is its text.

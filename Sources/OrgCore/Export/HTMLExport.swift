@@ -856,7 +856,7 @@ final class HTMLRenderer {
     static let imageExtensions: Set<String> = ["png", "jpg", "jpeg", "gif", "svg", "webp", "bmp", "tif", "tiff", "avif"]
 
     private func link(_ node: SyntaxNode) -> String {
-        let path = node.tokens.first { $0.kind == .linkPath }?.text
+        let path = node.linkPath
         let description = node.firstChild(.linkDescription)
         guard let path else {
             // A radio link goes to its target.

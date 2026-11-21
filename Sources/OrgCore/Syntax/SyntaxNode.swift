@@ -103,6 +103,12 @@ public final class SyntaxNode: Sendable {
     public func descendants() -> [SyntaxNode] {
         [self] + children.flatMap { $0.descendants() }
     }
+
+    /// A bracket link's path as `org-element-link-parser` reads it: each run of blanks
+    /// holding a newline made one space.
+    var linkPath: String? {
+        tokens.first { $0.kind == .linkPath }.map { $0.text.replacing(/[ \t]*\n[ \t]*/, with: " ") }
+    }
 }
 
 public struct SyntaxToken: Sendable, Equatable {

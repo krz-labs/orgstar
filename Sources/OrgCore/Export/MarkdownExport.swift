@@ -358,7 +358,7 @@ final class MarkdownRenderer {
     }
 
     private func link(_ node: SyntaxNode) -> String {
-        guard let path = node.tokens.first(where: { $0.kind == .linkPath })?.text else {
+        guard let path = node.linkPath else {
             // A radio link is its text.
             if !node.text.hasPrefix("<"), !node.text.contains(":") { return node.text }
             var target = node.text

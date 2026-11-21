@@ -304,7 +304,7 @@ struct InlineScanner {
         guard i + 1 < limit, chars[i + 1] == "[" else { return nil }
         var j = i + 2
         while j < limit, chars[j] != "]" {
-            if chars[j] == "[" || isNewline(chars[j]) { return nil }
+            if chars[j] == "[" { return nil }
             if chars[j] == "\\", j + 1 < limit { j += 1 }
             j += 1
         }
