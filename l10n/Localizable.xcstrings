@@ -298,6 +298,40 @@
         }
       }
     },
+    "%@ in a buffer": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ in einem Puffer"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ en un búfer"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dans un tampon"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "バッファ内の%@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ em um buffer"
+          }
+        }
+      }
+    },
     "%@ isn't available on iPhone and iPad.": {
       "comment": "A command that runs only on the Mac",
       "localizations": {
@@ -540,6 +574,76 @@
         }
       }
     },
+    "%@ on a closure": {
+      "comment": "Why a table needs Emacs: a Lisp function that looks inside a closure",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ auf einer Closure"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ sobre una clausura"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ sur une fermeture"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クロージャに対する%@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ em uma closure"
+          }
+        }
+      }
+    },
+    "%@ on a list another value shares": {
+      "comment": "Why a table needs Emacs: a Lisp function that changes a shared list",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ auf einer Liste, die ein anderer Wert mitbenutzt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ sobre una lista compartida con otro valor"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ sur une liste partagée avec une autre valeur"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ほかの値と共有されているリストに対する%@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ em uma lista compartilhada com outro valor"
+          }
+        }
+      }
+    },
     "%@ on a place": {
       "comment": "Why a table needs Emacs: a Lisp function used on a variable",
       "localizations": {
@@ -605,6 +709,46 @@
           "stringUnit": {
             "state": "translated",
             "value": "Estado %@"
+          }
+        }
+      }
+    },
+    "%@ with %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ mit %@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ with %2$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ con %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ avec %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@（%@を指定）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ com %@"
           }
         }
       }
@@ -2515,6 +2659,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Agenda"
+          }
+        }
+      }
+    },
+    "Agenda Files to iCalendar (orgstar+)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agenda-Dateien nach iCalendar (orgstar+)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archivos de agenda a iCalendar (orgstar+)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fichiers d'agenda vers iCalendar (orgstar+)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アジェンダファイルをiCalendarに書き出す（orgstar+）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arquivos da Agenda para iCalendar (orgstar+)"
           }
         }
       }
@@ -6087,6 +6265,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Escolha a pasta para o config.toml e os outros arquivos de configuração do orgstar."
+          }
+        }
+      }
+    },
+    "Choose the folder on this device for each one. Folders not chosen aren't added.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle für jeden den Ordner auf diesem Gerät. Nicht gewählte Ordner werden nicht hinzugefügt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige la carpeta de este dispositivo para cada una. Las carpetas no elegidas no se añaden."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez le dossier sur cet appareil pour chacun d'eux. Les dossiers non choisis ne sont pas ajoutés."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "それぞれについて、このデバイス上のフォルダを選択してください。選択しなかったフォルダは追加されません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escolha a pasta neste dispositivo para cada uma. As pastas não escolhidas não são adicionadas."
           }
         }
       }
@@ -12713,6 +12925,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pastas"
+          }
+        }
+      }
+    },
+    "Folders on this device": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ordner auf diesem Gerät"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Carpetas en este dispositivo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dossiers sur cet appareil"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このデバイス上のフォルダ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pastas neste dispositivo"
           }
         }
       }
@@ -33656,6 +33902,40 @@
     "[%@]": {
       "shouldTranslate": false
     },
+    "a closure as a list": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "eine Closure als Liste"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "una clausura como lista"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "une fermeture traitée comme une liste"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リストとしてのクロージャ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "uma closure como lista"
+          }
+        }
+      }
+    },
     "agenda.later": {
       "comment": "Shows the next days in the agenda",
       "localizations": {
@@ -33806,6 +34086,74 @@
         }
       }
     },
+    "capitalize past ASCII": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "capitalize bei Zeichen außerhalb von ASCII"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "capitalize con caracteres fuera de ASCII"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "capitalize sur des caractères non ASCII"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ASCII以外の文字に対するcapitalize"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "capitalize em caracteres fora do ASCII"
+          }
+        }
+      }
+    },
+    "case folding past ASCII": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ignorieren der Groß-/Kleinschreibung bei Zeichen außerhalb von ASCII"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "comparación sin distinguir mayúsculas con caracteres fuera de ASCII"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "insensibilité à la casse sur des caractères non ASCII"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ASCII以外の文字での大文字・小文字を区別しない照合"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "comparação sem distinção entre maiúsculas e minúsculas em caracteres fora do ASCII"
+          }
+        }
+      }
+    },
     "chained comparison": {
       "localizations": {
         "de": {
@@ -33836,6 +34184,142 @@
           "stringUnit": {
             "state": "translated",
             "value": "comparação encadeada"
+          }
+        }
+      }
+    },
+    "cl-loop %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cl-loop %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cl-loop %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cl-loop %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cl-loop %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cl-loop %@"
+          }
+        }
+      }
+    },
+    "cl-loop destructuring": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cl-loop mit Destrukturierung"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "desestructuración en cl-loop"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "déstructuration dans cl-loop"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cl-loopの分割代入"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "desestruturação em cl-loop"
+          }
+        }
+      }
+    },
+    "cl-loop with collect and sum": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cl-loop mit collect und sum"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cl-loop con collect y sum"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cl-loop avec collect et sum"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "collectとsumを併用したcl-loop"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cl-loop com collect e sum"
+          }
+        }
+      }
+    },
+    "cl-loop without for": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cl-loop ohne for"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cl-loop sin for"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cl-loop sans for"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "forのないcl-loop"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cl-loop sem for"
           }
         }
       }
@@ -33942,6 +34426,40 @@
         }
       }
     },
+    "condition-case on %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "condition-case für %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "condition-case sobre %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "condition-case sur %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@に対するcondition-case"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "condition-case em %@"
+          }
+        }
+      }
+    },
     "config.toml": {
       "shouldTranslate": false
     },
@@ -33975,6 +34493,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "constantes que se referem a si mesmas"
+          }
+        }
+      }
+    },
+    "date %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Datum %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "fecha %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "date %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日付 %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "data %@"
           }
         }
       }
@@ -34078,6 +34630,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "sintaxe de data"
+          }
+        }
+      }
+    },
+    "date-to-time of %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "date-to-time von %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "date-to-time de %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "date-to-time de %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@のdate-to-time"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "date-to-time de %@"
           }
         }
       }
@@ -34218,6 +34804,74 @@
         }
       }
     },
+    "float times": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeitwerte als Gleitkommazahlen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "valores de tiempo en coma flotante"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "valeurs temporelles en virgule flottante"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "浮動小数点数の時刻値"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "valores de tempo em ponto flutuante"
+          }
+        }
+      }
+    },
+    "float-time of picoseconds": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "float-time von Pikosekunden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "float-time de picosegundos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "float-time de picosecondes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ピコ秒単位の時刻に対するfloat-time"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "float-time de picossegundos"
+          }
+        }
+      }
+    },
     "format flag %@": {
       "comment": "Why a table needs Emacs: a format specifier flag",
       "localizations": {
@@ -34249,6 +34903,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "flag de formato %@"
+          }
+        }
+      }
+    },
+    "format-time-string %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "format-time-string %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "format-time-string %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "format-time-string %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "format-time-string %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "format-time-string %@"
+          }
+        }
+      }
+    },
+    "format-time-string zone %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "format-time-string mit Zeitzone %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "format-time-string con zona horaria %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "fuseau horaire %@ dans format-time-string"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "format-time-stringのタイムゾーン %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "format-time-string com fuso horário %@"
           }
         }
       }
@@ -34458,6 +35180,40 @@
         }
       }
     },
+    "let-alist %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "let-alist %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "let-alist %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "let-alist %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "let-alist %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "let-alist %@"
+          }
+        }
+      }
+    },
     "logarithm domain": {
       "localizations": {
         "de": {
@@ -34528,6 +35284,7 @@
     },
     "non-numeric field %@": {
       "comment": "Why a table needs Emacs",
+      "extractionState": "stale",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -34967,6 +35724,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "org-enforce-todo-dependencies e org-enforce-todo-checkbox-dependencies."
+          }
+        }
+      }
+    },
+    "org-time-string-to-absolute with a day": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "org-time-string-to-absolute mit einem Tag"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "org-time-string-to-absolute con un día"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "org-time-string-to-absolute avec un jour"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日を指定したorg-time-string-to-absolute"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "org-time-string-to-absolute com um dia"
           }
         }
       }
@@ -35420,6 +36211,74 @@
         }
       }
     },
+    "pcase pattern %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "pcase-Muster %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "patrón de pcase %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "motif pcase %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "pcaseのパターン %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "padrão de pcase %@"
+          }
+        }
+      }
+    },
+    "random with a seed": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "random mit einem Startwert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "random con una semilla"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "random avec une graine"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "シードを指定したrandom"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "random com uma semente"
+          }
+        }
+      }
+    },
     "range outside row": {
       "localizations": {
         "de": {
@@ -35488,6 +36347,81 @@
         }
       }
     },
+    "regexp %@ in %@": {
+      "comment": "Why a table needs Emacs: part of a Lisp regular expression",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "regexp %@ in %@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "regexp %1$@ in %2$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "regexp %@ en %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "regexp %@ dans %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "regexp %@（%@内）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "regexp %@ em %@"
+          }
+        }
+      }
+    },
+    "regexp classes on text past ASCII": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "regexp-Klassen bei Text mit Zeichen außerhalb von ASCII"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "clases de regexp en texto con caracteres fuera de ASCII"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "classes de regexp sur du texte non ASCII"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ASCII以外の文字を含むテキストに対するregexpの文字クラス"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "classes de regexp em texto com caracteres fora do ASCII"
+          }
+        }
+      }
+    },
     "remote table name from a range": {
       "localizations": {
         "de": {
@@ -35522,6 +36456,108 @@
         }
       }
     },
+    "replace-match case past ASCII": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "replace-match mit Anpassung der Groß-/Kleinschreibung bei Zeichen außerhalb von ASCII"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ajuste de mayúsculas de replace-match con caracteres fuera de ASCII"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "casse de replace-match sur des caractères non ASCII"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ASCII以外の文字に対するreplace-matchの大文字・小文字変換"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "maiúsculas e minúsculas de replace-match em caracteres fora do ASCII"
+          }
+        }
+      }
+    },
+    "replace-match in a buffer": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "replace-match in einem Puffer"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "replace-match en un búfer"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "replace-match dans un tampon"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "バッファ内のreplace-match"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "replace-match em um buffer"
+          }
+        }
+      }
+    },
+    "replace-regexp-in-string from the end": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "replace-regexp-in-string ab dem Ende"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "replace-regexp-in-string desde el final"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "replace-regexp-in-string depuis la fin"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "末尾からのreplace-regexp-in-string"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "replace-regexp-in-string a partir do final"
+          }
+        }
+      }
+    },
     "row out of range": {
       "localizations": {
         "de": {
@@ -35552,6 +36588,108 @@
           "stringUnit": {
             "state": "translated",
             "value": "linha fora do intervalo"
+          }
+        }
+      }
+    },
+    "seq-uniq with a test": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "seq-uniq mit einer Testfunktion"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "seq-uniq con una función de comparación"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "seq-uniq avec un test"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "比較関数を指定したseq-uniq"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "seq-uniq com um teste"
+          }
+        }
+      }
+    },
+    "sort on a string": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sort auf einer Zeichenkette"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sort sobre una cadena"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sort sur une chaîne"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文字列に対するsort"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sort em uma string"
+          }
+        }
+      }
+    },
+    "string-width of %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "string-width von %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "string-width de %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "string-width de %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@のstring-width"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "string-width de %@"
           }
         }
       }
@@ -35658,6 +36796,74 @@
         }
       }
     },
+    "the data of this error": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "die Daten dieses Fehlers"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "los datos de este error"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "les données de cette erreur"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このエラーのデータ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "os dados deste erro"
+          }
+        }
+      }
+    },
+    "time string %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeitangabe %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cadena de tiempo %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "chaîne temporelle %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "時刻文字列 %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "string de tempo %@"
+          }
+        }
+      }
+    },
     "time value %@": {
       "comment": "Why a table needs Emacs: a Lisp time value",
       "localizations": {
@@ -35727,8 +36933,48 @@
         }
       }
     },
+    "value< on %@ and %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "value< auf %@ und %@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "value< on %1$@ and %2$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "value< sobre %@ y %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "value< sur %@ et %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@と%@に対するvalue<"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "value< em %@ e %@"
+          }
+        }
+      }
+    },
     "variable %@": {
-      "comment": "Why a table needs Emacs: a Calc variable",
+      "comment": "Why a table needs Emacs: a Calc variable\nWhy a table needs Emacs: a Lisp variable with no value",
       "localizations": {
         "de": {
           "stringUnit": {
