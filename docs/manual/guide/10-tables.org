@@ -413,9 +413,10 @@ After the formula, a =;= starts its flags, as in ~$3=$1/$2;%.2f~ or ~$4=$1*2;f2~
 | =U=       | As =T=, showing =HH:MM=.                                                                  |
 | =t=       | As =T=, showing decimal hours with two places, such as =1.50=.                            |
 
-Above =p14=, functions worked out from decimal approximations (=sqrt= of a non-square,
-=exp=, =ln=, =log=, non-integer powers, trigonometric and hyperbolic functions) may need
-Emacs, and above =p16= so may the statistics functions and powers of decimal numbers.
+Above =p14=, functions worked out from decimal approximations (=exp=, =ln=, =log=,
+non-integer powers, =sinh= and =cosh=) may need Emacs, and so may =tanh= above =p12=.
+Above =p16= so may the statistics functions, powers of decimal numbers, =sqrt= of a
+non-square and the trigonometric functions.
 
 With =S=, the functions that may give an inexact result (=sqrt=, =exp=, =ln=, =log=,
 =log10=, =pow=, =nroot=, =hypot=, the inverse trigonometric and hyperbolic functions,
