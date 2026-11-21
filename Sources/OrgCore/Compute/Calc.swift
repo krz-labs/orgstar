@@ -116,6 +116,8 @@ public enum Calc {
     // Constants to 36 digits, rounded to the precision, as `math-defcache` gives them.
     static func pi() throws -> Value { try makeFloat(314159265358979323846264338327950288, -35) }
     static func piOver2() throws -> Value { try makeFloat(157079632679489661923132169163975144, -35) }
+    static func piOver4() throws -> Value { try makeFloat(785398163397448309615660845819875721, -36) }
+    static func twoPi() throws -> Value { try makeFloat(628318530717958647692528676655900577, -35) }
     static func piOver180() throws -> Value { try makeFloat(174532925199432957692369076848861271, -37) }
 
     /// `math-float`.
@@ -277,19 +279,6 @@ public enum Calc {
         }
     }
 
-    static func fromDouble(_ d: Double) throws -> Value {
-        // Calc works these out at two digits more; past 16 it uses its own series.
-        guard precision <= 14 else { throw Unsupported("calc precision") }
-        guard d.isFinite else { throw Unsupported("infinite result") }
-        if d == 0 { return .float(0, 0) }
-        // Seventeen significant digits are exact for a Double; rounding to 12 follows.
-        let text = String(format: "%.16e", d)
-        let pieces = text.split(separator: "e")
-        let digitsText = pieces[0].replacingOccurrences(of: ".", with: "")
-        guard let mantissa = Int128(digitsText), let exponent = Int(pieces[1]) else { throw Unsupported("number") }
-        return try makeFloat(mantissa, exponent - 16)
-    }
-
     static func isSymbolic(_ vs: Value...) -> Bool {
         vs.contains { if case .symbolic = $0 { true } else { false } }
     }
@@ -324,10 +313,22 @@ public enum Calc {
         let ediff = e1 - e2
         if ediff >= 0 {
             if ediff >= 2 * precision { return try makeFloat(m1, e1) }
-            return try makeFloat(try scaleRounding(m1, ediff) + m2, e2)
+            let (m, shift) = try align(m1, ediff, m2)
+            return try makeFloat(m, e2 + shift)
         }
         if -ediff >= 2 * precision { return try makeFloat(m2, e2) }
-        return try makeFloat(m1 + (try scaleRounding(m2, -ediff)), e1)
+        let (m, shift) = try align(m2, -ediff, m1)
+        return try makeFloat(m, e1 + shift)
+    }
+
+    /// `big` times 10^ediff plus `small`, and the power of ten that scales it. Past 37 digits
+    /// the digits of `small` below the precision become one sticky digit, which rounds the same.
+    static func align(_ big: Int128, _ ediff: Int, _ small: Int128) throws -> (Int128, Int) {
+        if digits(big) + ediff <= 37 { return (try scaleRounding(big, ediff) + small, 0) }
+        let s = max(precision + 2 - digits(big), 0)
+        let k = ediff - s
+        let (q, r) = k > 37 ? (0, small) : small.quotientAndRemainder(dividingBy: try power10(k))
+        return (try scaleRounding(big, s + 1) + q * 10 + r.signum(), k - 1)
     }
 
     static func negate(_ a: Value) throws -> Value {
@@ -507,7 +508,22 @@ public enum Calc {
     static func squareRootRaw(_ a: Value) throws -> Value {
         if isZero(a) { return a }
         guard try sign(a) > 0 else { throw Unsupported("complex result") }
-        return try emacs({ $0.squareRoot() }, a)
+        if precision <= 16 { return try emacs({ $0.squareRoot() }, a) }
+        // Newton's method from the root of the first six or seven digits.
+        guard case .float(let m, let e) = a else { throw Unsupported("arguments") }
+        var ldiff = digits(Int128(m)) - 6
+        if (e + ldiff) % 2 != 0 { ldiff += 1 }
+        let head = ldiff >= 0 ? Int128(m) / (try power10(ldiff)) : Int128(m) * (try power10(-ldiff))
+        var root = Int128(Double(head).squareRoot())
+        while root * root > head { root -= 1 }
+        while (root + 1) * (root + 1) <= head { root += 1 }
+        var guess = try makeFloat(root, (e + ldiff) / 2)
+        for _ in 0..<1000 {
+            let next = try multiply(try add(guess, try divide(a, guess)), .float(5, -1))
+            if nearlyEqual(next, guess) { return next }
+            guess = next
+        }
+        throw Unsupported("number")
     }
 
     /// `math-exp-raw` of a float.
@@ -525,7 +541,100 @@ public enum Calc {
     /// `math-arctan-raw` of a float.
     static func arctanRaw(_ x: Value) throws -> Value {
         if try sign(x) < 0 { return try negate(try arctanRaw(try negate(x))) }
-        return isZero(x) ? x : try emacs({ Foundation.atan($0) }, x)
+        if isZero(x) { return x }
+        if precision <= 16 { return try emacs({ Foundation.atan($0) }, x) }
+        if symbolicMode { throw Unsupported("symbolic mode") }
+        if x == .float(1, 0) { return try piOver4() }
+        if try compare(.float(414214, -6), x) < 0 {
+            if try compare(.float(1, 0), x) < 0 {
+                return try subtract(try multiply(try pi(), .float(5, -1)), try arctanRaw(try divide(.float(1, 0), x)))
+            }
+            let reduced = try divide(try subtract(.float(1, 0), x), try add(.float(1, 0), x))
+            return try subtract(try multiply(try pi(), .float(25, -2)), try arctanRaw(reduced))
+        }
+        // `math-arctan-series`.
+        let xnegsqr = try negate(try multiply(x, x))
+        var (sum, power, n) = (x, x, 3)
+        for _ in 0..<10000 {
+            power = try multiply(power, xnegsqr)
+            let next = try add(sum, try divide(power, try float(.int(n))))
+            if nearlyEqual(sum, next) { return sum }
+            (sum, n) = (next, n + 2)
+        }
+        throw Unsupported("number")
+    }
+
+    /// `math-arctan2-raw` of floats.
+    static func arctan2Raw(_ y: Value, _ x: Value) throws -> Value {
+        if isZero(y) { return try sign(x) < 0 ? try pi() : .float(0, 0) }
+        if isZero(x) { return try sign(y) > 0 ? try piOver2() : try negate(try piOver2()) }
+        if try sign(x) > 0 { return try arctanRaw(try divide(y, x)) }
+        if try sign(y) > 0 { return try add(try arctanRaw(try divide(y, x)), try pi()) }
+        // `math-sub-float` gives pi itself, not its negative, when the angle is too small to count.
+        let angle = try arctanRaw(try divide(y, x))
+        if case .float(_, let e) = angle, case .float(_, let ep) = try pi(), ep - e >= 2 * precision { return try pi() }
+        return try subtract(angle, try pi())
+    }
+
+    /// `math-arcsin-raw` of a real float.
+    static func arcsinRaw(_ x: Value) throws -> Value {
+        try arctan2Raw(x, try squareRootRaw(try subtract(.float(1, 0), try multiply(x, x))))
+    }
+
+    /// `math-sin-raw` of a real float; `orgx` is the argument before reduction.
+    static func sinRaw(_ x: Value, _ orgx: Value? = nil) throws -> Value {
+        let orgx = orgx ?? x
+        if try sign(x) < 0 { return try negate(try sinRaw(try negate(x), orgx)) }
+        if try compare(.float(7, 0), x) < 0 {
+            // `math-mod` by 2 pi.
+            let turns = try floorInt(try divide(x, try twoPi()))
+            return try sinRaw(try subtract(x, try multiply(.int(turns), try twoPi())), orgx)
+        }
+        return try sinRaw2(x, orgx)
+    }
+
+    /// `math-cos-raw` of a real float.
+    static func cosRaw(_ x: Value) throws -> Value {
+        try sinRaw(try subtract(try piOver2(), x), x)
+    }
+
+    /// `math-nearly-zerop-float`: `a` is zero next to `b`, at one digit less.
+    static func nearlyZero(_ a: Value, _ b: Value) -> Bool {
+        guard case .float(let ma, let ea) = a, case .float(let mb, let eb) = b else { return false }
+        return ma == 0 || digits(Int128(ma)) + ea <= 1 + (mb == 0 ? 0 : digits(Int128(mb))) + eb - (precision - 1)
+    }
+
+    /// `math-sin-raw-2`.
+    static func sinRaw2(_ x: Value, _ orgx: Value) throws -> Value {
+        let xmpo2 = try subtract(try piOver2(), x)
+        if try sign(xmpo2) < 0 { return try negate(try sinRaw2(try subtract(x, try pi()), orgx)) }
+        if try compare(try piOver4(), x) < 0 { return try cosRaw2(xmpo2, orgx) }
+        if try compare(x, try negate(try piOver4())) < 0 { return try negate(try cosRaw2(try add(try piOver2(), x), orgx)) }
+        if nearlyZero(x, orgx) { return .float(0, 0) }
+        if precision <= 16 { return try emacs({ Foundation.sin($0) }, x) }
+        if symbolicMode { throw Unsupported("symbolic mode") }
+        return try sinSeries(x, 6, 4, x, try negate(try multiply(x, x)))
+    }
+
+    /// `math-cos-raw-2`.
+    static func cosRaw2(_ x: Value, _ orgx: Value) throws -> Value {
+        if nearlyZero(x, orgx) { return .float(1, 0) }
+        if precision <= 16 { return try emacs({ Foundation.cos($0) }, x) }
+        if symbolicMode { throw Unsupported("symbolic mode") }
+        let xnegsqr = try negate(try multiply(x, x))
+        return try sinSeries(try add(.float(1, 0), try multiply(xnegsqr, .float(5, -1))), 24, 5, xnegsqr, xnegsqr)
+    }
+
+    /// `math-sin-series`.
+    static func sinSeries(_ sum: Value, _ nfac: Int, _ n: Int, _ x: Value, _ xnegsqr: Value) throws -> Value {
+        var (sum, nfac, n, x) = (sum, Value.int(nfac), n, x)
+        for _ in 0..<10000 {
+            x = try multiply(x, xnegsqr)
+            let next = try add(sum, try divide(x, try float(nfac)))
+            if nearlyEqual(sum, next) { return sum }
+            (sum, nfac, n) = (next, try multiply(nfac, .int(n * (n + 1))), n + 2)
+        }
+        throw Unsupported("number")
     }
 
     static func ln2() throws -> Value { try makeFloat(693147180559945309417232121458176568, -36) }
@@ -1456,8 +1565,6 @@ public enum Calc {
             return calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: modes.now ?? Date())
         }
 
-        func radians(_ x: Double) -> Double { modes.degrees ? x * .pi / 180 : x }
-        func angle(_ x: Double) -> Double { modes.degrees ? x * 180 / .pi : x }
 
         func call(_ name: String, _ args: [Value]) throws -> Value {
             switch name {
@@ -1583,33 +1690,42 @@ public enum Calc {
                 }
             case "sin", "cos", "tan":
                 let x = try one(args)
-                if modes.degrees, case .int(let i) = x, i % 90 == 0 {
+                if x == .nan { return x }
+                if case .int(let i) = x, modes.degrees ? i % (name == "tan" ? 180 : 90) == 0 : i == 0 {
                     let quarter = ((i / 90) % 4 + 4) % 4
                     switch name {
                     case "sin": return .int([0, 1, 0, -1][quarter])
                     case "cos": return .int([1, 0, -1, 0][quarter])
-                    default:
-                        guard quarter % 2 == 0 else { throw Unsupported("infinite result") }
-                        return .int(0)
+                    default: return .int(0)
                     }
                 }
-                if !modes.degrees, x == .int(0) { return .int(name == "cos" ? 1 : 0) }
-                let r = radians(try double(x))
-                return try fromDouble(name == "sin" ? Foundation.sin(r) : name == "cos" ? Foundation.cos(r) : Foundation.tan(r))
+                return try extra(2) {
+                    let r = try float(x)
+                    let radians = modes.degrees ? try multiply(r, try piOver180()) : r
+                    if name == "sin" { return try sinRaw(radians) }
+                    if name == "cos" { return try cosRaw(radians) }
+                    let cosine = try cosRaw(radians)
+                    // Calc leaves the quotient by zero alone.
+                    if isZero(cosine) { throw Unsupported("division by zero") }
+                    return try divide(try sinRaw(radians), cosine)
+                }
             case "arcsin", "arccos", "arctan":
                 let x = try one(args)
                 if modes.degrees, case .int(let i) = x {
                     switch (name, i) {
-                    case ("arcsin", -1), ("arcsin", 0), ("arcsin", 1): return .int(90 * i)
-                    case ("arccos", -1), ("arccos", 0), ("arccos", 1): return .int(90 - 90 * i)
-                    case ("arctan", -1), ("arctan", 0), ("arctan", 1): return .int(45 * i)
+                    case ("arcsin", -1), ("arcsin", 1): return .int(90 * i)
+                    case ("arccos", -1), ("arccos", 0): return .int(90 - 90 * i)
+                    case ("arctan", -1), ("arctan", 1): return .int(45 * i)
                     default: break
                     }
                 }
-                let d = try double(x)
-                if name != "arctan", abs(d) > 1 { throw Unsupported("complex result") }
-                let r = name == "arcsin" ? Foundation.asin(d) : name == "arccos" ? Foundation.acos(d) : Foundation.atan(d)
-                return try fromDouble(angle(r))
+                if x == .int(name == "arccos" ? 1 : 0) { return .int(0) }
+                if x == .nan { return x }
+                return try extra(2) {
+                    let r = try float(x)
+                    let angle = name == "arcsin" ? try arcsinRaw(r) : name == "arccos" ? try subtract(try piOver2(), try arcsinRaw(r)) : try arctanRaw(r)
+                    return modes.degrees ? try divide(angle, try piOver180()) : angle
+                }
             case "eq", "neq", "lt", "gt", "leq", "geq", "land", "lor":
                 guard args.count == 2 else { throw Unsupported("arguments") }
                 let ops: [String: Character] = ["eq": "=", "neq": "≠", "lt": "<", "gt": ">", "leq": "≤", "geq": "≥", "land": "&", "lor": "|"]
@@ -1722,7 +1838,8 @@ public enum Calc {
                 if x == .int(0) { return x }
                 _ = try sign(x)
                 return try extra(2) {
-                    let e = try extra(2) { try expRaw(try float(x)) }
+                    let f = try float(x)
+                    let e = try extra(2) { try expRaw(f) }
                     let inverse = try divide(.int(1), e)
                     return try divide(try subtract(e, inverse), try add(e, inverse))
                 }
@@ -1750,19 +1867,7 @@ public enum Calc {
                 guard args.count == 2 else { throw Unsupported("arguments") }
                 _ = (try sign(args[0]), try sign(args[1]))
                 return try extra(2) {
-                    let (y, x) = (try float(args[0]), try float(args[1]))
-                    let r: Value
-                    if isZero(y) {
-                        r = try sign(x) < 0 ? try pi() : .float(0, 0)
-                    } else if isZero(x) {
-                        r = try sign(y) > 0 ? try piOver2() : try negate(try piOver2())
-                    } else if try sign(x) > 0 {
-                        r = try arctanRaw(try divide(y, x))
-                    } else if try sign(y) > 0 {
-                        r = try add(try arctanRaw(try divide(y, x)), try pi())
-                    } else {
-                        r = try subtract(try arctanRaw(try divide(y, x)), try pi())
-                    }
+                    let r = try arctan2Raw(try float(args[0]), try float(args[1]))
                     return modes.degrees ? try divide(r, try piOver180()) : r
                 }
             case "deg", "rad":

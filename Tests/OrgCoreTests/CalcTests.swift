@@ -4,7 +4,8 @@ import Testing
 
 /// Runs `calc-eval` with org's table modes over a list of expressions.
 enum CalcOracle {
-    static func run(_ cases: [(expression: String, format: String)], precision: Int = 12, zone: String = "UTC", symbolic: Bool = false) throws -> [String] {
+    static func run(_ cases: [(expression: String, format: String)], precision: Int = 12, zone: String = "UTC", symbolic: Bool = false,
+                    radians: Bool = false, fractions: Bool = false) throws -> [String] {
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent("orgstar-calc-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: folder) }
@@ -27,6 +28,8 @@ enum CalcOracle {
                             (setq modes (plist-put modes 'calc-float-format format))
                             (setq modes (plist-put modes 'calc-internal-prec (string-to-number (getenv "ORACLE_PREC"))))
                             (when (getenv "ORACLE_SYMBOLIC") (setq modes (plist-put modes 'calc-symbolic-mode t)))
+                            (when (getenv "ORACLE_RADIANS") (setq modes (plist-put modes 'calc-angle-mode 'rad)))
+                            (when (getenv "ORACLE_FRACTIONS") (setq modes (plist-put modes 'calc-prefer-frac t)))
                             (let ((r (condition-case e (calc-eval (cons (car c) modes) nil)
                                        (error (format "LISP ERROR %S" e)))))
                               (if (stringp r) r (format "ERROR %S" r)))))
@@ -34,7 +37,10 @@ enum CalcOracle {
           (with-temp-file (getenv "ORACLE_OUTPUT")
             (insert (json-encode (vconcat results)))))
         """#.write(to: script, atomically: true, encoding: .utf8)
-        _ = try EmacsOracle.run(["-Q", "--batch", "-l", script.path], environment: ["ORACLE_INPUT": input.path, "ORACLE_OUTPUT": output.path, "ORACLE_PREC": String(precision), "TZ": zone].merging(symbolic ? ["ORACLE_SYMBOLIC": "1"] : [:]) { $1 })
+        _ = try EmacsOracle.run(["-Q", "--batch", "-l", script.path], environment: ["ORACLE_INPUT": input.path, "ORACLE_OUTPUT": output.path, "ORACLE_PREC": String(precision), "TZ": zone]
+            .merging(symbolic ? ["ORACLE_SYMBOLIC": "1"] : [:]) { $1 }
+            .merging(radians ? ["ORACLE_RADIANS": "1"] : [:]) { $1 }
+            .merging(fractions ? ["ORACLE_FRACTIONS": "1"] : [:]) { $1 })
         return try JSONDecoder().decode([String].self, from: Data(contentsOf: output))
     }
 }
@@ -224,14 +230,17 @@ struct CalcTests {
 
     /// Each case through Calc and through `Calc.evaluate`, expecting the same text; returns the
     /// cases `Calc.evaluate` doesn't support.
-    static func compare(_ cases: [(String, String)], precision: Int = 12, zone: (name: String, offset: Int) = ("UTC", 0), symbolic: Bool = false) throws -> [String] {
-        let emacs = try CalcOracle.run(cases, precision: precision, zone: zone.name, symbolic: symbolic)
+    static func compare(_ cases: [(String, String)], precision: Int = 12, zone: (name: String, offset: Int) = ("UTC", 0), symbolic: Bool = false,
+                        radians: Bool = false, fractions: Bool = false) throws -> [String] {
+        let emacs = try CalcOracle.run(cases, precision: precision, zone: zone.name, symbolic: symbolic, radians: radians, fractions: fractions)
         #expect(emacs.count == cases.count)
         var skipped: [String] = []
         for (c, expected) in zip(cases, emacs) {
             var modes = Calc.Modes()
             modes.precision = precision
             modes.symbolic = symbolic
+            modes.degrees = !radians
+            modes.preferFractions = fractions
             modes.timeZone = TimeZone(secondsFromGMT: zone.offset)!
             let f = c.1.dropFirst().dropLast().split(separator: " ")
             let n = Int(f[1])!
