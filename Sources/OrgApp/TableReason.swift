@@ -6,6 +6,20 @@ public enum TableReason {
     /// The reason translated, or as it is when it's one this doesn't know.
     public static func localized(_ reason: String) -> String { translated(reason) ?? reason }
 
+    /// Why a calc block can't be calculated here, `Calc.Unsupported`'s reason, in the app's language.
+    public static func calcRefusal(_ reason: String) -> String {
+        String(localized: "This calc block can't be calculated here: \(localized(reason)).", comment: "A calc block orgstar can't calculate")
+    }
+
+    /// A calc block's result, or a refusal in the app's language.
+    public static func calcBlock(_ job: BabelJob) throws -> BabelOutput {
+        do {
+            return try Babel.evaluateCalc(job)
+        } catch let refusal as Calc.Unsupported {
+            throw Babel.Failure.message(calcRefusal(refusal.reason))
+        }
+    }
+
     /// Nil for a reason not known here.
     static func translated(_ reason: String) -> String? {
         if reason.hasPrefix("Lisp ") {
@@ -19,6 +33,8 @@ public enum TableReason {
         if let name = value("variable ") { return String(localized: "variable \(name)", comment: "Why a table needs Emacs: a Calc variable") }
         if let number = value("number size ") { return String(localized: "number size \(number)", comment: "Why a table needs Emacs: a number too large") }
         if let flag = value("format flag ") { return String(localized: "format flag \(flag)", comment: "Why a table needs Emacs: a format specifier flag") }
+        if let key = value("stack command ") { return String(localized: "stack command \(key)", comment: "Why a calc block needs Emacs: a key it runs on the stack") }
+        if let name = value("value of :var ") { return String(localized: "value of :var \(name)", comment: "Why a calc block needs Emacs: a variable's value") }
         return nil
     }
 
@@ -103,6 +119,7 @@ public enum TableReason {
         case "constants that refer to themselves": return String(localized: "constants that refer to themselves", comment: comment)
         case "date arithmetic": return String(localized: "date arithmetic", comment: comment)
         case "date syntax": return String(localized: "date syntax", comment: comment)
+        case "dates in calc blocks": return String(localized: "dates in calc blocks", comment: comment)
         case "daylight saving time": return String(localized: "daylight saving time", comment: comment)
         case "division by zero": return String(localized: "division by zero", comment: comment)
         case "duration size": return String(localized: "duration size", comment: comment)
@@ -114,6 +131,7 @@ public enum TableReason {
         case "logarithm domain": return String(localized: "logarithm domain", comment: comment)
         case "number": return String(localized: "number", comment: comment)
         case "number size": return String(localized: "number size", comment: comment)
+        case "numeric :prologue or :epilogue": return String(localized: "numeric :prologue or :epilogue", comment: comment)
         case "range outside row": return String(localized: "range outside row", comment: comment)
         case "reference outside table": return String(localized: "reference outside table", comment: comment)
         case "remote table name from a range": return String(localized: "remote table name from a range", comment: comment)

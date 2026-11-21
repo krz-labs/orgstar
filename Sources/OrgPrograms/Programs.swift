@@ -21,8 +21,21 @@ public struct Programs: ProgramRunning {
             if words.count == 1, !BabelRunner.installed(words[0]), let output = try await JavaScriptBlocks.run(job, directory: fileDirectory) { return output }
         case .session(_, let executable, _):
             if !executable.contains(where: \.isWhitespace), !BabelRunner.installed(executable), let output = try await JavaScriptBlocks.run(job, directory: fileDirectory) { return output }
+        case .process where job.language == "sqlite":
+            // `sqlite3` when it's installed, as Emacs runs it; the SQLite library otherwise.
+            if !BabelRunner.installed("sqlite3"), let output = try SQLiteBlocks.run(job, directory: fileDirectory) { return output }
         case .process:
             break
+        case .emacs where job.calc != nil:
+            // calc natively, and in Emacs what Calc here refuses.
+            do {
+                return try Babel.evaluateCalc(job)
+            } catch let refusal as Calc.Unsupported {
+                guard emacs() != nil else { throw BabelRunner.Failure(description: TableReason.calcRefusal(refusal.reason)) }
+            }
+            let output = try await BabelRunner.run(job, fileDirectory: fileDirectory)
+            if output.status != 0 { throw BabelRunner.Failure(description: output.stderr.trimmingCharacters(in: .whitespacesAndNewlines)) }
+            return output
         case .emacs:
             // Emacs Lisp in `Elisp` when Emacs isn't installed.
             if emacs() == nil {

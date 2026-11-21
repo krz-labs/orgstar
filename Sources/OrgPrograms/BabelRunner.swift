@@ -51,7 +51,12 @@ public enum BabelRunner {
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: folder) }
         let resultFile = folder.appendingPathComponent("result")
-        let input = job.input.replacingOccurrences(of: Babel.resultFileToken, with: resultFile.path)
+        var input = job.input.replacingOccurrences(of: Babel.resultFileToken, with: resultFile.path)
+        for (token, contents) in job.dataFiles {
+            let file = folder.appendingPathComponent("sql-data-\(token.filter(\.isNumber))")
+            try contents.write(to: file, atomically: true, encoding: .utf8)
+            input = input.replacingOccurrences(of: token, with: file.path)
+        }
         if case .session(let name, let executable, let kind) = job.runner {
             let directory = job.directory.map { URL(fileURLWithPath: $0, relativeTo: fileDirectory).standardizedFileURL } ?? fileDirectory
             return try await BabelSessions.shared.run(job, name: name, executable: executable, kind: kind, directory: directory, resultFile: resultFile)

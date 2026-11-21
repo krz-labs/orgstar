@@ -53,6 +53,12 @@ public struct BabelJob: Sendable, Equatable {
     /// A Lisp header value couldn't be evaluated without the file's path: plan again with
     /// `Babel.replan` before running.
     public internal(set) var needsFile = false
+    /// A calc block, for `Babel.evaluateCalc`.
+    public internal(set) var calc: Babel.CalcBlock?
+    /// An sqlite block's `sqlite3` command line, for `SQLiteBlocks`.
+    public internal(set) var sqlite: Babel.SQLiteCommand?
+    /// Files the runner writes, each where its key stands in `input`: `:var` tables as CSV.
+    public internal(set) var dataFiles: [String: String] = [:]
 
     public struct Need: Sendable, Equatable {
         /// The `:var` value, `name` or `name(args)`.
@@ -64,7 +70,14 @@ public struct BabelJob: Sendable, Equatable {
         /// `compiled`: C, C++, D, Java, Fortran and Clojure, by `language`.
         /// `script`: ruby and js, whose value comes back as their `inspect` prints it, from
         /// the result file for ruby and the output for js.
-        enum Kind: Sendable, Equatable { case shell(valueIsExitStatus: Bool), python, generic, emacsLisp, compiled, script(js: Bool, session: Bool = false) }
+        /// `calc`: the value as JSON, `{"value": …}` or `{"rows": […]}`. `sqlite`: the output of
+        /// `sqlite3`, read as CSV when `csv`, with a rule after the first row when `headers`.
+        enum Kind: Sendable, Equatable {
+            case shell(valueIsExitStatus: Bool), python, generic, emacsLisp, compiled, script(js: Bool, session: Bool = false), calc
+            case sqlite(csv: Bool, headers: Bool)
+
+            var isSQLite: Bool { if case .sqlite = self { true } else { false } }
+        }
         let kind: Kind
         var language = ""
         public internal(set) var params: [String]
@@ -358,7 +371,7 @@ public enum Babel {
         if params.single[":cmdline"] != nil, !["dot", "plantuml", "mermaid"].contains(language), !shells.contains(language), !compiled {
             return .failure(.message(":cmdline isn't supported for \(language) yet; nothing was run."))
         }
-        let wraps = compiled || shells.contains(language) || ["python", "emacs-lisp", "elisp"].contains(language) || generic[language] != nil
+        let wraps = compiled || shells.contains(language) || ["python", "emacs-lisp", "elisp", "calc", "sqlite"].contains(language) || generic[language] != nil
         for key in [":prologue", ":epilogue", ":post", ":stdin", ":shebang"] where params.single[key] != nil
             && !(shells.contains(language) && [":stdin", ":shebang"].contains(key)) && !(wraps && [":prologue", ":epilogue"].contains(key)) {
             return .failure(.message("\(key) isn't supported yet; nothing was run."))
@@ -516,6 +529,26 @@ public enum Babel {
             )
             job.lispForm = form
             return .success(job)
+        }
+        if language == "calc" {
+            do {
+                return .success(try calcJob(body: body, vars: vars, params: params, finish: finishBase(.calc), directory: dir, block: location,
+                                            blockText: blockText, alwaysAsk: alwaysAsk))
+            } catch let error as Failure {
+                return .failure(error)
+            } catch {
+                return .failure(.message("\(error)"))
+            }
+        }
+        if language == "sqlite" {
+            do {
+                return .success(try sqliteJob(body: body, vars: vars, params: params, finishBase: finishBase, directory: dir, block: location,
+                                              blockText: blockText, alwaysAsk: alwaysAsk))
+            } catch let error as Failure {
+                return .failure(error)
+            } catch {
+                return .failure(.message("\(error)"))
+            }
         }
         if ["dot", "plantuml", "mermaid"].contains(language) {
             // ob-dot, ob-plantuml and ob-mermaid: the program draws into `:file`.

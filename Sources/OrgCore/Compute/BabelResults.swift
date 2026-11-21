@@ -42,7 +42,15 @@ extension Babel {
 
     /// The language's result handling: `org-babel-result-cond` and the table import.
     static func value(_ finish: BabelJob.Finish, _ output: BabelOutput) -> Value {
-        reassemble(rawValue(finish, output), finish)
+        let value = reassemble(rawValue(finish, output), finish)
+        switch (finish.kind, value) {
+        case (.calc, .string(let s)), (.sqlite, .string(let s)):
+            // `org-babel-execute-src-block` makes a table of a value that isn't a list.
+            if !finish.params.contains("output"), finish.params.contains("vector") || finish.params.contains("table") { return .table([[s]]) }
+            return value
+        default:
+            return value
+        }
     }
 
     static func rawValue(_ finish: BabelJob.Finish, _ output: BabelOutput) -> Value {
@@ -54,10 +62,16 @@ extension Babel {
             if let description = finish.fileDescription { link += "[" + (description.isEmpty ? path : description) + "]" }
             return .string(link + "]")
         }
-        let scalar = params.contains("scalar") || params.contains("verbatim") || params.contains("html") || params.contains("code")
-            || params.contains("pp") || params.contains("file")
-            || ((params.contains("output") || params.contains("raw") || params.contains("org")) && !params.contains("table"))
+        let scalar = resultCondScalar(params)
         switch finish.kind {
+        case .calc:
+            guard let data = output.stdout.data(using: .utf8), let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                return .string(output.stdout)
+            }
+            if let rows = object["rows"] as? [[String]] { return .table(rows) }
+            return .string(object["value"] as? String ?? "")
+        case .sqlite(let csv, let headers):
+            return sqliteValue(output.stdout, csv: csv, headers: headers, scalar: scalar)
         case .shell(let valueIsExitStatus):
             var results = output.stdout
             if valueIsExitStatus {
@@ -103,6 +117,10 @@ extension Babel {
         case .shell(let valueIsExitStatus):
             return valueIsExitStatus ? output.stdout.split(separator: "\n").last.map(String.init) ?? "" : output.stdout
         case .generic: return output.stdout
+        case .calc:
+            guard let data = output.stdout.data(using: .utf8), let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return output.stdout }
+            return object["value"] as? String ?? ""
+        case .sqlite: return output.stdout
         case .compiled: return compiledResult(finish, output)
         case .script(let js, let session): return finish.output || (js && !session) ? output.stdout : (output.resultFile ?? "")
         }
@@ -427,6 +445,16 @@ extension Babel {
             if s.last != "\n" { s += "\n" }
             let items = s.split(separator: "\n", omittingEmptySubsequences: true)
             buffer.insert(items.map { "- " + $0 }.joined(separator: "\n") + "\n")
+        case .table(let rows) where params.contains("list") && finish.kind.isSQLite:
+            // ob-sqlite's value is always rows: each an item, its first cell the text and the
+            // others lines under it.
+            listed = true
+            var items = rows.map { row in
+                guard let row else { return "- hline\n" }
+                return "- " + (row.first ?? "") + "\n" + row.dropFirst().map { "  " + $0 + "\n" }.joined()
+            }.joined()
+            while let last = items.unicodeScalars.last, " \r\t\n".unicodeScalars.contains(last) { items.unicodeScalars.removeLast() }
+            buffer.insert(items + "\n")
         case .table(let rows) where params.contains("list"):
             listed = true
             let items = rows.count == 1 ? (rows[0] ?? []) : rows.compactMap { $0?.joined(separator: " ") }
@@ -440,7 +468,8 @@ extension Babel {
             buffer.tableAlign()
             buffer.point = buffer.tableEnd()
         case .string(var s):
-            if !s.isEmpty, s.last != "\n" { s += "\n" }
+            // `org-string-nw-p`: a blank result gets no newline.
+            if s.unicodeScalars.contains(where: { !" \r\t\n".unicodeScalars.contains($0) }), s.unicodeScalars.last != "\n" { s += "\n" }
             buffer.insert(s)
         }
         let end = buffer.marker(buffer.point, advances: true)
@@ -500,7 +529,7 @@ extension Babel {
     /// `org-babel-examplify-region`: fewer than ten lines get `: `, more an example block.
     static func examplify(_ buffer: EmacsBuffer, _ beg: Int, _ end: Int) {
         let text = buffer.substring(beg, end)
-        var size = text.components(separatedBy: "\n").count - (text.hasSuffix("\n") ? 1 : 0)
+        var size = text.components(separatedBy: "\n").count - (text.utf16.last == 10 ? 1 : 0)
         if text.isEmpty { size = 0 }
         guard size > 0 else { return }
         if size < 10 {

@@ -131,7 +131,8 @@ extension EmacsBuffer {
                         fixed = cookie.1.first
                     } else {
                         nonEmpty += 1
-                        if numberRegex.firstMatch(in: cell, range: NSRange(location: 0, length: (cell as NSString).length)) != nil { numbers += 1 }
+                        // `$` doesn't match before a CR in Emacs.
+                        if !cell.unicodeScalars.contains("\r"), numberRegex.firstMatch(in: cell, range: NSRange(location: 0, length: (cell as NSString).length)) != nil { numbers += 1 }
                     }
                 }
                 widths.append(maxWidth)

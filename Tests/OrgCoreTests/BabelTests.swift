@@ -11,7 +11,12 @@ enum TestBabelRunner {
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: folder) }
         let resultFile = folder.appendingPathComponent("result")
-        let input = job.input.replacingOccurrences(of: Babel.resultFileToken, with: resultFile.path)
+        var input = job.input.replacingOccurrences(of: Babel.resultFileToken, with: resultFile.path)
+        for (token, contents) in job.dataFiles {
+            let file = folder.appendingPathComponent(token)
+            try contents.write(to: file, atomically: true, encoding: .utf8)
+            input = input.replacingOccurrences(of: token, with: file.path)
+        }
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
         switch job.runner {
@@ -42,7 +47,8 @@ enum TestBabelRunner {
         try stdin.fileHandleForWriting.close()
         let data = stdout.fileHandleForReading.readDataToEndOfFile()
         process.waitUntilExit()
-        return BabelOutput(stdout: String(decoding: data, as: UTF8.self), resultFile: try? String(contentsOf: resultFile, encoding: .utf8))
+        return BabelOutput(stdout: String(decoding: data, as: UTF8.self), resultFile: try? String(contentsOf: resultFile, encoding: .utf8),
+                           status: process.terminationStatus)
     }
 
     /// Plans, runs and finishes the block at `caret`: the new text, or the failure.
@@ -50,6 +56,7 @@ enum TestBabelRunner {
     static func execute(_ text: String, caret: Int, directory: URL, native: Bool = false) throws -> (text: String, failure: String?) {
         func run(_ job: BabelJob, directory: URL) throws -> BabelOutput {
             guard native else { return try TestBabelRunner.run(job, directory: directory) }
+            if job.calc != nil { return try Babel.evaluateCalc(job) }
             guard let output = try Babel.evaluateNatively(job) else { throw NativeUnsupported() }
             return output
         }
@@ -70,6 +77,8 @@ enum TestBabelRunner {
                 guard case .message(let message) = failure else { return (text, nil) }
                 return (text, message)
             }
+            // A calc block's error in Emacs.
+            if job.calc != nil, output.status != 0 { return (text, "error") }
             if let file = Babel.fileResult(job, output: output) {
                 try file.contents.write(to: directory.appendingPathComponent(file.path), atomically: true, encoding: .utf8)
             }

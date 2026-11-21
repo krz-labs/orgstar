@@ -9,6 +9,10 @@ extension Babel {
     static func cacheState(language: String, params: Params, tables: Tables, body: String, location: Range<Int>, name: String?,
                            call: Bool, text: NSString, options: Options, model: DocumentModel) throws -> (hash: String, current: Bool, value: VarValue?) {
         let heading = model.headings.lastIndex { $0.headingRange.lowerBound <= location.lowerBound }
+        // ob-sqlite writes a table to a new temporary file each run, so Emacs's hash never matches.
+        if language == "sqlite", tables.vars.contains(where: { if case .table = $0.1 { true } else { false } }) {
+            throw Failure.message(":cache with a table :var isn't supported for sqlite blocks; nothing was run.")
+        }
         // The hash is taken outside the shell's own binding of `shell-file-name`, so its
         // variables are written for the user's shell whatever the block's language.
         let expanded = try languageExpansion(body, language: language, tables: tables, params: params,
@@ -33,6 +37,22 @@ extension Babel {
         }
         if language == "python" {
             return (vars.map { "\($0.0)=\(pythonLiteral($0.1))" } + [body]).joined(separator: "\n")
+        }
+        if language == "calc" {
+            // `org-babel-expand-body:calc`.
+            return (params.single[":prologue"].map { $0 + "\n" } ?? "") + body + (params.single[":epilogue"].map { "\n" + $0 + "\n" } ?? "")
+        }
+        if language == "sqlite" {
+            // `org-babel-expand-body:sqlite`, with no tables.
+            var expanded = body
+            for (name, value) in vars {
+                switch value {
+                case .scalar(let s): expanded = replacingCaseInsensitively("$" + name, in: expanded, with: s)
+                case .number(let n): expanded = replacingCaseInsensitively("$" + name, in: expanded, with: n)
+                default: break
+                }
+            }
+            return [params.single[":prologue"] ?? "", expanded, params.single[":epilogue"] ?? ""].joined(separator: "\n")
         }
         if language == "emacs-lisp" || language == "elisp" {
             let bindings = vars.map { "(\($0.0) '\(lispLiteral($0.1)))" }
