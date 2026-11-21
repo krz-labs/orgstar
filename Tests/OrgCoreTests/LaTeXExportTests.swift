@@ -107,6 +107,8 @@ struct LaTeXExportTests {
         "Line one\\\\\nline two \\\\\n\\\\\nafter\n",
         "Links: [[https://orgmode.org][Org & co]] <https://a.b/c_d> https://x.y/%20 [[mailto:me@x.org]] [[file:doc.pdf][the doc]] [[./rel/file.txt]] [[file:/abs/path.org]]\n",
         "Run [[elisp:(+ 1 2)][add]] and [[elisp:(message \"50% #x\")]], [[shell:ls ~/x_y][list]] [[shell:echo $HOME]], [[help:car][car]] [[shortdoc:string]].\n",
+        "Plain shell:ls and elisp:foo and help:car here.\nGet ftp://x.org/f now, news:comp.x and mailto:a@b.c, shortdoc:string HTTPS://a.b/c.\nshell:echo_$x% and shell:ls\tx shell:ls[x elisp:(foo) FILE:a.txt File:b.org::s FILE:/abs FILE://h/p.\n[[https://a.b][see shell:ls]] *shell:ls* and\n| news:x |\n",
+        "* Heading shell:ls\nx\n",
         "Run [[elisp:(+ 1\n 2)]] and see [[https://a.b/c\n d]] ok, [[shell:a  \n\tb][two\n lines]] and [[elisp:a\tb\n c]].\n",
         "* Target section\nA <<anchor>> here and [[anchor]] and [[anchor][desc]].\n* Other\nSee [[*Target section]] and [[Target section][named]] and [[#cid]].\n* Third\n:PROPERTIES:\n:CUSTOM_ID: cid\n:END:\nx\n",
         "#+OPTIONS: num:nil\n* Head\nSee [[*Head]].\n",
@@ -352,6 +354,10 @@ struct LaTeXExportTests {
         let pre = "* Top\n:PROPERTIES:\n:EXPORT_LATEX_CLASS_PRE: \\x\n:END:\nBody.\n"
         #expect(ExportScope.subtree(pre, at: 0).flatMap(reason) == "#+LATEX_CLASS_PRE")
         #expect(reason("#+OPTIONS: tags:not-in-toc\n* 100% done :a:\n")?.hasPrefix("% in a heading") == true)
+        #expect(reason("See id:abc.\n") == "Plain links of type id")
+        #expect(reason("See info:emacs here.\n") == "Plain links of type info")
+        #expect(reason("See FILE:a.png here.\n") == "Plain image links")
+        #expect(reason("See FILE:~/a here.\n") == "File links under ~")
     }
 
     @Test func labelsStayTheSame() throws {

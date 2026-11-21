@@ -1231,7 +1231,7 @@ final class ASCIIRenderer {
     private static let unrenderedTypes: Set<String> = ["attachment", "bbdb", "bibtex", "docview", "doi", "eww", "gnus", "info", "irc", "mhe", "rmail", "w3m"]
 
     /// `org-link-plain-re`, in any case, for the plain links the parser leaves as text.
-    private static let plainLink: NSRegularExpression = {
+    static let plainLink: NSRegularExpression = {
         let plain = #"[^\[\]\s()<>]"#
         let parens = #"[<(\[](?:\#(plain)|[<(\[]\#(plain)*[\])>])*[\])>]"#
         let types = "attachment|bbdb|bibtex|docview|doi|elisp|eww|file\\+emacs|file\\+sys|file|ftp|gnus|help|https?|id|info|irc|mailto|mhe|news|rmail|shell|shortdoc|w3m"

@@ -1293,6 +1293,8 @@ final class LaTeXRenderer {
     }
 
     private var inTitle = false
+    /// Whether text is a link's description, where Org finds no plain links.
+    private var inDescription = false
 
     /// `org-export-data` over objects: math objects merged (`org-latex--wrap-latex-math-block`),
     /// objects that export nothing taking their blanks with them unless they are needed.
@@ -1314,7 +1316,7 @@ final class LaTeXRenderer {
                 }
                 dropBlanks = false
                 afterObject = false
-                out += plainText(t)
+                out += try plainTextAndLinks(t)
                 index += 1
             case .object(let node, let children):
                 dropBlanks = false
@@ -1569,7 +1571,11 @@ final class LaTeXRenderer {
 
     private func link(_ node: SyntaxNode, _ children: [Inline]) throws -> String? {
         let (type, path) = linkTarget(node)
+        let saved = inDescription
+        inDescription = true
+        defer { inDescription = saved }
         var description: String? = node.firstChild(.linkDescription) == nil ? nil : try transcode(children)
+        inDescription = saved
         if description == "" { description = nil }
         if node.firstChild(.linkDescription)?.descendants().contains(where: { $0.kind == .link }) == true {
             throw Unsupported(reason: "Links in link descriptions")
@@ -1604,9 +1610,7 @@ final class LaTeXRenderer {
             if let range = format.range(of: "(\(path))") { format.replaceSubrange(range, with: "%s") }
             return format.replacingOccurrences(of: "%s", with: resolved).replacingOccurrences(of: "%%", with: "%")
         case "file":
-            if path.hasPrefix("~") { throw Unsupported(reason: "File links under ~") }
-            let uri = path.hasPrefix("//") ? "file:" + path : path.hasPrefix("/") ? "file://" + path : path
-            let protected = Self.protect(uri)
+            let protected = Self.protect(try fileURI(path))
             return description.map { "\\href{\(protected)}{\($0)}" } ?? "\\url{\(protected)}"
         case "http", "https", "ftp", "mailto", "news", "elisp", "shell", "help", "shortdoc":
             let protected = Self.protect(type + ":" + path)
@@ -1614,6 +1618,48 @@ final class LaTeXRenderer {
         default:
             throw Unsupported(reason: "\(type): links")
         }
+    }
+
+    private func fileURI(_ path: String) throws -> String {
+        if path.hasPrefix("~") { throw Unsupported(reason: "File links under ~") }
+        return path.hasPrefix("//") ? "file:" + path : path.hasPrefix("/") ? "file://" + path : path
+    }
+
+    /// Text with the plain links the parser leaves in it, `shell:ls` and the like, written as Emacs does.
+    private func plainTextAndLinks(_ t: String) throws -> String {
+        guard !inDescription else { return plainText(t) }
+        let ns = t as NSString
+        var out = ""
+        var last = 0
+        for m in ASCIIRenderer.plainLink.matches(in: t, range: NSRange(location: 0, length: ns.length)) {
+            let type = ns.substring(with: m.range(at: 1))
+            var path = ns.substring(with: NSRange(location: NSMaxRange(m.range(at: 1)) + 1, length: NSMaxRange(m.range) - NSMaxRange(m.range(at: 1)) - 1))
+            var before = ns.substring(with: NSRange(location: last, length: m.range.location - last))
+            if last > 0 {
+                // The previous link's post-blank, which Emacs writes as spaces.
+                let blanks = before.prefix { $0 == " " || $0 == "\t" }
+                before = String(repeating: " ", count: blanks.count) + before.dropFirst(blanks.count)
+            }
+            out += plainText(before)
+            let ext = (path as NSString).pathExtension.lowercased()
+            switch type.lowercased() {
+            case "file":
+                if ["pdf", "jpeg", "jpg", "png", "ps", "eps", "tikz", "pgf", "svg"].contains(ext) { throw Unsupported(reason: "Plain image links") }
+                if !path.hasPrefix("//"), let range = path.range(of: "::") { path = String(path[..<range.lowerBound]) }
+                out += "\\url{\(Self.protect(try fileURI(path)))}"
+            case "http", "https", "ftp", "mailto", "news", "elisp", "shell", "help", "shortdoc":
+                if ["jpeg", "jpg", "png", "ps", "eps", "tikz", "pgf", "svg"].contains(ext) { throw Unsupported(reason: "Plain image links") }
+                out += "\\url{\(Self.protect(type + ":" + path))}"
+            default:
+                throw Unsupported(reason: "Plain links of type \(type)")
+            }
+            last = NSMaxRange(m.range)
+        }
+        guard last > 0 else { return plainText(t) }
+        var rest = ns.substring(from: last)
+        let blanks = rest.prefix { $0 == " " || $0 == "\t" }
+        rest = String(repeating: " ", count: blanks.count) + rest.dropFirst(blanks.count)
+        return out + plainText(rest)
     }
 
     /// Words of a fuzzy link or a title, as `org-export-search-cells` compares them.
