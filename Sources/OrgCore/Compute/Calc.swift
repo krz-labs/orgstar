@@ -1526,6 +1526,17 @@ public enum Calc {
         func floorOf(_ v: Value) throws -> Value {
             if case .int = v { return v }
             if case .frac(let n, let d) = v { return .int(n / d - (n % d < 0 ? 1 : 0)) }
+            if case .float(let m, let e) = v {
+                if e >= 0 {
+                    guard e <= 18 else { throw Unsupported("integer size") }
+                    let (i, overflow) = m.multipliedReportingOverflow(by: Int(try power10(e)))
+                    if overflow { throw Unsupported("integer size") }
+                    return .int(i)
+                }
+                guard -e <= 18 else { return .int(m < 0 ? -1 : 0) }
+                let d = Int(try power10(-e))
+                return .int(m / d - (m % d < 0 ? 1 : 0))
+            }
             guard let i = Int(exactly: try double(v).rounded(.down)) else { throw Unsupported("integer size") }
             return .int(i)
         }

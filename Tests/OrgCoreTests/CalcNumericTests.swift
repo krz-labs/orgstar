@@ -127,6 +127,14 @@ struct CalcNumericTests {
                 #expect(skipped == [], "p\(precision) \(skipped)")
             }
         }
+        let wide = ["mod(-1234567890123456789,7)", "(-1234567890123456789)%7", "mod(1234567890123456789,-7)", "mod(-29999999999999999,-10)",
+                    "(-29999999999999999)%(-10)", "mod(-9999999999999999,-10)"].map { ($0, "(float 0)") }
+        for precision in [16, 17, 18] {
+            for fractions in [true, false] {
+                let skipped = try CalcTests.compare(wide, precision: precision, fractions: fractions)
+                #expect(skipped == [], "p\(precision) \(skipped)")
+            }
+        }
     }
 
     /// Calc's `math-overflow` and `math-underflow` past an exponent of 4,000,000 leave the formula alone.
