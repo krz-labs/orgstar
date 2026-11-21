@@ -16,7 +16,10 @@ public struct Programs: ProgramRunning {
         // js in JavaScriptCore when node (or `:cmd`) isn't installed. A `:cmd` with arguments runs
         // as written, since JavaScriptCore can't take node's options.
         switch job.runner {
-        case .process(let executable, _), .session(_, let executable, _):
+        case .process(let executable, _):
+            let words = BabelRunner.words(executable)
+            if words.count == 1, !BabelRunner.installed(words[0]), let output = try await JavaScriptBlocks.run(job, directory: fileDirectory) { return output }
+        case .session(_, let executable, _):
             if !executable.contains(where: \.isWhitespace), !BabelRunner.installed(executable), let output = try await JavaScriptBlocks.run(job, directory: fileDirectory) { return output }
         case .emacs:
             // Emacs Lisp in `Elisp` when Emacs isn't installed.

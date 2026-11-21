@@ -24,6 +24,22 @@ public enum BabelRunner {
         return paths.contains { FileManager.default.isExecutableFile(atPath: $0) }
     }
 
+    /// The words `/bin/sh` makes of `command`, after expanding `~`, variables and quotes.
+    public static func words(_ command: String) -> [String] {
+        guard command.contains(where: { "~$'\"`\\".contains($0) }) else { return command.split(whereSeparator: \.isWhitespace).map(String.init) }
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/bin/sh")
+        process.arguments = ["-c", "printf '%s\\0' " + command]
+        process.environment = environment
+        let out = Pipe()
+        process.standardOutput = out
+        process.standardError = FileHandle.nullDevice
+        guard (try? process.run()) != nil else { return [] }
+        let data = out.fileHandleForReading.readDataToEndOfFile()
+        process.waitUntilExit()
+        return String(decoding: data, as: UTF8.self).split(separator: "\0").map(String.init)
+    }
+
     public static func run(_ job: BabelJob, fileDirectory: URL, timeout: Duration = .seconds(300)) async throws -> BabelOutput {
         for programs in job.programs where !programs.contains(where: installed) {
             let names = programs.count == 1 ? programs[0] : "Neither " + programs.joined(separator: " nor ")
@@ -42,7 +58,6 @@ public enum BabelRunner {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
         process.environment = environment
-        let stdin = Pipe()
         switch job.runner {
         case .process(let executable, var arguments):
             if let script = job.script {
@@ -51,10 +66,8 @@ public enum BabelRunner {
                 try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: file.path)
                 arguments = arguments.map { $0.replacingOccurrences(of: Babel.scriptFileToken, with: file.path) }
             }
-            // A command with arguments, such as `:cmd "node --no-warnings"`, runs in the shell as
-            // Org runs it.
-            process.arguments = executable.contains(where: \.isWhitespace)
-                ? ["/bin/sh", "-c", executable + " \"$@\"", "sh"] + arguments : [executable] + arguments
+            // In the shell, as Org runs it, so `:cmd "node --no-warnings"` or `~/bin/node` works.
+            process.arguments = ["/bin/sh", "-c", executable + " \"$@\"", "sh"] + arguments
         case .emacs:
             guard let emacs = EmacsRunner.executable() else { throw Failure(description: "Emacs isn't installed, so Emacs Lisp blocks can't run.") }
             let script = folder.appendingPathComponent("babel.el")
@@ -74,24 +87,16 @@ public enum BabelRunner {
         let stderr = folder.appendingPathComponent("stderr")
         FileManager.default.createFile(atPath: stderr.path, contents: nil)
         let err = try FileHandle(forWritingTo: stderr)
-        process.standardInput = stdin
+        // The input from a file, as `org-babel-eval` gives it.
+        let stdin = folder.appendingPathComponent("stdin")
+        if case .process = job.runner { try input.write(to: stdin, atomically: true, encoding: .utf8) } else { FileManager.default.createFile(atPath: stdin.path, contents: nil) }
+        process.standardInput = try FileHandle(forReadingFrom: stdin)
         process.standardOutput = out
         process.standardError = err
         do {
             try process.run()
         } catch {
             throw Failure(description: "Can't start \(process.arguments?.first ?? "the interpreter"): \(error.localizedDescription)")
-        }
-        if case .process = job.runner {
-            let handle = stdin.fileHandleForWriting
-            let data = Data(input.utf8)
-            // Large programs would fill the pipe; write off the main thread.
-            Task.detached {
-                try? handle.write(contentsOf: data)
-                try? handle.close()
-            }
-        } else {
-            try stdin.fileHandleForWriting.close()
         }
         let deadline = ContinuousClock.now + timeout
         while process.isRunning {

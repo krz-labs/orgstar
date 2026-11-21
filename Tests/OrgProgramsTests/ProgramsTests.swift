@@ -254,6 +254,50 @@ struct JavaScriptFallbackTests {
     func usesNodeWhenInstalled() async throws {
         #expect(try await run("#+begin_src js :results output\nconsole.log(typeof require('fs').readFileSync)\n#+end_src\n").stdout == "function\n")
     }
+
+    /// A `:cmd` the shell expands, such as `~/../../opt/homebrew/bin/node`, runs node, as in Org.
+    @Test(.enabled(if: BabelRunner.installed("node")))
+    func expandsTheCommandAsTheShellDoes() async throws {
+        let node = try #require(BabelRunner.environment["PATH"]?.split(separator: ":").map { "\($0)/node" }
+            .first { FileManager.default.isExecutableFile(atPath: $0) })
+        let home = NSHomeDirectory()
+        let up = String(repeating: "../", count: home.split(separator: "/").count)
+        for cmd in ["~/" + up + node.dropFirst(), "$HOME/" + up + node.dropFirst(), "'\(node)'"] {
+            let output = try await run("#+begin_src js :cmd \"\(cmd)\" :results output\nconsole.log(typeof __filename)\n#+end_src\n")
+            #expect(output.stdout == "string\n", "\(cmd)")
+        }
+    }
+
+    /// An expanded `:cmd` that isn't installed runs in JavaScriptCore.
+    @Test func expandedCommandFallsBack() async throws {
+        #expect(try await run("#+begin_src js :cmd ~/no-such-node\nreturn [1, 2]\n#+end_src\n").stdout == "[ 1, 2 ]")
+    }
+}
+
+/// Interpreters run through `/bin/sh`, as Org runs them.
+struct ShellCommandTests {
+    @Test func words() {
+        #expect(BabelRunner.words("node --no-warnings") == ["node", "--no-warnings"])
+        #expect(BabelRunner.words("~/bin/node") == [NSHomeDirectory() + "/bin/node"])
+        #expect(BabelRunner.words("'a b' \"$HOME\"") == ["a b", NSHomeDirectory()])
+    }
+
+    @Test(.enabled(if: BabelRunner.installed("python3")))
+    func pythonWithOptions() async throws {
+        let text = "#+begin_src python :python \"python3 -X utf8\" :results output\nimport sys\nprint(sys.flags.utf8_mode)\n#+end_src\n"
+        let context = EditContext(revision: 0, text: text, tree: OrgParser.parse(text), selection: [2..<2])
+        guard case .success(let job) = Babel.plan(context) else { throw Babel.Failure.message("not planned") }
+        #expect(try await BabelRunner.run(job, fileDirectory: FileManager.default.temporaryDirectory).stdout == "1\n")
+    }
+
+    /// Standard input is a file, as `org-babel-eval` gives it.
+    @Test(.enabled(if: BabelRunner.installed("node")))
+    func standardInputIsAFile() async throws {
+        let text = "#+begin_src js :results output\nconst s = require('fs').fstatSync(0)\nconsole.log(s.isFile(), s.isFIFO(), process.stdin.constructor.name)\n#+end_src\n"
+        let context = EditContext(revision: 0, text: text, tree: OrgParser.parse(text), selection: [2..<2])
+        guard case .success(let job) = Babel.plan(context) else { throw Babel.Failure.message("not planned") }
+        #expect(try await BabelRunner.run(job, fileDirectory: FileManager.default.temporaryDirectory).stdout == "true false ReadStream\n")
+    }
 }
 
 /// js blocks without a session run as `node FILE`, as `org-babel-execute:js` runs them.
@@ -270,6 +314,7 @@ struct NodeFileTests {
         "#+begin_src js :cmd \"node --no-warnings\" :results output\nconsole.log(process.argv.length, process.execArgv.join(' '))\n#+end_src\n",
         "#+begin_src js :results output\nconsole.log(JSON.stringify(require('fs').readFileSync(0, 'utf8')))\n#+end_src\n",
         "#+begin_src js :results output\nconsole.log('top'); return; console.log('not reached')\n#+end_src\n",
+        "#+begin_src js :results output\nconst s = require('fs').fstatSync(0)\nconsole.log(s.isFile(), s.isFIFO(), process.stdin.constructor.name)\n#+end_src\n",
     ]
 
     /// The results Emacs inserts. `org-babel-temporary-directory` is set as interactive Emacs

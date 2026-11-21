@@ -82,7 +82,7 @@ The block's text is remembered when the run starts. If you edit the block while 
 
 ** Languages that run
 
-On the Mac, orgstar starts each interpreter through =/usr/bin/env=. Because an app opened from the Dock does not see your shell's =PATH=, orgstar adds =/opt/homebrew/bin=, =/usr/local/bin=, =/Library/TeX/texbin=, =/usr/bin= and =/bin= to the end of it.
+On the Mac, orgstar starts each interpreter outside a =:session= through =/bin/sh=, as Org does, with standard input read from a file. Because an app opened from the Dock does not see your shell's =PATH=, orgstar adds =/opt/homebrew/bin=, =/usr/local/bin=, =/Library/TeX/texbin=, =/usr/bin= and =/bin= to the end of it.
 
 | Language                                                         | Program run                                         |
 |------------------------------------------------------------------+-----------------------------------------------------|
@@ -97,7 +97,7 @@ On the Mac, orgstar starts each interpreter through =/usr/bin/env=. Because an a
 | =dot=, =plantuml=, =mermaid=                                     | =dot=, =plantuml=, =mmdc=; see Graphics below       |
 | =C=, =C++=, =cpp=, =D=, =java=, =fortran=, =clojure=             | A compiler, or =bb= or =clojure=; see Compiled languages below |
 
-For =js=, =javascript= and =R=, =:cmd= names a different program. A program given with options, such as =:cmd "node --no-warnings"=, runs through =/bin/sh=, as Org runs it. =awk= takes =:cmd-line= arguments after its program, and =:in-file= as the file it reads.
+For =js=, =javascript= and =R=, =:cmd= names a different program. Since it runs through =/bin/sh=, a program in =:cmd=, =:python= or =:ruby= can be given with options, such as =:cmd "node --no-warnings"= or =:python "python3 -X utf8"=, or with =~= or a variable, such as =:cmd "~/bin/node"=. =awk= takes =:cmd-line= arguments after its program, and =:in-file= as the file it reads.
 
 Any other language is refused with "No way to run /language/ blocks yet."
 
@@ -107,7 +107,7 @@ The [[file:../install.org][Mac App Store version]] starts no programs, so only E
 
 ** JavaScript in JavaScriptCore
 
-In the Mac App Store version and on iOS, =js= and =javascript= blocks run in JavaScriptCore, the JavaScript engine built into macOS and iOS. The download version uses it when =node=, or the program in =:cmd=, isn't installed; a =:cmd= with options, such as =node --no-warnings=, never runs in JavaScriptCore. A block runs as Emacs runs it, with =node= reading it from a file as a CommonJS module, where =this= is =module.exports= and top-level =var= declarations stay in the block. Its output and result are what node gives:
+In the Mac App Store version and on iOS, =js= and =javascript= blocks run in JavaScriptCore, the JavaScript engine built into macOS and iOS. The download version uses it when =node=, or the program in =:cmd= after =/bin/sh= expands it, isn't installed; a =:cmd= with options, such as =node --no-warnings=, never runs in JavaScriptCore. A block runs as Emacs runs it, with =node= reading it from a file as a CommonJS module, where =this= is =module.exports= and top-level =var= declarations stay in the block. Its output and result are what node gives:
 
 - =console.log=, =console.info= and =console.debug= write to the output, =console.warn= and =console.error= to the error output, and =console.dir= prints with =util.inspect=. =process.stdout.write= and =process.stderr.write= write text.
 - =require('util')= has =inspect=, =format= and =formatWithOptions=, which print values as Node 26 prints them. =require('process')= has =stdout= and =stderr=.
