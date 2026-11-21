@@ -1608,7 +1608,7 @@ final class LaTeXRenderer {
             let uri = path.hasPrefix("//") ? "file:" + path : path.hasPrefix("/") ? "file://" + path : path
             let protected = Self.protect(uri)
             return description.map { "\\href{\(protected)}{\($0)}" } ?? "\\url{\(protected)}"
-        case "http", "https", "ftp", "mailto", "news":
+        case "http", "https", "ftp", "mailto", "news", "elisp", "shell", "help", "shortdoc":
             let protected = Self.protect(type + ":" + path)
             return description.map { "\\href{\(protected)}{\($0)}" } ?? "\\url{\(protected)}"
         default:

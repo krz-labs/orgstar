@@ -106,6 +106,7 @@ struct LaTeXExportTests {
         "Snippets @@latex:\\newpage@@ and @@html:<br>@@ gone. Also @@html:x@@ @@html:y@@ end.\n@@html:z@@ start\n",
         "Line one\\\\\nline two \\\\\n\\\\\nafter\n",
         "Links: [[https://orgmode.org][Org & co]] <https://a.b/c_d> https://x.y/%20 [[mailto:me@x.org]] [[file:doc.pdf][the doc]] [[./rel/file.txt]] [[file:/abs/path.org]]\n",
+        "Run [[elisp:(+ 1 2)][add]] and [[elisp:(message \"50% #x\")]], [[shell:ls ~/x_y][list]] [[shell:echo $HOME]], [[help:car][car]] [[shortdoc:string]].\n",
         "* Target section\nA <<anchor>> here and [[anchor]] and [[anchor][desc]].\n* Other\nSee [[*Target section]] and [[Target section][named]] and [[#cid]].\n* Third\n:PROPERTIES:\n:CUSTOM_ID: cid\n:END:\nx\n",
         "#+OPTIONS: num:nil\n* Head\nSee [[*Head]].\n",
         "Footnotes[fn:1] twice[fn:1] and[fn:2][fn:3] and inline[fn::anon /x/] and[fn:named:inline def].\n\n[fn:1] First.\n\n[fn:2] Second\n  with two lines.\n\n[fn:3] Third.\n",
