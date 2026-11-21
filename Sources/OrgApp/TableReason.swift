@@ -112,6 +112,7 @@ public enum TableReason {
         switch reason {
         case "arguments": return String(localized: "arguments", comment: comment)
         case "calc precision": return String(localized: "calc precision", comment: comment)
+        case "Calc constants": return String(localized: "Calc constants", comment: comment)
         case "chained comparison": return String(localized: "chained comparison", comment: comment)
         case "comparison with nan": return String(localized: "comparison with nan", comment: comment)
         case "complex result": return String(localized: "complex result", comment: comment)

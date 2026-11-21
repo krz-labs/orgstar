@@ -93,6 +93,47 @@ struct BabelCalcTests {
         }
     }
 
+    /// More blocks: each matches Emacs or is refused.
+    static let probes: [String] = [
+        "2^0.5", "-5 % 3", "1/0", "fact(5)", "round(2.5)", "12345678901234 * 10", "1e-5", "0.1 + 0.2", "2 * pi", "max(3, 5)",
+        "1:2 * 2", "e", "sqrt(-1)", "1e100", "[1, 2] + [3, 4]", "-0.5", "100000000000000", "1.23456789012345", "3 x + y", "x^2",
+        "ln(10)", "exp(1)", "7 \\ 2", "abs(-2.5)", "floor(-2.5)", "1 / 7", "2^-2", "[1, 2, 3] * 2", "\"abc\"", "a b c",
+    ].map { "#+begin_src calc\n\($0)\n#+end_src\n" } + [
+        "#+begin_src calc :var x=-3\nabs(x)\n#+end_src\n",
+        "#+begin_src calc :var x=3\nx^2\n#+end_src\n",
+        "#+begin_src calc :var x=5\nx - x\n#+end_src\n",
+        "#+begin_src calc :var v='(1 2 3)\nv * 2\n#+end_src\n",
+        "#+begin_src calc :var v='(1 2 3)\nv\n'n\n#+end_src\n",
+        "#+begin_src calc :results list\n[1, 2, 3]\n#+end_src\n",
+        "#+begin_src calc :results raw\n1/3\n#+end_src\n",
+        "#+begin_src calc :var x=4 y=x\ny\n#+end_src\n",
+        "#+begin_src calc :results vector\n5\n#+end_src\n",
+        "#+begin_src calc :rownames yes\n[[1, 2], [3, 4]]\n#+end_src\n",
+        "#+NAME: hd2\n| a | b |\n|---+---|\n| 1 | 2 |\n\n#+begin_src calc :var m=hd2\nm * 2\n#+end_src\n",
+        "#+begin_src calc\n1\n\n2\n'+\n3\n'*\n#+end_src\n",
+        "#+begin_src calc\n2.\n3\n'/\n#+end_src\n",
+        "#+begin_src calc :epilogue \"'n\"\n4\n#+end_src\n",
+    ]
+
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
+    func probesMatchEmacsOrAreRefused() throws {
+        var cases: [EmacsOracle.Case] = []
+        var ours: [(text: String, failure: String?)?] = []
+        for text in Self.probes {
+            ours.append(try? Self.native(text))
+            cases.append(EmacsOracle.Case(text: text, point: EmacsOracle.point(Self.caret(text), in: text), form: """
+            (progn (require 'ob-calc) (setq org-confirm-babel-evaluate nil)
+              (save-window-excursion (calc) (when (> (calc-stack-size) 0) (calc-pop (calc-stack-size))) (calc-quit))
+              (org-babel-execute-src-block))
+            """))
+        }
+        let emacs = try EmacsOracle.run(cases)
+        for (i, theirs) in emacs.enumerated() {
+            guard let mine = ours[i] else { continue }
+            #expect(mine.text == theirs.text, "\(Self.probes[i])\nours (\(mine.failure ?? "")):\n\(mine.text)\nemacs (\(theirs.error)):\n\(theirs.text)")
+        }
+    }
+
     /// What Calc here doesn't do as Emacs's does is refused, with the reason.
     @Test func refusals() throws {
         let refused: [(String, String)] = [

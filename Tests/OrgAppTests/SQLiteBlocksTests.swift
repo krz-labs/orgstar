@@ -110,7 +110,7 @@ struct SQLiteBlocksTests {
         "#+begin_src sqlite :prologue \"create table p(a);\" :epilogue \"select count(*) from p;\"\ninsert into p values (1), (2);\n#+end_src\n",
         "#+begin_src sqlite\nselect 1;\nselect * from nope;\nselect 2;\n#+end_src\n",
         "#+begin_src sqlite :bail\nselect 1;\nselect * from nope;\nselect 2;\n#+end_src\n",
-        "#+begin_src sqlite :echo\nselect 1;\nselect 2;\n#+end_src\n",
+        "#+begin_src sqlite :echo :results output\nselect 1;\nselect 2;\n#+end_src\n",
         "#+begin_src sqlite\nselect ' a ', '\"b\"', 'c\"d', '-', '1e3', '+5', '.5', '1.';\n#+end_src\n",
         "#+begin_src sqlite :list\nselect 'a b', 'c';\nselect 'single';\n#+end_src\n",
         "#+begin_src sqlite :list\nselect 'a' || char(9) || 'b', 'c';\nselect 'd' || char(9) || 'e';\n#+end_src\n",
@@ -119,35 +119,99 @@ struct SQLiteBlocksTests {
         "#+begin_src sqlite\nselect 1, '';\nselect '', '';\n#+end_src\n",
     ]
 
+    /// More blocks: each matches Emacs or is refused.
+    static let probes: [String] = [
+        "#+begin_src sqlite :column\nselect 1 as n, null as z, 'abc' as t union all select 12345, 'x', '';\n#+end_src\n",
+        "#+begin_src sqlite :html\nselect '<b>' as \"a&b\", null;\n#+end_src\n",
+        "#+begin_src sqlite :line\nselect 'a\nb' as x, 2 as longer;\nselect 3 as y;\n#+end_src\n",
+        "#+begin_src sqlite\nselect null, 1;\n#+end_src\n",
+        "#+begin_src sqlite\nselect 9223372036854775807, -9223372036854775808, 1.5e300;\n#+end_src\n",
+        "#+begin_src sqlite\nselect 'a' union all select 'b' union all select 'c';\n#+end_src\n",
+        "#+begin_src sqlite :list :nullvalue N\nselect null, 1;\n#+end_src\n",
+        "#+begin_src sqlite :csv\n.mode column\nselect 1 as a, 22 as bb;\n#+end_src\n",
+        "#+begin_src sqlite\nselect 'a|b', 'c';\n#+end_src\n",
+        "#+begin_src sqlite\n-- only a comment\n#+end_src\n",
+        "#+begin_src sqlite :results scalar\nselect 1, 2;\n#+end_src\n",
+        "#+begin_src sqlite :results table\nselect 'x';\n#+end_src\n",
+        "#+begin_src sqlite :colnames yes :list\nselect 1 as a, 2 as b;\n#+end_src\n",
+        "#+begin_src sqlite :colnames yes\nselect 1 as a;\n#+end_src\n",
+        "#+begin_src sqlite :results list\nselect 1;\n#+end_src\n",
+        "#+begin_src sqlite :results drawer\nselect 1, 2;\n#+end_src\n",
+        "#+begin_src sqlite :wrap example\nselect 1, 2;\n#+end_src\n",
+        "#+begin_src sqlite :separator , \nselect 'a b', 2;\n#+end_src\n",
+        "#+begin_src sqlite :list\nselect '  lead', 'trail  ';\n#+end_src\n",
+        "#+begin_src sqlite\nselect '  lead', 'trail  ', ' ';\n#+end_src\n",
+        "#+begin_src sqlite\nselect 'tab' || char(9) || 'x', 2;\n#+end_src\n",
+        "#+begin_src sqlite\nselect 'α', '日本', 'x';\n#+end_src\n",
+        "#+begin_src sqlite :column\nselect 'a b' as \"c d\";\n#+end_src\n",
+        "#+begin_src sqlite\nselect 1;\nselect 2, 3;\n#+end_src\n",
+        "#+begin_src sqlite\nselect '\"a\" \"b\"', '\"c\\\"d\"';\n#+end_src\n",
+        "#+begin_src sqlite\nselect '1e5', '0x10', '1,5', '--1';\n#+end_src\n",
+        "#+begin_src sqlite :var n=2\nselect $n + $n1;\n#+end_src\n",
+        "#+NAME: h\n| a | b |\n|---+---|\n| 1 | 2 |\n|---+---|\n| 3 | 4 |\n\n#+begin_src sqlite :var t=h :hlines yes\ncreate table v(a, b);\n.import --csv $t v\nselect * from v;\n#+end_src\n",
+        "#+NAME: s\n| x y | 2.50 |\n| \"q\" | 007 |\n\n#+begin_src sqlite :var t=s\ncreate table v(a, b);\n.import --csv $t v\nselect a, b, typeof(b) from v;\n#+end_src\n",
+        "#+begin_src sqlite :echo :list\nselect 1;\n#+end_src\n",
+        "#+begin_src sqlite :echo :results output\nselect 1;\n#+end_src\n",
+        "#+begin_src sqlite :list\nselect '';\nselect 1;\n#+end_src\n",
+        "#+begin_src sqlite :list\nselect '';\n#+end_src\n",
+        "#+begin_src sqlite :list\nselect 1;\nselect '';\n#+end_src\n",
+        "#+begin_src sqlite :list\nselect '';\nselect 1, 2;\n#+end_src\n",
+        "#+begin_src sqlite :results list\nselect 1, 2;\n#+end_src\n",
+        "#+begin_src sqlite :results list :list\nselect 'a', 'b c';\n#+end_src\n",
+        "#+begin_src sqlite :results output :line\nselect 1 as a;\nselect 2 as b;\n#+end_src\n",
+        "#+begin_src sqlite\ncreate table t(a);\ninsert into t values (1);\nselect changes(), total_changes();\n#+end_src\n",
+    ]
+
+    @MainActor
+    @Test(.enabled(if: oracle))
+    func probesMatchEmacsOrAreRefused() async throws {
+        let (ours, emacs, messages) = try await Self.compare(Self.probes)
+        for (i, text) in Self.probes.enumerated() where !messages[i].hasPrefix("This sqlite block can't run here") {
+            if emacs[i].hasPrefix("ERROR: ") {
+                // Emacs fails the run: the same message, and nothing written.
+                #expect(messages[i] == emacs[i].dropFirst("ERROR: ".count) && ours[i] == text, "\(text)\nours (\(messages[i])):\n\(ours[i])\nemacs:\n\(emacs[i])")
+                continue
+            }
+            #expect(ours[i] == emacs[i], "\(text)\nours (\(messages[i])):\n\(ours[i])\nemacs:\n\(emacs[i])")
+        }
+    }
+
     /// The results the app inserts, as Emacs inserts them running `sqlite3`.
     @MainActor
     @Test(.enabled(if: oracle))
     func resultsMatchEmacs() async throws {
+        let (ours, emacs, _) = try await Self.compare(Self.blocks)
+        for (i, text) in Self.blocks.enumerated() {
+            #expect(ours[i] == emacs[i], "\(text)\nours:\n\(ours[i])\nemacs:\n\(emacs[i])")
+        }
+    }
+
+    /// Each block run by the app, and by Emacs, with the app's messages.
+    @MainActor
+    static func compare(_ blocks: [String]) async throws -> (ours: [String], emacs: [String], messages: [String]) {
         let ourFolder = try Folder(), theirFolder = try Folder()
         var forms: [String] = []
         var ours: [String] = []
-        for text in Self.blocks {
+        var messages: [String] = []
+        for text in blocks {
             let caret = (text as NSString).range(of: "#+begin_src").location + 2
             let file = try ourFolder.write("b.org", text)
             let session = DocumentSession(recovery: FileRecoveryStore(directory: ourFolder.url.appendingPathComponent(".r")))
             session.open(file.path)
-            guard case .external(.babel(let job)) = session.perform(ExecuteSrcBlock(), path: file.path, at: caret, expect: nil) else {
-                Issue.record("not planned: \(text)")
-                return
+            switch session.perform(ExecuteSrcBlock(), path: file.path, at: caret, expect: nil) {
+            case .external(.babel(let job)): messages.append(await session.runBabel(job))
+            case let other: messages.append("\(other)")
             }
-            _ = await session.runBabel(job)
             ours.append(session.document?.text ?? "")
             let quoted = "\"" + text.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"") + "\""
-            forms.append("(with-temp-buffer (insert \(quoted)) (org-mode) (goto-char \(caret + 1)) (condition-case e (org-babel-execute-src-block) (error (insert (format \"ERROR: %S\" e)))) (princ (concat (buffer-string) \"\\f\")))")
+            forms.append("(with-temp-buffer (insert \(quoted)) (org-mode) (goto-char \(caret + 1)) (princ (condition-case e (progn (org-babel-execute-src-block) (concat (buffer-string) \"\\f\")) (error (format \"ERROR: %s\\f\" (error-message-string e))))))")
         }
         let emacs = try Self.emacs("""
             (progn (require 'org) (require 'ob-sqlite)
               (setq org-confirm-babel-evaluate nil org-babel-sqlite3-command "\(Self.sqlite3)" default-directory "\(theirFolder.url.path)/")
               \(forms.joined(separator: "\n")))
             """).split(separator: "\u{0C}", omittingEmptySubsequences: false).map(String.init)
-        for (i, text) in Self.blocks.enumerated() {
-            #expect(ours[i] == emacs[i], "\(text)\nours:\n\(ours[i])\nemacs:\n\(emacs[i])")
-        }
+        return (ours, emacs, messages)
     }
 
     /// Emacs in a UTF-8 locale, as it runs on the Mac.
@@ -188,6 +252,7 @@ struct SQLiteBlocksTests {
             ("#+begin_src sqlite :column\nselect 'é';\n#+end_src\n", .init(.width)),
             ("#+begin_src sqlite :column\nselect 'a\nb';\n#+end_src\n", .init(.width)),
             ("#+begin_src sqlite\nexplain select 1;\n#+end_src\n", .init(.explain)),
+            ("#+begin_src sqlite :echo\nselect 1;\n#+end_src\n", .init(.echo)),
             ("#+begin_src sqlite\ncreate table t(a);\nselect x'01';\n#+end_src\n", .init(.blob, partly: true)),
             (Self.table + "#+begin_src sqlite :var t=tbl\n.import --csv $t v\n#+end_src\n", .init(.newTable)),
             (Self.table + "#+begin_src sqlite :var t=tbl\ncreate table v(a);\n.import --csv $t v\n#+end_src\n", .init(.importRows, partly: true)),

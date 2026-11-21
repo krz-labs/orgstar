@@ -1813,6 +1813,41 @@
         }
       }
     },
+    ":echo with a result that isn't text": {
+      "comment": "Why an sqlite block can't run here",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ":echo mit einem Ergebnis, das kein Text ist"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ":echo con un resultado que no es texto"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ":echo avec un résultat qui n’est pas du texte"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テキストではない結果での :echo"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ":echo com um resultado que não é texto"
+          }
+        }
+      }
+    },
     "A folder with config.toml and capture.toml, such as a synced copy of ~/.config/orgstar from your Mac. Changes to them apply as they sync.": {
       "localizations": {
         "de": {
@@ -4960,6 +4995,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "C-c ' ou ⌘Return salva, Esc ou C-c C-k sai"
+          }
+        }
+      }
+    },
+    "Calc constants": {
+      "comment": "Why a table needs Emacs",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calc-Konstanten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "constantes de Calc"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "constantes de Calc"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calc の定数"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "constantes do Calc"
           }
         }
       }

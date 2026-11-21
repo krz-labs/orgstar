@@ -17,6 +17,45 @@ extension Trait where Self == WithPrograms {
     static var programs: Self { WithPrograms() }
 }
 
+/// The download version runs sqlite blocks with `sqlite3`, and calc natively with Emacs for
+/// what Calc here refuses.
+@MainActor
+@Suite(.programs)
+struct CalcAndSQLiteProgramsTests {
+    func run(_ text: String, in folder: Folder) async throws -> (message: String, text: String) {
+        let file = try folder.write("b.org", text)
+        let session = DocumentSession(recovery: FileRecoveryStore(directory: folder.url.appendingPathComponent(".r")))
+        session.open(file.path)
+        let caret = (text as NSString).range(of: "#+begin_src").location + 2
+        guard case .external(.babel(let job)) = session.perform(ExecuteSrcBlock(), path: file.path, at: caret, expect: nil) else {
+            Issue.record("not planned: \(text)")
+            return ("", "")
+        }
+        return (await session.runBabel(job), session.document?.text ?? "")
+    }
+
+    @Test(.enabled(if: FileManager.default.isExecutableFile(atPath: "/usr/bin/sqlite3")))
+    func sqliteRunsSqlite3WithTables() async throws {
+        let table = "#+NAME: t\n| 1 | one |\n| 2 | two |\n\n"
+        let text = table + "#+begin_src sqlite :var t=t :db x.db\ncreate table v(a, b);\n.import --csv $t v\nselect b, a * 2 from v;\n#+end_src\n"
+        let ran = try await run(text, in: try Folder())
+        #expect(ran.message == "Code block evaluation complete.")
+        #expect(ran.text == text + "\n#+RESULTS:\n| one | 2\r |\n| two | 4\r |\n")
+    }
+
+    @Test(.enabled(if: EmacsRunner.executable() != nil && ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
+    func calcFallsBackToEmacs() async throws {
+        let folder = try Folder()
+        let native = try await run("#+begin_src calc\n1/3\n#+end_src\n", in: folder)
+        #expect(native.text == "#+begin_src calc\n1/3\n#+end_src\n\n#+RESULTS:\n: 0.333333333333\n")
+        let emacs = try await run("#+begin_src calc\n2^100\n#+end_src\n", in: folder)
+        #expect(emacs.message == "Code block evaluation complete.")
+        #expect(emacs.text == "#+begin_src calc\n2^100\n#+end_src\n\n#+RESULTS:\n: 1267650600228229401496703205376\n")
+        let failed = try await run("#+begin_src calc\n'+\n#+end_src\n", in: folder)
+        #expect(failed.message == "Too few elements on stack")
+    }
+}
+
 @MainActor
 @Suite(.programs)
 struct EmacsFallbackTests {

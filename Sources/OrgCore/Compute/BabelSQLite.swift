@@ -108,13 +108,20 @@ extension Babel {
         let text = output
         if scalar { return .string(text) }
         if text.isEmpty { return .string("") }
-        var rows: [[String]?] = convertRegion(text, csv: csv)
+        guard var rows: [[String]?] = convertRegion(text, csv: csv) else { return .none }
         if headers, let first = rows.first {
             rows = [first, nil] + rows.dropFirst()
         }
         // `org-babel-sqlite-table-or-scalar`.
         if rows.count == 1, let only = rows[0], only.count == 1 { return .string(babelRead(only[0])) }
         return .table(rows.map { $0?.map(babelRead) })
+    }
+
+    /// The error Emacs stops with while making a table of the output, if any.
+    static func sqliteFailure(_ finish: BabelJob.Finish, _ output: BabelOutput) -> String? {
+        guard case .sqlite(let csv, _) = finish.kind, !resultCondScalar(finish.params), !finish.params.contains("discard"),
+              !output.stdout.isEmpty, convertRegion(output.stdout, csv: csv) == nil else { return nil }
+        return "Invalid search bound (wrong side of point)"
     }
 
     /// `org-babel-read` with Lisp evaluation inhibited: a number as Emacs prints it, a single
@@ -131,8 +138,9 @@ extension Babel {
     }
 
     /// `org-table-convert-region` on the whole output, then `org-table-to-lisp` of the aligned
-    /// table: rows of cells, padded to the widest row.
-    static func convertRegion(_ text: String, csv: Bool) -> [[String]?] {
+    /// table: rows of cells, padded to the widest row. Nil where Emacs fails: a last empty line
+    /// in a region read without a comma separator puts point past the search bound.
+    static func convertRegion(_ text: String, csv: Bool) -> [[String]?]? {
         var b = Array(text.unicodeScalars)
         let nl: Unicode.Scalar = "\n", tab: Unicode.Scalar = "\t", space: Unicode.Scalar = " ", comma: Unicode.Scalar = ",", quote: Unicode.Scalar = "\""
         var end = b.last == nl ? b.count - 1 : b.count
@@ -220,6 +228,7 @@ extension Babel {
                     i += 1
                 }
                 guard let found = match else { break }
+                if found.lowerBound == end { return nil }
                 replace(found, ["|", " "])
                 point = found.lowerBound + 2
             }

@@ -642,7 +642,7 @@ Each run starts with an empty stack. In Emacs the Calculator's stack carries ove
 
 =:var= values can be numbers, and lists and tables of integers; a table of one row is a vector. Errors that Emacs reports, such as "Too few elements on stack" or a stack key on a formula ("Invalid data object encountered"), fail the run without writing a result.
 
-What orgstar's Calc doesn't do as Emacs's Calc does is refused rather than given a different result: functions and forms table formulas also refuse, stack keys other than those above, dates, string variables, variables named like Calc's constants (=e=, =pi=, =i=) or with characters other than letters and digits, lists with fractional numbers, and a =:prologue= or =:epilogue= that is a bare number. The message is "This calc block can't be calculated here:" with the reason. The download version then runs the block in =emacs -Q --batch= when Emacs is installed.
+What orgstar's Calc doesn't do as Emacs's Calc does is refused rather than given a different result: functions and forms table formulas also refuse, Calc's constants such as =pi= and =e= (which Emacs replaces by their values), stack keys other than those above, dates, string variables, variables named like Calc's constants (=e=, =pi=, =i=) or with characters other than letters and digits, lists with fractional numbers, and a =:prologue= or =:epilogue= that is a bare number. The message is "This calc block can't be calculated here:" with the reason. The download version then runs the block in =emacs -Q --batch= when Emacs is installed.
 
 * sqlite blocks
 
@@ -669,11 +669,11 @@ select item, price * 2 from prices;
 ,#+end_src
 #+end_src
 
-The output is read as a table the way ob-sqlite reads it, with =org-table-convert-region=; a single value becomes a scalar. In =csv= mode =sqlite3= ends lines with CR LF and Emacs keeps the CR, so the last column of each row ends with a CR, which shows as =^M=; orgstar writes the same.
+The output is read as a table the way ob-sqlite reads it, with =org-table-convert-region=; a single value becomes a scalar. Where that conversion fails in Emacs, as it does for output whose last line is empty in a mode other than =csv=, the run fails with the same message. In =csv= mode =sqlite3= ends lines with CR LF and Emacs keeps the CR, so the last column of each row ends with a CR, which shows as =^M=; orgstar writes the same.
 
 In the Mac App Store version, =:db= must be in a folder orgstar has access to: a folder in the sidebar, or one you granted access to.
 
-Without =sqlite3=, these dot-commands run: =.headers= (=.header=), =.mode= with =list=, =csv=, =column=, =html= or =line=, =.separator= and =.nullvalue= with one plain argument, and =.import FILE TABLE= (with =--csv= or not) into a table that exists, of rows that fit it. Anything else is refused with "This sqlite block can't run here:" and the reason: other dot-commands, header values with characters the shell would read differently (spaces, quotes, =~=, =;=, =|=), BLOB values, control characters other than tab and newline in values, text other than ASCII or values on several lines in =column= mode and in =line= mode's column names, =EXPLAIN= statements, and text that isn't UTF-8. When the refused value comes after other statements, those statements have already run, and the message says so.
+Without =sqlite3=, these dot-commands run: =.headers= (=.header=), =.mode= with =list=, =csv=, =column=, =html= or =line=, =.separator= and =.nullvalue= with one plain argument, and =.import FILE TABLE= (with =--csv= or not) into a table that exists, of rows that fit it. Anything else is refused with "This sqlite block can't run here:" and the reason: other dot-commands, header values with characters the shell would read differently (spaces, quotes, =~=, =;=, =|=), BLOB values, control characters other than tab and newline in values, text other than ASCII or values on several lines in =column= mode and in =line= mode's column names, =EXPLAIN= statements, text that isn't UTF-8, and =:echo= unless the result is text (=:results output=, for example). When the refused value comes after other statements, those statements have already run, and the message says so.
 
 * Graphics
 

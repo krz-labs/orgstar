@@ -76,7 +76,13 @@ public struct BabelJob: Sendable, Equatable {
             case shell(valueIsExitStatus: Bool), python, generic, emacsLisp, compiled, script(js: Bool, session: Bool = false), calc
             case sqlite(csv: Bool, headers: Bool)
 
-            var isSQLite: Bool { if case .sqlite = self { true } else { false } }
+            /// ob-calc and ob-sqlite give a list of rows, never a flat list.
+            var givesRows: Bool {
+                switch self {
+                case .calc, .sqlite: true
+                default: false
+                }
+            }
         }
         let kind: Kind
         var language = ""

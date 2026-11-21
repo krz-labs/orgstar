@@ -23,6 +23,7 @@ extension Babel {
             }
             blockRange = found.location..<NSMaxRange(found)
         }
+        if let failure = sqliteFailure(job.finish, output) { return .failure(.message(failure)) }
         let value = Self.value(job.finish, output)
         if job.finish.params.contains("silent") || job.finish.params.contains("none") || job.finish.params.contains("discard") { return .success([]) }
         let buffer = EmacsBuffer(text, point: 0, settings: settings)
@@ -441,13 +442,17 @@ extension Babel {
         switch value {
         case .none:
             break
+        case .string(let s) where params.contains("list") && finish.kind.givesRows:
+            // `split-string` without empty lines, each an item; `org-trim` of the list.
+            var items = s.components(separatedBy: "\n").filter { !$0.isEmpty }.map { "- " + $0 }.joined(separator: "\n")
+            while let last = items.unicodeScalars.last, " \r\t\n".unicodeScalars.contains(last) { items.unicodeScalars.removeLast() }
+            if !items.isEmpty { buffer.insert(items + "\n") }
         case .string(var s) where params.contains("list"):
             if s.last != "\n" { s += "\n" }
             let items = s.split(separator: "\n", omittingEmptySubsequences: true)
             buffer.insert(items.map { "- " + $0 }.joined(separator: "\n") + "\n")
-        case .table(let rows) where params.contains("list") && finish.kind.isSQLite:
-            // ob-sqlite's value is always rows: each an item, its first cell the text and the
-            // others lines under it.
+        case .table(let rows) where params.contains("list") && finish.kind.givesRows:
+            // Each row an item, its first cell the text and the others lines under it.
             listed = true
             var items = rows.map { row in
                 guard let row else { return "- hline\n" }

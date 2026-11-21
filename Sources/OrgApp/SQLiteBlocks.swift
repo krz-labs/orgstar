@@ -17,6 +17,8 @@ public enum SQLiteBlocks {
         do {
             guard let arguments = command.arguments else { throw Refusal(.shell) }
             var shell = try Shell(arguments: arguments)
+            // Echoed statements as a table make Emacs's table conversion fail.
+            if shell.echo, !Babel.resultCondScalar(job.finish.params) { throw Refusal(.echo) }
             var input = job.input
             var temporary: URL?
             if !job.dataFiles.isEmpty {
@@ -39,7 +41,7 @@ public enum SQLiteBlocks {
     /// Why a block can't run as `sqlite3` would run it.
     struct Refusal: Error, Equatable {
         enum Reason: Equatable {
-            case shell, dotCommand(String), blob, control, width, explain, newTable, importRows, encoding
+            case shell, dotCommand(String), blob, control, width, explain, newTable, importRows, encoding, echo
         }
         let reason: Reason
         /// Statements before the refused one ran.
@@ -58,6 +60,7 @@ public enum SQLiteBlocks {
             case .newTable: what = String(localized: ".import into a table that doesn't exist yet", comment: "Why an sqlite block can't run here")
             case .importRows: what = String(localized: ".import of rows that don't fit the table", comment: "Why an sqlite block can't run here")
             case .encoding: what = String(localized: "text that isn't UTF-8", comment: "Why an sqlite block can't run here")
+            case .echo: what = String(localized: ":echo with a result that isn't text", comment: "Why an sqlite block can't run here")
             }
             return partly
                 ? String(localized: "This sqlite block can't run here: \(what). The statements before it ran.", comment: "An sqlite block refused partway")

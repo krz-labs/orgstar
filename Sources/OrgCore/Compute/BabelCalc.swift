@@ -51,7 +51,7 @@ extension Babel {
     }
 
     /// `org-babel-result-cond`: whether the value is taken as a string.
-    static func resultCondScalar(_ params: [String]) -> Bool {
+    public static func resultCondScalar(_ params: [String]) -> Bool {
         params.contains("scalar") || params.contains("verbatim") || params.contains("html") || params.contains("code")
             || params.contains("pp") || params.contains("file")
             || ((params.contains("output") || params.contains("raw") || params.contains("org")) && !params.contains("table"))
@@ -135,6 +135,9 @@ extension Babel {
                 } else {
                     var parser = Calc.Parser(line)
                     let tree = try parser.parse()
+                    // Calc's default modes give `pi` and `e` their values, which Calc here keeps
+                    // as symbols for table formulas.
+                    if !tree.variables.isDisjoint(with: Calc.constants) { throw Calc.Unsupported("Calc constants") }
                     // `calc-eval` of the line: a number is pushed as one.
                     let first: Calc.Value?
                     do {
