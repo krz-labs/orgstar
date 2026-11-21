@@ -69,6 +69,7 @@ public enum Calc {
                     if numeric {
                         switch value {
                         case .int, .float, .frac: break
+                        case .vector where isConstant(value): break
                         default:
                             // Calc explains the first argument a quotient, power or function
                             // rejected along the way, which isn't tracked here.
@@ -846,12 +847,23 @@ public enum Calc {
 
     // MARK: - Display
 
+    /// `math-constp` of the values here: a real number, or a vector of them.
+    static func isConstant(_ v: Value) -> Bool {
+        switch v {
+        case .int, .float, .frac: true
+        case .vector(let items): items.allSatisfy(isConstant)
+        default: false
+        }
+    }
+
     /// `math-format-number`.
     static func format(_ value: Value, _ floatFormat: FloatFormat) throws -> String {
         switch value {
         case .int(let i): return String(i)
         case .frac(let n, let d): return "\(n):\(d)"
-        case .vector: throw Unsupported("vector result")
+        case .vector(let items):
+            guard isConstant(value) else { throw Unsupported("vector result") }
+            return "[" + (try items.map { try format($0, floatFormat) }).joined(separator: ", ") + "]"
         case .symbolic(let t): return try Symbolic.format(t, floatFormat)
         case .nan: return "nan"
         case .date(let d): return "<" + (try formatDate(d)) + ">"
@@ -868,7 +880,8 @@ public enum Calc {
             case .sci(let n): (figs, kind) = (n, "sci")
             case .eng(let n): (figs, kind) = (n, "eng")
             }
-            if kind == "fix", figs < 0 || exp + digits(mant) > -figs {
+            // `math-numdigs` of zero is 0, so zero with no decimal places goes to scientific.
+            if kind == "fix", figs < 0 || exp + (mant == 0 ? 0 : digits(mant)) > -figs {
                 if figs < 0 { figs = -figs }
                 mant = try scaleRounding(mant, exp + figs)
                 var str = String(mant)

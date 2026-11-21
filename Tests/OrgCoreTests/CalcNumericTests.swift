@@ -71,4 +71,33 @@ struct CalcNumericTests {
             }
         }
     }
+
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
+    func zeroInEveryFormatMatchesCalc() throws {
+        var cases: [(String, String)] = []
+        for kind in ["float", "fix", "sci", "eng"] {
+            for figs in [0, 1, 2, 3, 8, -2] {
+                for e in ["0.", "-0.", "0.0", "1-1.0", "0./0", "0.e5", "0.001", "0.5", "-0.4", "4e-5", "123.456"] {
+                    cases.append((e, "(\(kind) \(figs))"))
+                }
+            }
+        }
+        let skipped = try CalcTests.compare(cases)
+        #expect(skipped == [], "\(skipped)")
+    }
+
+    /// Vector results, with and without `N`, and zero with no decimal places.
+    static let tables = [
+        "| 1 | 2 | |\n|---+---+---|\n| 3 | x | |\n| 1.5 | 0. | |\n#+TBLFM: $3=$1..$2;N\n",
+        "| 1 | 2 | |\n|---+---+---|\n| 1.5 | 0. | |\n| 1:3 | -2 | |\n#+TBLFM: $3=$1..$2\n",
+        "| 1.5 | 0 | |\n|---+---+---|\n| 2 | 4 | |\n#+TBLFM: $3=$1..$2;Nf0\n",
+        "| 1 | 2 | |\n|---+---+---|\n| 3 | 4 | |\n#+TBLFM: @1$3=@1$1..@2$2;N::@2$3=vflat(@1$1..@2$2);N\n",
+        "| 1 | 2 | |\n#+TBLFM: $3=[$1, [$2]];N\n",
+        "| 0 | | | |\n|---+---+---+---|\n| 0.5 | | | |\n#+TBLFM: $2=$1*1.0;f0::$3=($1-$1)*1.;s2::$4=($1-$1)*1./0;f0\n",
+    ]
+
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
+    func vectorsAndZeroInTablesMatchEmacsNatively() throws {
+        try TableFormulaTests().compare(Self.tables, fallbacksAllowed: false, headerFallbacksAllowed: false)
+    }
 }
