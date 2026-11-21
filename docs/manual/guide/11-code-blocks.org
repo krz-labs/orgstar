@@ -94,6 +94,8 @@ On the Mac, orgstar starts each interpreter outside a =:session= through =/bin/s
 | =js=, =javascript=                                               | =node FILE=, the program written to a file, or JavaScriptCore without node; see below |
 | =R=                                                              | =Rscript -=                                         |
 | =awk=                                                            | =awk -f=, the program written to a file             |
+| =calc=                                                           | orgstar's Calc, or =emacs -Q --batch=; see below    |
+| =sqlite=                                                         | =sqlite3=, or the SQLite library without it; see below |
 | =dot=, =plantuml=, =mermaid=                                     | =dot=, =plantuml=, =mmdc=; see Graphics below       |
 | =C=, =C++=, =cpp=, =D=, =java=, =fortran=, =clojure=             | A compiler, or =bb= or =clojure=; see Compiled languages below |
 
@@ -103,7 +105,7 @@ Any other language is refused with "No way to run /language/ blocks yet."
 
 A run that takes longer than five minutes is stopped. Runs in a =:session= have no time limit, except in JavaScriptCore.
 
-The [[file:../install.org][Mac App Store version]] starts no programs, so only Emacs Lisp and JavaScript blocks run there; see /In the Mac App Store version/ below.
+The [[file:../install.org][Mac App Store version]] starts no programs, so only Emacs Lisp, JavaScript, calc and sqlite blocks run there; see /In the Mac App Store version/ below.
 
 ** JavaScript in JavaScriptCore
 
@@ -626,6 +628,53 @@ In the [[file:../install.org][Mac App Store version]], Emacs Lisp blocks run in 
 
 Variables are bound with =let= around the body. =:results output= collects what the block prints with =princ=, =prin1=, =print= and =terpri=.
 
+* calc blocks
+
+A =calc= block runs as ob-calc runs it in =emacs -Q=, with orgstar's Calc, the one table formulas use. Each line of the body is trimmed and handled in turn; blank lines are skipped:
+
+- A line that is the name of a =:var= puts its value on the stack.
+- A line that starts with ='= runs a stack key on the stack: ='+=, ='-=, ='*=, ='/=, ='^=, ='%= (modulo), ='\= (integer division), ='n= (negate), ='&= (inverse), ='Q= (square root) and ='A= (absolute value).
+- Any other line is a formula. Its value goes on the stack; if it isn't a number, the formula is evaluated again with the block's variables put in, and that goes on the stack as text, as ob-calc does.
+
+The result is the top of the stack, shown with Calc's own settings in =emacs -Q=: 12 significant digits, all of them shown (=1/3= gives =0.333333333333=). A vector is written as a table row and a matrix as a table, unless =:results= asks for a string. =:prologue= and =:epilogue= add lines before and after the body.
+
+Each run starts with an empty stack. In Emacs the Calculator's stack carries over from one block to the next, so a block that relies on what an earlier block left there gives a different result in orgstar.
+
+=:var= values can be numbers, and lists and tables of integers; a table of one row is a vector. Errors that Emacs reports, such as "Too few elements on stack" or a stack key on a formula ("Invalid data object encountered"), fail the run without writing a result.
+
+What orgstar's Calc doesn't do as Emacs's Calc does is refused rather than given a different result: functions and forms table formulas also refuse, stack keys other than those above, dates, string variables, variables named like Calc's constants (=e=, =pi=, =i=) or with characters other than letters and digits, lists with fractional numbers, and a =:prologue= or =:epilogue= that is a bare number. The message is "This calc block can't be calculated here:" with the reason. The download version then runs the block in =emacs -Q --batch= when Emacs is installed.
+
+* sqlite blocks
+
+A =sqlite= block runs as ob-sqlite runs it: the body goes to =sqlite3= on standard input, with the options the header arguments name, and the output becomes the result. The download version runs =sqlite3= (macOS has one in =/usr/bin=) and uses the SQLite library only when it isn't installed. The Mac App Store version and iOS run the block in the SQLite library, writing the output as macOS's =sqlite3= writes it.
+
+| Header argument             | Effect                                                                     |
+|-----------------------------+----------------------------------------------------------------------------|
+| =:db file=                  | The database, relative to the file's folder or =:dir=; without it, an in-memory one |
+| =:readonly yes=             | Opens the database read-only                                               |
+| =:csv=, =:list=, =:column=, =:html=, =:line= | The output mode; without one or =:separator=, =csv=          |
+| =:separator s=, =:nullvalue s= | The column separator and the text for NULL, in list mode             |
+| =:colnames yes=             | The first row of the result becomes the table's header                    |
+| =:header=, =:echo=, =:bail= | Pass =-header=, =-echo= and =-bail= to =sqlite3=                           |
+
+As in Emacs, a mode option resets the header, separator and NULL text to that mode's, so =:header= has an effect only with =:separator= alone.
+
+=:var= values replace =$name= in the body, in any case. A table becomes a CSV file and =$name= its path, for =.import=:
+
+#+begin_src org
+,#+begin_src sqlite :var t=prices :db shop.db
+create table if not exists prices(item text, price real);
+.import --csv $t prices
+select item, price * 2 from prices;
+,#+end_src
+#+end_src
+
+The output is read as a table the way ob-sqlite reads it, with =org-table-convert-region=; a single value becomes a scalar. In =csv= mode =sqlite3= ends lines with CR LF and Emacs keeps the CR, so the last column of each row ends with a CR, which shows as =^M=; orgstar writes the same.
+
+In the Mac App Store version, =:db= must be in a folder orgstar has access to: a folder in the sidebar, or one you granted access to.
+
+Without =sqlite3=, these dot-commands run: =.headers= (=.header=), =.mode= with =list=, =csv=, =column=, =html= or =line=, =.separator= and =.nullvalue= with one plain argument, and =.import FILE TABLE= (with =--csv= or not) into a table that exists, of rows that fit it. Anything else is refused with "This sqlite block can't run here:" and the reason: other dot-commands, header values with characters the shell would read differently (spaces, quotes, =~=, =;=, =|=), BLOB values, control characters other than tab and newline in values, text other than ASCII or values on several lines in =column= mode and in =line= mode's column names, =EXPLAIN= statements, and text that isn't UTF-8. When the refused value comes after other statements, those statements have already run, and the message says so.
+
 * Graphics
 
 =dot= (Graphviz), =plantuml= and =mermaid= blocks draw a picture into =:file=, and the result is a link to it. =:file= is required: "/language/ code blocks need a :file header argument". The file's extension picks the output format; with none, =png= is used.
@@ -748,7 +797,7 @@ Tangling stops, writes nothing and says why when:
 
 * On iOS
 
-- Only Emacs Lisp blocks, in orgstar's own interpreter, and JavaScript blocks, in JavaScriptCore (see /JavaScript in JavaScriptCore/ above), run. Any other language, compiled languages included, fails with "/language/ blocks need the Mac to run." (for example "C blocks need the Mac to run."), and so does a block whose =:var= refers to a block in another language.
+- Only Emacs Lisp blocks, in orgstar's own interpreter, JavaScript blocks, in JavaScriptCore (see /JavaScript in JavaScriptCore/ above), and calc and sqlite blocks (see above) run. Any other language, compiled languages included, fails with "/language/ blocks need the Mac to run." (for example "C blocks need the Mac to run."), and so does a block whose =:var= refers to a block in another language.
 - JavaScript blocks can use =:session=. There are no other sessions and no graphics.
 - The trust prompt works the same way, with its own =trusted.json= on the device.
 - There is no cancel command.
@@ -759,7 +808,7 @@ See [[file:14-ios.org][iOS]] for the rest of the iOS app.
 
 * In the Mac App Store version
 
-- Only Emacs Lisp blocks, in the same interpreter as on iOS, and JavaScript blocks, in JavaScriptCore, run. Any other language, compiled languages included, fails with "/language/ blocks don't run in this version of orgstar."
+- Only Emacs Lisp blocks, in the same interpreter as on iOS, JavaScript blocks, in JavaScriptCore, and calc and sqlite blocks run. Any other language, compiled languages included, fails with "/language/ blocks don't run in this version of orgstar."
 - JavaScript blocks can use =:session=. There are no other sessions and no graphics.
 - The trust prompt works the same way.
 - Tangling works as in the download version, =:shebang= included. A target outside your folders needs access to its folder first: orgstar asks with Grant Access…, as described in [[file:../install.org][Install]]. So does a =:file= result outside them.

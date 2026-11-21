@@ -343,11 +343,12 @@ Publishing works from Commands as on the Mac, with the =[[publish]]= projects in
 
 =C-c C-c= on a source block asks whether to run it (yes, no, or always for this block), as on the Mac.
 
-On iOS, only Emacs Lisp and JavaScript blocks run. orgstar evaluates Emacs Lisp with its own interpreter, which covers a subset of the language, and JavaScript in JavaScriptCore, as =node= would run it, sessions included. Other results:
+On iOS, only Emacs Lisp, JavaScript, calc and sqlite blocks run. orgstar evaluates Emacs Lisp with its own interpreter, which covers a subset of the language, JavaScript in JavaScriptCore, as =node= would run it, sessions included, calc with its own Calc and sqlite with the SQLite library, as =sqlite3= would; see [[file:11-code-blocks.org][Code blocks]]. Other results:
 
 - A block in another language: "/language/ blocks need the Mac to run."
 - Emacs Lisp the interpreter doesn't have: "This block uses Emacs Lisp that runs only in Emacs, on the Mac."
 - JavaScript that uses something only node has, such as =Buffer=: "This block uses /name/, which runs only in node."
+- A calc or sqlite block orgstar can't run as Emacs would: "This calc block can't be calculated here: /reason/." or "This sqlite block can't run here: /reason/."
 
 Table formulas that orgstar computes itself work on iOS. In a table whose formulas need Emacs, orgstar applies the formulas up to the first one that needs it and stops there, as Emacs does when a formula fails: the fields written before it stay and the rest are unchanged. The message is "The table was recalculated up to /formula/, which needs Emacs on the Mac", with the formula's left-hand side and the reason. When nothing was written, it is "This table needs Emacs, which runs on the Mac", with the reason, and the table is unchanged.
 
@@ -444,7 +445,7 @@ Quick Look in the Files app shows org files as the HTML export renders them.
 
 * What the Mac has that iOS doesn't
 
-- In the download version: running code blocks in languages other than Emacs Lisp and JavaScript, Emacs Lisp beyond orgstar's interpreter, JavaScript that needs node, and tables that need Emacs.
+- In the download version: running code blocks in languages other than Emacs Lisp, JavaScript, calc and sqlite, Emacs Lisp beyond orgstar's interpreter, JavaScript that needs node, and tables that need Emacs.
 - In the download version, LaTeX-made PDF export.
 - Idle detection from keyboard and mouse input; iOS uses the time away from the app instead.
 - In the download version, attaching by hard link or symbolic link.
