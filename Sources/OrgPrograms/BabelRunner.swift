@@ -2,8 +2,8 @@
 import Foundation
 import OrgCore
 
-/// Runs Babel jobs as processes: the interpreter reads the program on standard input, in the
-/// file's folder or `:dir`.
+/// Runs Babel jobs as processes, in the file's folder or `:dir`: the interpreter reads the
+/// program on standard input, or from the file `job.script` is written to.
 public enum BabelRunner {
     public struct Failure: Error, CustomStringConvertible {
         public let description: String
@@ -51,7 +51,10 @@ public enum BabelRunner {
                 try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: file.path)
                 arguments = arguments.map { $0.replacingOccurrences(of: Babel.scriptFileToken, with: file.path) }
             }
-            process.arguments = [executable] + arguments
+            // A command with arguments, such as `:cmd "node --no-warnings"`, runs in the shell as
+            // Org runs it.
+            process.arguments = executable.contains(where: \.isWhitespace)
+                ? ["/bin/sh", "-c", executable + " \"$@\"", "sh"] + arguments : [executable] + arguments
         case .emacs:
             guard let emacs = EmacsRunner.executable() else { throw Failure(description: "Emacs isn't installed, so Emacs Lisp blocks can't run.") }
             let script = folder.appendingPathComponent("babel.el")

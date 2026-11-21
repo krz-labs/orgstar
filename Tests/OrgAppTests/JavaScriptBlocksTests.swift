@@ -88,7 +88,7 @@ struct JavaScriptBlocksTests {
             + Self.programs.map { "#+begin_src js :results output\n\($0)\n#+end_src\n" }
         for block in blocks {
             let job = try Self.plan(block)
-            let theirs = try Self.node(job.input, in: folder)
+            let theirs = try Self.node(try #require(job.script), in: folder)
             let ours = try await JavaScriptBlocks.run(job, directory: folder)
             #expect(ours?.stdout == theirs.stdout && ours?.status == theirs.status, "\(block)\nours: \(ours?.stdout ?? "nil") \(ours?.stderr ?? "")\nnode: \(theirs.stdout)")
         }

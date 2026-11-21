@@ -91,13 +91,13 @@ On the Mac, orgstar starts each interpreter through =/usr/bin/env=. Because an a
 | =python=                                                         | =python3=, or the program in =:python=              |
 | =emacs-lisp=, =elisp=                                            | =emacs -Q --batch=, or the interpreter; see below    |
 | =ruby=                                                           | =ruby=, or the program in =:ruby=                   |
-| =js=, =javascript=                                               | =node=, or JavaScriptCore without it; see below     |
+| =js=, =javascript=                                               | =node FILE=, the program written to a file, or JavaScriptCore without node; see below |
 | =R=                                                              | =Rscript -=                                         |
 | =awk=                                                            | =awk -f=, the program written to a file             |
 | =dot=, =plantuml=, =mermaid=                                     | =dot=, =plantuml=, =mmdc=; see Graphics below       |
 | =C=, =C++=, =cpp=, =D=, =java=, =fortran=, =clojure=             | A compiler, or =bb= or =clojure=; see Compiled languages below |
 
-For =js=, =javascript= and =R=, =:cmd= names a different program. =awk= takes =:cmd-line= arguments after its program, and =:in-file= as the file it reads.
+For =js=, =javascript= and =R=, =:cmd= names a different program. A program given with options, such as =:cmd "node --no-warnings"=, runs through =/bin/sh=, as Org runs it. =awk= takes =:cmd-line= arguments after its program, and =:in-file= as the file it reads.
 
 Any other language is refused with "No way to run /language/ blocks yet."
 

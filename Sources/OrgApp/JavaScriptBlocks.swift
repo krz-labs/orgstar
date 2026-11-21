@@ -19,7 +19,7 @@ public enum JavaScriptBlocks {
         switch job.runner {
         case .process:
             guard FileManager.default.fileExists(atPath: folder.path) else { throw Babel.Failure.message("No folder \(folder.path) for :dir.") }
-            return try await evaluate(timeout: timeout) { run in try Engine().main(job.input, run: run) }
+            return try await evaluate(timeout: timeout) { run in try Engine().main(job.script ?? job.input, run: run) }
         case .session(let name, _, .node):
             guard FileManager.default.fileExists(atPath: folder.path) else { throw Babel.Failure.message("No folder \(folder.path) for :dir.") }
             // One context per file folder and session name; a stopped run's context is dropped.
@@ -41,19 +41,20 @@ public enum JavaScriptBlocks {
     /// and is still running is refused without starting another.
     public static func runHere(_ job: BabelJob, timeout: Duration = .seconds(5)) throws -> BabelOutput? {
         guard job.language == "js" || job.language == "javascript", case .process = job.runner else { return nil }
-        if abandoned.contains(job.input) { throw Stopped(description: "The block took too long before and is still running.") }
+        let source = job.script ?? job.input
+        if abandoned.contains(source) { throw Stopped(description: "The block took too long before and is still running.") }
         let run = Run()
         let flag = Abandoned.Flag()
         let thread = Thread {
-            run.end(Result { try Engine().main(job.input, run: run) })
-            abandoned.ended(job.input, flag)
+            run.end(Result { try Engine().main(source, run: run) })
+            abandoned.ended(source, flag)
         }
         thread.stackSize = 8 << 20
         thread.start()
         do {
             return try run.result(within: timeout)
         } catch let error as Stopped {
-            abandoned.add(job.input, flag)
+            abandoned.add(source, flag)
             throw error
         }
     }

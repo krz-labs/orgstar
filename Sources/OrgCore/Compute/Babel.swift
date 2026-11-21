@@ -585,11 +585,14 @@ public enum Babel {
                         input: full, directory: dir, block: location, blockText: blockText, alwaysAsk: alwaysAsk, finish: finishBase(.script(js: true, session: true))
                     ))
                 }
-                return .success(BabelJob(
-                    language: language, runner: .process(executable: params.single[":cmd"] ?? executable, arguments: arguments),
-                    input: output ? full : jsWrapper(full), directory: dir, block: location, blockText: blockText, alwaysAsk: alwaysAsk,
-                    finish: finishBase(.script(js: true))
-                ))
+                // `org-babel-execute:js`: the program in a file, run as `:cmd FILE`, with the
+                // newline `org-babel-eval` sends as its input.
+                var job = BabelJob(
+                    language: language, runner: .process(executable: params.single[":cmd"] ?? executable, arguments: [scriptFileToken]),
+                    input: "\n", directory: dir, block: location, blockText: blockText, alwaysAsk: alwaysAsk, finish: finishBase(.script(js: true))
+                )
+                job.script = output ? full : jsWrapper(full)
+                return .success(job)
             case "awk":
                 // `org-babel-expand-body:awk`; the variables go on the command line.
                 let full = (params.single[":prologue"].map { $0 + "\n" } ?? "") + body + (params.single[":epilogue"].map { "\n" + $0 + "\n" } ?? "")

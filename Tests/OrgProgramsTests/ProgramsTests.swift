@@ -256,6 +256,76 @@ struct JavaScriptFallbackTests {
     }
 }
 
+/// js blocks without a session run as `node FILE`, as `org-babel-execute:js` runs them.
+@MainActor
+@Suite(.programs)
+struct NodeFileTests {
+    static let cases = [
+        "#+begin_src js :results output\nconsole.log(typeof require, typeof module, typeof exports, process.argv.length, require.main === module)\n#+end_src\n",
+        "#+begin_src js :results output\nconst path = require('path'), fs = require('fs')\nconsole.log(path.dirname(__filename) === __dirname, __dirname === process.cwd(), "
+            + "path.dirname(__dirname) === fs.realpathSync(require('os').tmpdir()), path.basename(process.argv[1]) === path.basename(__filename))\n#+end_src\n",
+        "#+begin_src js\nreturn [typeof require, typeof module, process.argv.length, this === module.exports]\n#+end_src\n",
+        "#+begin_src js :results output\ntry { require('./helper'); console.log('found') } catch (e) { console.log(e.code) }\nconsole.log(require(process.cwd() + '/helper'))\n#+end_src\n",
+        "#+begin_src js :results output\nimport os from 'os'\nconsole.log(typeof require, typeof os.tmpdir)\n#+end_src\n",
+        "#+begin_src js :cmd \"node --no-warnings\" :results output\nconsole.log(process.argv.length, process.execArgv.join(' '))\n#+end_src\n",
+        "#+begin_src js :results output\nconsole.log(JSON.stringify(require('fs').readFileSync(0, 'utf8')))\n#+end_src\n",
+        "#+begin_src js :results output\nconsole.log('top'); return; console.log('not reached')\n#+end_src\n",
+    ]
+
+    /// The results Emacs inserts. `org-babel-temporary-directory` is set as interactive Emacs
+    /// sets it; `--batch` leaves it nil and writes the file straight into the temporary folder.
+    @Test(.enabled(if: EmacsRunner.executable() != nil && BabelRunner.installed("node") && ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
+    func resultsMatchEmacs() async throws {
+        let folder = try Folder()
+        try folder.write("helper.js", "module.exports = 1\n")
+        var forms: [String] = []
+        var ours: [String] = []
+        for text in Self.cases {
+            let file = try folder.write("b.org", text)
+            let session = DocumentSession(recovery: FileRecoveryStore(directory: folder.url.appendingPathComponent(".r")))
+            session.open(file.path)
+            guard case .external(.babel(let job)) = session.perform(ExecuteSrcBlock(), path: file.path, at: 2, expect: nil) else {
+                Issue.record("not planned: \(text)")
+                return
+            }
+            _ = await session.runBabel(job)
+            ours.append(session.document?.text ?? "")
+            let quoted = "\"" + text.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"") + "\""
+            forms.append("(with-temp-buffer (insert \(quoted)) (org-mode) (goto-char 3) (org-babel-execute-src-block) (princ (concat (buffer-string) \"\\f\")))")
+        }
+        let process = Process()
+        process.executableURL = EmacsRunner.executable()
+        process.currentDirectoryURL = folder.url
+        process.arguments = ["-Q", "--batch", "--eval", """
+            (progn (require 'org) (require 'ob-js)
+              (setq org-confirm-babel-evaluate nil org-babel-js-cmd "node" org-babel-temporary-directory (make-temp-file "babel-" t))
+              \(forms.joined(separator: "\n"))
+              (delete-directory org-babel-temporary-directory t))
+            """]
+        let out = Pipe()
+        process.standardOutput = out
+        process.standardError = FileHandle.nullDevice
+        try process.run()
+        let emacs = String(decoding: out.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self)
+            .split(separator: "\u{0C}", omittingEmptySubsequences: false).map(String.init)
+        process.waitUntilExit()
+        for (i, text) in Self.cases.enumerated() {
+            #expect(ours[i] == emacs[i], "\(text)\nours:\n\(ours[i])\nemacs:\n\(emacs[i])")
+        }
+    }
+
+    /// The file is gone once the block has run.
+    @Test(.enabled(if: BabelRunner.installed("node")))
+    func removesTheFile() async throws {
+        let text = "#+begin_src js :results output\nconsole.log(__filename)\n#+end_src\n"
+        let context = EditContext(revision: 0, text: text, tree: OrgParser.parse(text), selection: [2..<2])
+        guard case .success(let job) = Babel.plan(context) else { throw Babel.Failure.message("not planned") }
+        let output = try await BabelRunner.run(job, fileDirectory: FileManager.default.temporaryDirectory)
+        let file = output.stdout.trimmingCharacters(in: .newlines)
+        #expect(file.hasPrefix("/") && !FileManager.default.fileExists(atPath: file))
+    }
+}
+
 /// Emacs Lisp runs in `Elisp` when Emacs isn't installed.
 struct EmacsLispFallbackTests {
     func run(_ text: String) async throws -> BabelOutput {
