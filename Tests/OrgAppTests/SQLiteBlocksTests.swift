@@ -160,6 +160,8 @@ struct SQLiteBlocksTests {
         "#+begin_src sqlite :results list :list\nselect 'a', 'b c';\n#+end_src\n",
         "#+begin_src sqlite :results output :line\nselect 1 as a;\nselect 2 as b;\n#+end_src\n",
         "#+begin_src sqlite\ncreate table t(a);\ninsert into t values (1);\nselect changes(), total_changes();\n#+end_src\n",
+        "#+begin_src sqlite :cache yes :var x=4\nselect $x * 2;\n#+end_src\n",
+        "#+begin_src sqlite :cache yes :prologue \"select 0;\"\nselect 1, 2;\n#+end_src\n",
     ]
 
     @MainActor

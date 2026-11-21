@@ -113,6 +113,8 @@ struct BabelCalcTests {
         "#+begin_src calc\n1\n\n2\n'+\n3\n'*\n#+end_src\n",
         "#+begin_src calc\n2.\n3\n'/\n#+end_src\n",
         "#+begin_src calc :epilogue \"'n\"\n4\n#+end_src\n",
+        "#+begin_src calc :cache yes :prologue \"2\"\n3\n'+\n#+end_src\n",
+        "#+begin_src calc :cache yes :var x=2\nx*3\n#+end_src\n",
     ]
 
     @Test(.enabled(if: ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
