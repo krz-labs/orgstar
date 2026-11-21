@@ -107,7 +107,7 @@ public final class SyntaxNode: Sendable {
     /// A bracket link's path as `org-element-link-parser` reads it: each run of blanks
     /// holding a newline made one space.
     var linkPath: String? {
-        tokens.first { $0.kind == .linkPath }.map { $0.text.replacing(/[ \t]*\n[ \t]*/, with: " ") }
+        tokens.first { $0.kind == .linkPath }.map { $0.text.replacing(/[ \t]*\r?\n[ \t]*/.matchingSemantics(.unicodeScalar), with: " ") }
     }
 }
 

@@ -312,19 +312,11 @@ struct InlineScanner {
         let path = (i + 2)..<j
         if chars[j + 1] == "]" { return .link(path: path, description: nil, whole: i..<(j + 2)) }
         guard chars[j + 1] == "[" else { return nil }
+        // `org-link-bracket-re`: the description is at least one character, up to the first `]]`.
         let descriptionStart = j + 2
-        var depth = 0
-        var k = descriptionStart
-        while k < limit {
-            if chars[k] == "[" {
-                depth += 1
-            } else if chars[k] == "]" {
-                if depth == 0 { break }
-                depth -= 1
-            }
-            k += 1
-        }
-        guard k > descriptionStart, k + 1 < limit, chars[k + 1] == "]" else { return nil }
+        var k = descriptionStart + 1
+        while k + 1 < limit, !(chars[k] == "]" && chars[k + 1] == "]") { k += 1 }
+        guard k + 1 < limit else { return nil }
         return .link(path: path, description: descriptionStart..<k, whole: i..<(k + 2))
     }
 

@@ -64,7 +64,15 @@ public enum LaTeXExport {
         if included.contains("{{{") {
             if included.contains(marker) { throw LaTeXExport.Unsupported(reason: "U+E000 in the text") }
             let ns = included as NSString
-            let kept = OrgParser.parse(included, defaults: settings).root.descendants()
+            let nodes = OrgParser.parse(included, defaults: settings).root.descendants()
+            // A macro a plain link runs on into is part of the link in Org, not expanded.
+            let links = ASCIIRenderer.plainLink.matches(in: included, range: NSRange(location: 0, length: ns.length)).map(\.range)
+            for macro in nodes where macro.kind == .macro {
+                if links.contains(where: { $0.location < macro.range.lowerBound && NSMaxRange($0) > macro.range.lowerBound }) {
+                    throw LaTeXExport.Unsupported(reason: "Plain links running into other objects")
+                }
+            }
+            let kept = nodes
                 .filter { [.verbatim, .code, .block, .fixedWidth, .comment, .latexEnvironment, .exportSnippet].contains($0.kind) }.map(\.range)
             var out = ""
             var at = 0
@@ -1299,6 +1307,7 @@ final class LaTeXRenderer {
     /// `org-export-data` over objects: math objects merged (`org-latex--wrap-latex-math-block`),
     /// objects that export nothing taking their blanks with them unless they are needed.
     func transcode(_ items: [Inline]) throws -> String {
+        if !inDescription { try refusePlainLinksIntoObjects(items) }
         var out = ""
         var index = 0
         var dropBlanks = false
@@ -1580,10 +1589,6 @@ final class LaTeXRenderer {
         if node.firstChild(.linkDescription)?.descendants().contains(where: { $0.kind == .link }) == true {
             throw Unsupported(reason: "Links in link descriptions")
         }
-        // Org's description ends at the first `]]`, where the parser's ends at the balancing `]`.
-        if let d = node.firstChild(.linkDescription)?.text, (d.dropFirst() + "]").contains("]]") {
-            throw Unsupported(reason: "]] in link descriptions")
-        }
         if let d = node.firstChild(.linkDescription)?.text, d.firstMatch(of: /^(?:[A-Za-z]+:\S+|<[^>]+>)$/) != nil {
             throw Unsupported(reason: "Images as link descriptions")
         }
@@ -1629,6 +1634,29 @@ final class LaTeXRenderer {
         return path.hasPrefix("//") ? "file:" + path : path.hasPrefix("/") ? "file://" + path : path
     }
 
+    /// Org matches `org-link-plain-re` on the source, so a plain link the parser leaves as text
+    /// can run on into what the parser reads as an object after it, such as `shell:a_b`.
+    private func refusePlainLinksIntoObjects(_ items: [Inline]) throws {
+        var raw = ""
+        var textRuns: [(start: Int, end: Int)] = []
+        for item in items {
+            let start = (raw as NSString).length
+            switch item {
+            case .text(let t):
+                raw += t
+                textRuns.append((start, (raw as NSString).length))
+            case .object(let node, _):
+                raw += node.text
+            }
+        }
+        guard textRuns.count < items.count else { return }
+        for m in ASCIIRenderer.plainLink.matches(in: raw, range: NSRange(location: 0, length: (raw as NSString).length)) {
+            if let text = textRuns.first(where: { $0.start <= m.range.location && m.range.location < $0.end }), NSMaxRange(m.range) > text.end {
+                throw Unsupported(reason: "Plain links running into other objects")
+            }
+        }
+    }
+
     /// Text with the plain links the parser leaves in it, `shell:ls` and the like, written as Emacs does.
     private func plainTextAndLinks(_ t: String) throws -> String {
         guard !inDescription else { return plainText(t) }
@@ -1645,11 +1673,11 @@ final class LaTeXRenderer {
                 before = String(repeating: " ", count: blanks.count) + before.dropFirst(blanks.count)
             }
             out += plainText(before)
+            if type.lowercased() == "file", !path.hasPrefix("//"), let range = path.range(of: "::") { path = String(path[..<range.lowerBound]) }
             let ext = (path as NSString).pathExtension.lowercased()
             switch type.lowercased() {
             case "file":
                 if ["pdf", "jpeg", "jpg", "png", "ps", "eps", "tikz", "pgf", "svg"].contains(ext) { throw Unsupported(reason: "Plain image links") }
-                if !path.hasPrefix("//"), let range = path.range(of: "::") { path = String(path[..<range.lowerBound]) }
                 out += "\\url{\(Self.protect(try fileURI(path)))}"
             case "http", "https", "ftp", "mailto", "news", "elisp", "shell", "help", "shortdoc":
                 if ["jpeg", "jpg", "png", "ps", "eps", "tikz", "pgf", "svg"].contains(ext) { throw Unsupported(reason: "Plain image links") }

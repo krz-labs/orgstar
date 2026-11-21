@@ -110,6 +110,9 @@ struct LaTeXExportTests {
         "Plain shell:ls and elisp:foo and help:car here.\nGet ftp://x.org/f now, news:comp.x and mailto:a@b.c, shortdoc:string HTTPS://a.b/c.\nshell:echo_$x% and shell:ls\tx shell:ls[x elisp:(foo) FILE:a.txt File:b.org::s FILE:/abs FILE://h/p.\n[[https://a.b][see shell:ls]] *shell:ls* and\n| news:x |\n",
         "* Heading shell:ls\nx\n",
         "[[https://a.b][[x] y]] and [[https://a.b][x [y] z]] after.\n",
+        "A [[https://a.b][a]b]] z [[https://a.b][x [y]] z [[https://a.b][=v]=]] z [[https://a.b][]x]] z [[https://a.b][a\\]b]] z.\n",
+        "[[elisp:foo][[[file:a.png]]]]\n\n[[https://a.b][[[x]] y]]\n\n[[https://a.b][[x]]]\n",
+        "See FILE:a.org::foo.png here.\n",
         "Run [[elisp:(+ 1\n 2)]] and see [[https://a.b/c\n d]] ok, [[shell:a  \n\tb][two\n lines]] and [[elisp:a\tb\n c]].\n",
         "* Target section\nA <<anchor>> here and [[anchor]] and [[anchor][desc]].\n* Other\nSee [[*Target section]] and [[Target section][named]] and [[#cid]].\n* Third\n:PROPERTIES:\n:CUSTOM_ID: cid\n:END:\nx\n",
         "#+OPTIONS: num:nil\n* Head\nSee [[*Head]].\n",
@@ -326,6 +329,12 @@ struct LaTeXExportTests {
         }
     }
 
+    /// A bracket link path broken across a CRLF line end is read as Emacs reads it once it decodes the file.
+    @Test func linkPathsAcrossCRLF() throws {
+        let body = try LaTeXExport.document("Text [[elisp:(+ 1\r\n 2)]] and [[https://a.b/c\r\n d]] ok.\r\n", bodyOnly: true)
+        #expect(body.hasPrefix("Text \\url{elisp:(+ 1 2)} and \\url{https://a.b/c d} ok."))
+    }
+
     /// What Emacs exports differently or refuses is refused, naming it.
     @Test func refusesWhatItCannotMatch() {
         func reason(_ org: String) -> String? {
@@ -355,12 +364,14 @@ struct LaTeXExportTests {
         let pre = "* Top\n:PROPERTIES:\n:EXPORT_LATEX_CLASS_PRE: \\x\n:END:\nBody.\n"
         #expect(ExportScope.subtree(pre, at: 0).flatMap(reason) == "#+LATEX_CLASS_PRE")
         #expect(reason("#+OPTIONS: tags:not-in-toc\n* 100% done :a:\n")?.hasPrefix("% in a heading") == true)
-        for org in ["[[elisp:foo][[[file:a.png]]]]\n", "[[https://a.b][[[x]] y]]\n", "[[https://a.b][[x]]]\n", "[[a][b [fn:1]]]\n\n[fn:1] d\n"] {
-            #expect(reason(org) == "]] in link descriptions")
+        for org in ["shell:ls^2 x\n", "x shell:a_b\n", "ftp://a/b_c\n", "elisp:x^{2}\n", "help:a_{b}\n", "shell:a\\alpha\n", "shell:a$x$ y\n",
+                    "shell:a@@latex:Z@@\n", "shell:a{{{date}}}\n", "shell:ls[fn:1] x\n\n[fn:1] d\n", "*shell:ab_c*\n"] {
+            #expect(reason(org) == "Plain links running into other objects", "\(org)")
         }
         #expect(reason("See id:abc.\n") == "Plain links of type id")
         #expect(reason("See info:emacs here.\n") == "Plain links of type info")
         #expect(reason("See FILE:a.png here.\n") == "Plain image links")
+        #expect(reason("See FILE:a.png::x here.\n") == "Plain image links")
         #expect(reason("See FILE:~/a here.\n") == "File links under ~")
     }
 

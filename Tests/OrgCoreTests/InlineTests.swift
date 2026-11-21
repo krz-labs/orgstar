@@ -50,6 +50,15 @@ struct InlineTests {
     @Test func linkPathsSpanLines() {
         let links = OrgParser.parse("[[elisp:(+ 1\n 2)]] and [[a  \n\tb][c]]\n\n[[x\n\ny]]\n").root.descendants().filter { $0.kind == .link }
         #expect(links.map(\.linkPath) == ["elisp:(+ 1 2)", "a b"])
+        let crlf = OrgParser.parse("[[elisp:(+ 1\r\n 2)]] ok\r\n").root.descendants().filter { $0.kind == .link }
+        #expect(crlf.map(\.linkPath) == ["elisp:(+ 1 2)"])
+    }
+
+    /// `org-link-bracket-re`: a description runs to the first `]]`, brackets in it balanced or not.
+    @Test func linkDescriptionsEndAtFirstDoubleBracket() {
+        let text = "[[a][x]b]] [[a][x [y]] [[a][]x]] [[a][[z]]]\n"
+        let descriptions = OrgParser.parse(text).root.descendants().filter { $0.kind == .linkDescription }.map(\.text)
+        #expect(descriptions == ["x]b", "x [y", "]x", "[z"])
     }
 
     @Test func noLinksInsideLinkDescriptions() {
