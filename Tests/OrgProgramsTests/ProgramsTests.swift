@@ -282,6 +282,20 @@ struct ShellCommandTests {
         #expect(BabelRunner.words("'a b' \"$HOME\"") == ["a b", NSHomeDirectory()])
     }
 
+    /// A command substitution in the command runs once, when the block runs, as in Org.
+    @Test(arguments: ["js :cmd", "python :python", "ruby :ruby"])
+    func substitutionRunsOnce(header: String) async throws {
+        #expect(BabelRunner.words("$(echo node)").isEmpty)
+        #expect(BabelRunner.words("`echo node`").isEmpty)
+        let folder = try Folder()
+        let count = folder.url.appendingPathComponent("count").path
+        let text = "#+begin_src \(header) \"$(echo x >> '\(count)'; echo cat)\" :results output\n1\n#+end_src\n"
+        let context = EditContext(revision: 0, text: text, tree: OrgParser.parse(text), selection: [2..<2])
+        guard case .success(let job) = Babel.plan(context) else { throw Babel.Failure.message("not planned") }
+        _ = try await Programs().runBabel(job, fileDirectory: folder.url)
+        #expect(try String(contentsOfFile: count, encoding: .utf8) == "x\n")
+    }
+
     @Test(.enabled(if: BabelRunner.installed("python3")))
     func pythonWithOptions() async throws {
         let text = "#+begin_src python :python \"python3 -X utf8\" :results output\nimport sys\nprint(sys.flags.utf8_mode)\n#+end_src\n"

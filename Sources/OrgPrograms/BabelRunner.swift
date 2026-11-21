@@ -24,8 +24,10 @@ public enum BabelRunner {
         return paths.contains { FileManager.default.isExecutableFile(atPath: $0) }
     }
 
-    /// The words `/bin/sh` makes of `command`, after expanding `~`, variables and quotes.
+    /// The words `/bin/sh` makes of `command`, after expanding `~`, variables and quotes. Empty for
+    /// a command substitution, which would otherwise run here as well as when the block runs.
     public static func words(_ command: String) -> [String] {
+        if command.contains("$(") || command.contains("`") { return [] }
         guard command.contains(where: { "~$'\"`\\".contains($0) }) else { return command.split(whereSeparator: \.isWhitespace).map(String.init) }
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/bin/sh")
