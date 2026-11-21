@@ -489,6 +489,103 @@ struct ODTExportTests {
             * A
             ** B
             """,
+        "babel-languages-results": """
+            #+OPTIONS: toc:nil
+            #+begin_src dot
+            a
+            #+end_src
+
+            #+RESULTS:
+            : resdot
+
+            #+begin_src dot :file graph.png
+            digraph { b }
+            #+end_src
+
+            #+RESULTS:
+            [[file:graph.png]]
+
+            #+begin_src latex
+            c
+            #+end_src
+
+            #+RESULTS:
+            #+begin_export latex
+            c
+            #+end_export
+
+            #+begin_src processing
+            d
+            #+end_src
+
+            #+RESULTS:
+            : resprocessing
+
+            #+begin_src org
+            e
+            #+end_src
+
+            #+RESULTS:
+            : resorg
+
+            #+begin_src gnuplot :file plot.png
+            f
+            #+end_src
+
+            #+RESULTS:
+            [[file:plot.png]]
+
+            after
+            """,
+        "babel-languages-exports": """
+            #+OPTIONS: toc:nil
+            #+begin_src dot :exports results
+            a
+            #+end_src
+
+            #+RESULTS:
+            : resdot
+
+            #+begin_src dot :file pic.png :exports both
+            digraph { b }
+            #+end_src
+
+            #+RESULTS:
+            [[file:pic.png]]
+
+            #+begin_src latex :exports results
+            c
+            #+end_src
+
+            #+RESULTS:
+            #+begin_export latex
+            c
+            #+end_export
+
+            #+begin_src processing :exports both
+            d
+            #+end_src
+
+            #+RESULTS:
+            : resprocessing
+
+            #+begin_src dot :exports none
+            g
+            #+end_src
+
+            #+RESULTS:
+            : resnone
+
+            #+begin_src dot :file none.png :exports results
+            h
+            #+end_src
+
+            #+begin_src latex :exports both
+            i
+            #+end_src
+
+            after
+            """,
         "babel-languages": """
             #+OPTIONS: toc:nil
             before
