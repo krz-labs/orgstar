@@ -125,10 +125,26 @@ public enum PDFExport {
         </style>
         """
 
+    /// MathJax 3.2.2's `tex-svg-full.js`: every TeX extension in one file, with SVG output that
+    /// needs no font files, so nothing is fetched.
+    nonisolated static func bundledMathJax() throws -> String {
+        guard let url = Bundle.module.url(forResource: "tex-svg-full", withExtension: "js", subdirectory: "MathJax") else {
+            throw Failure(description: "MathJax is missing from the app.")
+        }
+        return try String(contentsOf: url, encoding: .utf8)
+    }
+
+    /// `html` with the CDN's MathJax replaced by the bundled one, in the page. The configuration
+    /// before it stays.
+    nonisolated static func bundlingMathJax(_ html: String) throws -> String {
+        guard html.contains(HTMLExport.mathJaxScript) else { return html }
+        return html.replacingOccurrences(of: HTMLExport.mathJaxScript, with: "<script id=\"MathJax-script\">\(try bundledMathJax())</script>")
+    }
+
     /// The page `html` (an `HTMLExport.page`) as a PDF. `directory` is the Org file's folder,
     /// where relative image links are read from.
     public static func pdf(html: String, directory: URL?, options: Options = Options()) async throws -> Data {
-        let page = html.replacingOccurrences(of: "</head>", with: css(options) + "\n</head>")
+        let page = try bundlingMathJax(html).replacingOccurrences(of: "</head>", with: css(options) + "\n</head>")
         let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 800, height: 1100))
         let loader = Loader()
         webView.navigationDelegate = loader

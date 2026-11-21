@@ -110,7 +110,7 @@ The built-in stylesheet is always included first. Other =#+HTML_…= keywords ar
 
 ** Math
 
-LaTeX fragments (=\(…\)=, =\[…\]=, =$…$=, =$$…$$=) and LaTeX environments are left in the page for MathJax. When the page has any, orgstar adds MathJax 3 from =cdn.jsdelivr.net=, so the page needs a network connection to show math. Entities such as =\alpha= become their characters.
+LaTeX fragments (=\(…\)=, =\[…\]=, =$…$=, =$$…$$=) and LaTeX environments are left in the page for MathJax. When the page has any, orgstar adds MathJax 3 from =cdn.jsdelivr.net=, so the page needs a network connection to show math. PDF export uses a copy of MathJax that comes with orgstar instead, so math in a PDF needs no network connection. Entities such as =\alpha= become their characters.
 
 ** Includes
 
@@ -208,7 +208,7 @@ HTML and Markdown export handle citations the same way; see Citations below.
 
 * PDF export
 
-Export to PDF makes the HTML export into a PDF, laid out and split into pages by the system's web engine as printing does. It needs neither Emacs nor TeX, and works on iOS. The PDF has what the HTML export has: the title, the byline, the table of contents, colored code, tables, images and math (MathJax, which needs a network connection). For the page:
+Export to PDF makes the HTML export into a PDF, laid out and split into pages by the system's web engine as printing does. It needs neither Emacs nor TeX, and works on iOS. The PDF has what the HTML export has: the title, the byline, the table of contents, colored code, tables, images and math (MathJax, which comes with orgstar and needs no network connection). For the page:
 
 - Colors are always the light ones, whatever the system's appearance.
 - Pages are US Letter where that is the usual size and A4 elsewhere; on the Mac, the paper size set for printing.

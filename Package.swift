@@ -87,7 +87,8 @@ let package = Package(
             ]
         ),
         .executableTarget(name: "OrgstarSpike", dependencies: ["OrgEditorAppKit"]),
-        .target(name: "OrgApp", dependencies: ["OrgWorkspace", "OrgDocument", "OrgPresentation", "OrgWatchData"]),
+        // MathJax for PDF export, which typesets math without the network.
+        .target(name: "OrgApp", dependencies: ["OrgWorkspace", "OrgDocument", "OrgPresentation", "OrgWatchData"], resources: [.copy("Resources/MathJax")]),
         // What the phone and the watch send each other; Foundation only, so the watch builds it.
         .target(name: "OrgWatchData"),
         // The watch app and its complications, bundled by scripts/build-watch-app.sh.

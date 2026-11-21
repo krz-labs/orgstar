@@ -39,6 +39,9 @@ public enum HTMLExport {
         return meta
     }
 
+    /// The tag that loads MathJax on a page with math.
+    public static let mathJaxScript = #"<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>"#
+
     /// A standalone page: the body under the document's title, with a small stylesheet, as
     /// `#+OPTIONS` and the export keywords ask. `path` is the file's, for `#+INCLUDE` and
     /// `{{{input-file}}}`. `bodyOnly` returns what goes inside `<body>` without the title and
@@ -72,7 +75,7 @@ public enum HTMLExport {
         if renderer.hasMath {
             head += """
             <script>window.MathJax = { tex: { inlineMath: [['\\\\(', '\\\\)']], displayMath: [['\\\\[', '\\\\]'], ['$$', '$$']] } };</script>
-            <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+            \(mathJaxScript)
 
             """
         }

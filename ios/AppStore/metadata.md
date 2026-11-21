@@ -125,7 +125,7 @@ orgstar is now on the Mac App Store. orgstar+ bought in the iPhone and iPad app 
 
 - The app runs in the App Sandbox and starts no other programs. It reads and writes only folders and files the user chooses in an open panel or opens from Finder, and keeps security-scoped bookmarks to them.
 - Code (guideline 2.5.2): source blocks the user writes in their own documents can be run, and only Emacs Lisp blocks run. They are evaluated by an interpreter inside the app; no code is downloaded, and nothing changes the app's features. Before a block runs, the app asks whether to run it; the user can let it remember a block they trust.
-- com.apple.security.network.client: remote images in documents, attaching a file from a URL, MathJax in HTML and PDF export, and the App Store.
+- com.apple.security.network.client: remote images in documents, attaching a file from a URL, and the App Store.
 - com.apple.security.files.user-selected.executable: tangling writes source blocks to files in folders the user chose. A block with a :shebang header, such as a shell script, gets the executable bit (mode 0755), as Org mode sets it. The app never runs these files.
 - com.apple.security.personal-information.calendars: Calendar events and reminders in the agenda, after the system asks.
 - com.apple.security.application-groups: the widgets read the agenda from the app group.
