@@ -1580,6 +1580,10 @@ final class LaTeXRenderer {
         if node.firstChild(.linkDescription)?.descendants().contains(where: { $0.kind == .link }) == true {
             throw Unsupported(reason: "Links in link descriptions")
         }
+        // Org's description ends at the first `]]`, where the parser's ends at the balancing `]`.
+        if let d = node.firstChild(.linkDescription)?.text, (d.dropFirst() + "]").contains("]]") {
+            throw Unsupported(reason: "]] in link descriptions")
+        }
         if let d = node.firstChild(.linkDescription)?.text, d.firstMatch(of: /^(?:[A-Za-z]+:\S+|<[^>]+>)$/) != nil {
             throw Unsupported(reason: "Images as link descriptions")
         }
