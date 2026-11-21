@@ -479,6 +479,15 @@ public enum Calc {
     static func compare(_ a: Value, _ b: Value) throws -> Int {
         if case .date(let x) = a, case .date(let y) = b { return try compare(x, y) }
         if a == .nan || b == .nan { throw Unsupported("comparison with nan") }
+        // `math-compare` clears a fraction's denominator, so 0.333333333333 is less than 1:3.
+        let real = { (v: Value) in switch v { case .int, .float, .frac: true; default: false } }
+        if real(a), real(b) {
+            if case .frac(let n, let d) = a {
+                if case .frac(let n2, let d2) = b { return try compare(try multiply(.int(n), .int(d2)), try multiply(.int(n2), .int(d))) }
+                return try compare(.int(n), try multiply(b, .int(d)))
+            }
+            if case .frac(let n, let d) = b { return try compare(try multiply(a, .int(d)), .int(n)) }
+        }
         let difference = try add(a, try negate(b))
         let (m, _) = try parts(difference)
         return m == 0 ? 0 : (m < 0 ? -1 : 1)
@@ -1116,7 +1125,7 @@ public enum Calc {
             return true
         }
 
-        // `||` < `&&` < `!` < comparisons < sums.
+        // `||` < `&&` < comparisons < sums.
         mutating func or() throws -> Node {
             var left = try and()
             while take("||") { left = .binary("|", left, try and()) }
@@ -1124,19 +1133,9 @@ public enum Calc {
         }
 
         mutating func and() throws -> Node {
-            var left = try not()
-            while take("&&") { left = .binary("&", left, try not()) }
+            var left = try comparison()
+            while take("&&") { left = .binary("&", left, try comparison()) }
             return left
-        }
-
-        mutating func not() throws -> Node {
-            if peek() == "!", i + 1 >= chars.count || chars[i + 1] != "=" {
-                // Calc reads `!!` as one token.
-                if i + 1 < chars.count, chars[i + 1] == "!" { throw Unsupported("formula syntax") }
-                i += 1
-                return .unary("!", try not())
-            }
-            return try comparison()
         }
 
         mutating func comparison() throws -> Node {
@@ -1211,8 +1210,25 @@ public enum Calc {
             return try powerNode()
         }
 
+        /// Prefix `!`, whose operand Calc reads at precedence 1000: `!x^2` is `(!x)^2`, and
+        /// only a postfix `%` joins the operand. After `-` the operand is read as `-`'s.
+        mutating func not() throws -> Node? {
+            guard peek() == "!", i + 1 >= chars.count || chars[i + 1] != "=" else { return nil }
+            // Calc reads `!!` as one token.
+            if i + 1 < chars.count, chars[i + 1] == "!" { throw Unsupported("formula syntax") }
+            i += 1
+            if peek() == "-" { return .unary("!", try unary()) }
+            var operand = try not() ?? primary()
+            while peek() == "%", !factorAfter(i + 1) {
+                if i + 1 < chars.count, chars[i + 1] == "%" { throw Unsupported("formula syntax") }
+                i += 1
+                operand = .call("percent", [operand])
+            }
+            return .unary("!", operand)
+        }
+
         mutating func powerNode() throws -> Node {
-            var base = try primary()
+            var base = try not() ?? primary()
             // Postfix `%` (percent), `!` and `!!`, which bind tighter than `^`.
             while let c = peek() {
                 let next = i + 1 < chars.count ? chars[i + 1] : nil
@@ -1460,9 +1476,13 @@ public enum Calc {
                     if Symbolic.functions.contains(name), !values.contains(where: isVector) {
                         return value(try Symbolic.function(name, try values.map(term)))
                     }
-                    // `math-reduce-many-vecs`: `max` of the elements in turn.
+                    // `math-reduce-many-vecs`: `max` of the elements in turn, starting from
+                    // -inf (`inf` for `min`) when the first vector is empty.
                     if name == "vmax" || name == "vmin", values.allSatisfy(isVector) {
-                        let items = try elements(values).map(term)
+                        var items = try elements(values).map(term)
+                        if try elements([values[0]]).isEmpty {
+                            items.insert(name == "vmax" ? .op("neg", [Symbolic.inf]) : Symbolic.inf, at: 0)
+                        }
                         return try extra(2) {
                             value(try items.dropFirst().reduce(items[0]) { try Symbolic.function(name == "vmax" ? "max" : "min", [$0, $1]) })
                         }
@@ -1489,7 +1509,11 @@ public enum Calc {
         func literal(_ node: Node) throws -> Term {
             switch node {
             case .number, .variable: return try term(try eval(node))
-            case .unary("-", let a): return .op("neg", [try literal(a)])
+            case .unary("-", let a):
+                // The reader negates a number: `--3` is 3 and `-0.` is `0.`.
+                let t = try literal(a)
+                if case .number(let v) = t { return try term(try negate(v)) }
+                return .op("neg", [t])
             case .binary(let op, let a, let b) where "+-*/^".contains(op): return .op(String(op), [try literal(a), try literal(b)])
             default: throw Unsupported("condition")
             }

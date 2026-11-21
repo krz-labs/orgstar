@@ -321,7 +321,6 @@ side if it is nonzero, else the right side):
 | Operator                           | Meaning                                                   |
 |------------------------------------+-----------------------------------------------------------|
 | =&&=                               | Logical and: the left side if it is zero, else the right side. |
-| =!=                                | Logical not.                                              |
 | ~==~, ~!=~, =<=, =>=, ~<=~, ~>=~    | Comparisons, giving 1 or 0. They can't be chained.        |
 | =+=, =-=                           | Addition and subtraction.                                 |
 | =/=, =%=, =\=                      | Division, modulo (sign of the divisor), integer division rounding down. |
@@ -329,6 +328,7 @@ side if it is nonzero, else the right side):
 | unary =-=                          | Negation.                                                 |
 | =^=                                | Power.                                                    |
 | =!=, =!!= after a value            | Factorial, double factorial.                              |
+| =!= before a value                 | Logical not: =!x^2= is =(!x)^2= and =!x + 1= is =(!x) + 1=. |
 | =%= after a value                  | Percent: =5%= is =0.05=. Followed by a value, =%= is modulo instead. |
 
 Parentheses group, =[a, b, c]= writes a vector, =<2026-10-05 Mon>= writes a date, and

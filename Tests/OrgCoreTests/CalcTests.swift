@@ -231,7 +231,7 @@ struct CalcTests {
     /// Each case through Calc and through `Calc.evaluate`, expecting the same text; returns the
     /// cases `Calc.evaluate` doesn't support.
     static func compare(_ cases: [(String, String)], precision: Int = 12, zone: (name: String, offset: Int) = ("UTC", 0), symbolic: Bool = false,
-                        radians: Bool = false, fractions: Bool = false) throws -> [String] {
+                        radians: Bool = false, fractions: Bool = false, note: String = "") throws -> [String] {
         let emacs = try CalcOracle.run(cases, precision: precision, zone: zone.name, symbolic: symbolic, radians: radians, fractions: fractions)
         #expect(emacs.count == cases.count)
         var skipped: [String] = []
@@ -257,7 +257,7 @@ struct CalcTests {
                 if !expected.hasPrefix("LISP ERROR") { skipped.append(c.0) }
                 continue
             }
-            #expect(ours == expected, "\(c.0) \(c.1) p\(precision)")
+            #expect(ours == expected, "\(c.0) \(c.1) p\(precision)\(note)")
         }
         return skipped
     }
@@ -428,42 +428,66 @@ struct CalcTests {
         "if(inf,1,2)", "if(1,x,y)", "if(0,x,y)", "if(1,2,ln(0))", "x%2", "x%x", "(2 x)%2", "0%x", "x%0", "-1%inf",
         "2%inf", "x%inf", "x % y % z", "(x % y) * 2", "-x % y", "vmax([x,1])", "vmin([x,1,2])", "vmax([1,2,x])",
         "vmax([x,y],[1,2])", "vmax([x,1.23456789012345])", "vmin([inf,x])", "vmax([N/A,3,5])", "vmin([2,TBD,1])",
+        // Prefix `!` binds tighter than `^`.
+        "!x+1", "!x<1", "!x*2", "2*!x", "!x^2", "!(x<1) + 1", "!-x+1", "-!x^2", "! !x", "!2+1", "!x && y", "x^!y",
+        // The reader negates numbers in a branch.
+        "if(x, --3, 1)", "if(x, -(-(2)), 1)", "if(x, -0, 1)", "if(x, -0.0, 1)", "if(x, 1/-2, 1)", "if(x, 2^-1, 1)",
+        "if(x, y * -2, 1)", "if(x, -(-x), 1)", "if(x, -2 * -3, 1)", "if(x, -x^-2, 1)", "if(x, 1/(-x), 1)", "if(x, -(1:2), 1)",
+        // An empty first vector starts from -inf.
+        "vmax([], [x])", "vmin([], [x])", "vmax([], [x, 1])", "vmax([], [2, x])", "vmax([[]], [x])", "vmax([x], [], [1])",
+        "vmin([], [], [x])",
     ]
 
     @Test(.enabled(if: ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
     func symbolicFunctionsMatchCalc() throws {
         var cases = Self.symbolicFunctions.map { ($0, "(float 8)") }
-        for format in ["(fix 2)", "(sci 3)"] {
-            for e in ["sqrt(2 x)", "max(x, 2.5)", "if(x, 1.5, 2)", "x % 0.5", "vmin([x, 1:3, 0.25])"] { cases.append((e, format)) }
+        for format in ["(fix 2)", "(fix 0)", "(sci 3)", "(eng 2)"] {
+            for e in ["sqrt(2 x)", "max(x, 2.5)", "if(x, 1.5, 2)", "x % 0.5", "vmin([x, 1:3, 0.25])", "x + 0.4", "max(x, 0.)"] {
+                cases.append((e, format))
+            }
         }
         // Generated: the functions applied to formulas of a variable or two and numbers, and
         // their results combined again. What is refused is left to Emacs.
-        var generator = SystemRandomNumberGenerator()
+        let seed = ProcessInfo.processInfo.environment["ORGSTAR_SEED"].flatMap { UInt64($0) } ?? UInt64.random(in: 0...UInt64.max)
+        var generator = SeededGenerator(state: seed)
         let leaves = ["x", "x", "y", "1", "2", "3", "0", "0.5", "2.5", "1:3", "-1", "-2", "4", "inf", "e", "a b", "-inf", "uinf", "nan", "0.", "1.5e3", "-x", "2 x", "pi"]
-        let unary = ["sqrt", "abs", "exp", "ln", "!"]
+        let unary = ["sqrt", "abs", "exp", "ln", "!", "-"]
         let binary = ["min", "max", "%", "<", ">", "<=", ">=", "==", "!=", "&&", "||", "+", "-", "*", "/", "^"]
         func leaf() -> String { leaves.randomElement(using: &generator)! }
+        // Operands are left bare most of the time, so Calc's precedence decides.
+        func operand(_ e: String) -> String { Int.random(in: 0..<10, using: &generator) < 7 ? e : "(\(e))" }
         func expression(_ depth: Int) -> String {
             if depth == 0 || Int.random(in: 0..<4, using: &generator) == 0 { return leaf() }
             switch Int.random(in: 0..<10, using: &generator) {
             case 0..<4:
                 let f = unary.randomElement(using: &generator)!
-                return f == "!" ? "!(\(expression(depth - 1)))" : "\(f)(\(expression(depth - 1)))"
+                return f == "!" || f == "-" ? f + operand(expression(depth - 1)) : "\(f)(\(expression(depth - 1)))"
             case 4..<8:
                 let f = binary.randomElement(using: &generator)!
                 let (a, b) = (expression(depth - 1), f == "^" ? ["2", "3", "-1", "0.5", "x"].randomElement(using: &generator)! : expression(depth - 1))
-                return f.first!.isLetter ? "\(f)(\(a), \(b))" : "(\(a)) \(f) (\(b))"
+                return f.first!.isLetter ? "\(f)(\(a), \(b))" : "\(operand(a)) \(f) \(operand(b))"
             case 8:
-                return "if(\(expression(depth - 1)), \(leaf()), \(leaf()))"
+                return "if(\(expression(depth - 1)), \(expression(depth - 1)), \(expression(depth - 1)))"
             default:
-                let items = (0..<Int.random(in: 1...3, using: &generator)).map { _ in expression(depth - 1) }
-                return "\(["vmax", "vmin"].randomElement(using: &generator)!)([\(items.joined(separator: ", "))])"
+                let items = (0..<Int.random(in: 0...3, using: &generator)).map { _ in expression(depth - 1) }
+                return "\(["vmax", "vmin"].randomElement(using: &generator)!)([\(items.joined(separator: ", "))], [\(expression(depth - 1))])"
             }
         }
-        for _ in 0..<4000 { cases.append((expression(4), "(float 8)")) }
-        let skipped = try Self.compare(cases)
+        let formats = ["(float 8)", "(float 8)", "(fix 2)", "(fix 0)", "(eng 2)"]
+        for _ in 0..<4000 { cases.append((expression(4), formats.randomElement(using: &generator)!)) }
+        let skipped = try Self.compare(cases, note: " seed \(seed)")
         #expect(Set(skipped).intersection(Self.symbolicFunctions) == [], "\(skipped)")
-        #expect(skipped.count < cases.count / 3, "\(skipped.count) of \(cases.count) refused")
+        #expect(skipped.count < cases.count / 3, "\(skipped.count) of \(cases.count) refused, seed \(seed)")
+    }
+
+    /// Calc prints a float zero, in a formula too, under fix 0 as `0e0`.
+    @Test func floatZeroInFixZero() throws {
+        var modes = Calc.Modes()
+        modes.format = .fix(0)
+        for (e, expected) in [("max(x, 0.)", "max(x, 0e0)"), ("x < 0.", "x < 0e0"), ("if(x, 0., 1)", "x ? 0e0 : 1"),
+                              ("x / 0.", "x / 0e0"), ("0.", "0e0"), ("max(x, 0)", "max(x, 0)")] {
+            #expect(try Calc.evaluate(e, modes: modes) == expected, "\(e)")
+        }
     }
 
     @Test func unsupported() throws {
