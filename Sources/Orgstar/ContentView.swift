@@ -312,6 +312,7 @@ struct ContentView: View {
         .searchFocused($searchFocused)
         .toolbar(id: "main") { toolbarItems }
         .onChange(of: session.path) { plainOutlineShown = false }
+        .onChange(of: outlineShown, initial: true) { _, shown in commands.outlineShown = shown }
         .onChange(of: ScanRules(hiddenFiles: showHiddenFiles, ignoredFolders: Set(ignoredFolders.split(separator: " ").map(String.init))), initial: true) { _, rules in
             workspace.scanRules = rules
         }

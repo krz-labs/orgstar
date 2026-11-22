@@ -298,7 +298,7 @@ On iOS, spell checking follows =spell-check= in the synced =config.toml=, and is
 
 * Wrapping and filling
 
-Long lines wrap at the edge of the editor by default. View ▸ Truncate or Wrap Long Lines (=toggle-truncate-lines=) switches the current buffer to long lines that run off the right edge, with a horizontal scroll bar, and back. The echo area says which is now in effect.
+Long lines wrap at the edge of the editor by default. View ▸ Truncate Long Lines (=toggle-truncate-lines=) switches the current buffer to long lines that run off the right edge, with a horizontal scroll bar, and back. The echo area says which is now in effect.
 
 | Preset | Key                          |
 |--------+------------------------------|
@@ -310,19 +310,21 @@ To truncate lines in every file, turn on Settings ▸ Editing ▸ "Long lines ru
 
 Wrapping is display only. To rewrap the text of a paragraph, use Org ▸ Fill Paragraph (=org-fill-paragraph=), which breaks the paragraph's lines at the fill column: =M-q= in the Emacs preset and in every Doom state, =⌃⌘P= in the Mac preset. With a selection, it fills every paragraph the selection touches. In Doom's normal and visual states, =gq= and =gw= with a motion fill the paragraphs in the lines it covers (=gqq= and =gww= for the current lines); =gq= leaves the caret on the last line, =gw= where it was. Unlike Fill Paragraph, =gq= and =gw= keep extra spaces between words and at the ends of lines, as Doom does. See [[file:03-keys.org][Keys and commands]]. The fill column is Settings ▸ Editing ▸ "M-q fills to column N" (80 by default, 40 to 200), or =fill-column= in =config.toml=.
 
-=auto-fill-mode= breaks lines as you type: typing a space past the fill column breaks the line at the last space before the column, as often as it takes, and the new line starts with the line's fill prefix, as =org-auto-fill-function= has it: a list item's text lines up under the item, a comment line starts with =#=, and headings, tables and code aren't broken. Turn it on for every file with =auto-fill-mode = true= in =config.toml=, or for the current buffer with View ▸ Turn Auto Fill On or Off (=auto-fill-mode=, in the palette too); the echo area says =Auto-Fill mode enabled in current buffer= or =disabled=. Only a typed space fills, not =RET=.
+=auto-fill-mode= breaks lines as you type: typing a space past the fill column breaks the line at the last space before the column, as often as it takes, and the new line starts with the line's fill prefix, as =org-auto-fill-function= has it: a list item's text lines up under the item, a comment line starts with =#=, and headings, tables and code aren't broken. Turn it on for every file with =auto-fill-mode = true= in =config.toml=, or for the current buffer with View ▸ Auto Fill (=auto-fill-mode=, in the palette too); the echo area says =Auto-Fill mode enabled in current buffer= or =disabled=. Only a typed space fills, not =RET=.
 
 * View toggles
+
+The View menu shows a check mark next to each toggle that is on.
 
 | Toggle                        | Menu                          | Keys                                            | Default | =config.toml=                    | Scope          |
 |-------------------------------+-------------------------------+-------------------------------------------------+---------+----------------------------------+----------------|
 | Show Markup                   | View ▸ Show Markup            | =⇧⌘M=                                           | off     | =show-markup=                    | every buffer   |
 | Show Line Numbers             | View ▸ Show Line Numbers      | =⇧⌘L=                                           | off     | =display-line-numbers-type=      | every buffer   |
-| Auto fill                     | View ▸ Turn Auto Fill On or Off | palette                                       | off     | =auto-fill-mode=                 | current buffer |
+| Auto fill                     | View ▸ Auto Fill                | palette                                       | off     | =auto-fill-mode=                 | current buffer |
 | Inline images                 | Org ▸ Show or Hide Inline Images | =C-c C-x C-v= (Emacs, Doom)                  | off     | =org-startup-with-inline-images= | current buffer |
 | LaTeX previews                | palette                       | =C-c C-x C-l= (Emacs, Doom)                     | off     | =org-startup-with-latex-preview= | current buffer |
 | Spell checking                | View ▸ Check Spelling While Typing | =SPC t s= (Doom)                                | off     | =spell-check=                    | current buffer |
-| Truncate long lines           | View ▸ Truncate or Wrap Long Lines | =C-x x t= (Emacs), =SPC t w= (Doom)             | off     | =org-startup-truncated=          | current buffer |
+| Truncate long lines           | View ▸ Truncate Long Lines         | =C-x x t= (Emacs), =SPC t w= (Doom)             | off     | =org-startup-truncated=          | current buffer |
 
 Toggles that apply to the current buffer last until it closes; the =config.toml= setting decides how each file starts. Changing those settings, and =org-startup-indented= and =org-hide-leading-stars=, affects files opened afterwards, not buffers already open.
 

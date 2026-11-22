@@ -92,7 +92,7 @@ The two "Emacs hides" and "Emacs shows" switches describe your Emacs, not orgsta
 
 The Tags picker offers two values. =config.toml= accepts any integer; with a value other than =-77= or =0= the picker shows no selection.
 
-The long-lines switch applies to files as they open; View ▸ Truncate or Wrap Long Lines switches the file in front.
+The long-lines switch applies to files as they open; View ▸ Truncate Long Lines switches the file in front.
 
 Default TODO keywords apply to files without a =#+TODO= line. orgstar reads them at launch, so a change takes effect after you quit and reopen orgstar.
 
@@ -239,7 +239,7 @@ A key you remove from the file goes back to its default. A key that isn't in the
 | =org-tags-exclude-from-inheritance=  | string  | =""=    | Tags that never inherit, separated by spaces. Read at launch. Mirrors =org-tags-exclude-from-inheritance=. |
 | =org-tag-alist=                      | string  | =""=    | The tags Set Tags offers in files without =#+TAGS=, in =#+TAGS= syntax with keys and groups, rows separated by =\n=. Mirrors =org-tag-alist=. |
 | =org-track-ordered-property-with-tag= | string | ="nil"= | A tag that Toggle ORDERED Property adds and removes with the property: ="t"= for the tag =ORDERED=, or a tag name. Mirrors =org-track-ordered-property-with-tag=. |
-| =auto-fill-mode= | boolean | =false= | Typing a space past =fill-column= breaks the line. View ▸ Turn Auto Fill On or Off changes it for one buffer. Mirrors =auto-fill-mode= in =org-mode-hook=. |
+| =auto-fill-mode= | boolean | =false= | Typing a space past =fill-column= breaks the line. View ▸ Auto Fill changes it for one buffer. Mirrors =auto-fill-mode= in =org-mode-hook=. |
 | =org-roam-directory= | string | =""= | The folder org-roam notes are in; empty for the first sidebar folder. Mirrors =org-roam-directory=. |
 | =org-roam-dailies-directory= | string | ="daily/"= | The folder daily notes are in, relative to =org-roam-directory=. Mirrors =org-roam-dailies-directory=. |
 | =org-roam-dailies-file= | string | ="%<%Y-%m-%d>.org"= | A daily note's file name; =%<…>= formats its date. |
@@ -832,6 +832,6 @@ By default the editor uses one font for everything: body text, headings, code an
 - =font-size= is the body size, at least 6 points.
 - Headings are bold. Level 1 is =font-size= plus three times =heading-size-step=, level 2 plus two times, level 3 plus one time; level 4 and deeper are body size. Set =heading-size-step = 0= for one size throughout.
 - =line-spacing= adds space between lines, in points.
-- =text-width= keeps lines of text to that many columns of =font= in a wider editor, with equal margins either side and the line numbers beside the text, as =olivetti-mode= does in Emacs. Long lines wrap at it; with lines truncated (View ▸ Truncate or Wrap Long Lines) the text takes the whole width. It changes only the display: =M-q= still fills to =fill-column=.
+- =text-width= keeps lines of text to that many columns of =font= in a wider editor, with equal margins either side and the line numbers beside the text, as =olivetti-mode= does in Emacs. Long lines wrap at it; with lines truncated (View ▸ Truncate Long Lines) the text takes the whole width. It changes only the display: =M-q= still fills to =fill-column=.
 
 On iPhone and iPad, the editor and reader use the same theme, read from the synced configuration folder. =font= and =body-font= apply when the family is installed on the device, otherwise the system's monospaced font is used, and =font-size= is the size at the default Dynamic Type setting, scaled with the size chosen on the device. The =selection= color, the =cursor= color and the =syntax-*= colors apply there too. See [[file:14-ios.org][iPhone and iPad]].

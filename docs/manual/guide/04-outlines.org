@@ -703,7 +703,7 @@ for the value with the allowed values listed, Previous Value and Next Value (=p=
 
 ** The Columns inspector
 
-View ▸ Show or Hide Columns and Clock opens an inspector beside the editor. Its Columns
+View ▸ Show Columns and Clock opens an inspector beside the editor. Its Columns
 tab shows the same table for the open file, kept current as you type. Choose File for
 every entry or Subtree for the entry at the caret. The row of the heading at the caret
 is shown in bold, and clicking a row goes to it. The Clock tab is described in
@@ -960,7 +960,7 @@ The outline pane, to the left of the editor, lists the headings of the open org 
 indented by level. Click a heading to go to it; folded text around it opens. A heading
 with no title is shown as =(untitled)=.
 
-Show or hide it with the toolbar button or View ▸ Show or Hide Outline. orgstar
+Show or hide it with the toolbar button or View ▸ Show Outline. orgstar
 remembers the choice for org files; for other files the pane starts hidden and shows
 "Only org files have an outline." Drag the divider to resize it. While the search field
 has text, the pane shows search results instead. The backlinks pane, when shown, sits

@@ -514,7 +514,7 @@ public final class OrgEditor: NSObject {
 
     /// `auto-fill-mode` for this buffer: the settings' unless toggled here.
     public var autoFillOverride: Bool?
-    var autoFills: Bool { isOrg && (autoFillOverride ?? options.autoFill) }
+    public var autoFills: Bool { isOrg && (autoFillOverride ?? options.autoFill) }
 
     /// SPC with `auto-fill-mode`: true when it typed the space and filled the line.
     func autoFill(_ key: KeyChord) -> Bool {

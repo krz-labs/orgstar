@@ -4418,6 +4418,41 @@
         }
       }
     },
+    "Auto Fill": {
+      "comment": "View menu toggle (auto-fill-mode)",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatischer Umbruch"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Relleno automático"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remplissage automatique"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自動折り返し"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preenchimento Automático"
+          }
+        }
+      }
+    },
     "Automatically, when typing stops": {
       "localizations": {
         "de": {
@@ -34997,6 +35032,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Transpor Tabela"
+          }
+        }
+      }
+    },
+    "Truncate Long Lines": {
+      "comment": "View menu toggle",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lange Zeilen abschneiden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Truncar líneas largas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tronquer les lignes longues"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "長い行を切り詰める"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Truncar Linhas Longas"
           }
         }
       }

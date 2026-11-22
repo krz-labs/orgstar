@@ -292,7 +292,7 @@ When a key is defined twice, the first definition wins.
 
 * The backlinks pane
 
-View ▸ Show or Hide Backlinks shows a pane under the outline pane of an org file. It
+View ▸ Show Backlinks shows a pane under the outline pane of an org file. It
 has two sections:
 
 - *Links to* the heading at the caret, named after that heading.

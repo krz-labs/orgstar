@@ -24,6 +24,8 @@ final class AppCommands {
     var showingConflict = false
     var showingPalette = false
     var showingMessages = false
+    /// The main window's outline pane is shown, for View ▸ Show Outline.
+    var outlineShown = false
     /// A location another window asked the main window to show.
     private(set) var jumpRequest: (path: String, offset: Int, id: Int)?
     private var jumpID = 0
@@ -539,16 +541,7 @@ struct OrgstarApp: App {
                 Button("Next Pane") { commands.run("app.pane-next") }
                     .keyboardShortcut("`", modifiers: [.command, .option])
                 Divider()
-                Button("Show or Hide Outline") { commands.run("app.toggle-outline") }
-                    .keyboardShortcut("o", modifiers: [.command, .option])
-                Button("Show or Hide Backlinks") { commands.run("app.toggle-backlinks") }
-                Button("Show or Hide Columns and Clock") { commands.run("app.toggle-inspector") }
-                    .keyboardShortcut("i", modifiers: [.command, .option])
-                MarkupToggle()
-                Button("Truncate or Wrap Long Lines") { commands.run("editor.toggle-truncate-lines") }
-                Button("Turn Auto Fill On or Off") { commands.run("editor.toggle-auto-fill") }
-                Button("Check Spelling While Typing") { commands.editor?.run("editor.toggle-spell-check") }
-                    .disabled(commands.editor == nil)
+                ViewMenuToggles(commands: commands)
                 Divider()
                 Button("Messages") { commands.run("app.messages") }
             }
@@ -671,6 +664,34 @@ enum Manual {
     static let home = URL(string: "https://files.krz.sh/orgstar/")!
     /// The key reference, with every preset's keys.
     static let keys = URL(string: "https://files.krz.sh/orgstar/guide/03-keys.html#key-reference")!
+}
+
+/// View ▸ the panes and the focused editor's modes, checked while on.
+struct ViewMenuToggles: View {
+    let commands: AppCommands
+    @AppStorage("backlinksShown") private var backlinksShown = true
+    @AppStorage("inspectorShown") private var inspectorShown = false
+
+    var body: some View {
+        let outline = commands.outlineShown
+        let editor = commands.editor
+        // A key that switches an editor mode shows a message, so the checks follow it.
+        let _ = commands.message
+        Toggle("Show Outline", isOn: Binding(get: { outline }, set: { _ in commands.run("app.toggle-outline") }))
+            .keyboardShortcut("o", modifiers: [.command, .option])
+        Toggle("Show Backlinks", isOn: $backlinksShown)
+        Toggle("Show Columns and Clock", isOn: $inspectorShown)
+            .keyboardShortcut("i", modifiers: [.command, .option])
+        MarkupToggle()
+        editorToggle("Truncate Long Lines", "editor.toggle-truncate-lines", editor?.truncatesLines)
+        editorToggle("Auto Fill", "editor.toggle-auto-fill", editor?.autoFills)
+        editorToggle("Check Spelling While Typing", "editor.toggle-spell-check", editor?.spellChecking)
+    }
+
+    private func editorToggle(_ title: LocalizedStringKey, _ id: String, _ on: Bool?) -> some View {
+        Toggle(title, isOn: Binding(get: { on ?? false }, set: { _ in commands.editor?.run(id) }))
+            .disabled(on == nil)
+    }
 }
 
 /// View ▸ Show Markup (link brackets and targets, emphasis markers) and Show Line Numbers.
