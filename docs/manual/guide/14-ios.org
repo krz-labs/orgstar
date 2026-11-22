@@ -54,7 +54,7 @@ The toolbar has:
 - Undo
 - More :: Commands, Clock In, Show Markup, Recent Entries, Export, Sync Conflict Copies, and Recovered Versions.
 
-Messages from commands show at the top of the editor, and at the bottom of the reader, for a few seconds; tap one to dismiss it.
+Messages from commands show at the top of the editor, and at the bottom of the reader, for a few seconds; tap one to dismiss it. VoiceOver reads each message as it appears.
 
 ** Panes and windows on iPad
 

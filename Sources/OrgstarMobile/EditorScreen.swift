@@ -1254,7 +1254,8 @@ final class PaneHolder {
     }
 }
 
-/// A command's result or refusal, over the screen until it is tapped or for four seconds.
+/// A command's result or refusal, over the screen until it is tapped or for four seconds, and
+/// read out by VoiceOver.
 private struct MessageView: ViewModifier {
     @Binding var message: String?
     let edge: VerticalEdge
@@ -1272,6 +1273,9 @@ private struct MessageView: ViewModifier {
                         if self.message == message { self.message = nil }
                     }
             }
+        }
+        .onChange(of: message) { _, message in
+            if let message { AccessibilityNotification.Announcement(message).post() }
         }
     }
 }
