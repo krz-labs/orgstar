@@ -18,6 +18,9 @@ extension AgendaView {
                 Button(Self.todoMatch) { viewName = Self.todoMatch }
                 Button(Self.search) { viewName = Self.search }
                 Button(Self.todoSearch) { viewName = Self.todoSearch }
+                Divider()
+                Button("Save as View…") { saveView() }
+                    .disabled(!canSaveView)
             } label: {
                 Label(viewName, systemImage: "calendar").labelStyle(.titleAndIcon)
             }
@@ -217,6 +220,30 @@ extension AgendaView {
     var listTitle: String {
         if case .agenda = agenda.mode { return "" }
         return agenda.viewSettings[agenda.mode]?.header ?? agenda.mode.title
+    }
+
+    /// A typed match or search is showing, which isn't a named view yet.
+    var canSaveView: Bool {
+        guard isMatch || isSearch else { return false }
+        switch agenda.mode {
+        case .match, .search: return true
+        default: return false
+        }
+    }
+
+    /// Asks for a name and adds the match or search showing to `views.toml`, then shows it as
+    /// that view.
+    func saveView() {
+        let mode = agenda.mode
+        textPrompt = TextPrompt(title: String(localized: "Name for this view:")) { name in
+            do {
+                try AgendaViewLoader.save(name: name, mode: mode)
+                loadViews()
+                viewName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+            } catch {
+                message = "\(error)"
+            }
+        }
     }
 
     func loadViews() {

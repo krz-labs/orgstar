@@ -2120,6 +2120,40 @@
         }
       }
     },
+    "A view needs a name.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Ansicht braucht einen Namen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una vista necesita un nombre."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une vue doit avoir un nom."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ビューには名前が必要です。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uma visualização precisa de um nome."
+          }
+        }
+      }
+    },
     "About": {
       "localizations": {
         "de": {
@@ -19202,6 +19236,40 @@
         }
       }
     },
+    "Name for this view:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name für diese Ansicht:"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nombre para esta vista:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nom de cette vue :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このビューの名前:"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nome para esta visualização:"
+          }
+        }
+      }
+    },
     "Narrow to Block": {
       "comment": "Command title",
       "localizations": {
@@ -26944,6 +27012,40 @@
         }
       }
     },
+    "Save as View…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Als Ansicht sichern …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardar como vista…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer comme vue…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ビューとして保存…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salvar como Visualização…"
+          }
+        }
+      }
+    },
     "Save files": {
       "localizations": {
         "de": {
@@ -32854,6 +32956,40 @@
         }
       }
     },
+    "There is already a view named %@.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Es gibt bereits eine Ansicht namens %@."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ya existe una vista llamada %@."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il existe déjà une vue nommée %@."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@という名前のビューはすでにあります。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Já existe uma visualização chamada %@."
+          }
+        }
+      }
+    },
     "Third-Party Notices": {
       "localizations": {
         "de": {
@@ -33094,6 +33230,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "As fórmulas desta tabela não podem ser calculadas aqui: %@."
+          }
+        }
+      }
+    },
+    "This view can't be saved from here; write it in views.toml.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Ansicht kann von hier aus nicht gesichert werden; trage sie in views.toml ein."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta vista no se puede guardar desde aquí; escríbela en views.toml."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette vue ne peut pas être enregistrée d'ici ; écrivez-la dans views.toml."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このビューはここから保存できません。views.tomlに記述してください。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta visualização não pode ser salva daqui; escreva-a em views.toml."
           }
         }
       }

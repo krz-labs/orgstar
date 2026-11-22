@@ -213,6 +213,54 @@ public enum AgendaViewLoader {
         return (views, problems)
     }
 
+    /// Why a view wasn't saved.
+    public struct SaveFailure: Error, Equatable, CustomStringConvertible {
+        public let description: String
+    }
+
+    /// The `[[view]]` table that makes `mode` a view named `name`; nil for a block agenda and a
+    /// stuck-projects view with its own definition, which one table can't hold.
+    static func table(name: String, mode: AgendaMode) -> String? {
+        func line(_ key: String, _ value: String?) -> String { value.map { "\(key) = \(UserConfig.format(.string($0)))\n" } ?? "" }
+        var toml = "[[view]]\n" + line("name", name)
+        switch mode {
+        case .agenda(let span, let start):
+            toml += line("type", "agenda") + (span.map { "span = \($0)\n" } ?? "") + (start.map { "start = \($0)\n" } ?? "")
+        case .todo(let keywords):
+            toml += line("type", "todo") + line("keywords", keywords)
+        case .match(let match, let todoOnly):
+            toml += line("type", todoOnly ? "todo-match" : "match") + line("match", match)
+        case .search(let string, let todoOnly):
+            toml += line("type", todoOnly ? "todo-search" : "search") + line("match", string)
+        case .stuck(nil):
+            toml += line("type", "stuck")
+        case .stuck, .blocks:
+            return nil
+        }
+        return toml
+    }
+
+    /// Adds a view of `mode` named `name` to the end of `views.toml`, making the file when it
+    /// isn't there. A name another view has, the built-in ones included, is refused.
+    public static func save(name: String, mode: AgendaMode, userFile: URL = userFile) throws(SaveFailure) {
+        let name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else { throw SaveFailure(description: String(localized: "A view needs a name.")) }
+        guard !load(userFile: userFile).views.contains(where: { $0.name == name }) else {
+            throw SaveFailure(description: String(localized: "There is already a view named \(name)."))
+        }
+        guard let table = table(name: name, mode: mode) else {
+            throw SaveFailure(description: String(localized: "This view can't be saved from here; write it in views.toml."))
+        }
+        var text = (try? String(contentsOf: userFile, encoding: .utf8)) ?? ""
+        if !text.isEmpty { text += text.hasSuffix("\n") ? "\n" : "\n\n" }
+        do {
+            try FileManager.default.createDirectory(at: userFile.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try (text + table).write(to: userFile, atomically: true, encoding: .utf8)
+        } catch {
+            throw SaveFailure(description: error.localizedDescription)
+        }
+    }
+
     /// The view a `[[view]]` or `[[view.block]]` table describes.
     static func mode(_ table: TOML.Table, name: String, _ problems: inout [String]) -> AgendaMode? {
         let match = table.values["match"]?.string

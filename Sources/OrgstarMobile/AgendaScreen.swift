@@ -73,6 +73,8 @@ struct AgendaScreen: View, Equatable {
     /// A match typed for the tag and property view, or a search string.
     private enum Asking: Identifiable {
         case match, search
+        /// A name for the match or search showing, to keep it as a view.
+        case save
         var id: Self { self }
     }
 
@@ -212,6 +214,7 @@ struct AgendaScreen: View, Equatable {
                     }
                     Button("Tags and Properties…") { asking = .match }
                     Button("Search…") { asking = .search }
+                    if canSaveView { Button("Save as View…") { asking = .save } }
                     Divider()
                     Button("Board", systemImage: "rectangle.split.3x1") { showingBoard = true }
                 } label: {
@@ -241,7 +244,9 @@ struct AgendaScreen: View, Equatable {
             }
         }
         .sheet(item: $asking) { kind in
-            if kind == .search {
+            if kind == .save {
+                PromptSheet(prompt: Prompt(key: "view-name", message: "Name for this view:")) { saveView($0) }
+            } else if kind == .search {
                 PromptSheet(prompt: Prompt(key: "search", message: "Search: a phrase, or +word -word {regexp}; * for headlines, ! for TODO entries")) { answer in
                     asking = nil
                     guard let answer, answer.contains(where: { !$0.isWhitespace }) else { return }
@@ -310,12 +315,7 @@ struct AgendaScreen: View, Equatable {
             await workspace.refresh()
             await agenda.refresh(open: session.openTexts)
         }
-        .task {
-            let loaded = AgendaViewLoader.load()
-            views = loaded.views
-            agenda.viewSettings = AgendaViewLoader.settings(loaded.views)
-            if let problem = loaded.problems.first { message = problem }
-        }
+        .task { loadViews() }
         // The now line moves each minute; a new day refreshes the statuses.
         .task {
             while !Task.isCancelled {
@@ -393,6 +393,34 @@ struct AgendaScreen: View, Equatable {
         if case .agenda = agenda.mode { return agenda.days.flatMap(\.items).filter(\.isEntry) }
         if case .blocks = agenda.mode { return agenda.blocks.flatMap { $0.days.flatMap(\.items).filter(\.isEntry) + $0.list } }
         return agenda.list
+    }
+
+    private func loadViews() {
+        let loaded = AgendaViewLoader.load()
+        views = loaded.views
+        agenda.viewSettings = AgendaViewLoader.settings(loaded.views)
+        if let problem = loaded.problems.first { message = problem }
+    }
+
+    /// A typed match or search is showing, which isn't a named view yet.
+    private var canSaveView: Bool {
+        switch agenda.mode {
+        case .match, .search: return !views.contains { $0.mode == agenda.mode }
+        default: return false
+        }
+    }
+
+    /// Adds the match or search showing to `views.toml` as `name`, then shows it as that view.
+    private func saveView(_ name: String?) {
+        asking = nil
+        guard let name else { return }
+        do {
+            try AgendaViewLoader.save(name: name, mode: agenda.mode)
+            loadViews()
+            viewName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        } catch {
+            message = "\(error)"
+        }
     }
 
     private func show(_ definition: AgendaViewDefinition) {
