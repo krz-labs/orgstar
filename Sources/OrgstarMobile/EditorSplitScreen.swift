@@ -37,7 +37,7 @@ final class EditorSplit {
 
     var isSplit: Bool { layout.panes.count > 1 }
 
-    /// Runs a pane command; false when it does nothing here.
+    /// Runs a pane command; returns why it did nothing, or nil.
     func run(_ id: String, session: DocumentSession, store: MobileEditorStore) -> String? {
         switch id {
         case "app.split-right", "app.split-below":
@@ -49,7 +49,7 @@ final class EditorSplit {
         case "app.pane-next":
             focused = layout.next(after: focused)
         case "app.pane-close":
-            guard isSplit else { return "Attempt to delete the only pane" }
+            guard isSplit else { return String(localized: "This is the only pane.", comment: "Close Pane with one pane") }
             close(focused, session: session, store: store)
         case "app.pane-only":
             for id in layout.panes where id != focused { close(id, session: session, store: store) }
@@ -105,7 +105,7 @@ struct EditorSplitScreen: View {
                     path: file, offset: id == split.layout.panes.first ? offset : nil, workspace: workspace, session: session,
                     givenPane: pane, inSplit: split.isSplit, isFocused: split.focused == id,
                     onFocus: { split.focused = id },
-                    onPaneCommand: { command in _ = split.run(command, session: session, store: model.editors) }
+                    onPaneCommand: { split.run($0, session: session, store: model.editors) }
                 )
                 .id(id)
                 .overlay(alignment: .top) {

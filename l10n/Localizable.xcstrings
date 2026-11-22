@@ -3180,40 +3180,6 @@
         }
       }
     },
-    "Agenda Files to iCalendar (orgstar+)": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Agenda-Dateien nach iCalendar (orgstar+)"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Archivos de agenda a iCalendar (orgstar+)"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fichiers d'agenda vers iCalendar (orgstar+)"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アジェンダファイルをiCalendarに書き出す（orgstar+）"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Arquivos da Agenda para iCalendar (orgstar+)"
-          }
-        }
-      }
-    },
     "Agenda clear": {
       "localizations": {
         "de": {
@@ -36876,6 +36842,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Este arquivo não está em nenhuma das suas pastas. Escolha onde salvar a exportação."
+          }
+        }
+      }
+    },
+    "This is the only pane.": {
+      "comment": "Close Pane with one pane",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dies ist der einzige Bereich."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este es el único panel."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "C'est le seul volet."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ペインはこれだけです。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este é o único painel."
           }
         }
       }

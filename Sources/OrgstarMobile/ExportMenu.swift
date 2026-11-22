@@ -197,7 +197,7 @@ struct ExportMenu: View {
             if let calendars = AgendaCalendars(model: model) {
                 Divider()
                 if OrgExport.Format.icalendar.locked {
-                    Button("Agenda Files to iCalendar (orgstar+)") { ProAccess.shared.allows(.export) }
+                    Button("\(String(localized: "Export Agenda Files to iCalendar")) (orgstar+)", systemImage: "calendar") { ProAccess.shared.allows(.export) }
                 } else {
                     Button("Export Agenda Files to iCalendar", systemImage: "calendar") { report(calendars.exportEach()) }
                     ShareLink(item: calendars, preview: SharePreview(calendars.fileName)) {
@@ -206,7 +206,11 @@ struct ExportMenu: View {
                 }
             }
             Divider()
-            Button("Copy as Rich Text", systemImage: "doc.on.doc") { if ProAccess.shared.allows(.export) { report(Self.copy(path: path, text: text, theme: model.theme)) } }
+            if ProAccess.shared.isUnlocked {
+                Button("Copy as Rich Text", systemImage: "doc.on.doc") { report(Self.copy(path: path, text: text, theme: model.theme)) }
+            } else {
+                Button("\(String(localized: "Copy as Rich Text")) (orgstar+)", systemImage: "doc.on.doc") { ProAccess.shared.allows(.export) }
+            }
         }
     }
 

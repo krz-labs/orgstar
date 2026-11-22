@@ -51,7 +51,7 @@ The editor folds headings, drawers and blocks (tap a fold's =…= to open it, an
 The toolbar has:
 
 - Conflict :: shown while the file and your edits conflict; opens the conflict sheet.
-- Undo
+- Undo :: touch and hold it for Redo.
 - More :: Commands, Clock In, Show Markup, Recent Entries, Export, Sync Conflict Copies, and Recovered Versions.
 
 Messages from commands show at the top of the editor, and at the bottom of the reader, for a few seconds; tap one to dismiss it. VoiceOver reads each message as it appears.
@@ -70,7 +70,7 @@ On iPad, the editor can show a file in several panes, as a Mac window does (see 
 
 The focused pane has a line along its top and the toolbar acts on it; tap in a pane to focus it. Every pane shows the same buffer: text typed in one shows in the others at once, and folds, narrowing and styles are the buffer's. The caret and scroll position are each pane's own, and so is undo: Undo in a pane undoes what was typed or changed in that pane. A link to another file opens it on its own screen, leaving the panes as they are.
 
-Each iPad window (scene), opened from the app switcher or by dragging the app from the Dock, has its own tabs, screens and panes over the same open files, so a file edited in one window shows the edit in the others. The pane commands aren't offered on iPhone or in a narrow window.
+Each iPad window (scene), opened from the app switcher or by dragging the app from the Dock, has its own tabs, screens and panes over the same open files, so a file edited in one window shows the edit in the others. The pane commands aren't offered on iPhone or in a narrow window. Close Pane with one pane says "This is the only pane."
 
 ** Saving
 
@@ -339,7 +339,7 @@ PDF export follows =pdf-margin=, =pdf-font= and =pdf-page-numbers= in =config.to
 
 Body Only in the Export menu leaves out the title and the page around the text in HTML, Markdown, LaTeX and Plain Text (ASCII), and is kept for each file; the other formats say they have no body-only export while it is on. Export Subtree…, in the editor's Export menu, shares the subtree at the caret in any of the formats.
 
-The Export menu also has Export Agenda Files to iCalendar, which writes an =.ics= beside each agenda file, and Combine Agenda Files into iCalendar, which shares one calendar of them all. Commands has these, Copy as Rich Text, and Export to HTML and Open, which shows the HTML export in Quick Look.
+The Export menu also has Export Agenda Files to iCalendar, which writes an =.ics= beside each agenda file, and Combine Agenda Files into iCalendar, which shares one calendar of them all. Commands has these, Copy as Rich Text, and Export to HTML and Open, which shows the HTML export in Quick Look. Without orgstar+, the Export menu's items that need it end in "(orgstar+)" and open the orgstar+ screen.
 
 Publishing works from Commands as on the Mac, with the =[[publish]]= projects in =config.toml=. A project that publishes outside your folders asks for a folder the first time, and uses it from then on. See [[file:12-export.org][Export]].
 

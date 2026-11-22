@@ -23,8 +23,8 @@ struct EditorScreen: View {
     var isFocused = true
     /// Focus came to this screen's pane.
     var onFocus: () -> Void = {}
-    /// The pane commands (`app.split-right` …), which the split runs.
-    var onPaneCommand: ((String) -> Void)? = nil
+    /// The pane commands (`app.split-right` …), which the split runs; returns why one did nothing.
+    var onPaneCommand: ((String) -> String?)? = nil
     @State private var editor: MobileEditor?
     /// This screen's view of the editor.
     @State private var textView: UITextView?
@@ -133,7 +133,14 @@ struct EditorScreen: View {
                 if pane?.conflict != nil {
                     Button("Conflict", systemImage: "exclamationmark.triangle") { sheet = .conflict }
                 }
-                Button("Undo", systemImage: "arrow.uturn.backward") { editor?.run("edit.undo") }
+                // Redo on a long press, as the system's back buttons offer history.
+                Menu {
+                    Button("Redo", systemImage: "arrow.uturn.forward") { editor?.run("edit.redo") }
+                } label: {
+                    Label("Undo", systemImage: "arrow.uturn.backward")
+                } primaryAction: {
+                    editor?.run("edit.undo")
+                }
                 Menu("More", systemImage: "ellipsis.circle") {
                     Button("Commands", systemImage: "command") { sheet = .palette }
                     Button("Word Count", systemImage: "textformat.123") { message = wordCount() }
@@ -196,12 +203,12 @@ struct EditorScreen: View {
                     Button("Recovered Versions", systemImage: "clock.arrow.circlepath") { sheet = .recovery }
                     if onPaneCommand != nil, sizeClass == .regular {
                         Menu("Panes", systemImage: "rectangle.split.2x1") {
-                            Button("Split Pane Right", systemImage: "rectangle.split.2x1") { onPaneCommand?("app.split-right") }
-                            Button("Split Pane Below", systemImage: "rectangle.split.1x2") { onPaneCommand?("app.split-below") }
+                            Button("Split Pane Right", systemImage: "rectangle.split.2x1") { _ = onPaneCommand?("app.split-right") }
+                            Button("Split Pane Below", systemImage: "rectangle.split.1x2") { _ = onPaneCommand?("app.split-below") }
                             if inSplit {
-                                Button("Next Pane", systemImage: "arrow.right.square") { onPaneCommand?("app.pane-next") }
-                                Button("Close Pane", systemImage: "xmark.square") { onPaneCommand?("app.pane-close") }
-                                Button("Close Other Panes", systemImage: "square") { onPaneCommand?("app.pane-only") }
+                                Button("Next Pane", systemImage: "arrow.right.square") { _ = onPaneCommand?("app.pane-next") }
+                                Button("Close Pane", systemImage: "xmark.square") { _ = onPaneCommand?("app.pane-close") }
+                                Button("Close Other Panes", systemImage: "square") { _ = onPaneCommand?("app.pane-only") }
                             }
                         }
                     }
@@ -471,7 +478,7 @@ struct EditorScreen: View {
         editor.onAppCommand = { id in
             if let feature = ProFeature.required(byCommand: id), !ProAccess.shared.allows(feature) { return }
             if Self.paneCommands.contains(id) {
-                if let onPaneCommand { onPaneCommand(id) } else { message = MobileEditor.unavailable(command: id) }
+                if let onPaneCommand { if let text = onPaneCommand(id) { message = text } } else { message = MobileEditor.unavailable(command: id) }
             } else if id == "app.save" {
                 _ = session.save(path)
             } else if id == "app.archive" {
