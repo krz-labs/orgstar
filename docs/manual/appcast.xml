@@ -4,6 +4,30 @@
     <title>orgstar</title>
     <link>https://gitbay.org/krz/orgstar</link>
     <item>
+      <title>orgstar 1.2.0</title>
+      <link>https://krz.sh/apps/orgstar/</link>
+      <sparkle:version>728</sparkle:version>
+      <sparkle:shortVersionString>1.2.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+      <pubDate>Sat, 21 Nov 2026 22:04:19 -0600</pubDate>
+      <description><![CDATA[<h2>orgstar 1.2.0</h2>
+<ul>
+<li>The agenda in the sidebar, beside the editor: the calendar button under the sidebar switches between your files and the agenda or one of your saved views.</li>
+<li>A graph of your org-roam or Denote notes and the links between them (Window ▸ Graph).</li>
+<li><code>dot</code> and <code>mermaid</code> blocks are drawn in the app when the programs aren't installed; <code>calc</code> and <code>sqlite</code> blocks run in the app too.</li>
+<li>LaTeX, ODT and plain text (ASCII) export without Emacs.</li>
+<li>More table formulas without Emacs: more Calc and Lisp formulas, date arithmetic and <code>org-sbe</code>.</li>
+<li>Radar plots, more of gnuplot's <code>set</code> options and SVG files without gnuplot.</li>
+<li>Save as View… keeps a typed match or search as a view in <code>views.toml</code>.</li>
+<li>orgstar can stay in the menu bar, with capture and today's agenda (Settings ▸ General).</li>
+<li>A sheet shows what's new once after an update.</li>
+<li>PDF export typesets math without a network connection.</li>
+<li>Fixes: attachment links stay with the entry they belong to, and attached images show in HTML and PDF export.</li>
+</ul>
+<p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
+      <enclosure url="https://files.krz.sh/orgstar/orgstar-1.2.0.dmg" type="application/octet-stream" sparkle:edSignature="hHwHIUJ7VWf+I4FotDK7XjBhKiiD4kv8x+zRJuRXBsAXDgf98KM/iP/F3fPe4uzPmNoBWpwZpkSju3KlPjmzCA==" length="69432234"/>
+    </item>
+    <item>
       <title>orgstar 1.1.1</title>
       <link>https://krz.sh/apps/orgstar/</link>
       <sparkle:version>611</sparkle:version>
