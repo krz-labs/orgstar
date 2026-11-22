@@ -6,7 +6,6 @@ import SwiftUI
 struct EditorWindowView: View {
     let session: DocumentSession
     let commands: AppCommands
-    let clock: ClockModel
     @AppStorage("showTabBar") private var showTabBar = false
     @State private var window: WindowModel?
     @Environment(\.openWindow) private var openWindow
@@ -25,7 +24,7 @@ struct EditorWindowView: View {
                 }
                 .safeAreaInset(edge: .bottom, spacing: 0) {
                     VStack(spacing: 0) {
-                        ModeLine(session: session, commands: commands, clock: clock) { run($0) }
+                        ModeLine(session: session, commands: commands)
                         EchoArea(commands: commands)
                     }
                 }

@@ -195,7 +195,6 @@ The line under the editor shows, from the left:
 | Evil state                 | Doom preset                        | =NORMAL=, =INSERT=, =VISUAL=, =V-LINE= or =V-BLOCK=, on a coloured tag |
 | Unsaved dot                | the buffer has unsaved edits       | a small dot                                                       |
 | Outline path               | the caret is under a heading       | the headings containing the caret, outermost first, as =Projects › House › Roof= |
-| Running clock              | a clock is running                 | elapsed time and the clocked heading; click for Clock Out, Cancel Clock and Go to Clocked Entry |
 | Selection counts           | text is selected                   | lines, words and characters in the selection, as =count-words-region= |
 | Line and column            | always                             | =LINE:COLUMN= of the caret (the end of the selection)             |
 | Word count                 | always                             | words in the whole file, as =count-words=; click for the characters and reading time of the file and the selection |
@@ -206,7 +205,7 @@ Lines count from 1. Columns count from 0, as Emacs's =column-number-mode= does: 
 
 The word count follows edits after a pause. Reading time is at 230 words a minute, rounded up. The Git branch is read from the repository's =HEAD= file without running =git=, and checked again every 5 seconds; worktrees and submodules are followed.
 
-The running clock is covered in [[file:06-dates-and-clocking.org][Dates and clocking]]; the evil states in [[file:03-keys.org][Keys and commands]].
+The running clock shows in the toolbar; see [[file:06-dates-and-clocking.org][Dates and clocking]]. The evil states are covered in [[file:03-keys.org][Keys and commands]].
 
 * The echo area
 

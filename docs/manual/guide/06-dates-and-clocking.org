@@ -312,10 +312,9 @@ An existing drawer of that name always takes the new line.
 
 ** The running clock
 
-While a clock runs, orgstar shows it in three places, refreshed every 30 seconds:
+While a clock runs, orgstar shows it in two places, refreshed every 30 seconds:
 
-- the mode line under the editor: =⏱ 0:42 Write the report=;
-- the window's toolbar;
+- the main window's toolbar, with a clock symbol, the heading and the elapsed time: =Write the report 0:42=;
 - the macOS menu bar, with the elapsed time.
 
 The time shown is the time since you clocked in, not the entry's total. Each of them opens a menu with Clock Out, Cancel Clock and Go to Clocked Entry. The toolbar's menu also has Clock In to Recent Entry…, Go to Recent Clocked Entry… and the recent entries. The menu bar item also has Clock In to Recent Entry…, Clock Report and a Recent Entries section. Choosing a recent entry clocks in to it.

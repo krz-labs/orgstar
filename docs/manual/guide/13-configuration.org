@@ -797,7 +797,7 @@ The colors stack in this order, each over the one before: the themes chosen with
 | =sidebar-header=        | folder names there                                           |
 | =modeline-background=   | the modeline and message line                                |
 | =modeline-foreground=   | modeline text                                                |
-| =modeline-highlight=    | the outline path and the clock in the modeline               |
+| =modeline-highlight=    | the outline path in the modeline                             |
 | =state-normal=          | the NORMAL tag (Doom keys)                                   |
 | =state-insert=          | the INSERT tag                                               |
 | =state-visual=          | the VISUAL and V-LINE tags                                   |

@@ -182,7 +182,7 @@ struct ContentView: View {
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 VStack(spacing: 0) {
-                    ModeLine(session: session, commands: commands, clock: clock, perform: perform)
+                    ModeLine(session: session, commands: commands)
                     EchoArea(commands: commands)
                 }
             }
@@ -237,18 +237,23 @@ struct ContentView: View {
         }
         if let running = clock.running {
             ToolbarItem(id: "clock") {
-                Menu {
-                    Button("Clock Out") { perform("app.clock.out") }
-                    Button("Cancel Clock") { perform("app.clock.cancel") }
-                    Button("Go to Clocked Entry") { perform("app.clock.goto") }
-                    Divider()
-                    Button("Clock In to Recent Entry…") { perform("app.clock.in-recent") }
-                    Button("Go to Recent Clocked Entry…") { perform("app.clock.goto-recent") }
-                    RecentClocks(clock: clock) { perform($0) }
-                } label: {
-                    TimelineView(.periodic(from: .now, by: 30)) { context in
-                        Text("⏱ \(running.heading) \(clockElapsed(running, now: context.date))").lineLimit(1)
+                TimelineView(.periodic(from: .now, by: 30)) { context in
+                    Menu {
+                        Button("Clock Out") { perform("app.clock.out") }
+                        Button("Cancel Clock") { perform("app.clock.cancel") }
+                        Button("Go to Clocked Entry") { perform("app.clock.goto") }
+                        Divider()
+                        Button("Clock In to Recent Entry…") { perform("app.clock.in-recent") }
+                        Button("Go to Recent Clocked Entry…") { perform("app.clock.goto-recent") }
+                        RecentClocks(clock: clock) { perform($0) }
+                    } label: {
+                        Label {
+                            Text(verbatim: "\(running.heading) \(clockElapsed(running, now: context.date))").lineLimit(1)
+                        } icon: {
+                            Image(systemName: "clock")
+                        }
                     }
+                    .labelStyle(.titleAndIcon)
                 }
                 .help("Clocked in since \(running.startedAt.formatted(date: .omitted, time: .shortened))")
             }

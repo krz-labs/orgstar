@@ -435,7 +435,7 @@ struct OrgstarApp: App {
         .defaultSize(width: 1280, height: 860)
         WindowGroup("Editor", id: "editor") {
             if case .success = workspace {
-                EditorWindowView(session: session, commands: commands, clock: clock)
+                EditorWindowView(session: session, commands: commands)
                     .environment(\.orgTheme, ConfigSync.shared.theme)
                     .tint(ConfigSync.shared.theme.color("accent"))
             }

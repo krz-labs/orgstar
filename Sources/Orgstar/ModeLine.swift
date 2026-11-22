@@ -4,14 +4,11 @@ import OrgPresentation
 import SwiftUI
 
 /// The line under the editor: evil state, unsaved mark and the headings around the caret on
-/// the left; the running clock, the selection's counts, line and column, the file's words,
+/// the left; the timer, the selection's counts, line and column, the file's words,
 /// anything unusual about its encoding and the git branch on the right.
 struct ModeLine: View {
     let session: DocumentSession
     let commands: AppCommands
-    let clock: ClockModel
-    /// Runs an app command (clock out, go to the clocked entry).
-    let perform: (String) -> Void
     @Environment(\.orgTheme) private var theme
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.appearsActive) private var appearsActive
@@ -34,23 +31,6 @@ struct ModeLine: View {
             }
             breadcrumb(at: selection.location)
             Spacer(minLength: 12)
-            if let running = clock.running {
-                Menu {
-                    Button("Clock Out") { perform("app.clock.out") }
-                    Button("Cancel Clock") { perform("app.clock.cancel") }
-                    Button("Go to Clocked Entry") { perform("app.clock.goto") }
-                } label: {
-                    TimelineView(.periodic(from: .now, by: 30)) { context in
-                        Text("⏱ \(clockElapsed(running, now: context.date)) \(running.heading)")
-                            .font(.system(.caption, design: .monospaced))
-                    }
-                }
-                .menuStyle(.borderlessButton)
-                .menuIndicator(.hidden)
-                .fixedSize()
-                .foregroundStyle(theme.color("modeline-highlight") ?? .primary)
-                .help("Clocked in since \(running.startedAt.formatted(date: .omitted, time: .shortened))")
-            }
             if let timer = TimerModel.shared.timer {
                 Menu {
                     Button(timer.paused == nil ? "Pause Timer" : "Continue Timer") { commands.editor?.run("org.timer.pause") }
