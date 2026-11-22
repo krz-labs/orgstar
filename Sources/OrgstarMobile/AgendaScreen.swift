@@ -216,6 +216,12 @@ struct AgendaScreen: View, Equatable {
                     Button("Search…") { asking = .search }
                     if canSaveView { Button("Save as View…") { asking = .save } }
                     Divider()
+                    if case .agenda = agenda.mode {
+                        Button("Go to Date…", systemImage: "calendar") { jumping = true }
+                    }
+                    Button("Filter…", systemImage: filter.isEmpty ? "line.3.horizontal.decrease" : "line.3.horizontal.decrease.circle.fill") { showingFilter = true }
+                    Button("Select", systemImage: "checkmark.circle") { selecting = true }
+                    Divider()
                     Button("Board", systemImage: "rectangle.split.3x1") { showingBoard = true }
                 } label: {
                     Label("Views", systemImage: "list.bullet.rectangle")
@@ -642,16 +648,14 @@ struct AgendaScreen: View, Equatable {
                     .glassEffect(.regular, in: Capsule())
                     .onTapGesture { message = nil }
             }
-            HStack(spacing: 2) {
-                let isAgenda = if case .agenda = agenda.mode { true } else { false }
-                if isAgenda {
+            if case .agenda = agenda.mode {
+                HStack(spacing: 2) {
                     barButton("Earlier", "chevron.left") { step(forward: false) }
-                }
-                barButton("Filter", filter.isEmpty ? "line.3.horizontal.decrease" : "line.3.horizontal.decrease.circle.fill") { showingFilter = true }
-                barButton("Select", "checkmark.circle") { selecting = true }
-                if isAgenda {
-                    barButton("Today", "smallcircle.filled.circle") { goToday() }
-                    barButton("Go to Date", "calendar") { jumping = true }
+                    Button("Today") { goToday() }
+                        .font(.subheadline.weight(.semibold))
+                        .padding(.horizontal, 8)
+                        .frame(minHeight: 44)
+                        .contentShape(Rectangle())
                     Menu {
                         Picker("Span", selection: Binding { range } set: { show($0, around: $0 == nil || todayShown ? agenda.today : firstDay) }) {
                             ForEach(SpanRange.allCases) { Text($0.title).tag(Optional($0)) }
@@ -660,19 +664,17 @@ struct AgendaScreen: View, Equatable {
                         Toggle("Log Mode", systemImage: "clock.arrow.circlepath", isOn: $logMode)
                     } label: {
                         (range.map { Text($0.title) } ?? Text("\(agenda.span) Days"))
-                            .font(.footnote.weight(.semibold).monospacedDigit())
+                            .font(.subheadline.weight(.semibold).monospacedDigit())
                             .lineLimit(1)
                             .frame(minWidth: 52, minHeight: 44)
                             .contentShape(Rectangle())
                     }
                     .accessibilityLabel("Span")
                     barButton(LocalizedStringResource("agenda.later", defaultValue: "Later", comment: "Shows the next days in the agenda"), "chevron.right") { step(forward: true) }
-                } else {
-                    barButton("Agenda", "calendar") { show(nil, around: agenda.today) }
                 }
+                .padding(.horizontal, 6)
+                .glassEffect(.regular.interactive(), in: Capsule())
             }
-            .padding(.horizontal, 6)
-            .glassEffect(.regular.interactive(), in: Capsule())
         }
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity)
@@ -951,21 +953,26 @@ struct AgendaRowView: View {
             // TODO and match lists have no times or statuses.
             if !row.gutter.isEmpty || row.icon != nil { gutter.frame(width: 82, alignment: .leading) }
             VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 5) {
-                    if !row.category.isEmpty {
-                        Circle().fill(categoryColor).frame(width: 7, height: 7)
-                        Text(row.category).lineLimit(1).layoutPriority(1)
-                    }
-                    if let detail = row.prefixDetail { Text(detail).lineLimit(1).truncationMode(.middle) }
-                    ForEach([row.progress, row.detail].compactMap { $0 }, id: \.self) { progress in
-                        Text(progress).monospacedDigit()
-                            .padding(.horizontal, 5)
-                            .background(.quaternary.opacity(0.7), in: Capsule())
-                    }
-                    ForEach(row.tags.prefix(3), id: \.self) { tag in
-                        Text(tag).lineLimit(1)
-                            .padding(.horizontal, 5)
-                            .background(.quaternary.opacity(0.7), in: Capsule())
+                HStack(alignment: .top, spacing: 5) {
+                    // Wraps instead of truncating the tags.
+                    FlowLayout(spacing: 5, lineSpacing: 3) {
+                        if !row.category.isEmpty {
+                            HStack(spacing: 5) {
+                                Circle().fill(categoryColor).frame(width: 7, height: 7)
+                                Text(row.category).lineLimit(1)
+                            }
+                        }
+                        if let detail = row.prefixDetail { Text(detail).lineLimit(1).truncationMode(.middle) }
+                        ForEach([row.progress, row.detail].compactMap { $0 }, id: \.self) { progress in
+                            Text(progress).monospacedDigit()
+                                .padding(.horizontal, 5)
+                                .background(.quaternary.opacity(0.7), in: Capsule())
+                        }
+                        ForEach(row.tags, id: \.self) { tag in
+                            Text(tag).lineLimit(1)
+                                .padding(.horizontal, 5)
+                                .background(.quaternary.opacity(0.7), in: Capsule())
+                        }
                     }
                     Spacer(minLength: 4)
                     marks
