@@ -151,4 +151,14 @@ extension Presentation {
         let oldMapped = oldAffected.lowerBound..<(oldAffected.upperBound >= edit.range.upperBound ? oldAffected.upperBound + delta : newEnd)
         return min(oldMapped.lowerBound, newAffected.lowerBound)..<max(oldMapped.upperBound, newAffected.upperBound)
     }
+
+    /// Whether the lines around `range`, and the line after it (a deleted newline joins it to
+    /// them), hold a block delimiter or a fixed-width line.
+    public static func mayChangeBlocks(_ text: NSString, _ range: Range<Int>) -> Bool {
+        let start = min(range.lowerBound, text.length)
+        let end = min(range.upperBound + 1, text.length)
+        let lines = text.lineRange(for: NSRange(location: start, length: end - start))
+        let content = text.substring(with: lines)
+        return content.contains("#+") || content.range(of: "(^|\\n)([ \\t]*:|\\*)", options: .regularExpression) != nil
+    }
 }

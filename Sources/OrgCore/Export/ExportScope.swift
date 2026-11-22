@@ -59,7 +59,11 @@ public enum ExportScope {
     /// The export's name: the subtree's `EXPORT_FILE_NAME` property when exporting the subtree
     /// at `offset`, else the file's last `#+EXPORT_FILE_NAME`; nil when neither is set.
     public static func fileName(_ text: String, subtreeAt offset: Int? = nil, settings: OrgSettings = .default) -> String? {
-        let tree = OrgParser.parse(text, defaults: settings)
+        fileName(OrgParser.parse(text, defaults: settings), subtreeAt: offset, settings: settings)
+    }
+
+    /// The export's name from a parsed file; `settings` gives the setup files' keywords.
+    public static func fileName(_ tree: OrgTree, subtreeAt offset: Int? = nil, settings: OrgSettings = .default) -> String? {
         if let offset {
             let model = DocumentModel(tree: tree)
             if let index = model.headings.lastIndex(where: { $0.headingRange.lowerBound <= offset }),

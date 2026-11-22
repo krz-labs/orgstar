@@ -144,6 +144,8 @@ final class MobileEditor: NSObject, DocumentBuffer {
     static let imageCache = NSCache<NSString, UIImage>()
     var loading = false
     var restyleScheduled: Range<Int>?
+    /// An edit since the last restyle touched a line that can start or end a block.
+    var blocksMayChange = false
     /// Text before its end is styled; after it, the text waits for the background passes.
     var styled = StyledExtent()
     var stylingScheduled = false
@@ -583,6 +585,14 @@ final class MobileEditor: NSObject, DocumentBuffer {
         styled.map(through: edit, in: newText)
         let affected = Presentation.restyleRange(for: edit, old: (oldTree, oldText), new: (document.tree, newText))
         vim.changed(edit)
+        // Walking the tree for blocks costs more than typing; only an edit on a line that could
+        // start or end one needs it, others move the ranges.
+        let newEnd = edit.range.lowerBound + (replacement as NSString).length
+        if Presentation.mayChangeBlocks(oldText, edit.range) || Presentation.mayChangeBlocks(newText, edit.range.lowerBound..<newEnd) {
+            blocksMayChange = true
+        } else {
+            shaded.set(ViewState(selection: shaded.all).mapped(through: [edit]).selection, folded: [])
+        }
         for table in shrunk.map(through: edit, in: textView.textStorage.string, command: commandEditing) { scheduleRestyle(table) }
         fold = FoldState(
             folds: Self.map(fold.folds, old, delta), bodyFolds: Self.map(fold.bodyFolds, old, delta),

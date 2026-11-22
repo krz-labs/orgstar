@@ -189,8 +189,8 @@ struct EditorScreen: View {
                         Button("Encrypt Tagged Entries…", systemImage: "lock.rectangle.stack") { crypt("app.crypt.encrypt-entries") }
                         Button("Forget Encryption Passphrase", systemImage: "key.slash") { crypt("app.crypt.forget-passphrase") }
                     }
-                    if let text = session.document(of: path)?.text {
-                        ExportMenu(path: path, text: text, report: { message = $0 }, exportSubtree: exportSubtree)
+                    if let tree = session.document(of: path)?.tree {
+                        ExportMenu(path: path, tree: tree, report: { message = $0 }, exportSubtree: exportSubtree)
                     }
                     Button("Sync Conflict Copies", systemImage: "doc.on.doc") { sheet = .syncCopies }
                     Button("Recovered Versions", systemImage: "clock.arrow.circlepath") { sheet = .recovery }
@@ -276,7 +276,7 @@ struct EditorScreen: View {
             case .crypt(let request):
                 CryptScreen(request: request, session: session, editor: editor) { message = $0 }
             case .exportSubtree(let caret):
-                if let text = session.document(of: path)?.text { SubtreeExportScreen(path: path, text: text, caret: caret) }
+                if let tree = session.document(of: path)?.tree { SubtreeExportScreen(path: path, tree: tree, caret: caret) }
             case .backlinks:
                 BacklinksScreen(workspace: workspace, session: session, path: path, caret: editor?.editContext().caret ?? 0) { location in
                     if location.path == path { editor?.reveal(location.start) } else { model.openRequest = .heading(location) }

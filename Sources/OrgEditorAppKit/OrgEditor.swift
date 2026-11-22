@@ -759,16 +759,6 @@ public final class OrgEditor: NSObject {
         invalidateLayout(from: old, to: blocks)
     }
 
-    /// Whether the lines around `range`, and the line after it (a deleted newline joins it to
-    /// them), hold a block delimiter or a fixed-width line.
-    static func mayChangeBlocks(_ text: NSString, _ range: Range<Int>) -> Bool {
-        let start = min(range.lowerBound, text.length)
-        let end = min(range.upperBound + 1, text.length)
-        let lines = text.lineRange(for: NSRange(location: start, length: end - start))
-        let content = text.substring(with: lines)
-        return content.contains("#+") || content.range(of: "(^|\\n)([ \\t]*:|\\*)", options: .regularExpression) != nil
-    }
-
     fileprivate func storageEdited(range: NSRange, delta: Int) {
         guard !isLoading, let storage = textView.textStorage else { return }
         markActive = false
@@ -810,7 +800,7 @@ public final class OrgEditor: NSObject {
         if isOrg {
             // Walking the tree for blocks costs more than typing; only an edit on a line that
             // could start or end one (`#+…`, `: …`) needs it, others move the ranges.
-            if Self.mayChangeBlocks(oldText, edit.range) || Self.mayChangeBlocks(newText, edit.range.lowerBound..<newEnd) {
+            if Presentation.mayChangeBlocks(oldText, edit.range) || Presentation.mayChangeBlocks(newText, edit.range.lowerBound..<newEnd) {
                 shaded.set(Presentation.shadedBlocks(document.tree))
             } else {
                 shaded.set(oldShaded.map { mapRange($0, through: edit) })

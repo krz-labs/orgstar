@@ -192,7 +192,10 @@ extension MobileEditor {
         DispatchQueue.main.async { [weak self] in
             guard let self, let range = self.restyleScheduled else { return }
             self.restyleScheduled = nil
-            self.shaded.set(Presentation.shadedBlocks(self.document.tree), folded: [])
+            if self.blocksMayChange {
+                self.blocksMayChange = false
+                self.shaded.set(Presentation.shadedBlocks(self.document.tree), folded: [])
+            }
             self.restyle(range)
             self.updateHidden()
             self.textView.typingAttributes = self.theme.base

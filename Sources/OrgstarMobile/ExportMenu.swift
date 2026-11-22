@@ -56,17 +56,16 @@ struct OrgExport: Transferable {
     let settings: OrgSettings
     /// Made on the main actor, where the editor's highlighter is.
     let codeStyle: HTMLCodeStyle
+    /// The subtree's `EXPORT_FILE_NAME`, `#+EXPORT_FILE_NAME`'s name, or nil for the file's.
+    let name: String?
     /// The subtree at this offset exported alone.
     var subtree: Int?
     /// Without the title and the page around the text, in the formats that allow it.
     var bodyOnly = false
 
-    /// The subtree's `EXPORT_FILE_NAME`, `#+EXPORT_FILE_NAME`'s name, or the file's, with the
-    /// format's extension.
+    /// `name`, or the file's, with the format's extension.
     var fileName: String {
-        ExportScope.output(for: URL(fileURLWithPath: path), name: ExportScope.fileName(text, subtreeAt: subtree, settings: settings),
-                           extension: format.fileExtension)
-            .lastPathComponent
+        ExportScope.output(for: URL(fileURLWithPath: path), name: name, extension: format.fileExtension).lastPathComponent
     }
 
     /// Posted with the message, for the screen's message line, when the LaTeX or ASCII export
@@ -165,7 +164,7 @@ struct OrgExport: Transferable {
 /// Save to Files; or copying it as rich text.
 struct ExportMenu: View {
     let path: String
-    let text: String
+    let tree: OrgTree
     @Environment(MobileModel.self) private var model
     /// Shows what happened, as the screen's message line does.
     var report: (String) -> Void = { _ in }
@@ -176,6 +175,9 @@ struct ExportMenu: View {
 
     var body: some View {
         let bodyOnly = kept.isEmpty ? false : ExportSettings.saved(for: path).bodyOnly
+        let text = tree.text
+        // From the open tree: SwiftUI evaluates the menu on every edit.
+        let name = ExportScope.fileName(tree, settings: OrgPreferences.orgSettings())
         Menu("Export", systemImage: "square.and.arrow.up") {
             ForEach(OrgExport.Format.allCases, id: \.self) { format in
                 if format.locked {
@@ -184,7 +186,7 @@ struct ExportMenu: View {
                     Button(format.name) { report(ExportSettings.noBodyOnly) }
                 } else {
                     let export = OrgExport(text: text, path: path, format: format, settings: OrgPreferences.orgSettings(),
-                                           codeStyle: HTMLCodeStyle(highlighter: MobileEditor.highlighter, theme: model.theme), bodyOnly: bodyOnly)
+                                           codeStyle: HTMLCodeStyle(highlighter: MobileEditor.highlighter, theme: model.theme), name: name, bodyOnly: bodyOnly)
                     ShareLink(item: export, preview: SharePreview(export.fileName)) { Text(format.name) }
                 }
             }
@@ -274,7 +276,7 @@ struct AgendaCalendars: Transferable {
 /// The subtree at `caret` shared alone, in each of the export formats.
 struct SubtreeExportScreen: View {
     let path: String
-    let text: String
+    let tree: OrgTree
     let caret: Int
     @Environment(MobileModel.self) private var model
     @Environment(\.dismiss) private var dismiss
@@ -282,12 +284,14 @@ struct SubtreeExportScreen: View {
     var body: some View {
         NavigationStack {
             let bodyOnly = ExportSettings.saved(for: path).bodyOnly
+            let name = ExportScope.fileName(tree, subtreeAt: caret, settings: OrgPreferences.orgSettings())
             List(OrgExport.Format.allCases.filter { !$0.locked }, id: \.self) { format in
                 if bodyOnly, !format.allowsBodyOnly {
                     LabeledContent(format.name) { Text("No body-only export") }.foregroundStyle(.secondary)
                 } else {
-                    let export = OrgExport(text: text, path: path, format: format, settings: OrgPreferences.orgSettings(),
-                                           codeStyle: HTMLCodeStyle(highlighter: MobileEditor.highlighter, theme: model.theme), subtree: caret, bodyOnly: bodyOnly)
+                    let export = OrgExport(text: tree.text, path: path, format: format, settings: OrgPreferences.orgSettings(),
+                                           codeStyle: HTMLCodeStyle(highlighter: MobileEditor.highlighter, theme: model.theme), name: name,
+                                           subtree: caret, bodyOnly: bodyOnly)
                     ShareLink(item: export, preview: SharePreview(export.fileName)) { Text(format.name) }
                 }
             }

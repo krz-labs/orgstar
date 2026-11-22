@@ -62,6 +62,8 @@ struct ExportScopeTests {
         #expect(ExportScope.fileName(Self.file, subtreeAt: Self.project) == "project-notes")
         #expect(ExportScope.fileName(Self.file, subtreeAt: 0) == nil)
         #expect(ExportScope.fileName("#+EXPORT_FILE_NAME: out/x\n* A\n") == "out/x")
+        #expect(ExportScope.fileName(OrgParser.parse(Self.file), subtreeAt: Self.project) == "project-notes")
+        #expect(ExportScope.fileName(OrgParser.parse("#+EXPORT_FILE_NAME: out/x\n* A\n")) == "out/x")
         #expect(ExportScope.output(for: source, name: "out/x", extension: "html").path == "/notes/out/x.html")
         #expect(ExportScope.output(for: source, name: "out/x.txt", extension: "html").path == "/notes/out/x.html")
         #expect(ExportScope.output(for: source, name: "/tmp/abs", extension: "md").path == "/tmp/abs.md")
