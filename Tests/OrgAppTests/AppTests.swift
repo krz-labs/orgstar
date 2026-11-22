@@ -2,6 +2,7 @@ import Foundation
 import OrgCore
 import OrgDocument
 import OrgIndex
+import os
 import Testing
 @testable import OrgApp
 
@@ -595,32 +596,23 @@ struct AgendaModelTests {
         #expect(agenda.list.map(\.text) == ["TODO One"])
     }
 
-    /// A refresh over cached files leaves the main actor free while it checks them on disk.
+    /// A refresh, the first and one over cached files, checks the files on disk off the main thread.
     @Test func checksFilesOffTheMainActor() async throws {
         let notes = try Folder()
-        for file in 0..<1_500 { try notes.write("f\(file).org", "* TODO Item\n") }
+        for file in 0..<20 { try notes.write("f\(file).org", "* TODO Item\n") }
         let model = try WorkspaceModel(directory: nil)
         try await model.addRoot(notes.url)
         let agenda = AgendaModel(workspace: model)
         agenda.mode = .todo(keywords: nil)
-        await agenda.refresh(open: [:])
-        let clock = ContinuousClock()
-        var longest = Duration.zero
-        let beat = Task { @MainActor in
-            var last = clock.now
-            while !Task.isCancelled {
-                await Task.yield()
-                longest = max(longest, clock.now - last)
-                last = clock.now
-            }
+        let stats = OSAllocatedUnfairLock(initialState: (all: 0, onMain: 0))
+        agenda.willStat = { _ in
+            let onMain = Thread.isMainThread
+            stats.withLock { $0 = ($0.all + 1, $0.onMain + (onMain ? 1 : 0)) }
         }
-        await Task.yield()
-        let start = clock.now
         await agenda.refresh(open: [:])
-        let took = clock.now - start
-        beat.cancel()
-        #expect(agenda.list.count == 1_500)
-        #expect(longest < took / 2, "main actor held for \(longest) of \(took)")
+        await agenda.refresh(open: [:])
+        #expect(agenda.list.count == 20)
+        #expect(stats.withLock { $0 } == (40, 0))
     }
 
     @Test func entriesKnowTheirDoneKeyword() async throws {

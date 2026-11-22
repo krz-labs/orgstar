@@ -14,6 +14,11 @@ struct SeededGenerator: RandomNumberGenerator {
     }
 }
 
+/// `ORGSTAR_SEED` when set, else `fallback`, so random tests repeat unless asked to vary.
+func testSeed(_ fallback: UInt64) -> UInt64 {
+    ProcessInfo.processInfo.environment["ORGSTAR_SEED"].flatMap { UInt64($0) } ?? fallback
+}
+
 let fragments = [
     "* ", "** TODO [#A] title :a:b:", "*** DONE", "#+TODO: NEXT | DONE", "#+begin_src sh", "#+end_src",
     "#+BEGIN_QUOTE", "#+end_quote", "#+BEGIN: clocktable", "#+END:", ":PROPERTIES:", ":ID: x", ":END:",

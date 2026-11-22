@@ -62,7 +62,7 @@ public enum Calc {
         guard (3...18).contains(modes.precision) else { throw Unsupported("calc precision") }
         return try $precision.withValue(modes.precision) {
             try $fractions.withValue(modes.preferFractions) {
-                try $symbolicMode.withValue(modes.symbolic) {
+                try $symbolicMode.withValue(modes.symbolic) { try $nesting.withValue(Nesting()) {
                     var parser = Parser(expression)
                     let tree = try parser.parse()
                     let value = try Evaluator(modes: modes).eval(tree)
@@ -78,7 +78,7 @@ public enum Calc {
                         }
                     }
                     return try format(value, modes.format)
-                }
+                } }
             }
         }
     }
@@ -1142,6 +1142,11 @@ public enum Calc {
             let left = try sum()
             // Calc reads `<<` and `>>` as one token, so `1<<2026-10-05 Mon>` is a syntax error.
             if take("<<") || take(">>") { throw Unsupported("formula syntax") }
+            // In a vector without commas Calc reads `<` after a space as the start of a date:
+            // `[0 < (1 > 2)]` is `[0, <2026-01-02 Fri>]`.
+            if spaceSeparated, peek() == "<", chars[i - 1] == " " || chars[i - 1] == "\t", i + 1 < chars.count, !"=<>".contains(chars[i + 1]) {
+                throw Unsupported("formula syntax")
+            }
             for (token, op) in [("==", "="), ("!=", "≠"), ("<=", "≤"), (">=", "≥"), ("<", "<"), (">", ">")] where take(token) {
                 let right = try sum()
                 if let next = peek(), "=!<>".contains(next) { throw Unsupported("chained comparison") }

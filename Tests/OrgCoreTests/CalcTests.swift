@@ -269,7 +269,8 @@ struct CalcTests {
             for e in ["2/3", "3", "1.5", "1234.5678", "0.000123", "1e20*1", "-2/3", "1/7*100"] { cases.append((e, format)) }
         }
         // Generated: random operands and operators.
-        var generator = SystemRandomNumberGenerator()
+        let seed = testSeed(20261122)
+        var generator = SeededGenerator(state: seed)
         let numbers = ["1", "2", "3", "7", "10", "0.5", "1.25", "3.14159", "100", "0.001", "12.5", "99", "0.3", "1e3", "2.5e-2"]
         let ops = ["+", "-", "*", "/"]
         for _ in 0..<300 {
@@ -280,8 +281,8 @@ struct CalcTests {
             cases.append((e, "(float 8)"))
         }
         // Only what Calc itself can't show as a number.
-        let skipped = try Self.compare(cases)
-        #expect(skipped == [], "\(skipped)")
+        let skipped = try Self.compare(cases, note: " seed \(seed)")
+        #expect(skipped == [], "\(skipped) seed \(seed)")
     }
 
     @Test(.enabled(if: ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
@@ -294,7 +295,8 @@ struct CalcTests {
         }
         // Generated: functions of random integers, fractions and floats. Arguments outside a
         // function's domain are refused, so only what is computed is compared.
-        var generator = SystemRandomNumberGenerator()
+        let seed = testSeed(20261122)
+        var generator = SeededGenerator(state: seed)
         let numbers = ["1", "2", "3", "7", "10", "0.5", "1.25", "3.14159", "100", "0.001", "12.5", "99", "1:3", "5:4", "2.5e-2"]
         let unary = ["sinh", "cosh", "tanh", "arcsinh", "rad", "deg", "frac", "sign", "rounde", "roundu", "float", "sqrt", "arctanh"]
         let binary = ["log", "hypot", "arctan2", "agmean", "nroot", "gcd", "lcm", "fdiv"]
@@ -305,13 +307,14 @@ struct CalcTests {
             cases.append(("\(binary.randomElement(using: &generator)!)(\(x),\(y))", "(float 12)"))
             cases.append(("vgmean([\(x),\(y),\(numbers.randomElement(using: &generator)!)])", "(float 12)"))
         }
-        let skipped = Set(try Self.compare(cases)).intersection(Self.functions + sample)
-        #expect(skipped == [], "\(skipped)")
+        let skipped = Set(try Self.compare(cases, note: " seed \(seed)")).intersection(Self.functions + sample)
+        #expect(skipped == [], "\(skipped) seed \(seed)")
     }
 
     @Test(.enabled(if: ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
     func precisionMatchesCalc() throws {
-        var generator = SystemRandomNumberGenerator()
+        let seed = testSeed(20261122)
+        var generator = SeededGenerator(state: seed)
         let numbers = ["1", "2", "3", "7", "10", "0.5", "1.25", "3.14159", "100", "0.001", "12.5", "99", "0.3", "1e3", "2.5e-2",
                        "1.23456789012345678", "123456789.987654321"]
         let ops = ["+", "-", "*", "/"]
@@ -347,8 +350,8 @@ struct CalcTests {
                 }
                 cases.append((e, "(float 0)"))
             }
-            let skipped = try Self.compare(cases, precision: precision)
-            #expect(skipped == [], "p\(precision) \(skipped)")
+            let skipped = try Self.compare(cases, precision: precision, note: " seed \(seed)")
+            #expect(skipped == [], "p\(precision) \(skipped) seed \(seed)")
         }
     }
 
@@ -399,7 +402,8 @@ struct CalcTests {
         }
         // Generated: a variable or two mixed with numbers. What Calc would decide from more
         // than this arithmetic is refused, so only what is computed is compared.
-        var generator = SystemRandomNumberGenerator()
+        let seed = testSeed(20261122)
+        var generator = SeededGenerator(state: seed)
         let leaves = ["x", "x", "y", "1", "2", "3", "0", "0.5", "2.5", "1:3", "-1", "10", "inf", "a b"]
         let ops = ["+", "-", "*", "/", "^"]
         func expression(_ depth: Int) -> String {
@@ -410,9 +414,9 @@ struct CalcTests {
             return Int.random(in: 0..<6, using: &generator) == 0 ? "-\(e)" : e
         }
         for _ in 0..<2000 { cases.append((expression(4), "(float 8)")) }
-        let skipped = try Self.compare(cases)
+        let skipped = try Self.compare(cases, note: " seed \(seed)")
         #expect(Set(skipped).intersection(Self.symbolic) == [], "\(skipped)")
-        #expect(skipped.count < cases.count / 4, "\(skipped.count) of \(cases.count) refused")
+        #expect(skipped.count < cases.count / 4, "\(skipped.count) of \(cases.count) refused, seed \(seed)")
     }
 
     /// Functions of formulas Calc simplifies, or keeps with their arguments.
@@ -448,7 +452,7 @@ struct CalcTests {
         }
         // Generated: the functions applied to formulas of a variable or two and numbers, and
         // their results combined again. What is refused is left to Emacs.
-        let seed = ProcessInfo.processInfo.environment["ORGSTAR_SEED"].flatMap { UInt64($0) } ?? UInt64.random(in: 0...UInt64.max)
+        let seed = testSeed(20261122)
         var generator = SeededGenerator(state: seed)
         let leaves = ["x", "x", "y", "1", "2", "3", "0", "0.5", "2.5", "1:3", "-1", "-2", "4", "inf", "e", "a b", "-inf", "uinf", "nan", "0.", "1.5e3", "-x", "2 x", "pi"]
         let unary = ["sqrt", "abs", "exp", "ln", "!", "-"]
@@ -500,6 +504,10 @@ struct CalcTests {
                   "nroot(-8,3)", "vgmean([-1,2])", "vhmean([0,1])", "gcd(1.5,3)", "gcd(12,18,4)", "5%%3", "1:0", "1:2:3:4",
                   "16#1.8", "16#FG", "2##11", "2.5!", "(-1)!", "(-3)!!", "choose(5.5,2)", "exp10(0.5)", "3!!!",
                   "eq(1,1,1)", "percent(nan)", "frac(0.5,0.1)", "frac(1e-20)",
+                  // Calc reads `<` after a space in a vector without commas as the start of a date.
+                  "abs(vmin([(3 - uinf) ^ (-1)], [0. < (-1 > 2.5)]))", "vmin([1], [0 < (1 > 2)])", "vcount([0 <(1 > 2)])",
+                  // Calc stops at `max-lisp-eval-depth`.
+                  "2*(((-1)/0+1.)*(-24))",
                   "(2..5)", "[2..5]", "vmax([1..5])", "vcount([1..5])", "2...5", "(-8)^(1:3)", "(-2)^1.5", "ln(0)", "ln(-1)",
                   // Calc leaves these date expressions unevaluated.
                   "<2026-10-05 Mon>*2", "2*<2026-10-05 Mon>", "<2026-10-05 Mon>/2", "<2026-10-05 Mon>*0", "<2026-10-05 Mon> < 5",

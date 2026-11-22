@@ -5,7 +5,7 @@ import Testing
 struct CalcNumericTests {
     /// A random real number up to `scale` digits before the point: an integer, a fraction or
     /// a float, tiny to large.
-    static func argument(_ generator: inout SystemRandomNumberGenerator, scale: Int = 6) -> String {
+    static func argument(_ generator: inout SeededGenerator, scale: Int = 6) -> String {
         let sign = Bool.random(using: &generator) ? "-" : ""
         let digits = Int.random(in: 1...9, using: &generator)
         let mantissa = String(Int.random(in: 1...999_999_999, using: &generator)).prefix(digits)
@@ -20,7 +20,7 @@ struct CalcNumericTests {
     }
 
     /// A random number from -1 to 1.
-    static func unit(_ generator: inout SystemRandomNumberGenerator) -> String {
+    static func unit(_ generator: inout SeededGenerator) -> String {
         let sign = Bool.random(using: &generator) ? "-" : ""
         let mantissa = String(Int.random(in: 1...999_999_999, using: &generator)).prefix(Int.random(in: 1...9, using: &generator))
         switch Int.random(in: 0..<4, using: &generator) {
@@ -35,7 +35,8 @@ struct CalcNumericTests {
 
     @Test(.enabled(if: ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
     func trigonometryMatchesCalc() throws {
-        var generator = SystemRandomNumberGenerator()
+        let seed = testSeed(20261122)
+        var generator = SeededGenerator(state: seed)
         for precision in [3, 6, 8, 12, 14, 15, 16, 17, 18] {
             for radians in [false, true] {
                 var cases: [(String, String)] = ["sin(nan)", "cos(nan)", "arctan(nan)", "tan(180)", "tan(-360)", "tan(0)", "arcsin(0)",
@@ -66,9 +67,9 @@ struct CalcNumericTests {
                         }
                         continue
                     }
-                    #expect(ours == expected, "\(c.0) p\(precision) \(radians ? "rad" : "deg")")
+                    #expect(ours == expected, "\(c.0) p\(precision) \(radians ? "rad" : "deg") seed \(seed)")
                 }
-                #expect(refused == [], "p\(precision) \(radians ? "rad" : "deg") \(refused)")
+                #expect(refused == [], "p\(precision) \(radians ? "rad" : "deg") \(refused) seed \(seed)")
             }
         }
     }
@@ -89,7 +90,8 @@ struct CalcNumericTests {
 
     @Test(.enabled(if: ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
     func fractionModeMatchesCalc() throws {
-        var generator = SystemRandomNumberGenerator()
+        let seed = testSeed(20261122)
+        var generator = SeededGenerator(state: seed)
         let numbers = ["0", "1", "2", "3", "-2", "7", "10", "12", "1:2", "1:3", "-5:4", "7:2", "-3:7", "0.5", "2.5", "-1.5", "0.25", "3.", "1.2e1",
                        "100", "0.123456789", "0."]
         func number() -> String { numbers.randomElement(using: &generator)! }
@@ -113,7 +115,7 @@ struct CalcNumericTests {
                 cases.append(("(\(number()))\(op)(\(number()))", "(float 12)"))
             }
         }
-        for fractions in [true, false] { _ = try CalcTests.compare(cases, fractions: fractions) }
+        for fractions in [true, false] { _ = try CalcTests.compare(cases, fractions: fractions, note: " seed \(seed)") }
     }
 
     /// `math-mod` divides as a float, without F, unless both operands are natural numbers.

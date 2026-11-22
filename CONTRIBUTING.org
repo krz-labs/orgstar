@@ -143,6 +143,9 @@ swift test                                                 # all tests
 ORGSTAR_GATES=1 swift test -c release --filter GateTests   # performance gates
 #+END_SRC
 
+Randomised tests use a fixed seed and print it when they fail. =ORGSTAR_SEED=<n> swift test=
+runs them with another; the incremental-parse and restyle fuzz tests read =ORGSTAR_FUZZ_SEED= instead.
+
 =swift test= covers the Developer ID build. =APPSTORE= is set only in the Xcode targets, so
 also check that the App Store build and the iOS app compile:
 

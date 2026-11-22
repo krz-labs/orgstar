@@ -7,8 +7,10 @@ import Testing
 struct ListItemScanTests {
     static let pieces = ["[@", "start:", "3", "12", "b", "B", "]", " ", "\t", "::", ":", "a", "é", "x y", "[", "\\n"]
 
+    static let seed = testSeed(20261122)
+
     static func strings() -> [Substring] {
-        var generator = SystemRandomNumberGenerator()
+        var generator = SeededGenerator(state: seed)
         var out: [Substring] = ["", "[@3]", "[@start:3] x", "[@b]", "[@start:]", "[@start:b]", "[@3", "[@ab]", "a :: b", "a ::", "a::b",
                                 "a :: b :: c", "a\t::\tb", " :: x", "::", "a ::b", "tag  ::  rest", "x :: y\nz :: w"]
         for _ in 0..<5000 {
@@ -21,7 +23,7 @@ struct ListItemScanTests {
     @Test func counterMatchesThePattern() {
         for s in Self.strings() {
             let expected = s.prefixMatch(of: /\[@(?:start:)?(?:[0-9]+|[A-Za-z])\]/).map { s[$0.range] }
-            #expect(Parser.counter(s) == expected, "\(s.debugDescription)")
+            #expect(Parser.counter(s) == expected, "\(s.debugDescription) seed \(Self.seed)")
         }
     }
 
@@ -29,8 +31,8 @@ struct ListItemScanTests {
         for s in Self.strings() {
             let m = s.prefixMatch(of: /(.*)([ \t]+::)(?:[ \t]+|$)/.anchorsMatchLineEndings())
             let found = Parser.descriptionTag(s)
-            #expect(found?.tag == m.map { s[$0.1.startIndex..<$0.1.endIndex] }, "\(s.debugDescription)")
-            #expect(found?.separator == m.map { s[$0.2.startIndex..<$0.2.endIndex] }, "\(s.debugDescription)")
+            #expect(found?.tag == m.map { s[$0.1.startIndex..<$0.1.endIndex] }, "\(s.debugDescription) seed \(Self.seed)")
+            #expect(found?.separator == m.map { s[$0.2.startIndex..<$0.2.endIndex] }, "\(s.debugDescription) seed \(Self.seed)")
         }
     }
 }

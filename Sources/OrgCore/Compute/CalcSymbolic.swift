@@ -26,6 +26,14 @@ extension Calc {
     /// `calc-prefer-frac`, for the division the arithmetic does.
     @TaskLocal static var fractions = false
 
+    /// How deeply `mul` calls itself in one evaluation. Some products rewrite themselves
+    /// without end, where Calc stops at `max-lisp-eval-depth`; past `limit` they are refused.
+    final class Nesting: @unchecked Sendable {
+        static let limit = 64
+        var depth = 0
+    }
+    @TaskLocal static var nesting: Nesting?
+
     /// Variables Calc gives a value or a declaration, which would change the arithmetic.
     static let reserved: Set<String> = ["CommuteRules", "Decls", "DistribRules", "EvalRules", "FactorRules", "FitRules",
                                         "Holidays", "IntegAfterRules", "InvertRules", "JumpRules", "MergeRules", "Modes",
@@ -491,6 +499,10 @@ extension Calc {
 
         /// `math-mul`.
         static func mul(_ a: Term, _ b: Term) throws -> Term {
+            let nesting = Calc.nesting
+            nesting?.depth += 1
+            defer { nesting?.depth -= 1 }
+            if let nesting, nesting.depth > Nesting.limit { throw Unsupported("symbolic arithmetic") }
             if let product = try numeric(a, b, { try multiply($0, $1) }) { return product }
             if zerop(a) { return try mulZero(a, b) }
             if zerop(b) { return try mulZero(b, a) }

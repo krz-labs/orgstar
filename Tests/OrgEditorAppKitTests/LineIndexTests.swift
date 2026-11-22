@@ -3,6 +3,23 @@ import Testing
 import OrgPresentation
 @testable import OrgEditorAppKit
 
+/// SplitMix64, so failures reproduce from the seed.
+struct SeededGenerator: RandomNumberGenerator {
+    var state: UInt64
+    mutating func next() -> UInt64 {
+        state &+= 0x9E37_79B9_7F4A_7C15
+        var z = state
+        z = (z ^ (z >> 30)) &* 0xBF58_476D_1CE4_E5B9
+        z = (z ^ (z >> 27)) &* 0x94D0_49BB_1331_11EB
+        return z ^ (z >> 31)
+    }
+}
+
+/// `ORGSTAR_SEED` when set, else `fallback`, so random tests repeat unless asked to vary.
+func testSeed(_ fallback: UInt64) -> UInt64 {
+    ProcessInfo.processInfo.environment["ORGSTAR_SEED"].flatMap { UInt64($0) } ?? fallback
+}
+
 struct LineIndexTests {
     func naive(_ text: String) -> [Int] {
         var starts = [0]
@@ -11,7 +28,8 @@ struct LineIndexTests {
     }
 
     @Test func followsRandomEdits() {
-        var generator = SystemRandomNumberGenerator()
+        let seed = testSeed(20261122)
+        var generator = SeededGenerator(state: seed)
         let pieces = ["a", "bc\n", "\n", "\n\n", "xyz", "é\n", "😀", ""]
         var text = "first\nsecond\n\nthird"
         let index = LineIndex(text as NSString)
@@ -22,7 +40,7 @@ struct LineIndexTests {
             let replacement = pieces.randomElement(using: &generator)!
             text = ns.replacingCharacters(in: NSRange(location: start, length: end - start), with: replacement)
             index.replace(start..<end, newLength: (replacement as NSString).length, in: text as NSString)
-            #expect(index.starts == naive(text))
+            #expect(index.starts == naive(text), "seed \(seed)")
             if index.starts != naive(text) { return }
         }
         #expect(index.line(of: 0) == 1)
@@ -34,7 +52,8 @@ struct LineIndexTests {
 struct ShadedBlockTests {
     /// Bands after edits match a full search once typing settles.
     @Test func incrementalMatchesFull() {
-        var generator = SystemRandomNumberGenerator()
+        let seed = testSeed(20261122)
+        var generator = SeededGenerator(state: seed)
         let pieces = ["x", "word ", "\n", "#+begin_src sh\n", "#+end_src\n", ": fixed\n", "* H\n", "#+begin_quote\n", "#+end_quote\n", ""]
         let h = Harness("* A\n#+begin_src sh\nls\n#+end_src\ntext\n: one\n* B\nbody\n")
         for _ in 0..<400 {
@@ -45,7 +64,7 @@ struct ShadedBlockTests {
             h.textView.insertText(piece, replacementRange: NSRange(location: start, length: end - start))
             h.editor.settleBlocks()
             let full = Presentation.shadedBlocks(h.editor.document.tree)
-            #expect(h.editor.shaded.all == full, "\(h.editor.document.text)")
+            #expect(h.editor.shaded.all == full, "\(h.editor.document.text) seed \(seed)")
             if h.editor.shaded.all != full { return }
         }
     }

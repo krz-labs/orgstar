@@ -236,7 +236,7 @@ extension Calc {
         guard (3...18).contains(modes.precision) else { throw Unsupported("calc precision") }
         return try $precision.withValue(modes.precision) {
             try $fractions.withValue(modes.preferFractions) {
-                try $symbolicMode.withValue(modes.symbolic, operation: body)
+                try $symbolicMode.withValue(modes.symbolic) { try $nesting.withValue(Nesting(), operation: body) }
             }
         }
     }

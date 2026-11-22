@@ -62,6 +62,8 @@ public final class AgendaModel {
     private let workspace: WorkspaceModel
     @ObservationIgnored public let cache: AgendaSourceCache
     @ObservationIgnored private var generation = 0
+    /// Called with each file's path before it is checked on disk. For tests.
+    @ObservationIgnored var willStat: (@Sendable (String) -> Void)?
 
     public init(workspace: WorkspaceModel, cache: AgendaSourceCache = AgendaSourceCache()) {
         self.workspace = workspace
@@ -179,6 +181,7 @@ public final class AgendaModel {
         let blocking = options.dimBlockedTasks != .off && (options.enforceTodoDependencies || options.enforceTodoCheckboxDependencies)
         let files = files
         let (openCache, diskCache) = (cache.open, cache.entries)
+        let willStat = willStat
         let loaded = await Task.detached {
             var sources: [(path: String, mtime: Date, size: Int, source: AgendaSource, fromDisk: Bool)] = []
             for path in files {
@@ -194,6 +197,7 @@ public final class AgendaModel {
                     sources.append((path, .distantPast, -1, cached ?? AgendaSource(path: path, text: text, defaults: defaults.resolvingSetupFiles(in: text, path: path, read: OrgSettings.readFile), checksBlocking: blocking), false))
                     continue
                 }
+                willStat?(path)
                 let attributes = try? FileManager.default.attributesOfItem(atPath: path)
                 let mtime = attributes?[.modificationDate] as? Date ?? .distantPast
                 let size = (attributes?[.size] as? NSNumber)?.intValue ?? -1
