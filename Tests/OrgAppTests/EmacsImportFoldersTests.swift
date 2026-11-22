@@ -9,12 +9,7 @@ struct EmacsImportFoldersTests {
         paths.enumerated().map { EmacsImport.Item(id: $0.offset, name: "org-directory", summary: $0.element, source: "config.el:1", change: .folder($0.element)) }
     }
 
-    func defaults() -> UserDefaults {
-        let name = "orgstar-import-folders-\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: name)!
-        defaults.removePersistentDomain(forName: name)
-        return defaults
-    }
+    func defaults() -> UserDefaults { TestDefaults("orgstar-import-folders") }
 
     @Test func addsOnlyTheFoldersChosen() async throws {
         let notes = try Folder()

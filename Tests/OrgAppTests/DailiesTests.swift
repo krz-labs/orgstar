@@ -219,9 +219,7 @@ struct DailiesTests {
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent("orgstar-capture-\(UUID().uuidString)").resolvingSymlinksInPath()
         defer { try? FileManager.default.removeItem(at: folder) }
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-        let name = "orgstar-capture-\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: name)!
-        defer { defaults.removePersistentDomain(forName: name) }
+        let defaults = TestDefaults("orgstar-capture")
         defaults.set("title signature keywords", forKey: "denotePrompts")
         let capture = DenoteCapture(roots: [folder.path], paths: ["/x/20260101T000000--a__old.org"], defaults: defaults)
         #expect(capture.questions.map(\.prompt) == ["New file TITLE", "New file SIGNATURE", "New file KEYWORDS"])

@@ -4,7 +4,7 @@ import Testing
 import OrgCore
 
 struct ExportSettingsTests {
-    static func defaults() -> UserDefaults { UserDefaults(suiteName: "orgstar-export-\(UUID().uuidString)")! }
+    static func defaults() -> UserDefaults { TestDefaults("orgstar-export") }
 
     static let file = "#+TITLE: Whole\n#+OPTIONS: toc:nil\nIntro.\n* One\nFirst.\n** Sub\nSub body.\n* Two\nSecond.\n"
     static var caret: Int { (file as NSString).range(of: "First.").location }

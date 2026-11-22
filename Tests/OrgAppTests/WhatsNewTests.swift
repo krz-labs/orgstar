@@ -5,9 +5,7 @@ import Testing
 struct WhatsNewTests {
     private let releases = [ReleaseNotes(version: "2.0.0", items: [.init("star", "Title", "Text")])]
 
-    private func defaults() throws -> UserDefaults {
-        try #require(UserDefaults(suiteName: "test.\(UUID().uuidString)"))
-    }
+    private func defaults() throws -> UserDefaults { TestDefaults("test") }
 
     @Test func showsOnceAfterAnUpdate() throws {
         let defaults = try defaults()

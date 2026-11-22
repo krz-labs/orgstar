@@ -339,7 +339,7 @@ struct PublishFoldersTests {
         """
         let root = folder.path
         let loaded = Publish.projects(fromConfig: config, root: root)
-        let defaults = UserDefaults(suiteName: "orgstar-publish-\(UUID().uuidString)")!
+        let defaults = TestDefaults("orgstar-publish")
         let folders = PublishFolders(defaults: defaults, sandboxed: false)
         let both = loaded.projects.first { $0.name == "both" }!
         #expect(try folders.needed([both], all: loaded.projects, roots: [root]).map(\.name) == ["site"])

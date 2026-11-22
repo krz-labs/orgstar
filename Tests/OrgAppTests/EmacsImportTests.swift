@@ -237,9 +237,7 @@ struct EmacsImportTests {
         try "(setq org-tags-column 0 org-log-done 'time)\n(add-to-list 'org-structure-template-alist '(\"el\" . \"src emacs-lisp\"))"
             .write(to: folder.appendingPathComponent("init.el"), atomically: true, encoding: .utf8)
         let result = EmacsImport.scan(EmacsImport.files(in: folder))
-        let name = "orgstar-import-\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: name)!
-        defer { defaults.removePersistentDomain(forName: name) }
+        let defaults = TestDefaults("orgstar-import")
         _ = await EmacsImport.apply(result.items, defaults: defaults, workspace: nil, directory: folder, writeConfig: true)
         let config = try String(contentsOf: folder.appendingPathComponent("config.toml"), encoding: .utf8)
         let values = UserConfig.values(in: config)
@@ -302,16 +300,13 @@ struct EmacsImportTests {
         #expect(templates == ["report=* Summary\n\n* Details\n", "memo=* To\n\n* From\n"])
         #expect(result.unsupported.map(\.name) == ["Denote template journal"])
 
-        let name = "orgstar-import-\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: name)!
-        defer { defaults.removePersistentDomain(forName: name) }
+        let defaults = TestDefaults("orgstar-import")
         _ = await EmacsImport.apply(result.items, defaults: defaults, workspace: nil, directory: folder, writeConfig: true)
         #expect(UserConfig.denoteTemplates(defaults).map(\.key) == ["report", "memo"])
         #expect(OrgPreferences.denotePrompts(defaults) == ["title", "keywords", "subdirectory", "signature"])
         let config = try String(contentsOf: folder.appendingPathComponent("config.toml"), encoding: .utf8)
         // The file reads back to the same templates.
-        let reread = UserDefaults(suiteName: name + "-reread")!
-        defer { reread.removePersistentDomain(forName: name + "-reread") }
+        let reread = TestDefaults("orgstar-import-reread")
         #expect(UserConfig.apply(config, to: reread).isEmpty, "\(config)")
         #expect(UserConfig.denoteTemplates(reread).map(\.text) == ["* Summary\n\n* Details\n", "* To\n\n* From\n"])
     }
@@ -343,7 +338,7 @@ struct EmacsImportTests {
         try FileManager.default.createDirectory(at: config, withIntermediateDirectories: true)
         try "fill-column = 72\n".write(to: config.appendingPathComponent("config.toml"), atomically: true, encoding: .utf8)
         let summary = await EmacsImport.apply(result.items.filter { if case .publish = $0.change { true } else { false } },
-                                              defaults: UserDefaults(suiteName: "orgstar-import-\(UUID().uuidString)")!, workspace: nil, directory: config)
+                                              defaults: TestDefaults("orgstar-import"), workspace: nil, directory: config)
         #expect(summary == "Imported 3 publishing projects.")
         let written = try String(contentsOf: config.appendingPathComponent("config.toml"), encoding: .utf8)
         let loaded = await Publish.projects(fromConfig: written, root: nil)
@@ -403,9 +398,7 @@ struct EmacsImportTests {
         defer { try? FileManager.default.removeItem(at: folder) }
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         try "[[template]]\nkey = \"t\"\nfile = \"x.org\"\ntemplate = \"* %?\"\n".write(to: folder.appendingPathComponent("capture.toml"), atomically: true, encoding: .utf8)
-        let name = "orgstar-import-\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: name)!
-        defer { defaults.removePersistentDomain(forName: name) }
+        let defaults = TestDefaults("orgstar-import")
         let summary = await EmacsImport.apply(result.items, defaults: defaults, workspace: nil, directory: folder)
         #expect(defaults.string(forKey: "keymap") == "doom")
         #expect(defaults.integer(forKey: "tagsColumn") == -80)

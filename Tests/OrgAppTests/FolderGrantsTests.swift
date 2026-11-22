@@ -4,12 +4,7 @@ import Testing
 
 @MainActor
 struct FolderGrantsTests {
-    func defaults() -> UserDefaults {
-        let name = "orgstar-folder-grants-\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: name)!
-        defaults.removePersistentDomain(forName: name)
-        return defaults
-    }
+    func defaults() -> UserDefaults { TestDefaults("orgstar-folder-grants") }
 
     @Test func grantsComeBackAtLaunch() throws {
         let store = defaults()

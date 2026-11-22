@@ -6,7 +6,7 @@ import Testing
 
 struct OrgPreferencesTests {
     @Test func readsWhatConfigTomlSets() throws {
-        let defaults = try #require(UserDefaults(suiteName: "orgstar-preferences-\(UUID().uuidString)"))
+        let defaults = TestDefaults("orgstar-preferences")
         // Nothing set: the file's fallbacks, which match the Mac's.
         #expect(OrgPreferences.orgSettings(defaults).todoSequences.first?.active.map(\.name) == ["TODO"])
         #expect(OrgPreferences.orgSettings(defaults).todoSequences.first?.done.map(\.name) == ["DONE"])
@@ -73,7 +73,7 @@ struct OrgPreferencesTests {
     }
 
     @Test func themeTypeAndShowMarkup() throws {
-        let defaults = try #require(UserDefaults(suiteName: "orgstar-preferences-\(UUID().uuidString)"))
+        let defaults = TestDefaults("orgstar-preferences")
         var colors = ThemeSpec.default
         colors.light["link"] = RGBA(hex: "#000001")
         let fallback = OrgPreferences.theme(colors, defaults)

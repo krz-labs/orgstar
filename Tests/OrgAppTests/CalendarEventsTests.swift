@@ -7,7 +7,7 @@ import Testing
 
 struct AgendaSettingsTests {
     @Test func agendaSettingsReadFromConfigToml() throws {
-        let defaults = try #require(UserDefaults(suiteName: "orgstar-agenda-settings-\(UUID().uuidString)"))
+        let defaults = TestDefaults("orgstar-agenda-settings")
         #expect(!OrgPreferences.agendaShowAllDates(defaults))
         #expect(!OrgPreferences.agendaSkipScheduledIfDone(defaults) && !OrgPreferences.agendaSkipDeadlineIfDone(defaults))
         #expect(!OrgPreferences.calendarEvents(defaults) && OrgPreferences.calendarEventCalendars(defaults).isEmpty)

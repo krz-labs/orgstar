@@ -6,12 +6,7 @@ import Testing
 
 @MainActor
 struct UserConfigTests {
-    func defaults() -> UserDefaults {
-        let name = "orgstar-config-\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: name)!
-        defaults.removePersistentDomain(forName: name)
-        return defaults
-    }
+    func defaults() -> UserDefaults { TestDefaults("orgstar-config") }
 
     @Test func lineNumbersTypes() throws {
         let d = defaults()
@@ -182,9 +177,7 @@ struct UserConfigTests {
 @MainActor
 struct ThemeConfigTests {
     @Test func themeTablesAreNotSettingsProblems() throws {
-        let name = "orgstar-theme-\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: name)!
-        defer { defaults.removePersistentDomain(forName: name) }
+        let defaults = TestDefaults("orgstar-theme")
         let problems = UserConfig.apply("[theme]\nfont-size = 15\nlink = \"#123456\"\n[theme.dark]\nlink = \"#654321\"\n", to: defaults)
         #expect(problems.isEmpty)
         #expect(defaults.integer(forKey: "themeFontSize") == 15)
@@ -203,9 +196,7 @@ struct ThemeConfigTests {
     }
 
     @Test func themeFileInASubfolderIsRecognized() throws {
-        let name = "orgstar-theme-\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: name)!
-        defer { defaults.removePersistentDomain(forName: name) }
+        let defaults = TestDefaults("orgstar-theme")
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent("orgstar-theme-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: folder) }
         try FileManager.default.createDirectory(at: folder.appendingPathComponent("themes"), withIntermediateDirectories: true)
@@ -255,10 +246,8 @@ struct ThemeReadingTests {
     }
 
     @Test @MainActor func chosenPalettesSitUnderTheThemeFileAndConfig() throws {
-        let name = "orgstar-palette-\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: name)!
-        defer { defaults.removePersistentDomain(forName: name) }
-        let folder = FileManager.default.temporaryDirectory.appendingPathComponent(name)
+        let defaults = TestDefaults("orgstar-palette")
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent(defaults.name)
         defer { try? FileManager.default.removeItem(at: folder) }
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         try "[theme.dark]\nlink = \"#000001\"\n".write(to: folder.appendingPathComponent("mine.toml"), atomically: true, encoding: .utf8)
@@ -296,10 +285,8 @@ struct ThemeReadingTests {
     }
 
     @Test @MainActor func aThemePickedInTheAppAppliesAtOnce() throws {
-        let name = "orgstar-pick-\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: name)!
-        defer { defaults.removePersistentDomain(forName: name) }
-        let folder = FileManager.default.temporaryDirectory.appendingPathComponent(name)
+        let defaults = TestDefaults("orgstar-pick")
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent(defaults.name)
         defer { try? FileManager.default.removeItem(at: folder) }
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         try "[theme]\n".write(to: folder.appendingPathComponent("config.toml"), atomically: true, encoding: .utf8)

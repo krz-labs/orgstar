@@ -10,12 +10,7 @@ private func item(_ change: EmacsImport.Change) -> EmacsImport.Item {
     EmacsImport.Item(id: 0, name: "", summary: "", source: "config.el:1", change: change)
 }
 
-private func defaults() -> UserDefaults {
-    let name = "orgstar-userfile-\(UUID().uuidString)"
-    let defaults = UserDefaults(suiteName: name)!
-    defaults.removePersistentDomain(forName: name)
-    return defaults
-}
+private func defaults() -> UserDefaults { TestDefaults("orgstar-userfile") }
 
 /// Takes or gives back the folder's write permission, so that writes into it fail.
 private func setWritable(_ writable: Bool, _ folder: URL) {

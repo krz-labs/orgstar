@@ -734,7 +734,7 @@ struct AgendaModelTests {
     }
 
     @Test func hiddenFoldersPersistAndMatchPaths() {
-        let defaults = UserDefaults(suiteName: "hidden-\(UUID().uuidString)")!
+        let defaults = TestDefaults("hidden")
         let folders = HiddenFolders(defaults: defaults)
         folders.manual = ["/a"]
         folders.focus = ["/b"]
@@ -1262,7 +1262,7 @@ struct ClockModelTests {
         let notes = try Folder()
         let work = try notes.write("work.org", "* TODO Task\n:PROPERTIES:\n:Effort:   1:00\n:END:\n:LOGBOOK:\nCLOCK: [2026-09-01 Tue 09:00]--[2026-09-01 Tue 09:20] =>  0:20\n:END:\n** Sub\n:LOGBOOK:\nCLOCK: [2026-09-02 Wed 09:00]--[2026-09-02 Wed 09:10] =>  0:10\n:END:\n")
         let session = DocumentSession(recovery: FileRecoveryStore(directory: notes.url.appendingPathComponent(".r")))
-        let defaults = try #require(UserDefaults(suiteName: "orgstar-clock-done-\(UUID().uuidString)"))
+        let defaults = TestDefaults("orgstar-clock-done")
         let clock = ClockModel(file: notes.url.appendingPathComponent("clock.json"), defaults: defaults)
         let center = FakeReminderCenter()
         clock.notifications = center
@@ -1446,7 +1446,7 @@ struct ICalendarFilesTests {
     }
 
     @Test func readsSettings() {
-        let defaults = UserDefaults(suiteName: "orgstar-ics-\(UUID().uuidString)")!
+        let defaults = TestDefaults("orgstar-ics")
         #expect(OrgPreferences.icalendarOptions(defaults).includeTodo == .none)
         #expect(OrgPreferences.icalendarOptions(defaults).useDeadline == ["event-if-not-todo", "todo-due"])
         defaults.set("NEXT WAIT", forKey: "icalendarIncludeTodo")

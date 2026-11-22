@@ -18,7 +18,7 @@ struct GrandfatheringTests {
     }
 
     @Test func macDecidesOnceFromAnEarlierLaunch() throws {
-        let defaults = try #require(UserDefaults(suiteName: "test.\(UUID().uuidString)"))
+        let defaults = TestDefaults("test")
         defaults.set(true, forKey: "SUHasLaunchedBefore")
         #expect(Grandfathering.macPredatesPro(defaults: defaults, marker: nil))
         defaults.removeObject(forKey: "SUHasLaunchedBefore")
@@ -26,7 +26,7 @@ struct GrandfatheringTests {
     }
 
     @Test func aNewMacDoesNotPredatePro() throws {
-        let defaults = try #require(UserDefaults(suiteName: "test.\(UUID().uuidString)"))
+        let defaults = TestDefaults("test")
         let missing = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         #expect(!Grandfathering.macPredatesPro(defaults: defaults, marker: missing))
         // A folder created after the first Pro launch doesn't change the answer.
@@ -59,7 +59,7 @@ struct ProFeatureTests {
 @MainActor
 struct ProAccessTests {
     @Test func gatesUntilGrantedAndRemembers() throws {
-        let defaults = try #require(UserDefaults(suiteName: "test.\(UUID().uuidString)"))
+        let defaults = TestDefaults("test")
         let access = ProAccess(defaults: defaults)
         #expect(!access.allows(.babel))
         #expect(access.paywall == .babel)
@@ -125,7 +125,7 @@ struct LicenseKeyTests {
     }
 
     @Test func refusesAndIgnoresExpiredKeys() throws {
-        let defaults = try #require(UserDefaults(suiteName: "test.\(UUID().uuidString)"))
+        let defaults = TestDefaults("test")
         let text = try key(#"{"e":"octo","t":"github:U_1","i":100,"x":200}"#)
         #expect(throws: LicenseKey.Failure.expired) {
             try LicenseStore.activate(text, defaults: defaults, now: Date(timeIntervalSince1970: 300), publicKey: publicKey)
@@ -138,7 +138,7 @@ struct LicenseKeyTests {
     /// Stores a monthly key expiring at `expires` and renews at `now`, the issuer answering
     /// `status` with `answer`. Returns the stored key afterwards and whether it asked.
     func renew(expires: Int, now: Int, status: Int, answer: String) async throws -> (key: String?, asked: Bool) {
-        let defaults = try #require(UserDefaults(suiteName: "test.\(UUID().uuidString)"))
+        let defaults = TestDefaults("test")
         defaults.set(try key(#"{"e":"octo","t":"github:U_1","i":1,"x":\#(expires)}"#), forKey: LicenseStore.key)
         nonisolated(unsafe) var asked = false
         _ = await LicenseStore.renewIfDue(defaults: defaults, now: Date(timeIntervalSince1970: TimeInterval(now)), publicKey: publicKey) { request in
@@ -170,7 +170,7 @@ struct LicenseKeyTests {
     }
 
     @Test func storesOnlyKeysThatVerify() throws {
-        let defaults = try #require(UserDefaults(suiteName: "test.\(UUID().uuidString)"))
+        let defaults = TestDefaults("test")
         #expect(throws: LicenseKey.Failure.malformed) { try LicenseStore.activate("nope", defaults: defaults) }
         #expect(LicenseStore.current(defaults: defaults) == nil)
     }

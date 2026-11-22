@@ -33,7 +33,7 @@ struct ClockHistoryModelTests {
         session = DocumentSession(recovery: FileRecoveryStore(directory: notes.url.appendingPathComponent(".r")))
         session.open(work.path)
         stateFile = notes.url.appendingPathComponent("clock.json")
-        defaults = UserDefaults(suiteName: "orgstar-clock-\(UUID().uuidString)")!
+        defaults = TestDefaults("orgstar-clock")
     }
 
     func offset(_ heading: String) -> Int {

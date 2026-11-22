@@ -5,12 +5,7 @@ import Testing
 
 @MainActor
 struct ConfigFolderTests {
-    func defaults() -> UserDefaults {
-        let name = "orgstar-config-folder-\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: name)!
-        defaults.removePersistentDomain(forName: name)
-        return defaults
-    }
+    func defaults() -> UserDefaults { TestDefaults("orgstar-config-folder") }
 
     func folder() throws -> URL {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("orgstar-config-folder-\(UUID().uuidString)")
