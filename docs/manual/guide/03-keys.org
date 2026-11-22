@@ -985,6 +985,8 @@ When a key appears in several rows, it runs the command whose condition holds at
 | Command | Emacs | Mac | Doom | What it does |
 |-+-+-+-+-|
 | Export… (=app.export-dialog=) | — | =⇧⌘E= | — | Opens the export sheet. In the Emacs and Doom presets =C-c C-e= is a prefix for the export keys only; pausing after it lists them in the key hints. |
+| Turn Subtree Export On or Off (=app.export-subtree=) | =C-c C-e C-s= | — | — | The file's export commands export the subtree at the caret, or the whole file again (=C-s= in =org-export-dispatch=). |
+| Turn Body-Only Export On or Off (=app.export-body-only=) | =C-c C-e C-b= | — | — | The file's export commands leave out the title and the page, or write them again (=C-b= in =org-export-dispatch=). |
 | Export to HTML (=app.export.html=) | =C-c C-e h h= | — | =SPC m e h h= (N) | Exports to HTML (=org-html-export-to-html=). |
 | Export to HTML and Open (=app.export.html-open=) | =C-c C-e h o= | — | =SPC m e h o= (N) | Exports to HTML and opens the result. |
 | Export to Markdown (=app.export.markdown=) | =C-c C-e m m= | — | =SPC m e m m= (N) | Exports to Markdown (=org-md-export-to-markdown=). |

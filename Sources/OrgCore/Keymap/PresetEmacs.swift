@@ -470,6 +470,12 @@ extension KeymapPreset {
         keys = "C-c C-x C-z"
         command = "app.clock.resolve"
         [[bind]]
+        keys = "C-c C-e C-s"
+        command = "app.export-subtree"
+        [[bind]]
+        keys = "C-c C-e C-b"
+        command = "app.export-body-only"
+        [[bind]]
         keys = "C-c C-e h h"
         command = "app.export.html"
         [[bind]]

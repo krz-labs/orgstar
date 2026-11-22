@@ -426,7 +426,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
         case "app.crypt.open-entry", "app.crypt.decrypt-entry": return onAppCommand != nil && OrgCrypt.encryptedRange(context.text, at: context.caret) != nil
         case "app.table-export", "app.plot": return onAppCommand != nil && ImportTable.exportText(context.text, at: context.caret, path: "") != nil
         case "app.refile", "app.refile.copy", "app.archive": return onAppCommand != nil && Presentation.heading(containing: context.caret, in: context.tree) != nil
-        case "app.copy-rich-text", "app.export.html-open", "app.export.icalendar-agenda", "app.export.icalendar-combined": return onAppCommand != nil
+        case "app.copy-rich-text", "app.export.html-open", "app.export-body-only", "app.export.icalendar-agenda", "app.export.icalendar-combined": return onAppCommand != nil
         case _ where id.hasPrefix("app.publish"): return onAppCommand != nil
         case _ where Self.linkCommands.contains(id): return onAppCommand != nil
         case "org.link.open": return OpenLinkAtPoint().applies(in: context)

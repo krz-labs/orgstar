@@ -68,6 +68,52 @@ struct ExportScopeTests {
         #expect(ExportScope.output(for: source, name: nil, extension: "md").path == "/notes/t.md")
     }
 
+    /// The words `C-s` and `C-b` keep in ox-html and ox-md, for the whole file and a subtree.
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
+    func subtreeAndBodyOnlyKeepWhatOrgKeeps() throws {
+        let text = """
+            #+TITLE: wordtitle
+            #+AUTHOR: wordauthor
+            #+OPTIONS: toc:nil num:nil
+            wordintro
+            * wordone
+            SCHEDULED: <2026-10-10 Sat>
+            :PROPERTIES:
+            :EXPORT_AUTHOR: wordbob
+            :wordkey: wordvalue
+            :END:
+            wordfirst
+            ** wordsub
+            worddeep
+            * wordtwo
+            wordsecond
+            """ + "\n"
+        let offset = (text as NSString).range(of: "wordfirst").location
+        let point = EmacsOracle.point(offset, in: text)
+        let emacs = try EmacsOracle.evaluate(text, """
+            (progn
+              (require 'ox-html) (require 'ox-md)
+              (goto-char \(point))
+              (list (org-export-as 'html t nil nil) (org-export-as 'html nil nil t) (org-export-as 'html t nil t)
+                    (org-export-as 'md t nil nil) (org-export-as 'md nil nil t) (org-export-as 'md t nil t)))
+            """)
+        let subtree = try #require(ExportScope.subtree(text, at: offset))
+        let ours = [
+            HTMLExport.page(subtree, fallbackTitle: "t"), HTMLExport.page(text, fallbackTitle: "t", bodyOnly: true),
+            HTMLExport.page(subtree, fallbackTitle: "t", bodyOnly: true),
+            MarkdownExport.document(subtree), MarkdownExport.document(text, bodyOnly: true), MarkdownExport.document(subtree, bodyOnly: true),
+        ]
+        let names = ["html subtree", "html body", "html subtree body", "md subtree", "md body", "md subtree body"]
+        let words = Set(text.matches(of: /\bword[a-z]+\b/).map { String($0.0) })
+        for (index, name) in names.enumerated() {
+            // ox-md writes no title; this export makes it the top heading.
+            for word in words where !(name == "md subtree" && word == "wordone") {
+                #expect(ours[index].contains(word) == emacs[index].contains(word), "\(name) \(word)\nours:\n\(ours[index])\nemacs:\n\(emacs[index])")
+            }
+        }
+        #expect(emacs[0].contains("wordone") && !emacs[2].contains("wordone") && !emacs[1].contains("wordtitle") && emacs[1].contains("wordsecond"))
+    }
+
     @Test func markdownBodyOnlyHasNoTitle() {
         let text = "#+TITLE: T\n* A\nx\n"
         #expect(MarkdownExport.document(text).hasPrefix("# T"))

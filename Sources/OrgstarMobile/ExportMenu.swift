@@ -31,6 +31,9 @@ struct OrgExport: Transferable {
             }
         }
 
+        /// Whether it can leave out the title and the page around the text.
+        var allowsBodyOnly: Bool { [.html, .markdown, .latex, .ascii].contains(self) }
+
         var fileExtension: String {
             switch self {
             case .html: "html"
@@ -55,6 +58,8 @@ struct OrgExport: Transferable {
     let codeStyle: HTMLCodeStyle
     /// The subtree at this offset exported alone.
     var subtree: Int?
+    /// Without the title and the page around the text, in the formats that allow it.
+    var bodyOnly = false
 
     /// The subtree's `EXPORT_FILE_NAME`, `#+EXPORT_FILE_NAME`'s name, or the file's, with the
     /// format's extension.
@@ -93,10 +98,10 @@ struct OrgExport: Transferable {
 
     /// The page HTML export makes of `text`, the file at `path`, with its setup files.
     @MainActor
-    static func html(_ text: String, path: String, theme: ThemeSpec) -> String {
+    static func html(_ text: String, path: String, theme: ThemeSpec, bodyOnly: Bool = false) -> String {
         let base = ((path as NSString).lastPathComponent as NSString).deletingPathExtension
         let settings = OrgPreferences.orgSettings().resolvingSetupFiles(in: text, path: path, read: OrgSettings.readFile)
-        return HTMLExport.page(text, fallbackTitle: base, settings: settings, path: path,
+        return HTMLExport.page(text, fallbackTitle: base, settings: settings, path: path, bodyOnly: bodyOnly,
                                codeStyle: HTMLCodeStyle(highlighter: MobileEditor.highlighter, theme: theme), language: OrgPreferences.exportLanguage())
     }
 
@@ -109,14 +114,14 @@ struct OrgExport: Transferable {
         let text = subtree.flatMap { ExportScope.subtree(self.text, at: $0, settings: settings) } ?? self.text
         switch format {
         case .html:
-            try HTMLExport.page(text, fallbackTitle: base, settings: settings, path: path, codeStyle: codeStyle, language: OrgPreferences.exportLanguage())
+            try HTMLExport.page(text, fallbackTitle: base, settings: settings, path: path, bodyOnly: bodyOnly, codeStyle: codeStyle, language: OrgPreferences.exportLanguage())
                 .write(to: url, atomically: true, encoding: .utf8)
         case .markdown:
-            try MarkdownExport.document(text, settings: settings, path: path).write(to: url, atomically: true, encoding: .utf8)
+            try MarkdownExport.document(text, settings: settings, path: path, bodyOnly: bodyOnly).write(to: url, atomically: true, encoding: .utf8)
         case .latex:
             let content: String
             do {
-                content = try LaTeXExport.document(text, settings: settings, path: path, language: OrgPreferences.exportLanguage(), file: true)
+                content = try LaTeXExport.document(text, settings: settings, path: path, bodyOnly: bodyOnly, language: OrgPreferences.exportLanguage(), file: true)
             } catch let error as LaTeXExport.Unsupported {
                 let message = "Can't export to LaTeX: \(error.reason)"
                 await MainActor.run { NotificationCenter.default.post(name: Self.refused, object: message) }
@@ -126,7 +131,7 @@ struct OrgExport: Transferable {
         case .ascii:
             let content: String
             do {
-                content = try ASCIIExport.document(text, settings: settings, path: path, language: OrgPreferences.exportLanguage(), file: true)
+                content = try ASCIIExport.document(text, settings: settings, path: path, bodyOnly: bodyOnly, language: OrgPreferences.exportLanguage(), file: true)
             } catch let error as ASCIIExport.Unsupported {
                 let message = "Can't export to plain text: \(error.reason)"
                 await MainActor.run { NotificationCenter.default.post(name: Self.refused, object: message) }
@@ -166,18 +171,24 @@ struct ExportMenu: View {
     var report: (String) -> Void = { _ in }
     /// Offers the subtree at the caret alone, where there is a caret.
     var exportSubtree: (() -> Void)?
+    /// Every file's export settings as kept, so the menu follows a change to this file's.
+    @AppStorage(ExportSettings.key) private var kept = Data()
 
     var body: some View {
+        let bodyOnly = kept.isEmpty ? false : ExportSettings.saved(for: path).bodyOnly
         Menu("Export", systemImage: "square.and.arrow.up") {
             ForEach(OrgExport.Format.allCases, id: \.self) { format in
                 if format.locked {
                     Button("\(format.name) (orgstar+)") { ProAccess.shared.allows(.export) }
+                } else if bodyOnly, !format.allowsBodyOnly {
+                    Button(format.name) { report(ExportSettings.noBodyOnly) }
                 } else {
                     let export = OrgExport(text: text, path: path, format: format, settings: OrgPreferences.orgSettings(),
-                                           codeStyle: HTMLCodeStyle(highlighter: MobileEditor.highlighter, theme: model.theme))
+                                           codeStyle: HTMLCodeStyle(highlighter: MobileEditor.highlighter, theme: model.theme), bodyOnly: bodyOnly)
                     ShareLink(item: export, preview: SharePreview(export.fileName)) { Text(format.name) }
                 }
             }
+            Toggle("Body Only", isOn: Binding(get: { bodyOnly }, set: { ExportMenu.setBodyOnly($0, path: path) }))
             if let exportSubtree {
                 Button("Export Subtree…", systemImage: "list.bullet.indent") { exportSubtree() }
             }
@@ -195,6 +206,13 @@ struct ExportMenu: View {
             Divider()
             Button("Copy as Rich Text", systemImage: "doc.on.doc") { if ProAccess.shared.allows(.export) { report(Self.copy(path: path, text: text, theme: model.theme)) } }
         }
+    }
+
+    /// Keeps the body-only choice for the file at `path`.
+    static func setBodyOnly(_ on: Bool, path: String) {
+        var settings = ExportSettings.saved(for: path)
+        settings.bodyOnly = on
+        settings.save(for: path)
     }
 
     /// The file on the clipboard as HTML, RTF and plain text, to paste formatted. Returns a message.
@@ -263,10 +281,15 @@ struct SubtreeExportScreen: View {
 
     var body: some View {
         NavigationStack {
+            let bodyOnly = ExportSettings.saved(for: path).bodyOnly
             List(OrgExport.Format.allCases.filter { !$0.locked }, id: \.self) { format in
-                let export = OrgExport(text: text, path: path, format: format, settings: OrgPreferences.orgSettings(),
-                                       codeStyle: HTMLCodeStyle(highlighter: MobileEditor.highlighter, theme: model.theme), subtree: caret)
-                ShareLink(item: export, preview: SharePreview(export.fileName)) { Text(format.name) }
+                if bodyOnly, !format.allowsBodyOnly {
+                    LabeledContent(format.name) { Text("No body-only export") }.foregroundStyle(.secondary)
+                } else {
+                    let export = OrgExport(text: text, path: path, format: format, settings: OrgPreferences.orgSettings(),
+                                           codeStyle: HTMLCodeStyle(highlighter: MobileEditor.highlighter, theme: model.theme), subtree: caret, bodyOnly: bodyOnly)
+                    ShareLink(item: export, preview: SharePreview(export.fileName)) { Text(format.name) }
+                }
             }
             .navigationTitle("Export Subtree")
             .navigationBarTitleDisplayMode(.inline)

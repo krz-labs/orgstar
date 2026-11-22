@@ -1,4 +1,5 @@
 import AppKit
+import OrgApp
 import SwiftUI
 
 /// Export… (`app.export-dialog`): the format, where the file goes, and whether to open it after.
@@ -11,15 +12,31 @@ struct ExportSheet: View {
     /// Without a chosen destination, the App Store build passes nil, and the export asks where
     /// to write when the default is outside the sandbox's reach.
     let export: (_ format: String, _ destination: URL?, _ open: Bool, _ subtree: Bool, _ bodyOnly: Bool) -> Void
-    @AppStorage("exportFormat") private var format = "html"
-    @AppStorage("exportOpenAfter") private var openAfter = false
-    @AppStorage("exportBodyOnly") private var bodyOnly = false
+    /// The file's settings, kept when it is exported.
+    @State private var format: String
+    @State private var openAfter: Bool
+    @State private var bodyOnly: Bool
+    @State private var subtree: Bool
     @AppStorage("pdfMargin") private var pdfMargin = 50
     @AppStorage("pdfFont") private var pdfFont = ""
     @AppStorage("pdfPageNumbers") private var pdfPageNumbers = true
-    @State private var subtree = false
     @State private var destination: URL?
     @Environment(\.dismiss) private var dismiss
+
+    init(
+        source: URL, inSubtree: Bool, target: @escaping (_ ext: String, _ subtree: Bool) -> URL,
+        export: @escaping (_ format: String, _ destination: URL?, _ open: Bool, _ subtree: Bool, _ bodyOnly: Bool) -> Void
+    ) {
+        self.source = source
+        self.inSubtree = inSubtree
+        self.target = target
+        self.export = export
+        let saved = ExportSettings.saved(for: source.path)
+        _format = State(initialValue: saved.format)
+        _openAfter = State(initialValue: saved.openAfter)
+        _bodyOnly = State(initialValue: saved.bodyOnly)
+        _subtree = State(initialValue: saved.subtree)
+    }
 
     #if APPSTORE
     static let formats: [(id: String, title: String, ext: String)] = [
@@ -37,9 +54,9 @@ struct ExportSheet: View {
     #endif
 
     private var ext: String { Self.formats.first { $0.id == format }?.ext ?? "html" }
-    private var chosen: URL { destination ?? target(ext, subtree) }
+    private var chosen: URL { destination ?? target(ext, subtree && inSubtree) }
     /// PDF and ODT are whole documents.
-    private var allowsBodyOnly: Bool { !["pdf", "print-pdf", "odt", "docx", "rtf", "plain-text", "icalendar"].contains(format) }
+    private var allowsBodyOnly: Bool { ExportSettings.allowsBodyOnly(format) }
 
     var body: some View {
         Form {
@@ -47,7 +64,7 @@ struct ExportSheet: View {
                 ForEach(Self.formats, id: \.id) { Text($0.title).tag($0.id) }
             }
             .onChange(of: format) { destination = destination.map { $0.deletingPathExtension().appendingPathExtension(ext) } }
-            Picker("Scope", selection: $subtree) {
+            Picker("Scope", selection: Binding(get: { subtree && inSubtree }, set: { subtree = $0 })) {
                 Text("Whole file").tag(false)
                 Text("Subtree at the caret").tag(true)
             }
@@ -78,6 +95,9 @@ struct ExportSheet: View {
                 Spacer()
                 Button("Cancel") { dismiss() }.keyboardShortcut(.cancelAction)
                 Button("Export") {
+                    var settings = ExportSettings()
+                    (settings.format, settings.subtree, settings.bodyOnly, settings.openAfter) = (format, subtree, bodyOnly, openAfter)
+                    settings.save(for: source.path, lastUsed: true)
                     #if APPSTORE
                     export(format, destination, openAfter, subtree && inSubtree, bodyOnly && allowsBodyOnly)
                     #else

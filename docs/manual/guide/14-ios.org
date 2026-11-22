@@ -335,6 +335,8 @@ Export (in the reader's toolbar and the editor's More menu) offers HTML, Markdow
 
 PDF export follows =pdf-margin=, =pdf-font= and =pdf-page-numbers= in =config.toml=, and Word files get heading styles and the file's images, as on the Mac. PDF through LaTeX isn't available on iOS.
 
+Body Only in the Export menu leaves out the title and the page around the text in HTML, Markdown, LaTeX and Plain Text (ASCII), and is kept for each file; the other formats say they have no body-only export while it is on. Export Subtree…, in the editor's Export menu, shares the subtree at the caret in any of the formats.
+
 The Export menu also has Export Agenda Files to iCalendar, which writes an =.ics= beside each agenda file, and Combine Agenda Files into iCalendar, which shares one calendar of them all. Commands has these, Copy as Rich Text, and Export to HTML and Open, which shows the HTML export in Quick Look.
 
 Publishing works from Commands as on the Mac, with the =[[publish]]= projects in =config.toml=. A project that publishes outside your folders asks for a folder the first time, and uses it from then on. See [[file:12-export.org][Export]].

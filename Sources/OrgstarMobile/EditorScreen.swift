@@ -486,6 +486,10 @@ struct EditorScreen: View {
                 if let text = session.document(of: path)?.text { message = ExportMenu.copy(path: path, text: text, theme: model.theme) }
             } else if id == "app.export.html-open" {
                 exportHTMLAndOpen()
+            } else if id == "app.export-body-only" {
+                let on = !ExportSettings.saved(for: path).bodyOnly
+                ExportMenu.setBodyOnly(on, path: path)
+                message = on ? "Export: body only" : "Export: whole document"
             } else if id == "app.export.icalendar-agenda" || id == "app.export.icalendar-combined" {
                 agendaCalendars(combined: id == "app.export.icalendar-combined")
             } else if id.hasPrefix("app.publish") {
@@ -632,7 +636,7 @@ extension EditorScreen {
     /// `org-html-export-to-html` and open: the page in Quick Look, from a temporary file.
     private func exportHTMLAndOpen() {
         guard let text = session.document(of: path)?.text else { return }
-        let html = OrgExport.html(text, path: path, theme: model.theme)
+        let html = OrgExport.html(text, path: path, theme: model.theme, bodyOnly: ExportSettings.saved(for: path).bodyOnly)
         let name = ExportScope.output(for: URL(fileURLWithPath: path), name: ExportScope.fileName(text, settings: OrgPreferences.orgSettings()), extension: "html")
             .lastPathComponent
         do {
@@ -1090,6 +1094,7 @@ struct CommandPalette: View {
         ("app.clock.default", "Mark as Default Clock Task"), ("app.clock.resolve", "Resolve Open Clocks…"),
         ("app.refile", "Refile…"), ("app.refile.copy", "Copy to Refile Target…"), ("app.refile.goto", "Go to Refile Target…"),
         ("app.archive", "Archive Subtree"), ("app.copy-rich-text", "Copy as Rich Text"), ("app.export.html-open", "Export to HTML and Open"),
+        ("app.export-body-only", "Turn Body-Only Export On or Off"),
         ("app.export.icalendar-agenda", "Export Agenda Files to iCalendar"), ("app.export.icalendar-combined", "Combine Agenda Files into iCalendar"),
         ("app.publish", "Publish Project…"), ("app.publish.all", "Publish All Projects"), ("app.publish.current-file", "Publish Current File"),
         ("app.publish.current-project", "Publish Current Project"),

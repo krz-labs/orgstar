@@ -27,7 +27,16 @@ Export works on the file in the current editor, using its text as it is now, sav
 
 The keys follow Emacs's export dispatcher (=org-export-dispatch=). =C-c C-e= on its own is only a prefix: pause after it and the key hints list the formats. The =SPC m e= keys work in normal state; the =C-c C-e= keys work in every Doom state. The Mac preset has no keys for the single formats; its =⇧⌘E= opens the export dialog.
 
-All fourteen commands are in File ▸ Export and in the command palette. They write the export beside the Org file, with the same name and the format's extension: =.html=, =.md=, =.pdf=, =.docx=, =.rtf=, =.tex=, =.odt=, =.txt= or =.ics=. The two agenda-file commands are the exceptions; see [[*iCalendar export][iCalendar export]]. =#+EXPORT_FILE_NAME:= names it instead, as in Org: relative to the Org file's folder (or absolute, or starting with =~=), with its extension replaced by the format's, so =#+EXPORT_FILE_NAME: out/report= writes =out/report.html=. A file already there is replaced. The message area shows "Exported to /name/".
+All fourteen commands are in File ▸ Export and in the command palette. They write the export beside the Org file, with the same name and the format's extension: =.html=, =.md=, =.pdf=, =.docx=, =.rtf=, =.tex=, =.odt=, =.txt= or =.ics=. The two agenda-file commands are the exceptions; see [[*iCalendar export][iCalendar export]]. =#+EXPORT_FILE_NAME:= names it instead, as in Org: relative to the Org file's folder (or absolute, or starting with =~=), with its extension replaced by the format's, so =#+EXPORT_FILE_NAME: out/report= writes =out/report.html=. A file already there is replaced. The message area shows "Exported to /name/", or "Exported the subtree to /name/", "Exported the body to /name/" or "Exported the subtree's body to /name/" when the export was not the whole file as a whole document.
+
+The twelve commands that export the current file export the whole file as a whole document, unless the file is set otherwise. Two commands set it, as =C-s= and =C-b= do in Org's dispatcher:
+
+| Command                         | Emacs preset and Doom | Effect on the file's export commands                              |
+|---------------------------------+-----------------------+-------------------------------------------------------------------|
+| Turn Subtree Export On or Off   | =C-c C-e C-s=         | They export the subtree at the caret; see /Scope/ below.          |
+| Turn Body-Only Export On or Off | =C-c C-e C-b=         | They leave out the title and the page; see /Body only/ below.     |
+
+Both are in the command palette, and the message area says what is now on. The choice is kept for the file, and it is the same one the export dialog shows as /Scope/ and /Body only/, so setting it in the dialog sets it for the commands too. With subtree export on and the caret before the first heading, a command says "Not in a subtree" and writes nothing. With body-only export on, a command for PDF, Word, RTF, plain text, ODT or iCalendar says "This format has no body-only export. Turn body-only export off for this file first." and writes nothing. The two agenda-file commands follow neither.
 
 The [[file:../install.org][Mac App Store version]] has the thirteen commands that don't need Emacs; File ▸ Export, the export dialog and the command palette leave out Export to PDF with Emacs, and a key bound to it runs Export to PDF. When the export file, or an =#+INCLUDE:= or =#+SETUPFILE:=, is outside your folders, orgstar first asks for access to its folder; for the export file, Save Elsewhere… instead picks another place. See [[file:../install.org][Install]].
 
@@ -42,13 +51,15 @@ The [[file:../install.org][Mac App Store version]] has the thirteen commands tha
 - *Margins*, *Font* and *Page numbers*, for PDF: see /PDF export/.
 - *Open after export*: opens the file in its default app when the export finishes.
 
-The dialog remembers the format and the *Open after export* setting. The PDF settings are =config.toml= settings, and apply to every PDF export.
+The dialog keeps the format, scope, body-only and *Open after export* settings for each file, by the file's path, in orgstar's preferences; nothing is written to the Org file, and a renamed or moved file starts again. They are saved when you click Export. A file exported for the first time starts with the format and *Open after export* setting last used, the whole file, and body only off. When the kept scope is the subtree and the caret is before the first heading, the dialog exports the whole file. The destination is not kept. The PDF settings are =config.toml= settings, and apply to every PDF export.
 
 ** On iOS
 
 The Export menu offers HTML, Markdown, PDF, Word, Rich Text (RTF), Plain Text, ODT, iCalendar, LaTeX and Plain Text (ASCII), and Copy as Rich Text. It is under More in the editor, and in the toolbar in the reader. Choosing one opens the share sheet with the exported file, named after the Org file or its =#+EXPORT_FILE_NAME:=. Send it to another app, or use Save to Files to keep it. The export is the same as on the Mac, except that LaTeX, ODT and ASCII have no author unless the file has =#+AUTHOR:=. PDF through LaTeX is not available on iOS.
 
-The Export menu also has Export Agenda Files to iCalendar and Combine Agenda Files into iCalendar (see [[*iCalendar export][iCalendar export]]). Export to HTML and Open, in Commands or on =C-c C-e h o= with a hardware keyboard, shows the HTML export in Quick Look, with the file's images in the page; nothing is written beside the Org file. Copy as Rich Text is in Commands too.
+Body Only in the Export menu leaves out the title and the page around the text, as in the Mac's export dialog, and is kept for each file. While it is on, PDF, Word, Rich Text (RTF), Plain Text, ODT and iCalendar say "This format has no body-only export. Turn body-only export off for this file first." Turn Body-Only Export On or Off, in Commands or on =C-c C-e C-b= with a hardware keyboard, changes the same setting. Export Subtree…, in the editor's Export menu, lists the formats for the subtree at the caret, and follows Body Only too. There is no subtree setting on iOS: the menu's formats always export the whole file.
+
+The Export menu also has Export Agenda Files to iCalendar and Combine Agenda Files into iCalendar (see [[*iCalendar export][iCalendar export]]). Export to HTML and Open, in Commands or on =C-c C-e h o= with a hardware keyboard, shows the HTML export in Quick Look, with the file's images in the page; nothing is written beside the Org file; it follows Body Only. Copy as Rich Text is in Commands too.
 
 * HTML export
 
@@ -466,6 +477,5 @@ The publisher part comes from the =publisher=, =journal=, =institution= or =scho
 
 * What export does not do
 
-- Subtree and body-only export are in the export dialog only; the single-format commands export the whole file. There is no asynchronous export.
+- There is no asynchronous export.
 - Source blocks are not run, and noweb references are not expanded.
-- Export settings in the dialog are not per file.

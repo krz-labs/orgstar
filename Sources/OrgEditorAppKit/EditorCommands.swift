@@ -164,6 +164,8 @@ public enum EditorCommands {
         EditorCommand(id: "app.crypt.encrypt-entries", title: "Encrypt Tagged Entries…", action: .app),
         EditorCommand(id: "app.crypt.forget-passphrase", title: "Forget Encryption Passphrase", action: .app),
         EditorCommand(id: "app.export-dialog", title: "Export…", action: .app),
+        EditorCommand(id: "app.export-subtree", title: "Turn Subtree Export On or Off", action: .app),
+        EditorCommand(id: "app.export-body-only", title: "Turn Body-Only Export On or Off", action: .app),
         EditorCommand(id: "app.sync-conflicts", title: "Resolve Sync Conflicts…", action: .app),
         EditorCommand(id: "app.revert", title: "Revert to File on Disk", action: .app),
         EditorCommand(id: "app.recovery", title: "Recovery Versions…", action: .app),

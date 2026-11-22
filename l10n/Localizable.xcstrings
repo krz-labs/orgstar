@@ -4861,6 +4861,40 @@
         }
       }
     },
+    "Body Only": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur Inhalt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solo el cuerpo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Corps uniquement"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本文のみ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Só o Corpo"
+          }
+        }
+      }
+    },
     "Body only": {
       "localizations": {
         "de": {
@@ -20864,6 +20898,40 @@
         }
       }
     },
+    "No body-only export": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kein Export nur des Inhalts"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sin exportación solo del cuerpo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pas d'exportation du corps uniquement"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本文のみの書き出しなし"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sem exportação só do corpo"
+          }
+        }
+      }
+    },
     "No buffer": {
       "localizations": {
         "de": {
@@ -34025,6 +34093,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ativar ou Desativar Preenchimento Automático"
+          }
+        }
+      }
+    },
+    "Turn Body-Only Export On or Off": {
+      "comment": "Command title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export nur des Inhalts ein- oder ausschalten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activar o desactivar la exportación solo del cuerpo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activer ou désactiver l'exportation du corps uniquement"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本文のみの書き出しのオン/オフ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ativar ou Desativar Exportação Só do Corpo"
+          }
+        }
+      }
+    },
+    "Turn Subtree Export On or Off": {
+      "comment": "Command title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Teilbaum-Export ein- oder ausschalten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activar o desactivar la exportación del subárbol"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activer ou désactiver l'exportation du sous-arbre"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サブツリー書き出しのオン/オフ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ativar ou Desativar Exportação da Subárvore"
           }
         }
       }

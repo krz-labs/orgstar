@@ -620,7 +620,7 @@ struct ContentView: View {
             do {
                 let target = try ICalendarFiles.export(whole, path: path, settings: defaults, options: OrgPreferences.icalendarOptions(),
                                                        subtree: subtree ? caret : nil, destination: destination)
-                commands.show("Exported to \(target.lastPathComponent)")
+                commands.show(ExportSettings.exported(target.lastPathComponent, subtree: subtree, bodyOnly: bodyOnly))
                 if open { NSWorkspace.shared.open(target) }
             } catch {
                 commands.show("Can't export: \(error.localizedDescription)")
@@ -637,16 +637,16 @@ struct ContentView: View {
             do {
                 try FileManager.default.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
                 try content.write(to: target, atomically: true, encoding: .utf8)
-                commands.show("Exported to \(target.lastPathComponent)")
+                commands.show(ExportSettings.exported(target.lastPathComponent, subtree: subtree, bodyOnly: bodyOnly))
                 if open { NSWorkspace.shared.open(target) }
             } catch {
                 commands.show("Can't write \(target.lastPathComponent): \(error.localizedDescription)")
             }
-        case "latex" where exportNative("LaTeX", extension: "tex", whole: whole, url: url, to: destination, open: open, subtree: subtree ? caret : nil, settings: defaults, export: {
+        case "latex" where exportNative("LaTeX", extension: "tex", whole: whole, url: url, to: destination, open: open, subtree: subtree ? caret : nil, bodyOnly: bodyOnly, settings: defaults, export: {
             try LaTeXExport.document(text, settings: defaults, path: path, bodyOnly: bodyOnly, author: NSFullUserName(), language: OrgPreferences.exportLanguage(), file: true)
         }):
             break
-        case "text" where exportNative("plain text", extension: "txt", whole: whole, url: url, to: destination, open: open, subtree: subtree ? caret : nil, settings: defaults, export: {
+        case "text" where exportNative("plain text", extension: "txt", whole: whole, url: url, to: destination, open: open, subtree: subtree ? caret : nil, bodyOnly: bodyOnly, settings: defaults, export: {
             try ASCIIExport.document(text, settings: defaults, path: path, bodyOnly: bodyOnly, author: NSFullUserName(), language: OrgPreferences.exportLanguage(), file: true)
         }):
             break
@@ -659,7 +659,7 @@ struct ContentView: View {
                 let data = try ODTExport.document(text, settings: defaults, path: path, author: NSFullUserName(), language: OrgPreferences.exportLanguage())
                 try FileManager.default.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
                 try data.write(to: target, options: .atomic)
-                commands.show("Exported to \(target.lastPathComponent)")
+                commands.show(ExportSettings.exported(target.lastPathComponent, subtree: subtree, bodyOnly: bodyOnly))
                 if open { NSWorkspace.shared.open(target) }
             } catch {
                 commands.show("Can't export \(target.lastPathComponent): \(error.localizedDescription)")
@@ -687,7 +687,7 @@ struct ContentView: View {
                     }
                     try FileManager.default.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
                     try data.write(to: target, options: .atomic)
-                    commands.show("Exported to \(target.lastPathComponent)")
+                    commands.show(ExportSettings.exported(target.lastPathComponent, subtree: subtree, bodyOnly: bodyOnly))
                     if open { NSWorkspace.shared.open(target) }
                 } catch {
                     commands.show("Can't export \(target.lastPathComponent): \(error)")
@@ -710,7 +710,7 @@ struct ContentView: View {
                         try FileManager.default.moveItem(at: written, to: destination)
                         written = destination
                     }
-                    commands.show("Exported to \(written.lastPathComponent)")
+                    commands.show(ExportSettings.exported(written.lastPathComponent, subtree: subtree, bodyOnly: bodyOnly))
                     if open { NSWorkspace.shared.open(written) }
                 } catch is CancellationError {
                     commands.show("Export canceled")
@@ -728,7 +728,7 @@ struct ContentView: View {
     /// Writes what `export` makes, as ox does for `format`. False when the native export can't
     /// match Emacs and Emacs is installed to export instead; otherwise the reason is shown.
     private func exportNative(
-        _ format: String, extension ext: String, whole: String, url: URL, to destination: URL?, open: Bool, subtree: Int?, settings: OrgSettings,
+        _ format: String, extension ext: String, whole: String, url: URL, to destination: URL?, open: Bool, subtree: Int?, bodyOnly: Bool, settings: OrgSettings,
         export: () throws -> String
     ) -> Bool {
         let content: String
@@ -746,7 +746,7 @@ struct ContentView: View {
         do {
             try FileManager.default.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
             try content.write(to: target, atomically: true, encoding: .utf8)
-            commands.show("Exported to \(target.lastPathComponent)")
+            commands.show(ExportSettings.exported(target.lastPathComponent, subtree: subtree != nil, bodyOnly: bodyOnly))
             if open { NSWorkspace.shared.open(target) }
         } catch {
             commands.show("Can't write \(target.lastPathComponent): \(error.localizedDescription)")
@@ -1243,7 +1243,7 @@ struct ContentView: View {
             return commands.show(Self.unavailable(EditorCommands.all.first { $0.id == id }?.title ?? id))
         }
         if let feature = ProFeature.required(byCommand: id), !ProAccess.shared.allows(feature) { return }
-        let orgOnly = ["app.refile", "app.refile.copy", "app.archive", "app.clock.in", "app.clock.default", "app.copy-rich-text"].contains(id) || (id.hasPrefix("app.export.") && !id.hasPrefix("app.export.icalendar-")) || id.hasPrefix("org.")
+        let orgOnly = ["app.refile", "app.refile.copy", "app.archive", "app.clock.in", "app.clock.default", "app.copy-rich-text", "app.export-subtree", "app.export-body-only"].contains(id) || (id.hasPrefix("app.export.") && !id.hasPrefix("app.export.icalendar-")) || id.hasPrefix("org.")
         if orgOnly, !session.isOrg {
             commands.show("Not an org file")
             return
@@ -1438,8 +1438,23 @@ struct ContentView: View {
         case "app.export-dialog":
             guard let path = session.path else { return commands.show("No file is open") }
             panel = .export(UUID(), URL(fileURLWithPath: path))
+        case "app.export-subtree", "app.export-body-only":
+            guard let path = session.path else { return commands.show("No file is open") }
+            var settings = ExportSettings.saved(for: path)
+            if id == "app.export-subtree" {
+                settings.subtree.toggle()
+                commands.show(settings.subtree ? "Export commands: subtree at the caret" : "Export commands: whole file")
+            } else {
+                settings.bodyOnly.toggle()
+                commands.show(settings.bodyOnly ? "Export commands: body only" : "Export commands: whole document")
+            }
+            settings.save(for: path)
         case let id where id.hasPrefix("app.export."):
-            export(String(id.dropFirst("app.export.".count)))
+            let format = String(id.dropFirst("app.export.".count))
+            guard let options = (session.path.map { ExportSettings.saved(for: $0) } ?? ExportSettings()).commandOptions(format) else {
+                return commands.show(ExportSettings.noBodyOnly)
+            }
+            export(format, subtree: options.subtree, bodyOnly: options.bodyOnly)
         case let id where id.hasPrefix("app.publish"):
             publish(id)
         case "app.plot":

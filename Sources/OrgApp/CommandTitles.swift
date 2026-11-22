@@ -314,6 +314,8 @@ enum CommandTitles {
         String(localized: "Transpose Table", comment: "Command title"),
         String(localized: "Truncate or Wrap Long Lines", comment: "Command title"),
         String(localized: "Turn Auto Fill On or Off", comment: "Command title"),
+        String(localized: "Turn Body-Only Export On or Off", comment: "Command title"),
+        String(localized: "Turn Subtree Export On or Off", comment: "Command title"),
         String(localized: "Underline", comment: "Command title"),
         String(localized: "Undo", comment: "Command title"),
         String(localized: "Unset Attachment Folder", comment: "Command title"),
