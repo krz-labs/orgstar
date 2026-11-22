@@ -4,6 +4,7 @@ import OrgCore
 import OrgDocument
 import OrgIndex
 import OrgPresentation
+import QuickLook
 import SwiftUI
 import UIKit
 
@@ -36,6 +37,8 @@ struct ReaderScreen: View {
     @State private var startup: StartupDisplay?
     @State private var showingOutline = false
     @State private var message: String?
+    /// A file a link opened, shown in Quick Look.
+    @State private var previewed: URL?
     /// The pane the reader shows its file in, closed with the reader.
     @State private var holder = PaneHolder()
     @Environment(\.openURL) private var openURL
@@ -109,6 +112,7 @@ struct ReaderScreen: View {
                 }
             }
         }
+        .quickLookPreview($previewed)
         .sheet(isPresented: $showingOutline) { outlineSheet }
         .safeAreaInset(edge: .bottom) {
             if let message {
@@ -381,7 +385,7 @@ struct ReaderScreen: View {
                 session.open(path, in: pane)
                 model.openRequest = .offset(target, caret)
             }
-        case .openExternally(let target): openURL(target)
+        case .openExternally(let target): if target.isFileURL { previewed = target } else { openURL(target) }
         case .message(let text): message = text
         case .choose(let question, let paths): message = question + paths.map { ($0 as NSString).lastPathComponent }.joined(separator: ", ")
         case .elisp: message = "Open the file in the editor to run elisp links."
