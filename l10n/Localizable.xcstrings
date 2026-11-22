@@ -52,6 +52,41 @@
       },
       "shouldTranslate": false
     },
+    "%@ (and %lld more)": {
+      "comment": "A problem with the configuration, and how many more there are",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ (und %2$lld weitere)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ (y %2$lld más)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ (et %2$lld autres)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@（ほか%2$lld件）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ (e mais %2$lld)"
+          }
+        }
+      }
+    },
     "%@ (orgstar+)": {
       "localizations": {
         "de": {
@@ -1759,6 +1794,208 @@
         }
       }
     },
+    "%lld sync conflict copies of this file; Resolve Sync Conflicts compares them.": {
+      "comment": "Echo area when a file with Syncthing conflict copies opens",
+      "localizations": {
+        "de": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Synchronisierungskonflikt-Kopie dieser Datei; Synchronisierungskonflikte auflösen vergleicht sie."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Synchronisierungskonflikt-Kopien dieser Datei; Synchronisierungskonflikte auflösen vergleicht sie."
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld sync conflict copy of this file; Resolve Sync Conflicts compares them."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld sync conflict copies of this file; Resolve Sync Conflicts compares them."
+                }
+              }
+            }
+          }
+        },
+        "es": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld copia de conflicto de sincronización de este archivo; Resolver conflictos de sincronización las compara."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld copias de conflicto de sincronización de este archivo; Resolver conflictos de sincronización las compara."
+                }
+              }
+            }
+          }
+        },
+        "fr": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld copie de conflit de synchronisation de ce fichier ; Résoudre les conflits de synchronisation les compare."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld copies de conflit de synchronisation de ce fichier ; Résoudre les conflits de synchronisation les compare."
+                }
+              }
+            }
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このファイルの同期競合コピーが%lld個あります。「同期の競合を解決」で比較できます。"
+          }
+        },
+        "pt-BR": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld cópia de conflito de sincronização deste arquivo; Resolver Conflitos de Sincronização as compara."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld cópias de conflito de sincronização deste arquivo; Resolver Conflitos de Sincronização as compara."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld words": {
+      "comment": "Modeline: words in the file",
+      "localizations": {
+        "de": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Wort"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Wörter"
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld word"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld words"
+                }
+              }
+            }
+          }
+        },
+        "es": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld palabra"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld palabras"
+                }
+              }
+            }
+          }
+        },
+        "fr": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld mot"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld mots"
+                }
+              }
+            }
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld語"
+          }
+        },
+        "pt-BR": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld palavra"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld palavras"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld/%lld today": {
       "localizations": {
         "de": {
@@ -3283,6 +3520,41 @@
         }
       }
     },
+    "All": {
+      "comment": "Inspector: all clocked time",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "すべて"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tudo"
+          }
+        }
+      }
+    },
     "All Folders": {
       "localizations": {
         "de": {
@@ -4418,6 +4690,41 @@
         }
       }
     },
+    "Attempt to delete the only pane": {
+      "comment": "Echo area: Close Pane with one pane",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der einzige Bereich kann nicht geschlossen werden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede cerrar el único panel"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de fermer le seul panneau"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "唯一のペインは閉じられません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível fechar o único painel"
+          }
+        }
+      }
+    },
     "Auto Fill": {
       "comment": "View menu toggle (auto-fill-mode)",
       "localizations": {
@@ -4518,6 +4825,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "valores BLOB"
+          }
+        }
+      }
+    },
+    "BOM": {
+      "comment": "Modeline: the file starts with a byte order mark",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BOM"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BOM"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BOM"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BOM"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BOM"
           }
         }
       }
@@ -4690,6 +5032,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Indicador"
+          }
+        }
+      }
+    },
+    "Before first headline": {
+      "comment": "Echo area: an entry command before the file's first heading",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vor der ersten Überschrift"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Antes del primer encabezado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avant le premier titre"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最初の見出しより前です"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Antes do primeiro cabeçalho"
           }
         }
       }
@@ -5312,6 +5689,41 @@
         }
       }
     },
+    "CRLF": {
+      "comment": "Modeline: the file has Windows line endings",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CRLF"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CRLF"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CRLF"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CRLF"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CRLF"
+          }
+        }
+      }
+    },
     "Calc constants": {
       "comment": "Why a table needs Emacs",
       "localizations": {
@@ -5450,6 +5862,110 @@
         }
       }
     },
+    "Can't export %@: %@": {
+      "comment": "Echo area: file name, then the reason",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ kann nicht exportiert werden: %2$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede exportar %1$@: %2$@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d'exporter %1$@ : %2$@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@を書き出せません：%2$@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível exportar %1$@: %2$@"
+          }
+        }
+      }
+    },
+    "Can't export to %@: %@": {
+      "comment": "Echo area: export format, then the reason",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export nach %1$@ nicht möglich: %2$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede exportar a %1$@: %2$@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d'exporter en %1$@ : %2$@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@に書き出せません：%2$@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível exportar para %1$@: %2$@"
+          }
+        }
+      }
+    },
+    "Can't export: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export nicht möglich: %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede exportar: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d'exporter : %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "書き出せません：%@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível exportar: %@"
+          }
+        }
+      }
+    },
     "Can't include %@.": {
       "comment": "Export stopped by an #+INCLUDE file that can't be read",
       "localizations": {
@@ -5584,6 +6100,75 @@
           "stringUnit": {
             "state": "translated",
             "value": "Não é possível abrir o índice"
+          }
+        }
+      }
+    },
+    "Can't read %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kann nicht gelesen werden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede leer %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de lire %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@を読み込めません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível ler %@"
+          }
+        }
+      }
+    },
+    "Can't write %@: %@": {
+      "comment": "Echo area: file name, then the reason",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ kann nicht geschrieben werden: %2$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede escribir %1$@: %2$@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d'écrire %1$@ : %2$@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@に書き込めません：%2$@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível gravar %1$@: %2$@"
           }
         }
       }
@@ -8346,6 +8931,41 @@
         }
       }
     },
+    "Columns": {
+      "comment": "Inspector tab",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spalten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Columnas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Colonnes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "列"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Colunas"
+          }
+        }
+      }
+    },
     "Combine Agenda Files into iCalendar": {
       "comment": "Command title",
       "localizations": {
@@ -8724,6 +9344,74 @@
         }
       }
     },
+    "Copied the file as rich text": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Datei als formatierter Text kopiert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archivo copiado como texto enriquecido"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fichier copié en texte enrichi"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルをリッチテキストとしてコピーしました"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arquivo copiado como texto formatado"
+          }
+        }
+      }
+    },
+    "Copied the selection as rich text": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auswahl als formatierter Text kopiert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selección copiada como texto enriquecido"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sélection copiée en texte enrichi"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選択範囲をリッチテキストとしてコピーしました"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seleção copiada como texto formatado"
+          }
+        }
+      }
+    },
     "Copied to my-theme.toml, now the theme file in place of %@.": {
       "localizations": {
         "de": {
@@ -9000,6 +9688,41 @@
         }
       }
     },
+    "Copy to:": {
+      "comment": "Echo area prompt for a refile target",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kopieren nach:"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copiar a:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copier vers :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コピー先："
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copiar para:"
+          }
+        }
+      }
+    },
     "Couldn't change the file": {
       "localizations": {
         "de": {
@@ -9168,6 +9891,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Criar Tabela"
+          }
+        }
+      }
+    },
+    "Create new node \"%@\"?": {
+      "comment": "Echo area prompt when refiling to a heading that doesn't exist yet",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neuen Knoten „%@“ anlegen?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Crear el nodo «%@»?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Créer le nœud « %@ » ?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新しいノード「%@」を作成しますか？"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Criar o nó \"%@\"?"
           }
         }
       }
@@ -10715,6 +11473,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Descartar as alterações?"
+          }
+        }
+      }
+    },
+    "Don't Save": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht sichern"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No guardar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ne pas enregistrer"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存しない"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não Salvar"
           }
         }
       }
@@ -12344,6 +13136,41 @@
         }
       }
     },
+    "Execute %@ as Elisp? (%@)": {
+      "comment": "Echo area prompt: the elisp: link's form, then the answers it accepts (yes, no, always), which stay in English",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ als Elisp ausführen? (%2$@)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Ejecutar %1$@ como Elisp? (%2$@)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exécuter %1$@ en Elisp ? (%2$@)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@をElispとして実行しますか？（%2$@）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Executar %1$@ como Elisp? (%2$@)"
+          }
+        }
+      }
+    },
     "Expand": {
       "localizations": {
         "de": {
@@ -12717,6 +13544,211 @@
           "stringUnit": {
             "state": "translated",
             "value": "Exporte e publique em LaTeX, ODT e ASCII sem o Emacs."
+          }
+        }
+      }
+    },
+    "Export canceled": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export abgebrochen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportación cancelada"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportation annulée"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "書き出しをキャンセルしました"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportação cancelada"
+          }
+        }
+      }
+    },
+    "Export commands: body only": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportbefehle: nur Inhalt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comandos de exportación: solo el cuerpo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commandes d'exportation : corps seulement"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "書き出しコマンド：本文のみ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comandos de exportação: só o corpo"
+          }
+        }
+      }
+    },
+    "Export commands: subtree at the caret": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportbefehle: Teilbaum an der Einfügemarke"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comandos de exportación: subárbol en el punto de inserción"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commandes d'exportation : sous-arbre au point d'insertion"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "書き出しコマンド：キャレット位置のサブツリー"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comandos de exportação: subárvore no cursor"
+          }
+        }
+      }
+    },
+    "Export commands: whole document": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportbefehle: ganzes Dokument"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comandos de exportación: documento completo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commandes d'exportation : document entier"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "書き出しコマンド：ドキュメント全体"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comandos de exportação: documento inteiro"
+          }
+        }
+      }
+    },
+    "Export commands: whole file": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportbefehle: ganze Datei"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comandos de exportación: archivo completo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commandes d'exportation : fichier entier"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "書き出しコマンド：ファイル全体"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comandos de exportação: arquivo inteiro"
+          }
+        }
+      }
+    },
+    "Export done.": {
+      "comment": "Echo area after Export Table to File, as org-table-export says",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export abgeschlossen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportación terminada."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportation terminée."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "書き出しが完了しました。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportação concluída."
           }
         }
       }
@@ -13175,6 +14207,142 @@
         }
       }
     },
+    "Exported %lld agenda files to %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld Agenda-Dateien nach %2$@ exportiert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld archivos de agenda exportados a %2$@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld fichiers d'agenda exportés vers %2$@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld個のアジェンダファイルを%2$@に書き出しました"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld arquivos de agenda exportados para %2$@"
+          }
+        }
+      }
+    },
+    "Exported %lld agenda files to iCalendar": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Agenda-Dateien nach iCalendar exportiert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld archivos de agenda exportados a iCalendar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld fichiers d'agenda exportés en iCalendar"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld個のアジェンダファイルをiCalendarに書き出しました"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld arquivos de agenda exportados para iCalendar"
+          }
+        }
+      }
+    },
+    "Exporting to PDF…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export als PDF …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportando a PDF…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportation en PDF…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PDFに書き出し中…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportando para PDF…"
+          }
+        }
+      }
+    },
+    "Exporting with Emacs…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export mit Emacs …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportando con Emacs…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportation avec Emacs…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Emacsで書き出し中…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportando com o Emacs…"
+          }
+        }
+      }
+    },
     "Export…": {
       "comment": "Command title",
       "localizations": {
@@ -13278,6 +14446,41 @@
         }
       }
     },
+    "File is not part of any known project": {
+      "comment": "Echo area for Publish Current File, as org-publish says",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Datei gehört zu keinem bekannten Projekt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El archivo no forma parte de ningún proyecto conocido"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le fichier ne fait partie d'aucun projet connu"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルはどの既知のプロジェクトにも含まれていません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O arquivo não faz parte de nenhum projeto conhecido"
+          }
+        }
+      }
+    },
     "File names and the words of headings and their text.": {
       "localizations": {
         "de": {
@@ -13308,6 +14511,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nomes de arquivo e as palavras dos cabeçalhos e do seu texto."
+          }
+        }
+      }
+    },
+    "File not written: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Datei nicht geschrieben: %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archivo no escrito: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fichier non écrit : %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルを書き込めませんでした：%@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arquivo não gravado: %@"
           }
         }
       }
@@ -14893,6 +16130,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ir para uma data (j)"
+          }
+        }
+      }
+    },
+    "Goto:": {
+      "comment": "Echo area prompt for a refile target to go to",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gehe zu:"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ir a:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aller à :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移動先："
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ir para:"
           }
         }
       }
@@ -17044,6 +18316,41 @@
         }
       }
     },
+    "Invalid target location": {
+      "comment": "Echo area: a refile target that doesn't exist",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ungültiges Ziel"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Destino no válido"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Destination non valide"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無効な移動先です"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Destino inválido"
+          }
+        }
+      }
+    },
     "It isn't in one of your folders. Grant access to it to continue.": {
       "comment": "Alert for a folder outside the sidebar's folders",
       "localizations": {
@@ -17315,6 +18622,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Manter o orgstar na barra de menus"
+          }
+        }
+      }
+    },
+    "Keymap reloaded": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tastenbelegung neu geladen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mapa de teclas recargado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raccourcis rechargés"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キーマップを再読み込みしました"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mapa de teclas recarregado"
           }
         }
       }
@@ -21457,6 +22798,40 @@
         }
       }
     },
+    "No [[publish]] projects in config.toml": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine [[publish]]-Projekte in config.toml"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay proyectos [[publish]] en config.toml"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun projet [[publish]] dans config.toml"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "config.tomlに[[publish]]プロジェクトがありません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum projeto [[publish]] no config.toml"
+          }
+        }
+      }
+    },
     "No agenda files": {
       "localizations": {
         "de": {
@@ -21555,6 +22930,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nenhum buffer"
+          }
+        }
+      }
+    },
+    "No buffers are open": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Puffer geöffnet"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay búferes abiertos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun tampon ouvert"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開いているバッファはありません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum buffer aberto"
           }
         }
       }
@@ -21725,6 +23134,75 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nenhuma entrada"
+          }
+        }
+      }
+    },
+    "No file %@": {
+      "comment": "Echo area: a file typed at a prompt that doesn't exist",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Datei %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No existe el archivo %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun fichier %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイル%@はありません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum arquivo %@"
+          }
+        }
+      }
+    },
+    "No file is open": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Datei geöffnet"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay ningún archivo abierto"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun fichier ouvert"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルが開かれていません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum arquivo aberto"
           }
         }
       }
@@ -22002,6 +23480,40 @@
         }
       }
     },
+    "No method for storing a link from this buffer": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aus diesem Puffer kann kein Link gespeichert werden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede guardar un enlace desde este búfer"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d'enregistrer un lien depuis ce tampon"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このバッファからリンクを保存できません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível guardar um link deste buffer"
+          }
+        }
+      }
+    },
     "No notes match": {
       "localizations": {
         "de": {
@@ -22134,6 +23646,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nenhum registro recente"
+          }
+        }
+      }
+    },
+    "No table at point": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Tabelle an der Einfügemarke"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay ninguna tabla en el punto de inserción"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun tableau au point d'insertion"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キャレット位置に表がありません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhuma tabela no cursor"
           }
         }
       }
@@ -22308,6 +23854,74 @@
         }
       }
     },
+    "Not an encrypted entry": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kein verschlüsselter Eintrag"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No es una entrada cifrada"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce n'est pas une entrée chiffrée"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暗号化されたエントリではありません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é uma entrada criptografada"
+          }
+        }
+      }
+    },
+    "Not an org file": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Org-Datei"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No es un archivo Org"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce n'est pas un fichier Org"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orgファイルではありません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é um arquivo Org"
+          }
+        }
+      }
+    },
     "Not clocked in": {
       "localizations": {
         "de": {
@@ -22478,6 +24092,108 @@
         }
       }
     },
+    "Not in a subtree": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht in einem Teilbaum"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No está en un subárbol"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pas dans un sous-arbre"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サブツリー内ではありません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fora de uma subárvore"
+          }
+        }
+      }
+    },
+    "Not recalculated": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht neu berechnet"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha recalculado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non recalculé"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "再計算しませんでした"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não recalculado"
+          }
+        }
+      }
+    },
+    "Not run": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht ausgeführt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha ejecutado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non exécuté"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "実行しませんでした"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não executado"
+          }
+        }
+      }
+    },
     "Notes": {
       "localizations": {
         "de": {
@@ -22508,6 +24224,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Notas"
+          }
+        }
+      }
+    },
+    "Nothing is running": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Es läuft nichts"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay nada en ejecución"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien n'est en cours"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "実行中の処理はありません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada em execução"
           }
         }
       }
@@ -24055,6 +25805,40 @@
         }
       }
     },
+    "Passphrase forgotten for %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passphrase für %@ vergessen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frase de contraseña olvidada para %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phrase secrète oubliée pour %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@のパスフレーズを消去しました"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frase secreta esquecida para %@"
+          }
+        }
+      }
+    },
     "Paste Subtree": {
       "comment": "Command title",
       "localizations": {
@@ -24398,6 +26182,40 @@
         }
       }
     },
+    "Plot written to %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diagramm nach %@ geschrieben"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gráfico escrito en %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Graphique écrit dans %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "グラフを%@に書き出しました"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gráfico gravado em %@"
+          }
+        }
+      }
+    },
     "Plots": {
       "localizations": {
         "de": {
@@ -24428,6 +26246,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Gráficos"
+          }
+        }
+      }
+    },
+    "Plotting with gnuplot…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diagramm mit gnuplot …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dibujando con gnuplot…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tracé avec gnuplot…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "gnuplotで描画中…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plotando com o gnuplot…"
           }
         }
       }
@@ -25471,6 +27323,109 @@
         }
       }
     },
+    "Publish project:": {
+      "comment": "Echo area prompt",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Projekt veröffentlichen:"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Publicar el proyecto:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Publier le projet :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "公開するプロジェクト："
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Publicar projeto:"
+          }
+        }
+      }
+    },
+    "Published %lld files": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Dateien veröffentlicht"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld archivos publicados"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld fichiers publiés"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld個のファイルを公開しました"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld arquivos publicados"
+          }
+        }
+      }
+    },
+    "Published %lld files, %lld up to date": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld Dateien veröffentlicht, %2$lld aktuell"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld archivos publicados, %2$lld al día"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld fichiers publiés, %2$lld à jour"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld個のファイルを公開しました（%2$lld個は最新）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld arquivos publicados, %2$lld atualizados"
+          }
+        }
+      }
+    },
     "Quick Open…": {
       "comment": "Command title",
       "localizations": {
@@ -25709,6 +27664,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Avaliar na App Store"
+          }
+        }
+      }
+    },
+    "Read-only": {
+      "comment": "Modeline: the file can't be saved",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schreibgeschützt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solo lectura"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lecture seule"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "読み出し専用"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Somente leitura"
           }
         }
       }
@@ -26123,6 +28113,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Refazer"
+          }
+        }
+      }
+    },
+    "Refile to:": {
+      "comment": "Echo area prompt for a refile target",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verschieben nach:"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reubicar en:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reclasser vers :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移動先："
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Realocar em:"
           }
         }
       }
@@ -27433,6 +29458,40 @@
         }
       }
     },
+    "Reverted to the file on disk": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf die Datei auf der Festplatte zurückgesetzt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se ha vuelto al archivo del disco"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rétabli à partir du fichier sur le disque"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ディスク上のファイルに戻しました"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revertido para o arquivo no disco"
+          }
+        }
+      }
+    },
     "Right Option": {
       "localizations": {
         "de": {
@@ -27600,6 +29659,75 @@
           "stringUnit": {
             "state": "translated",
             "value": "Executar comando"
+          }
+        }
+      }
+    },
+    "Run this %@ block? (%@)": {
+      "comment": "Echo area prompt: the block's language, then the answers it accepts (yes, no, always), which stay in English",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diesen %1$@-Block ausführen? (%2$@)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Ejecutar este bloque de %1$@? (%2$@)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exécuter ce bloc %1$@ ? (%2$@)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この%1$@ブロックを実行しますか？（%2$@）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Executar este bloco de %1$@? (%2$@)"
+          }
+        }
+      }
+    },
+    "Running %@ block… (⌘. to cancel)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@-Block wird ausgeführt … (⌘. zum Abbrechen)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecutando el bloque de %@… (⌘. para cancelar)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exécution du bloc %@… (⌘. pour annuler)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ブロックを実行中…（⌘.でキャンセル）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Executando bloco de %@… (⌘. para cancelar)"
           }
         }
       }
@@ -27944,6 +30072,108 @@
           "stringUnit": {
             "state": "translated",
             "value": "Salvar como Visualização…"
+          }
+        }
+      }
+    },
+    "Save changes to %@?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Änderungen an „%@“ sichern?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Guardar los cambios en «%@»?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer les modifications de « %@ » ?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”への変更を保存しますか？"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salvar as alterações em \"%@\"?"
+          }
+        }
+      }
+    },
+    "Save changes to %lld files?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Änderungen an %lld Dateien sichern?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Guardar los cambios en %lld archivos?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer les modifications de %lld fichiers ?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld個のファイルへの変更を保存しますか？"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salvar as alterações em %lld arquivos?"
+          }
+        }
+      }
+    },
+    "Save changes to this file?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Änderungen an dieser Datei sichern?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Guardar los cambios en este archivo?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer les modifications de ce fichier ?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このファイルへの変更を保存しますか？"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salvar as alterações neste arquivo?"
           }
         }
       }
@@ -28595,6 +30825,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Seleção (count-words-region)"
+          }
+        }
+      }
+    },
+    "Selection: %@": {
+      "comment": "Modeline word count menu: the selection's words and characters",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auswahl: %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selección: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sélection : %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選択範囲：%@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seleção: %@"
           }
         }
       }
@@ -32185,6 +34450,41 @@
         }
       }
     },
+    "Switch to buffer:": {
+      "comment": "Echo area prompt",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zu Puffer wechseln:"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambiar al búfer:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Basculer vers le tampon :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "切り替えるバッファ："
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mudar para o buffer:"
+          }
+        }
+      }
+    },
     "Sync Attachments": {
       "comment": "Command title",
       "localizations": {
@@ -33453,6 +35753,40 @@
         }
       }
     },
+    "The clipboard is empty": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Zwischenablage ist leer"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El portapapeles está vacío"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le presse-papiers est vide"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クリップボードは空です"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A área de transferência está vazia"
+          }
+        }
+      }
+    },
     "The empty folder is removed from disk and from orgstar.": {
       "localizations": {
         "de": {
@@ -33517,6 +35851,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "A pasta vazia é removida."
+          }
+        }
+      }
+    },
+    "The entry is encrypted already": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Eintrag ist bereits verschlüsselt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La entrada ya está cifrada"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'entrée est déjà chiffrée"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このエントリはすでに暗号化されています"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A entrada já está criptografada"
           }
         }
       }
@@ -34135,6 +36503,41 @@
         }
       }
     },
+    "This Week": {
+      "comment": "Inspector: clocked time this week",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Woche"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta semana"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette semaine"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今週"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta Semana"
+          }
+        }
+      }
+    },
     "This calc block can't be calculated here: %@.": {
       "comment": "A calc block orgstar can't calculate",
       "localizations": {
@@ -34341,6 +36744,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "As fórmulas desta tabela não podem ser calculadas aqui: %@."
+          }
+        }
+      }
+    },
+    "This table's formulas run Lisp and source blocks. Run them? (yes, no)": {
+      "comment": "Echo area prompt; the answers yes and no stay in English",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Formeln dieser Tabelle führen Lisp und Quellblöcke aus. Ausführen? (yes, no)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las fórmulas de esta tabla ejecutan Lisp y bloques de código. ¿Ejecutarlas? (yes, no)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les formules de ce tableau exécutent du Lisp et des blocs de code. Les exécuter ? (yes, no)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この表の数式はLispとソースブロックを実行します。実行しますか？（yes, no）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As fórmulas desta tabela executam Lisp e blocos de código. Executá-las? (yes, no)"
+          }
+        }
+      }
+    },
+    "This table's formulas run Lisp. Run them? (yes, no, always)": {
+      "comment": "Echo area prompt; the answers yes, no and always stay in English",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Formeln dieser Tabelle führen Lisp aus. Ausführen? (yes, no, always)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las fórmulas de esta tabla ejecutan Lisp. ¿Ejecutarlas? (yes, no, always)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les formules de ce tableau exécutent du Lisp. Les exécuter ? (yes, no, always)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この表の数式はLispを実行します。実行しますか？（yes, no, always）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As fórmulas desta tabela executam Lisp. Executá-las? (yes, no, always)"
           }
         }
       }
@@ -37026,6 +39499,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Seus modelos de captura, no app, no menu Compartilhar, nos widgets e no relógio."
+          }
+        }
+      }
+    },
+    "Your changes will be lost if you don't save them.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Änderungen gehen verloren, wenn du sie nicht sicherst."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Si no guardas los cambios, se perderán."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vos modifications seront perdues si vous ne les enregistrez pas."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存しないと変更内容は失われます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suas alterações serão perdidas se você não as salvar."
           }
         }
       }
@@ -39758,6 +42265,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "O orgstar o guarda com o modelo na próxima vez que você o abrir."
+          }
+        }
+      }
+    },
+    "orgstar handles org-protocol capture and store-link": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar verarbeitet die org-protocol-Aktionen capture und store-link"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar gestiona las acciones capture y store-link de org-protocol"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar prend en charge les actions capture et store-link d'org-protocol"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstarが扱うorg-protocolはcaptureとstore-linkです"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O orgstar trata as ações capture e store-link do org-protocol"
           }
         }
       }

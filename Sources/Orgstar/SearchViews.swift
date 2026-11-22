@@ -15,7 +15,7 @@ struct SearchResults: View {
                 open(location)
             } label: {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(location.title.isEmpty ? "(untitled)" : location.title).lineLimit(1)
+                    Text(location.title.isEmpty ? String(localized: "(untitled)") : location.title).lineLimit(1)
                     if let snippet = location.snippet {
                         Text(snippet.attributed).font(.callout).foregroundStyle(.secondary).lineLimit(3)
                     }

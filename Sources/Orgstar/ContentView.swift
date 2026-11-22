@@ -338,7 +338,7 @@ struct ContentView: View {
             saveBuffers()
             // Syncthing's conflict copies of the file.
             let copies = session.syncConflictCopies().count
-            if copies > 0 { commands.show("\(copies) sync conflict \(copies == 1 ? "copy" : "copies") of this file; Resolve Sync Conflicts compares them.") }
+            if copies > 0 { commands.show(String(localized: "\(copies) sync conflict copies of this file; Resolve Sync Conflicts compares them.")) }
         }
         .onChange(of: session.openPaths) { _, paths in
             saveBuffers()
@@ -479,7 +479,7 @@ struct ContentView: View {
         }
         .onChange(of: ConfigSync.shared.problems, initial: true) { _, problems in
             if let first = problems.first {
-                commands.show(first + (problems.count > 1 ? " (and \(problems.count - 1) more)" : ""))
+                commands.show(problems.count > 1 ? String(localized: "\(first) (and \(problems.count - 1) more)") : first)
             }
         }
         .onChange(of: ConfigSync.shared.changedFile?.serial) {
@@ -588,7 +588,7 @@ struct ContentView: View {
     /// The selection, or the whole file without one, on the clipboard as HTML, RTF and plain
     /// text, to paste formatted into mail and documents.
     private func copyRichText() {
-        guard let path = session.path, let whole = session.document?.text, let editor = commands.editor else { return commands.show("No file is open") }
+        guard let path = session.path, let whole = session.document?.text, let editor = commands.editor else { return commands.show(String(localized: "No file is open")) }
         let defaults = Preferences.orgSettings.resolvingSetupFiles(in: whole, path: path, read: OrgSettings.readFile)
         let selection = editor.context().selection.first { !$0.isEmpty }
         let selected = selection.map { (whole as NSString).substring(with: NSRange($0)) }
@@ -599,7 +599,7 @@ struct ContentView: View {
         )
         do {
             try RichTextExport.copy(html: html, directory: url.deletingLastPathComponent())
-            commands.show(selected == nil ? "Copied the file as rich text" : "Copied the selection as rich text")
+            commands.show(selected == nil ? String(localized: "Copied the file as rich text") : String(localized: "Copied the selection as rich text"))
         } catch {
             commands.show("\(error)")
         }
@@ -627,7 +627,7 @@ struct ContentView: View {
         if let feature = ProFeature.required(byExport: format), !ProAccess.shared.allows(feature) { return }
         if format == "icalendar-agenda" || format == "icalendar-combined" { return exportAgendaCalendars(combined: format == "icalendar-combined") }
         guard let path = session.path, var text = session.document?.text else {
-            commands.show("No file is open")
+            commands.show(String(localized: "No file is open"))
             return
         }
         guard readsIncludes(text, path: path) else { return }
@@ -638,7 +638,7 @@ struct ContentView: View {
         let caret = commands.editor?.context().caret ?? 0
         let whole = text
         if subtree {
-            guard let narrowed = ExportScope.subtree(text, at: caret, settings: defaults) else { return commands.show("Not in a subtree") }
+            guard let narrowed = ExportScope.subtree(text, at: caret, settings: defaults) else { return commands.show(String(localized: "Not in a subtree")) }
             text = narrowed
         }
         switch format {
@@ -651,7 +651,7 @@ struct ContentView: View {
                 commands.show(ExportSettings.exported(target.lastPathComponent, subtree: subtree, bodyOnly: bodyOnly))
                 if open { NSWorkspace.shared.open(target) }
             } catch {
-                commands.show("Can't export: \(error.localizedDescription)")
+                commands.show(String(localized: "Can't export: \(error.localizedDescription)"))
             }
         case "html", "html-open", "markdown":
             let name = ExportScope.fileName(whole, subtreeAt: subtree ? caret : nil, settings: defaults)
@@ -668,7 +668,7 @@ struct ContentView: View {
                 commands.show(ExportSettings.exported(target.lastPathComponent, subtree: subtree, bodyOnly: bodyOnly))
                 if open { NSWorkspace.shared.open(target) }
             } catch {
-                commands.show("Can't write \(target.lastPathComponent): \(error.localizedDescription)")
+                commands.show(String(localized: "Can't write \(target.lastPathComponent): \(error.localizedDescription)"))
             }
         case "latex" where exportNative("LaTeX", extension: "tex", whole: whole, url: url, to: destination, open: open, subtree: subtree ? caret : nil, bodyOnly: bodyOnly, settings: defaults, export: {
             try LaTeXExport.document(text, settings: defaults, path: path, bodyOnly: bodyOnly, author: NSFullUserName(), language: OrgPreferences.exportLanguage(), file: true)
@@ -690,7 +690,7 @@ struct ContentView: View {
                 commands.show(ExportSettings.exported(target.lastPathComponent, subtree: subtree, bodyOnly: bodyOnly))
                 if open { NSWorkspace.shared.open(target) }
             } catch {
-                commands.show("Can't export \(target.lastPathComponent): \(error.localizedDescription)")
+                commands.show(String(localized: "Can't export \(target.lastPathComponent): \(error.localizedDescription)"))
             }
         case "print-pdf", "docx", "rtf", "plain-text":
             let ext = ["print-pdf": "pdf", "plain-text": "txt"][format] ?? format
@@ -703,7 +703,7 @@ struct ContentView: View {
             let directory = url.deletingLastPathComponent()
             // Images that can't be read are left out, so offer access to them first.
             _ = reach(PDFExport.imageFiles(html, directory: directory).filter(WorkspaceModel.isThere))
-            if format == "print-pdf" { commands.show("Exporting to PDF…") }
+            if format == "print-pdf" { commands.show(String(localized: "Exporting to PDF…")) }
             Task {
                 do {
                     let data: Data
@@ -718,14 +718,14 @@ struct ContentView: View {
                     commands.show(ExportSettings.exported(target.lastPathComponent, subtree: subtree, bodyOnly: bodyOnly))
                     if open { NSWorkspace.shared.open(target) }
                 } catch {
-                    commands.show("Can't export \(target.lastPathComponent): \(error)")
+                    commands.show(String(localized: "Can't export \(target.lastPathComponent): \(String(describing: error))"))
                 }
             }
         default:
             #if !APPSTORE
             let functions = ["pdf": "org-latex-export-to-pdf", "latex": "org-latex-export-to-latex", "text": "org-ascii-export-to-ascii"]
             guard let function = functions[format] else { return }
-            commands.show("Exporting with Emacs…")
+            commands.show(String(localized: "Exporting with Emacs…"))
             commands.runInEmacs {
                 do {
                     // Emacs narrows to the subtree and reads EXPORT_FILE_NAME itself.
@@ -741,7 +741,7 @@ struct ContentView: View {
                     commands.show(ExportSettings.exported(written.lastPathComponent, subtree: subtree, bodyOnly: bodyOnly))
                     if open { NSWorkspace.shared.open(written) }
                 } catch is CancellationError {
-                    commands.show("Export canceled")
+                    commands.show(String(localized: "Export canceled"))
                 } catch {
                     commands.show("\(error)")
                 }
@@ -766,7 +766,7 @@ struct ContentView: View {
             #if !APPSTORE
             if EmacsRunner.executable() != nil { return false }
             #endif
-            commands.show("Can't export to \(format): \(error.localizedDescription)")
+            commands.show(String(localized: "Can't export to \(format): \(error.localizedDescription)"))
             return true
         }
         let name = ExportScope.fileName(whole, subtreeAt: subtree, settings: settings)
@@ -777,7 +777,7 @@ struct ContentView: View {
             commands.show(ExportSettings.exported(target.lastPathComponent, subtree: subtree != nil, bodyOnly: bodyOnly))
             if open { NSWorkspace.shared.open(target) }
         } catch {
-            commands.show("Can't write \(target.lastPathComponent): \(error.localizedDescription)")
+            commands.show(String(localized: "Can't write \(target.lastPathComponent): \(error.localizedDescription)"))
         }
         return true
     }
@@ -861,34 +861,34 @@ struct ContentView: View {
             let options = OrgPreferences.icalendarOptions()
             if combined {
                 let url = try ICalendarFiles.combine(paths, to: OrgPreferences.icalendarCombinedFile(), options: options, read: read)
-                commands.show("Exported \(paths.count) agenda files to \(url.lastPathComponent)")
+                commands.show(String(localized: "Exported \(paths.count) agenda files to \(url.lastPathComponent)"))
             } else {
                 let written = try ICalendarFiles.exportEach(paths, options: options, read: read)
-                commands.show("Exported \(written.count) agenda files to iCalendar")
+                commands.show(String(localized: "Exported \(written.count) agenda files to iCalendar"))
             }
         } catch {
-            commands.show("Can't export: \(error.localizedDescription)")
+            commands.show(String(localized: "Can't export: \(error.localizedDescription)"))
         }
     }
 
     /// org-crypt's commands at the caret, through the passphrase sheet.
     private func crypt(_ id: String) {
-        guard let editor = commands.editor, let path = session.path else { return commands.show("No file is open") }
+        guard let editor = commands.editor, let path = session.path else { return commands.show(String(localized: "No file is open")) }
         let caret = editor.context().caret
         let text = editor.context().text
         switch id {
         case "app.crypt.forget-passphrase":
             CryptPassphrases.forget(path)
-            commands.show("Passphrase forgotten for \((path as NSString).lastPathComponent)")
+            commands.show(String(localized: "Passphrase forgotten for \((path as NSString).lastPathComponent)"))
         case "app.crypt.encrypt-entries":
             panel = .crypt(UUID(), CryptRequest(mode: .encryptAll(tag: OrgPreferences.cryptTag()), path: path, offset: caret))
         default:
-            guard OrgCrypt.heading(text, at: caret) != nil else { return commands.show("Before first headline") }
+            guard OrgCrypt.heading(text, at: caret) != nil else { return commands.show(String(localized: "Before first headline")) }
             if id == "app.crypt.encrypt-entry" {
-                guard OrgCrypt.encryptedRange(text, at: caret) == nil else { return commands.show("The entry is encrypted already") }
+                guard OrgCrypt.encryptedRange(text, at: caret) == nil else { return commands.show(String(localized: "The entry is encrypted already")) }
                 panel = .crypt(UUID(), CryptRequest(mode: .encrypt, path: path, offset: caret))
             } else {
-                guard OrgCrypt.encryptedRange(text, at: caret) != nil else { return commands.show("Not an encrypted entry") }
+                guard OrgCrypt.encryptedRange(text, at: caret) != nil else { return commands.show(String(localized: "Not an encrypted entry")) }
                 panel = .crypt(UUID(), CryptRequest(mode: id == "app.crypt.open-entry" ? .open : .decryptInPlace, path: path, offset: caret))
             }
         }
@@ -902,7 +902,7 @@ struct ContentView: View {
             show: { [commands] in commands.show($0) }, ask: { [commands] in commands.ask($0, reply: $1) },
             open: { [commands] path, offset in commands.jump(path: path, offset: offset) },
             insertLink: { [commands] link, title in
-                guard let editor = commands.editor else { return commands.show("No file is open") }
+                guard let editor = commands.editor else { return commands.show(String(localized: "No file is open")) }
                 let context = editor.context()
                 let range = context.selection.first ?? context.caret..<context.caret
                 let selected = (context.text as NSString).substring(with: NSRange(range))
@@ -989,14 +989,14 @@ struct ContentView: View {
     /// `org-plot/gnuplot` for the table at the caret: through gnuplot when it's installed, as
     /// Emacs runs it, else drawn here; written to `file:` when the options name one, else shown.
     private func plotTable() {
-        guard let editor = commands.editor, let path = session.path else { return commands.show("No file is open") }
+        guard let editor = commands.editor, let path = session.path else { return commands.show(String(localized: "No file is open")) }
         let context = editor.context()
         let plot: TablePlot.Plot
         do { plot = try TablePlot.plot(context.text, at: context.caret) } catch { return commands.show("\(error)") }
         let directory = URL(fileURLWithPath: path).deletingLastPathComponent()
         #if !APPSTORE
         if let gnuplot = PlotOutput.gnuplot {
-            commands.show("Plotting with gnuplot…")
+            commands.show(String(localized: "Plotting with gnuplot…"))
             Task {
                 do {
                     let image = try await PlotOutput.runGnuplot(plot, directory: directory, gnuplot: gnuplot)
@@ -1025,7 +1025,7 @@ struct ContentView: View {
 
     /// The image is where `file:` says; a link to it shows it again.
     private func plotWritten(_ url: URL, editor: OrgEditor, note: String? = nil) {
-        commands.show("Plot written to \(url.lastPathComponent)" + (note.map { ". " + $0 } ?? ""))
+        commands.show(String(localized: "Plot written to \(url.lastPathComponent)") + (note.map { ". " + $0 } ?? ""))
         if editor.showsImages { editor.refreshImages() }
     }
 
@@ -1035,7 +1035,7 @@ struct ContentView: View {
         let config = (try? String(contentsOf: UserConfig.file("config.toml"), encoding: .utf8)) ?? ""
         let loaded = Publish.projects(fromConfig: config, root: workspace.rootPaths.first)
         if let problem = loaded.problems.first { commands.show(problem) }
-        guard !loaded.projects.isEmpty else { return commands.show("No [[publish]] projects in config.toml") }
+        guard !loaded.projects.isEmpty else { return commands.show(String(localized: "No [[publish]] projects in config.toml")) }
         let read = { (path: String) -> String? in
             session.openDocuments.first { $0.path == path }?.document.text ?? (try? String(contentsOfFile: path, encoding: .utf8))
         }
@@ -1048,7 +1048,8 @@ struct ContentView: View {
                 let report = try Publish.publish(chosen, all: loaded.projects, only: only, read: read) { function, text, path, bodyOnly in
                     try Publish.export(function, text: text, path: path, bodyOnly: bodyOnly, settings: Preferences.orgSettings, codeStyle: codeStyle)
                 }
-                commands.show("Published \(report.published.count) files" + (report.skipped.isEmpty ? "" : ", \(report.skipped.count) up to date"))
+                commands.show(report.skipped.isEmpty ? String(localized: "Published \(report.published.count) files")
+                    : String(localized: "Published \(report.published.count) files, \(report.skipped.count) up to date"))
             } catch {
                 commands.show("\(error)")
             }
@@ -1058,14 +1059,14 @@ struct ContentView: View {
         case "app.publish.all":
             run(loaded.projects)
         case "app.publish.current-file":
-            guard let path = session.path, !current.isEmpty else { return commands.show("File is not part of any known project") }
+            guard let path = session.path, !current.isEmpty else { return commands.show(String(localized: "File is not part of any known project")) }
             run([current[0]], only: path)
         case "app.publish.current-project":
-            guard !current.isEmpty else { return commands.show("File is not part of any known project") }
+            guard !current.isEmpty else { return commands.show(String(localized: "File is not part of any known project")) }
             run([current[0]])
         default:
             let names = loaded.projects.map(\.name)
-            commands.ask(Prompt(key: "project", message: "Publish project:", choices: names)) { answer in
+            commands.ask(Prompt(key: "project", message: String(localized: "Publish project:"), choices: names)) { answer in
                 guard let answer, let project = loaded.projects.first(where: { $0.name == answer }) else { return }
                 run([project])
             }
@@ -1128,14 +1129,14 @@ struct ContentView: View {
             guard lisp, let path = session.path, let text = session.document?.text else { return run() }
             let content = (text as NSString).substring(with: NSRange(location: table.lowerBound, length: min((text as NSString).length, table.upperBound + 2000) - table.lowerBound))
             if !blocks, trust.isTrusted(path: path, content: content) { return run() }
-            let message = blocks ? "This table's formulas run Lisp and source blocks. Run them? (yes, no)" : "This table's formulas run Lisp. Run them? (yes, no, always)"
+            let message = blocks ? String(localized: "This table's formulas run Lisp and source blocks. Run them? (yes, no)") : String(localized: "This table's formulas run Lisp. Run them? (yes, no, always)")
             commands.ask(Prompt(key: "confirm", message: message, choices: blocks ? ["yes", "no"] : ["yes", "no", "always"])) { answer in
                 switch answer {
                 case "always":
                     trust.trust(path: path, content: content)
                     run()
                 case "yes": run()
-                default: commands.show("Not recalculated")
+                default: commands.show(String(localized: "Not recalculated"))
                 }
             }
         #endif
@@ -1143,19 +1144,19 @@ struct ContentView: View {
             guard ProAccess.shared.allows(.babel) else { return }
             let run = {
                 guard reach(session.resultFile(of: job).map { [$0] } ?? []) else { return }
-                commands.show("Running \(job.language) block… (⌘. to cancel)")
+                commands.show(String(localized: "Running \(job.language) block… (⌘. to cancel)"))
                 session.startBabel(job) { commands.show($0) }
             }
             guard let path = session.path else { return }
             if !job.alwaysAsk, trust.isTrusted(path: path, content: job.blockText) { return run() }
             let choices = job.alwaysAsk ? ["yes", "no"] : ["yes", "no", "always"]
-            commands.ask(Prompt(key: "confirm", message: "Run this \(job.language) block? (\(choices.joined(separator: ", ")))", choices: choices)) { answer in
+            commands.ask(Prompt(key: "confirm", message: String(localized: "Run this \(job.language) block? (\(choices.joined(separator: ", ")))"), choices: choices)) { answer in
                 switch answer {
                 case "always":
                     trust.trust(path: path, content: job.blockText)
                     run()
                 case "yes": run()
-                default: commands.show("Not run")
+                default: commands.show(String(localized: "Not run"))
                 }
             }
         }
@@ -1167,13 +1168,13 @@ struct ContentView: View {
         let content = "elisp:" + form
         if let path = session.path, trust.isTrusted(path: path, content: content) { return run() }
         let choices = session.path == nil ? ["yes", "no"] : ["yes", "no", "always"]
-        commands.ask(Prompt(key: "confirm", message: "Execute \(form) as Elisp? (\(choices.joined(separator: ", ")))", choices: choices)) { answer in
+        commands.ask(Prompt(key: "confirm", message: String(localized: "Execute \(form) as Elisp? (\(choices.joined(separator: ", ")))"), choices: choices)) { answer in
             switch answer {
             case "always":
                 if let path = session.path { trust.trust(path: path, content: content) }
                 run()
             case "yes": run()
-            default: commands.show("Not run")
+            default: commands.show(String(localized: "Not run"))
             }
         }
     }
@@ -1247,8 +1248,7 @@ struct ContentView: View {
         commands.keymap = loaded.keymap
         commands.modal = preset.isModal
         if let first = loaded.problems.first {
-            let more = loaded.problems.count > 1 ? " (and \(loaded.problems.count - 1) more)" : ""
-            commands.show("keymap.toml: \(first)\(more)")
+            commands.show("keymap.toml: " + (loaded.problems.count > 1 ? String(localized: "\(first) (and \(loaded.problems.count - 1) more)") : first))
         }
     }
 
@@ -1256,8 +1256,8 @@ struct ContentView: View {
     private func switchBuffer() {
         let paths = session.recentPaths.dropFirst() + session.recentPaths.prefix(1)
         let labels = paths.map(session.bufferName)
-        guard !labels.isEmpty else { return commands.show("No buffers are open") }
-        commands.ask(Prompt(key: "buffer", message: "Switch to buffer:", choices: labels)) { answer in
+        guard !labels.isEmpty else { return commands.show(String(localized: "No buffers are open")) }
+        commands.ask(Prompt(key: "buffer", message: String(localized: "Switch to buffer:"), choices: labels)) { answer in
             guard let answer, let index = labels.firstIndex(of: answer) else { return }
             session.open(Array(paths)[index])
         }
@@ -1272,7 +1272,7 @@ struct ContentView: View {
         if let feature = ProFeature.required(byCommand: id), !ProAccess.shared.allows(feature) { return }
         let orgOnly = ["app.refile", "app.refile.copy", "app.archive", "app.clock.in", "app.clock.default", "app.copy-rich-text", "app.export-subtree", "app.export-body-only"].contains(id) || (id.hasPrefix("app.export.") && !id.hasPrefix("app.export.icalendar-")) || id.hasPrefix("org.")
         if orgOnly, !session.isOrg {
-            commands.show("Not an org file")
+            commands.show(String(localized: "Not an org file"))
             return
         }
         switch id {
@@ -1303,7 +1303,7 @@ struct ContentView: View {
         case "app.split-below": paneWindow?.split(.vertical)
         case "app.split-right": paneWindow?.split(.horizontal)
         case "app.pane-close":
-            guard let window = paneWindow, window.paneCount > 1 else { return commands.show("Attempt to delete the only pane") }
+            guard let window = paneWindow, window.paneCount > 1 else { return commands.show(String(localized: "Attempt to delete the only pane")) }
             commands.store.releasePane(window.focused)
             window.close(window.focused)
             focusPane(window)
@@ -1323,7 +1323,7 @@ struct ContentView: View {
             } else if let task = commands.emacsTask {
                 task.cancel()
             } else {
-                commands.show("Nothing is running")
+                commands.show(String(localized: "Nothing is running"))
             }
         case "app.toggle-outline": toggleOutline()
         case "app.toggle-backlinks": backlinksShown.toggle()
@@ -1338,11 +1338,11 @@ struct ContentView: View {
         case "app.search": commands.focusSearch = true
         case "app.reload-keymap":
             loadKeymap()
-            commands.show("Keymap reloaded")
+            commands.show(String(localized: "Keymap reloaded"))
         case "app.refile", "app.refile.copy":
             let keep = id == "app.refile.copy"
             let targets = workspace.refileTargets(openPath: session.path, document: session.document)
-            commands.ask(Prompt(key: "refile", message: keep ? "Copy to:" : "Refile to:", choices: targets.map(\.label))) { answer in
+            commands.ask(Prompt(key: "refile", message: keep ? String(localized: "Copy to:") : String(localized: "Refile to:"), choices: targets.map(\.label))) { answer in
                 guard let answer else { return }
                 if let target = targets.first(where: { $0.label == answer }) {
                     if let message = session.refile(to: target, keep: keep) { commands.show(message) }
@@ -1350,7 +1350,7 @@ struct ContentView: View {
                 }
                 // `org-refile-allow-creating-parent-nodes`: `parent/new` adds the heading first.
                 let creating = OrgPreferences.refileSettings().creating
-                guard creating != .no, let (parent, child) = RefileSettings.newNode(answer, in: targets) else { return commands.show("Invalid target location") }
+                guard creating != .no, let (parent, child) = RefileSettings.newNode(answer, in: targets) else { return commands.show(String(localized: "Invalid target location")) }
                 let create = {
                     switch session.createRefileChild(under: parent, title: child) {
                     case .success(let target): if let message = session.refile(to: target, keep: keep) { commands.show(message) }
@@ -1358,14 +1358,14 @@ struct ContentView: View {
                     }
                 }
                 guard creating == .confirm else { return create() }
-                commands.ask(Prompt(key: "confirm", message: "Create new node \"\(child)\"?", choices: ["yes", "no"])) { reply in
+                commands.ask(Prompt(key: "confirm", message: String(localized: "Create new node \"\(child)\"?"), choices: ["yes", "no"])) { reply in
                     if reply == "yes" { create() }
                 }
             }
         case "app.refile.goto":
             // `C-u C-c C-w`: the target heading, or the end of a file.
             let targets = workspace.refileTargets(openPath: session.path, document: session.document)
-            commands.ask(Prompt(key: "refile", message: "Goto:", choices: targets.map(\.label))) { answer in
+            commands.ask(Prompt(key: "refile", message: String(localized: "Goto:"), choices: targets.map(\.label))) { answer in
                 guard let answer, let target = targets.first(where: { $0.label == answer }) else { return }
                 commands.jump(path: target.path, offset: target.start ?? Int.max)
             }
@@ -1374,34 +1374,34 @@ struct ContentView: View {
             if let message = session.archive() { commands.show(message) }
         case "app.table-import":
             // `org-table-import`: a TSV, CSV or space-separated file becomes a table at point.
-            guard let editor = commands.editor else { return commands.show("No file is open") }
+            guard let editor = commands.editor else { return commands.show(String(localized: "No file is open")) }
             let panel = NSOpenPanel()
             panel.allowedContentTypes = [.commaSeparatedText, .tabSeparatedText, .plainText]
             guard panel.runModal() == .OK, let url = panel.url else { return }
-            guard let contents = try? String(contentsOf: url, encoding: .utf8) else { return commands.show("Can't read \(url.lastPathComponent)") }
+            guard let contents = try? String(contentsOf: url, encoding: .utf8) else { return commands.show(String(localized: "Can't read \(url.lastPathComponent)")) }
             editor.perform(ImportTable(contents: contents))
         case "app.table-export":
             // `org-table-export`: CSV for a .csv name, else TSV.
-            guard let editor = commands.editor else { return commands.show("No file is open") }
+            guard let editor = commands.editor else { return commands.show(String(localized: "No file is open")) }
             let context = editor.context()
-            guard ImportTable.exportText(context.text, at: context.caret, path: "") != nil else { return commands.show("No table at point") }
+            guard ImportTable.exportText(context.text, at: context.caret, path: "") != nil else { return commands.show(String(localized: "No table at point")) }
             let panel = NSSavePanel()
             panel.nameFieldStringValue = "table.csv"
             guard panel.runModal() == .OK, let url = panel.url,
                   let text = ImportTable.exportText(context.text, at: context.caret, path: url.path) else { return }
             do {
                 try text.write(to: url, atomically: true, encoding: .utf8)
-                commands.show("Export done.")
+                commands.show(String(localized: "Export done."))
             } catch {
-                commands.show("File not written: \(error.localizedDescription)")
+                commands.show(String(localized: "File not written: \(error.localizedDescription)"))
             }
         case "org.subtree.paste":
-            guard let text = NSPasteboard.general.string(forType: .string) else { return commands.show("The clipboard is empty") }
+            guard let text = NSPasteboard.general.string(forType: .string) else { return commands.show(String(localized: "The clipboard is empty")) }
             commands.editor?.perform(PasteSubtree(text: text))
         case "org.link.insert":
             commands.editor?.perform(InsertLink(stored: commands.storedLinks, file: session.path))
         case "org.link.store":
-            guard let editor = commands.editor, let path = session.path else { return commands.show("No method for storing a link from this buffer") }
+            guard let editor = commands.editor, let path = session.path else { return commands.show(String(localized: "No method for storing a link from this buffer")) }
             let context = editor.context()
             let denote = OrgPreferences.usesDenote() ? Links.storeDenote(in: context, path: path) : nil
             commands.storeLink(denote ?? Links.store(in: context, path: Links.abbreviate(path, home: OrgPaths.home)))
@@ -1452,29 +1452,29 @@ struct ContentView: View {
             openWindow(id: "capture")
         case "app.revert":
             // `:e`: the file as it is on disk; unsaved changes go to recovery.
-            guard session.path != nil else { return commands.show("No file is open") }
+            guard session.path != nil else { return commands.show(String(localized: "No file is open")) }
             session.useDiskVersion()
-            commands.show("Reverted to the file on disk")
+            commands.show(String(localized: "Reverted to the file on disk"))
         case "app.sync-conflicts":
-            guard session.path != nil else { return commands.show("No file is open") }
+            guard session.path != nil else { return commands.show(String(localized: "No file is open")) }
             panel = .syncCopies(UUID())
         case "app.recovery":
-            guard session.path != nil else { return commands.show("No file is open") }
+            guard session.path != nil else { return commands.show(String(localized: "No file is open")) }
             panel = .recovery(UUID())
         case "app.copy-rich-text":
             copyRichText()
         case "app.export-dialog":
-            guard let path = session.path else { return commands.show("No file is open") }
+            guard let path = session.path else { return commands.show(String(localized: "No file is open")) }
             panel = .export(UUID(), URL(fileURLWithPath: path))
         case "app.export-subtree", "app.export-body-only":
-            guard let path = session.path else { return commands.show("No file is open") }
+            guard let path = session.path else { return commands.show(String(localized: "No file is open")) }
             var settings = ExportSettings.saved(for: path)
             if id == "app.export-subtree" {
                 settings.subtree.toggle()
-                commands.show(settings.subtree ? "Export commands: subtree at the caret" : "Export commands: whole file")
+                commands.show(settings.subtree ? String(localized: "Export commands: subtree at the caret") : String(localized: "Export commands: whole file"))
             } else {
                 settings.bodyOnly.toggle()
-                commands.show(settings.bodyOnly ? "Export commands: body only" : "Export commands: whole document")
+                commands.show(settings.bodyOnly ? String(localized: "Export commands: body only") : String(localized: "Export commands: whole document"))
             }
             settings.save(for: path)
         case let id where id.hasPrefix("app.export."):
@@ -1495,7 +1495,7 @@ struct ContentView: View {
         case let id where id.hasPrefix("app.dailies.") || id.hasPrefix("app.node."):
             roamActions.run(id)
         default:
-            if let editor = commands.editor { editor.run(id) } else { commands.show("No file is open") }
+            if let editor = commands.editor { editor.run(id) } else { commands.show(String(localized: "No file is open")) }
         }
     }
 

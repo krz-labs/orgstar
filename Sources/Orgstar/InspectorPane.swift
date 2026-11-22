@@ -15,8 +15,28 @@ struct InspectorPane: View {
     @State private var columns: ColumnView.View?
     @State private var clocked: [(start: Int, heading: String, minutes: Int)] = []
 
-    enum Tab: String, CaseIterable { case columns = "Columns", clock = "Clock" }
-    enum Span: String, CaseIterable { case today = "Today", week = "This Week", all = "All" }
+    enum Tab: String, CaseIterable {
+        case columns = "Columns", clock = "Clock"
+
+        var title: LocalizedStringKey {
+            switch self {
+            case .columns: "Columns"
+            case .clock: "Clock"
+            }
+        }
+    }
+
+    enum Span: String, CaseIterable {
+        case today = "Today", week = "This Week", all = "All"
+
+        var title: LocalizedStringKey {
+            switch self {
+            case .today: "Today"
+            case .week: "This Week"
+            case .all: "All"
+            }
+        }
+    }
 
     private struct Key: Equatable {
         var shown: Bool
@@ -33,7 +53,7 @@ struct InspectorPane: View {
     var body: some View {
         VStack(spacing: 0) {
             Picker("", selection: $tab) {
-                ForEach(Tab.allCases, id: \.self) { Text($0.rawValue) }
+                ForEach(Tab.allCases, id: \.self) { Text($0.title) }
             }
             .pickerStyle(.segmented)
             .labelsHidden()
@@ -94,7 +114,7 @@ struct InspectorPane: View {
     @ViewBuilder
     private var clockView: some View {
         Picker("Span", selection: $span) {
-            ForEach(Span.allCases, id: \.self) { Text($0.rawValue) }
+            ForEach(Span.allCases, id: \.self) { Text($0.title) }
         }
         .pickerStyle(.segmented)
         .padding(.horizontal, 8)
@@ -105,7 +125,7 @@ struct InspectorPane: View {
             List {
                 ForEach(clocked, id: \.start) { entry in
                     HStack {
-                        Text(entry.heading.isEmpty ? "(untitled)" : entry.heading).lineLimit(1)
+                        Text(entry.heading.isEmpty ? String(localized: "(untitled)") : entry.heading).lineLimit(1)
                         Spacer()
                         Text(ClockReport.hours(entry.minutes)).monospacedDigit()
                     }

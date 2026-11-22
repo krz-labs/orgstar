@@ -165,7 +165,7 @@ final class AppCommands {
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(link, forType: .string)
         case nil:
-            show("orgstar handles org-protocol capture and store-link")
+            show(String(localized: "orgstar handles org-protocol capture and store-link"))
         }
     }
 
@@ -289,11 +289,12 @@ enum UnsavedChanges {
         guard session.isDirty else { return true }
         if session.saveMode == .automatic { return session.save() }
         let alert = NSAlert()
-        alert.messageText = "Save changes to \(session.path.map { ($0 as NSString).lastPathComponent } ?? "this file")?"
-        alert.informativeText = "Your changes will be lost if you don't save them."
-        alert.addButton(withTitle: "Save")
-        alert.addButton(withTitle: "Don't Save")
-        alert.addButton(withTitle: "Cancel")
+        alert.messageText = session.path.map { String(localized: "Save changes to \(($0 as NSString).lastPathComponent)?") }
+            ?? String(localized: "Save changes to this file?")
+        alert.informativeText = String(localized: "Your changes will be lost if you don't save them.")
+        alert.addButton(withTitle: String(localized: "Save"))
+        alert.addButton(withTitle: String(localized: "Don't Save"))
+        alert.addButton(withTitle: String(localized: "Cancel"))
         switch alert.runModal() {
         case .alertFirstButtonReturn: return session.save()
         case .alertSecondButtonReturn: return true
@@ -309,11 +310,11 @@ enum UnsavedChanges {
         if session.saveMode == .automatic { return dirty.map(session.save).allSatisfy { $0 } }
         if dirty == [session.path] { return resolve(session) }
         let alert = NSAlert()
-        alert.messageText = "Save changes to \(dirty.count) files?"
+        alert.messageText = String(localized: "Save changes to \(dirty.count) files?")
         alert.informativeText = dirty.map { ($0 as NSString).lastPathComponent }.joined(separator: ", ")
-        alert.addButton(withTitle: "Save All")
-        alert.addButton(withTitle: "Don't Save")
-        alert.addButton(withTitle: "Cancel")
+        alert.addButton(withTitle: String(localized: "Save All"))
+        alert.addButton(withTitle: String(localized: "Don't Save"))
+        alert.addButton(withTitle: String(localized: "Cancel"))
         switch alert.runModal() {
         case .alertFirstButtonReturn: return dirty.map(session.save).allSatisfy { $0 }
         case .alertSecondButtonReturn: return true

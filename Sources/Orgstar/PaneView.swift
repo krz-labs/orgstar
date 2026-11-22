@@ -117,7 +117,7 @@ struct PaneView: NSViewRepresentable {
             guard commands?.reach([target]) ?? false else { return }
             #endif
             guard FileManager.default.fileExists(atPath: target) else {
-                commands?.show("No file \(typed)")
+                commands?.show(String(localized: "No file \(typed)"))
                 return
             }
             session?.open(target)

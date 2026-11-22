@@ -56,10 +56,10 @@ struct ModeLine: View {
                 Menu {
                     Text(TextStats.summary(words: words, characters: characters))
                     if selection.length > 0, let region = region(text, selection) {
-                        Text("Selection: " + TextStats.summary(words: region.words, characters: region.characters))
+                        Text(String(localized: "Selection: \(TextStats.summary(words: region.words, characters: region.characters))"))
                     }
                 } label: {
-                    Text("\(words.formatted()) \(words == 1 ? "word" : "words")")
+                    Text("\(words) words")
                 }
                 .menuStyle(.borderlessButton)
                 .menuIndicator(.hidden)
@@ -129,7 +129,7 @@ struct ModeLine: View {
         var path: [String] = []
         var current = outline.lastIndex { $0.start <= offset }
         while let i = current {
-            path.insert(outline[i].title.isEmpty ? "(untitled)" : outline[i].title, at: 0)
+            path.insert(outline[i].title.isEmpty ? String(localized: "(untitled)") : outline[i].title, at: 0)
             current = outline[i].parent
         }
         return path
@@ -145,9 +145,9 @@ struct ModeLine: View {
     private var encodingNotes: [String] {
         guard let document = session.document else { return [] }
         var notes: [String] = []
-        if session.isReadOnly { notes.append("Read-only") }
-        if document.source.hasBOM { notes.append("BOM") }
-        if crlf { notes.append("CRLF") }
+        if session.isReadOnly { notes.append(String(localized: "Read-only")) }
+        if document.source.hasBOM { notes.append(String(localized: "BOM", comment: "Modeline: the file starts with a byte order mark")) }
+        if crlf { notes.append(String(localized: "CRLF", comment: "Modeline: the file has Windows line endings")) }
         return notes
     }
 }
