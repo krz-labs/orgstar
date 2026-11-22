@@ -159,6 +159,9 @@ scripts/build-app.sh
 
 Your settings live in =~/.config/orgstar/= and survive rebuilds.
 
+After an update that has notes, orgstar shows what changed once, the next time it opens. Help ▸
+What's New in orgstar shows them again, in both versions.
+
 * Uninstalling
 
 Delete =orgstar.app=, or run =brew uninstall --cask orgstar=. To remove your settings as

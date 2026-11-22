@@ -3761,6 +3761,40 @@
         }
       }
     },
+    "Archive subtrees, publish projects, show calendars in the agenda, copy rich text, and resolve idle clock time.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Teilbäume archivieren, Projekte veröffentlichen, Kalender in der Agenda anzeigen, formatierten Text kopieren und Leerlaufzeit der Zeiterfassung klären."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archiva subárboles, publica proyectos, muestra calendarios en la agenda, copia texto con formato y resuelve el tiempo inactivo del registro de tiempo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archivez des sous-arbres, publiez des projets, affichez les calendriers dans l'agenda, copiez du texte enrichi et traitez le temps d'inactivité du chronométrage."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サブツリーのアーカイブ、プロジェクトの公開、アジェンダでのカレンダー表示、リッチテキストのコピー、クロックのアイドル時間の処理ができます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arquive subárvores, publique projetos, mostre calendários na agenda, copie texto formatado e resolva o tempo ocioso do registro de tempo."
+          }
+        }
+      }
+    },
     "Archive this entry?": {
       "localizations": {
         "de": {
@@ -7587,6 +7621,40 @@
         }
       }
     },
+    "Code blocks that run in orgstar": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Codeblöcke, die in orgstar laufen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bloques de código que se ejecutan en orgstar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Des blocs de code qui s'exécutent dans orgstar"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar内で実行されるコードブロック"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blocos de código que rodam no orgstar"
+          }
+        }
+      }
+    },
     "Collapse": {
       "localizations": {
         "de": {
@@ -10968,6 +11036,40 @@
     "Emacs": {
       "shouldTranslate": false
     },
+    "Emacs Lisp, JavaScript, calc and sqlite blocks run without any other program installed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Emacs-Lisp-, JavaScript-, calc- und sqlite-Blöcke laufen, ohne dass ein anderes Programm installiert ist."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los bloques de Emacs Lisp, JavaScript, calc y sqlite se ejecutan sin ningún otro programa instalado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les blocs Emacs Lisp, JavaScript, calc et sqlite s'exécutent sans aucun autre programme installé."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Emacs Lisp、JavaScript、calc、sqliteのブロックは、ほかのプログラムをインストールしなくても実行できます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blocos de Emacs Lisp, JavaScript, calc e sqlite rodam sem nenhum outro programa instalado."
+          }
+        }
+      }
+    },
     "Emacs hides emphasis markers (org-hide-emphasis-markers)": {
       "localizations": {
         "de": {
@@ -12027,6 +12129,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Exportar Tabela para Arquivo…"
+          }
+        }
+      }
+    },
+    "Export and publish to LaTeX, ODT and ASCII without Emacs.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportiere und veröffentliche als LaTeX, ODT und ASCII ohne Emacs."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exporta y publica en LaTeX, ODT y ASCII sin Emacs."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportez et publiez en LaTeX, ODT et ASCII sans Emacs."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EmacsなしでLaTeX、ODT、ASCIIに書き出しと公開ができます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exporte e publique em LaTeX, ODT e ASCII sem o Emacs."
           }
         }
       }
@@ -16495,6 +16631,40 @@
         }
       }
     },
+    "LaTeX, OpenDocument and plain text export": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export als LaTeX, OpenDocument und reiner Text"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportación a LaTeX, OpenDocument y texto sin formato"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export en LaTeX, OpenDocument et texte brut"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LaTeX、OpenDocument、プレーンテキストへの書き出し"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportação para LaTeX, OpenDocument e texto simples"
+          }
+        }
+      }
+    },
     "Last Buffer": {
       "comment": "Command title",
       "localizations": {
@@ -17868,6 +18038,40 @@
         }
       }
     },
+    "Math in PDFs": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mathematik in PDFs"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fórmulas matemáticas en PDF"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mathématiques dans les PDF"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PDFの数式"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fórmulas matemáticas em PDFs"
+          }
+        }
+      }
+    },
     "Merge": {
       "localizations": {
         "de": {
@@ -18068,6 +18272,108 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mais"
+          }
+        }
+      }
+    },
+    "More Calc and Lisp formulas, date arithmetic and org-sbe are worked out without Emacs.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehr Calc- und Lisp-Formeln, Datumsberechnungen und org-sbe werden ohne Emacs berechnet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más fórmulas de Calc y Lisp, cálculos con fechas y org-sbe se resuelven sin Emacs."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Davantage de formules Calc et Lisp, les calculs de dates et org-sbe sont évalués sans Emacs."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "より多くのCalcとLispの数式、日付の計算、org-sbeをEmacsなしで計算します。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mais fórmulas de Calc e Lisp, cálculos com datas e org-sbe são resolvidos sem o Emacs."
+          }
+        }
+      }
+    },
+    "More from the Mac app": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehr aus der Mac-App"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más de la app para Mac"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plus de fonctions de l'app Mac"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac Appの機能を追加"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mais do app para Mac"
+          }
+        }
+      }
+    },
+    "More table formulas": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehr Tabellenformeln"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más fórmulas de tabla"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plus de formules de tableau"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "より多くの表の数式"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mais fórmulas de tabela"
           }
         }
       }
@@ -22066,6 +22372,40 @@
     "P": {
       "shouldTranslate": false
     },
+    "PDF export typesets math without a network connection.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der PDF-Export setzt Formeln ohne Netzwerkverbindung."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La exportación a PDF compone las fórmulas sin conexión de red."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'export PDF compose les formules sans connexion réseau."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PDFの書き出しで、ネットワーク接続なしに数式を組版します。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A exportação para PDF compõe as fórmulas sem conexão de rede."
+          }
+        }
+      }
+    },
     "Page numbers": {
       "localizations": {
         "de": {
@@ -22541,6 +22881,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tabela como Gráfico"
+          }
+        }
+      }
+    },
+    "Plots": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diagramme"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gráficas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Graphiques"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "グラフ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gráficos"
           }
         }
       }
@@ -23650,6 +24024,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Encerrar o orgstar"
+          }
+        }
+      }
+    },
+    "Radar plots, more of gnuplot's set options, and SVG files without gnuplot.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Netzdiagramme, mehr von gnuplots set-Optionen und SVG-Dateien ohne gnuplot."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gráficas de radar, más opciones set de gnuplot y archivos SVG sin gnuplot."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Graphiques en radar, davantage d'options set de gnuplot et fichiers SVG sans gnuplot."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "レーダーチャート、gnuplotのsetオプションの追加対応、gnuplotなしでのSVGファイル。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gráficos de radar, mais opções set do gnuplot e arquivos SVG sem o gnuplot."
           }
         }
       }
@@ -33526,6 +33934,108 @@
           "stringUnit": {
             "state": "translated",
             "value": "O que a agenda mostra"
+          }
+        }
+      }
+    },
+    "What's New": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neue Funktionen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Novedades"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nouveautés"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新機能"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Novidades"
+          }
+        }
+      }
+    },
+    "What's New in orgstar": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neu in orgstar"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Novedades de orgstar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nouveautés d'orgstar"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstarの新機能"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Novidades do orgstar"
+          }
+        }
+      }
+    },
+    "What's New in orgstar %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neu in orgstar %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Novedades de orgstar %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nouveautés d'orgstar %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar %@の新機能"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Novidades do orgstar %@"
           }
         }
       }

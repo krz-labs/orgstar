@@ -325,6 +325,7 @@ struct ContentView: View {
             clock.remindAtEffort(session)
             commands.knownTags = { [index = workspace.index] in (try? index.tags()) ?? [] }
             commands.mainWindowOpen = true
+            commands.whatsNew = WhatsNew.pending(firstLaunch: noFolders && !welcomeShown)
             if noFolders, !welcomeShown {
                 welcomeShown = true
                 commands.showingWelcome = true
@@ -379,6 +380,7 @@ struct ContentView: View {
                 DispatchQueue.main.async { commands.showingFolderPicker = true }
             }, open: { selectedFile = $0 })
         }
+        .sheet(item: $commands.whatsNew) { WhatsNewView(notes: $0) }
         .sheet(isPresented: $commands.showingPalette) {
             PaletteView(commands: commands) { id in
                 commands.showingPalette = false

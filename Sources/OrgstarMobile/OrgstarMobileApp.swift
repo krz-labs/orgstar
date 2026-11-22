@@ -130,6 +130,7 @@ struct RootView: View {
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage(OnboardingScreen.doneKey) private var onboarded = false
     @State private var onboarding = false
+    @State private var whatsNew: ReleaseNotes?
 
     private var session: DocumentSession { model.session }
 
@@ -210,6 +211,7 @@ struct RootView: View {
         // Until a folder is added there is nothing for the agenda to show.
         .onAppear {
             if workspace.rootPaths.isEmpty { tab = .folders }
+            whatsNew = WhatsNew.pending(firstLaunch: !onboarded)
             // First launch only; a workspace from before onboarding existed skips it.
             guard !onboarded else { return }
             if workspace.rootPaths.isEmpty, ProcessInfo.processInfo.environment["ORGSTAR_ROOT"] == nil {
@@ -228,6 +230,7 @@ struct RootView: View {
             }
             .interactiveDismissDisabled()
         }
+        .sheet(item: $whatsNew) { WhatsNewView(notes: $0) }
         .sheet(item: Bindable(ProAccess.shared).paywall) { ProSheet(feature: $0) }
         .onChange(of: ProAccess.shared.isUnlocked) {
             // Calendar and Reminders in the agenda, the widgets and the watch follow Pro.

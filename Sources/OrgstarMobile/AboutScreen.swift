@@ -1,4 +1,5 @@
 #if os(iOS)
+import OrgApp
 import SwiftUI
 import UIKit
 
@@ -6,6 +7,7 @@ import UIKit
 struct AboutScreen: View {
     /// The app icon in use, as `AppIcons` names it.
     let appIcon: String
+    @State private var whatsNew: ReleaseNotes?
 
     static let supportEmail = "help@krz.sh"
 
@@ -38,7 +40,10 @@ struct AboutScreen: View {
             }
             Section {
                 link("Manual", "book", Self.site)
-                link("Release Notes", "sparkles", "https://apps.apple.com/app/id6821552018")
+                if let notes = WhatsNew.releases.first {
+                    Button { whatsNew = notes } label: { Label("What's New", systemImage: "sparkles") }
+                }
+                link("Release Notes", "list.bullet.rectangle", "https://apps.apple.com/app/id6821552018")
                 link("Website", "globe", "https://krz.sh/apps/orgstar")
             }
             Section {
@@ -57,6 +62,7 @@ struct AboutScreen: View {
             }
         }
         .navigationTitle("About")
+        .sheet(item: $whatsNew) { WhatsNewView(notes: $0) }
         .navigationBarTitleDisplayMode(.inline)
     }
 

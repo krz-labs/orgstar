@@ -18,6 +18,8 @@ final class AppCommands {
     var showingFolderPicker = false
     /// The first-launch sheet, while no folder has been added.
     var showingWelcome = false
+    /// The notes the main window shows as a sheet.
+    var whatsNew: ReleaseNotes?
     var focusSearch = false
     var showingConflict = false
     var showingPalette = false
@@ -573,6 +575,10 @@ struct OrgstarApp: App {
                 CheckForUpdatesItem(updates: delegate.updates)
             }
             #endif
+            CommandGroup(before: .help) {
+                Button("What's New in orgstar") { commands.whatsNew = WhatsNew.releases.first }
+                    .disabled(!commands.mainWindowOpen)
+            }
         }
         Settings {
             #if APPSTORE
