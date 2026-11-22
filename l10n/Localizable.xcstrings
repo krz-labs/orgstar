@@ -28426,6 +28426,40 @@
         }
       }
     },
+    "Show Agenda": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agenda anzeigen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar agenda"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher l'agenda"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アジェンダを表示"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar Agenda"
+          }
+        }
+      }
+    },
     "Show Agenda or Files in Sidebar": {
       "localizations": {
         "de": {
@@ -28594,6 +28628,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mostrar Tema Padrão"
+          }
+        }
+      }
+    },
+    "Show Files": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dateien anzeigen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar archivos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher les fichiers"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルを表示"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar Arquivos"
           }
         }
       }
@@ -29661,6 +29729,74 @@
         }
       }
     },
+    "Show the agenda": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agenda anzeigen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar la agenda"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher l'agenda"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アジェンダを表示"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar a agenda"
+          }
+        }
+      }
+    },
+    "Show the files": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dateien anzeigen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar los archivos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher les fichiers"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルを表示"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar os arquivos"
+          }
+        }
+      }
+    },
     "Show the outline (⌥⌘O)": {
       "localizations": {
         "de": {
@@ -29795,40 +29931,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Encolher ou Expandir Coluna da Tabela"
-          }
-        }
-      }
-    },
-    "Sidebar": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Seitenleiste"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Barra lateral"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Barre latérale"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "サイドバー"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Barra Lateral"
           }
         }
       }
@@ -31900,40 +32002,6 @@
         }
       }
     },
-    "The Agenda button at the top of the sidebar shows your agenda, or a view from views.toml, beside the editor.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Die Taste „Agenda“ oben in der Seitenleiste zeigt deine Agenda oder eine Ansicht aus views.toml neben dem Editor."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "El botón Agenda en la parte superior de la barra lateral muestra tu agenda, o una vista de views.toml, junto al editor."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Le bouton Agenda en haut de la barre latérale affiche votre agenda, ou une vue de views.toml, à côté de l'éditeur."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "サイドバー上部のアジェンダボタンで、アジェンダまたはviews.tomlのビューをエディタの横に表示します。"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "O botão Agenda no topo da barra lateral mostra sua agenda, ou uma visualização do views.toml, ao lado do editor."
-          }
-        }
-      }
-    },
     "The App Store can't be reached right now.": {
       "localizations": {
         "de": {
@@ -32134,6 +32202,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "A visualização da agenda mostrada aqui; adicione visualizações em views.toml"
+          }
+        }
+      }
+    },
+    "The calendar button under the sidebar shows your agenda, or a view from views.toml, beside the editor.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Kalendertaste unter der Seitenleiste zeigt deine Agenda oder eine Ansicht aus views.toml neben dem Editor."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El botón de calendario bajo la barra lateral muestra tu agenda, o una vista de views.toml, junto al editor."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le bouton calendrier sous la barre latérale affiche votre agenda, ou une vue de views.toml, à côté de l'éditeur."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サイドバー下のカレンダーボタンで、アジェンダまたはviews.tomlのビューをエディタの横に表示します。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O botão de calendário sob a barra lateral mostra sua agenda, ou uma visualização do views.toml, ao lado do editor."
           }
         }
       }

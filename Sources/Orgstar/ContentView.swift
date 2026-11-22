@@ -247,20 +247,10 @@ struct ContentView: View {
         NavigationSplitView {
             Group {
                 if sidebarAgenda {
-                    AgendaSidebar(workspace: workspace, session: session, commands: commands, hour: hour)
+                    AgendaSidebar(workspace: workspace, session: session, commands: commands, hour: hour, showsAgenda: $sidebarAgenda)
                 } else {
-                    Sidebar(workspace: workspace, session: session, selection: $selectedFile) { commands.showingFolderPicker = true }
+                    Sidebar(workspace: workspace, session: session, selection: $selectedFile, showsAgenda: $sidebarAgenda) { commands.showingFolderPicker = true }
                 }
-            }
-            .safeAreaInset(edge: .top, spacing: 0) {
-                Picker("Sidebar", selection: $sidebarAgenda) {
-                    Text("Files").tag(false)
-                    Text("Agenda").tag(true)
-                }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-                .padding(.horizontal, 10)
-                .padding(.bottom, 6)
             }
             .navigationSplitViewColumnWidth(min: 200, ideal: 260)
         } detail: {

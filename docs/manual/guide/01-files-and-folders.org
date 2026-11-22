@@ -36,7 +36,7 @@ Several commands in this chapter are only in the palette, not in a menu: Close O
 | View ▸ Show or Hide Columns and Clock    | =⌥⌘I=    | Show or Hide Columns and Clock   |
 | View ▸ Show Tab Bar                      |          | Show or Hide Tab Bar             |
 
-The toolbar's outline button does the same as View ▸ Show or Hide Outline. The sidebar is shown and hidden with the standard View menu command. Its Files and Agenda buttons switch it between the files and an agenda; see [[file:07-agenda.org][The agenda]].
+The toolbar's outline button does the same as View ▸ Show or Hide Outline. The sidebar is shown and hidden with the standard View menu command. The button at the right of the bar under it switches it between the files and an agenda; see [[file:07-agenda.org][The agenda]].
 
 orgstar remembers whether the outline, backlinks and inspector are shown. The outline pane's visibility is remembered for org files only: for other files it starts hidden each time you open one. Drag the divider on the outline pane's right edge to resize it (160 to 400 points; 220 by default).
 

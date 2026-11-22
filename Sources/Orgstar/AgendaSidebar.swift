@@ -3,7 +3,7 @@ import OrgCore
 import OrgPresentation
 import SwiftUI
 
-/// The sidebar's Agenda tab: the agenda, or one of the named views, as a narrow list beside the
+/// The sidebar's agenda: the agenda, or one of the named views, as a narrow list beside the
 /// editor. A click on an entry shows it in the editor. It follows the Agenda window's span and
 /// files, and shows Calendar events and Reminders only once the Agenda window has asked for them.
 struct AgendaSidebar: View {
@@ -12,6 +12,7 @@ struct AgendaSidebar: View {
     let commands: AppCommands
     /// Changes every hour, so that the day rolls over.
     let hour: Int
+    @Binding var showsAgenda: Bool
     @State private var agenda: AgendaModel
     @State private var views = AgendaViewLoader.builtIn
     @AppStorage("sidebarAgendaView") private var viewName = AgendaViewLoader.builtIn[0].name
@@ -24,11 +25,12 @@ struct AgendaSidebar: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.openWindow) private var openWindow
 
-    init(workspace: WorkspaceModel, session: DocumentSession, commands: AppCommands, hour: Int) {
+    init(workspace: WorkspaceModel, session: DocumentSession, commands: AppCommands, hour: Int, showsAgenda: Binding<Bool>) {
         self.workspace = workspace
         self.session = session
         self.commands = commands
         self.hour = hour
+        _showsAgenda = showsAgenda
         _agenda = State(initialValue: AgendaModel(workspace: workspace))
     }
 
@@ -94,8 +96,10 @@ struct AgendaSidebar: View {
                 }
             }
         }
-        .safeAreaInset(edge: .top, spacing: 0) {
-            HStack {
+        .listStyle(.sidebar)
+        .themedListBackground(theme.color("sidebar-background", in: colorScheme))
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            SidebarBar(showsAgenda: $showsAgenda) {
                 Menu {
                     ForEach(views) { view in Button(view.name) { viewName = view.name } }
                     Divider()
@@ -103,13 +107,9 @@ struct AgendaSidebar: View {
                 } label: {
                     Text(view.name)
                 }
-                .menuStyle(.borderlessButton)
                 .fixedSize()
                 .help("The agenda view shown here; add views in views.toml")
-                Spacer()
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 4)
         }
         .task(id: Key(
             view: viewName, mode: views.first { $0.name == viewName }?.mode, settings: ["\(span)", "\(startOffset)", startOnWeekday, "\(includeSubfolders)", agendaFileList],

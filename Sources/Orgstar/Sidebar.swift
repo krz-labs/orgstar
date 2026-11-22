@@ -8,6 +8,8 @@ struct Sidebar: View {
     let workspace: WorkspaceModel
     let session: DocumentSession
     @Binding var selection: String?
+    /// The sidebar shows the agenda in place of the files.
+    @Binding var showsAgenda: Bool
     var addFolder: () -> Void = {}
     /// Folders shown collapsed, by path, one per line.
     @AppStorage("collapsedFolders") private var collapsedText = ""
@@ -74,7 +76,7 @@ struct Sidebar: View {
         .listStyle(.sidebar)
         .themedListBackground(theme.color("sidebar-background", in: colorScheme))
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            HStack(spacing: 4) {
+            SidebarBar(showsAgenda: $showsAgenda) {
                 Button("Add Folder…", systemImage: "plus", action: addFolder)
                     .help("Add a folder (⇧⌘O)")
                 Menu {
@@ -88,13 +90,8 @@ struct Sidebar: View {
                 .fixedSize()
                 .disabled(workspace.rootPaths.isEmpty)
                 .help("Remove a folder from the sidebar")
-                Spacer()
             }
             .labelStyle(.iconOnly)
-            .buttonStyle(.borderless)
-            .menuStyle(.borderlessButton)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
         }
         .confirmationDialog(
             "Remove “\(removing.map { ($0 as NSString).lastPathComponent } ?? "")” from the sidebar?",
@@ -136,6 +133,31 @@ struct Sidebar: View {
             if type.conforms(to: .text) { return "doc.plaintext" }
             return "doc"
         }
+    }
+}
+
+/// The bar under the sidebar: what the shown side offers, then the button that switches between
+/// the files and the agenda.
+struct SidebarBar<Content: View>: View {
+    @Binding var showsAgenda: Bool
+    @ViewBuilder var content: Content
+    @Environment(\.orgTheme) private var theme
+
+    var body: some View {
+        HStack(spacing: 6) {
+            content
+            Spacer()
+            Button(showsAgenda ? "Show Files" : "Show Agenda", systemImage: showsAgenda ? "folder" : "calendar") { showsAgenda.toggle() }
+                .labelStyle(.iconOnly)
+                .help(showsAgenda ? "Show the files" : "Show the agenda")
+        }
+        .buttonStyle(.borderless)
+        .menuStyle(.borderlessButton)
+        .font(.system(size: 14, weight: .medium))
+        .foregroundStyle(theme.color("sidebar-foreground") ?? .primary)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 7)
+        .overlay(alignment: .top) { Divider() }
     }
 }
 
