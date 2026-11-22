@@ -47,18 +47,27 @@ public enum WhatsNew {
                   "More Calc and Lisp formulas, date arithmetic and org-sbe are worked out without Emacs."),
             .init("chart.xyaxis.line", "Plots",
                   "Radar plots, more of gnuplot's set options, and SVG files without gnuplot."),
+            .init("point.3.connected.trianglepath.dotted", "Diagrams",
+                  "dot and mermaid blocks draw SVG and PNG pictures without Graphviz or mermaid installed."),
             .init("function", "Math in PDFs",
                   "PDF export typesets math without a network connection."),
-        ]),
+        ] + mac),
     ]
 
     #if os(iOS)
     private static let ios = [
         ReleaseNotes.Item("iphone", "More from the Mac app",
                           "Archive subtrees, publish projects, show calendars in the agenda, copy rich text, and resolve idle clock time."),
+        ReleaseNotes.Item("doc.viewfinder", "Scan documents",
+                          "More ▸ Attachments ▸ Scan Document… saves the pages as a PDF and links it at the caret."),
     ]
+    private static let mac: [ReleaseNotes.Item] = []
     #else
     private static let ios: [ReleaseNotes.Item] = []
+    private static let mac = [
+        ReleaseNotes.Item("menubar.rectangle", "orgstar in the menu bar",
+                          "Settings ▸ General ▸ Keep orgstar in the menu bar adds capture, the agenda and today's entries to the menu bar."),
+    ]
     #endif
 
     /// The notes to show at launch: those for `version`, the first time it runs after another

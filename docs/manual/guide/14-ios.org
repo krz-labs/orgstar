@@ -343,7 +343,7 @@ Publishing works from Commands as on the Mac, with the =[[publish]]= projects in
 
 =C-c C-c= on a source block asks whether to run it (yes, no, or always for this block), as on the Mac.
 
-On iOS, only Emacs Lisp, JavaScript, calc and sqlite blocks run. orgstar evaluates Emacs Lisp with its own interpreter, which covers a subset of the language, JavaScript in JavaScriptCore, as =node= would run it, sessions included, calc with its own Calc and sqlite with the SQLite library, as =sqlite3= would; see [[file:11-code-blocks.org][Code blocks]]. Other results:
+On iOS, only Emacs Lisp, JavaScript, calc, sqlite, dot and mermaid blocks run. orgstar evaluates Emacs Lisp with its own interpreter, which covers a subset of the language, JavaScript in JavaScriptCore, as =node= would run it, sessions included, calc with its own Calc, sqlite with the SQLite library, as =sqlite3= would, and dot and mermaid with Graphviz and mermaid built in, as SVG or PNG; see [[file:11-code-blocks.org][Code blocks]]. Other results:
 
 - A block in another language: "/language/ blocks need the Mac to run."
 - Emacs Lisp the interpreter doesn't have: "This block uses Emacs Lisp that runs only in Emacs, on the Mac."
@@ -445,7 +445,7 @@ Quick Look in the Files app shows org files as the HTML export renders them.
 
 * What the Mac has that iOS doesn't
 
-- In the download version: running code blocks in languages other than Emacs Lisp, JavaScript, calc and sqlite, Emacs Lisp beyond orgstar's interpreter, JavaScript that needs node, and tables that need Emacs.
+- In the download version: running code blocks in languages other than Emacs Lisp, JavaScript, calc, sqlite, dot and mermaid, Emacs Lisp beyond orgstar's interpreter, JavaScript that needs node, and tables that need Emacs.
 - In the download version, LaTeX-made PDF export.
 - Idle detection from keyboard and mouse input; iOS uses the time away from the app instead.
 - In the download version, attaching by hard link or symbolic link.

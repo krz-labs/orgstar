@@ -24,6 +24,9 @@ public struct Programs: ProgramRunning {
         case .process where job.language == "sqlite":
             // `sqlite3` when it's installed, as Emacs runs it; the SQLite library otherwise.
             if !BabelRunner.installed("sqlite3"), let output = try SQLiteBlocks.run(job, directory: fileDirectory) { return output }
+        case .process where job.diagram != nil:
+            // `dot` and `mmdc` when they're installed, as Emacs runs them; a web view otherwise.
+            if !BabelRunner.installed(job.language == "dot" ? "dot" : "mmdc"), let output = try await DiagramBlocks.run(job, directory: fileDirectory) { return output }
         case .process:
             break
         case .emacs where job.calc != nil:

@@ -222,6 +222,74 @@
         }
       }
     },
+    "%@ blocks draw only SVG and PNG files in this version of orgstar.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@-Blöcke zeichnen in dieser Version von orgstar nur SVG- und PNG-Dateien."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los bloques de %@ solo dibujan archivos SVG y PNG en esta versión de orgstar."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les blocs %@ ne dessinent que des fichiers SVG et PNG dans cette version d'orgstar."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このバージョンのorgstarでは、%@ブロックはSVGとPNGのファイルのみ描画します。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blocos de %@ só desenham arquivos SVG e PNG nesta versão do orgstar."
+          }
+        }
+      }
+    },
+    "%@ blocks with this :cmdline don't run in this version of orgstar.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@-Blöcke mit diesem :cmdline laufen in dieser Version von orgstar nicht."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los bloques de %@ con este :cmdline no se ejecutan en esta versión de orgstar."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les blocs %@ avec ce :cmdline ne s'exécutent pas dans cette version d'orgstar."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この:cmdlineを持つ%@ブロックは、このバージョンのorgstarでは実行できません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blocos de %@ com este :cmdline não rodam nesta versão do orgstar."
+          }
+        }
+      }
+    },
     "%@ can't run here": {
       "comment": "A command that doesn't apply in column view",
       "localizations": {
@@ -10131,6 +10199,40 @@
         }
       }
     },
+    "Diagrams": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diagramme"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diagramas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diagrammes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ダイアグラム"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diagramas"
+          }
+        }
+      }
+    },
     "Dimmed": {
       "localizations": {
         "de": {
@@ -18480,6 +18582,40 @@
         }
       }
     },
+    "More ▸ Attachments ▸ Scan Document… saves the pages as a PDF and links it at the caret.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehr ▸ Anhänge ▸ Dokument scannen … sichert die Seiten als PDF und verlinkt es an der Einfügemarke."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más ▸ Adjuntos ▸ Escanear documento… guarda las páginas como PDF y lo enlaza en el cursor."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plus ▸ Pièces jointes ▸ Scanner un document… enregistre les pages en PDF et insère le lien au point d'insertion."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "その他 ▸ 添付ファイル ▸ 書類をスキャン…で、ページをPDFとして保存し、キャレット位置にリンクします。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mais ▸ Anexos ▸ Escanear Documento… salva as páginas como PDF e cria o link no cursor."
+          }
+        }
+      }
+    },
     "Move Item Down": {
       "comment": "Command title",
       "localizations": {
@@ -26570,6 +26706,40 @@
         }
       }
     },
+    "Scan documents": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dokumente scannen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escanear documentos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scanner des documents"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "書類をスキャン"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escanear documentos"
+          }
+        }
+      }
+    },
     "Schedule": {
       "comment": "Command title",
       "localizations": {
@@ -27843,6 +28013,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ajustes"
+          }
+        }
+      }
+    },
+    "Settings ▸ General ▸ Keep orgstar in the menu bar adds capture, the agenda and today's entries to the menu bar.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einstellungen ▸ Allgemein ▸ orgstar in der Menüleiste behalten fügt der Menüleiste Erfassen, die Agenda und die heutigen Einträge hinzu."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajustes ▸ General ▸ Mantener orgstar en la barra de menús añade la captura, la agenda y las entradas de hoy a la barra de menús."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages ▸ Général ▸ Garder orgstar dans la barre des menus ajoute la capture, l'agenda et les entrées du jour à la barre des menus."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定 ▸ 一般 ▸ orgstarをメニューバーに常に表示で、キャプチャ、アジェンダ、今日のエントリをメニューバーに追加します。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajustes ▸ Geral ▸ Manter o orgstar na barra de menus adiciona a captura, a agenda e as entradas de hoje à barra de menus."
           }
         }
       }
@@ -35802,6 +36006,40 @@
         }
       }
     },
+    "dot and mermaid blocks draw SVG and PNG pictures without Graphviz or mermaid installed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "dot- und mermaid-Blöcke zeichnen SVG- und PNG-Bilder, ohne dass Graphviz oder mermaid installiert ist."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los bloques dot y mermaid dibujan imágenes SVG y PNG sin tener Graphviz ni mermaid instalados."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les blocs dot et mermaid dessinent des images SVG et PNG sans Graphviz ni mermaid installés."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "dotとmermaidのブロックは、Graphvizやmermaidをインストールしなくても、SVGとPNGの画像を描画します。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blocos dot e mermaid desenham imagens SVG e PNG sem o Graphviz ou o mermaid instalados."
+          }
+        }
+      }
+    },
     "duration size": {
       "localizations": {
         "de": {
@@ -37206,6 +37444,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "O orgstar o guarda com o modelo na próxima vez que você o abrir."
+          }
+        }
+      }
+    },
+    "orgstar in the menu bar": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar in der Menüleiste"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar en la barra de menús"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar dans la barre des menus"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メニューバーのorgstar"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar na barra de menus"
           }
         }
       }

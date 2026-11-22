@@ -16,8 +16,8 @@ There are two versions of the Mac app. Both edit the same files in the same way;
 differ in where they come from, how orgstar+ is bought, and what they can run.
 
 - The Mac App Store version runs in the App Sandbox and starts no other programs. Emacs
-  Lisp blocks run in orgstar's own interpreter, JavaScript blocks in JavaScriptCore, and calc and
-  sqlite blocks built in, as on iOS; other languages, Emacs and gnuplot are not used. orgstar+ is an in-app purchase shared
+  Lisp blocks run in orgstar's own interpreter, JavaScript blocks in JavaScriptCore, and calc,
+  sqlite, dot and mermaid blocks built in, as on iOS; other languages, Emacs and gnuplot are not used. orgstar+ is an in-app purchase shared
   with the iPhone and iPad app.
 - The download version, from Homebrew or files.krz.sh, is signed with a Developer ID and
   notarized. It runs code blocks with the programs installed on the Mac, hands some tables and
@@ -54,8 +54,8 @@ App Store version.
 
 | Feature                    | Mac App Store version                                                         | Download version                                                                                |
 |----------------------------+-------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------|
-| Code blocks                | Emacs Lisp, JavaScript, calc and sqlite, each built in                        | Every language installed; Emacs Lisp in Emacs and JavaScript in node, or built in without them  |
-| Sessions, graphics         | JavaScript sessions; no graphics                                              | Yes                                                                                             |
+| Code blocks                | Emacs Lisp, JavaScript, calc, sqlite, dot and mermaid, each built in          | Every language installed; Emacs Lisp in Emacs and JavaScript in node, or built in without them  |
+| Sessions, graphics         | JavaScript sessions; dot and mermaid as SVG or PNG                            | Yes                                                                                             |
 | Tangling                   | Yes                                                                           | Yes                                                                                             |
 | Table formulas             | Those orgstar computes itself                                                 | The rest in Emacs as well                                                                       |
 | Plots                      | Drawn with Swift Charts, following a subset of gnuplot's =set=                | gnuplot when installed, else Swift Charts                                                       |

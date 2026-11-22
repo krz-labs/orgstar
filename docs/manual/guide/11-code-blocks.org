@@ -96,7 +96,7 @@ On the Mac, orgstar starts each interpreter outside a =:session= through =/bin/s
 | =awk=                                                            | =awk -f=, the program written to a file             |
 | =calc=                                                           | orgstar's Calc, or =emacs -Q --batch=; see below    |
 | =sqlite=                                                         | =sqlite3=, or the SQLite library without it; see below |
-| =dot=, =plantuml=, =mermaid=                                     | =dot=, =plantuml=, =mmdc=; see Graphics below       |
+| =dot=, =plantuml=, =mermaid=                                     | =dot=, =plantuml=, =mmdc=; =dot= and =mermaid= built in without them; see Graphics below |
 | =C=, =C++=, =cpp=, =D=, =java=, =fortran=, =clojure=             | A compiler, or =bb= or =clojure=; see Compiled languages below |
 
 For =js=, =javascript= and =R=, =:cmd= names a different program. Since it runs through =/bin/sh=, a program in =:cmd=, =:python= or =:ruby= can be given with options, such as =:cmd "node --no-warnings"= or =:python "python3 -X utf8"=, or with =~= or a variable, such as =:cmd "~/bin/node"=. =awk= takes =:cmd-line= arguments after its program, and =:in-file= as the file it reads.
@@ -105,7 +105,7 @@ Any other language is refused with "No way to run /language/ blocks yet."
 
 A run that takes longer than five minutes is stopped. Runs in a =:session= have no time limit, except in JavaScriptCore.
 
-The [[file:../install.org][Mac App Store version]] starts no programs, so only Emacs Lisp, JavaScript, calc and sqlite blocks run there; see /In the Mac App Store version/ below.
+The [[file:../install.org][Mac App Store version]] starts no programs, so only Emacs Lisp, JavaScript, calc, sqlite, dot and mermaid blocks run there; see /In the Mac App Store version/ below.
 
 ** JavaScript in JavaScriptCore
 
@@ -685,7 +685,15 @@ Without =sqlite3=, these dot-commands run: =.headers= (=.header=), =.mode= with 
 | =plantuml= | =plantuml -p -t/ext/=, output to the file  |
 | =mermaid=  | =mmdc -i input -o file=                    |
 
-A =plantuml= body without an =@start…= line is wrapped in =@startuml= and =@enduml=. =:cmdline= adds options to the command. The program must be installed and on the =PATH= described under Languages that run.
+A =plantuml= body without an =@start…= line is wrapped in =@startuml= and =@enduml=. =:cmdline= adds options to the command. =plantuml= must be installed and on the =PATH= described under Languages that run.
+
+Without =dot= or =mmdc=, and in the Mac App Store version and on iOS, orgstar draws =dot= and =mermaid= blocks itself, with Graphviz and mermaid built in:
+
+- It writes SVG and PNG files. Another extension fails with "/language/ blocks draw only SVG and PNG files in this version of orgstar."
+- =:cmdline= may hold =-K/engine/= for =dot=, and =-t /theme/= (=--theme=) and =-b /color/= (=--backgroundColor=) for =mermaid=. Anything else fails with "/language/ blocks with this :cmdline don't run in this version of orgstar."
+- A PNG has the size the picture has at 96 dots per inch, on white unless =-b= says otherwise; a mermaid diagram wider than 800 points is scaled down to that, as =mmdc= does.
+- Mermaid labels are drawn as SVG text, not HTML, so line breaks and Markdown in labels can look different from =mmdc='s.
+- The picture comes from the same Graphviz and mermaid code as the programs use, in the versions orgstar ships (Viz.js 3.31.0 and mermaid 12.3.0), so it can differ in detail from an installed program of another version or with other fonts.
 
 #+BEGIN_SRC org
 ,#+begin_src dot :file graph.svg
@@ -797,8 +805,8 @@ Tangling stops, writes nothing and says why when:
 
 * On iOS
 
-- Only Emacs Lisp blocks, in orgstar's own interpreter, JavaScript blocks, in JavaScriptCore (see /JavaScript in JavaScriptCore/ above), and calc and sqlite blocks (see above) run. Any other language, compiled languages included, fails with "/language/ blocks need the Mac to run." (for example "C blocks need the Mac to run."), and so does a block whose =:var= refers to a block in another language.
-- JavaScript blocks can use =:session=. There are no other sessions and no graphics.
+- Only Emacs Lisp blocks, in orgstar's own interpreter, JavaScript blocks, in JavaScriptCore (see /JavaScript in JavaScriptCore/ above), and calc, sqlite, dot and mermaid blocks (see above) run. Any other language, compiled languages included, fails with "/language/ blocks need the Mac to run." (for example "C blocks need the Mac to run."), and so does a block whose =:var= refers to a block in another language.
+- JavaScript blocks can use =:session=. There are no other sessions, and no graphics other than dot and mermaid.
 - The trust prompt works the same way, with its own =trusted.json= on the device.
 - There is no cancel command.
 - Tangling works, for files in folders orgstar can write to.
@@ -808,7 +816,7 @@ See [[file:14-ios.org][iOS]] for the rest of the iOS app.
 
 * In the Mac App Store version
 
-- Only Emacs Lisp blocks, in the same interpreter as on iOS, JavaScript blocks, in JavaScriptCore, and calc and sqlite blocks run. Any other language, compiled languages included, fails with "/language/ blocks don't run in this version of orgstar."
-- JavaScript blocks can use =:session=. There are no other sessions and no graphics.
+- Only Emacs Lisp blocks, in the same interpreter as on iOS, JavaScript blocks, in JavaScriptCore, and calc, sqlite, dot and mermaid blocks run. Any other language, compiled languages included, fails with "/language/ blocks don't run in this version of orgstar."
+- JavaScript blocks can use =:session=. There are no other sessions, and no graphics other than dot and mermaid.
 - The trust prompt works the same way.
 - Tangling works as in the download version, =:shebang= included. A target outside your folders needs access to its folder first: orgstar asks with Grant Access…, as described in [[file:../install.org][Install]]. So does a =:file= result outside them.

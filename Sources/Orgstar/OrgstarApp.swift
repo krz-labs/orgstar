@@ -378,6 +378,8 @@ struct OrgstarApp: App {
 
     init() {
         PDFExport.mathJaxURL = OrgMathJax.script
+        DiagramBlocks.vizURL = OrgMathJax.viz
+        DiagramBlocks.mermaidURL = OrgMathJax.mermaid
         #if APPSTORE
         AgendaSnapshot.useGroupContainer = true
         EmacsFallback.offered = false

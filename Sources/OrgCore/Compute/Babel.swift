@@ -57,6 +57,8 @@ public struct BabelJob: Sendable, Equatable {
     public internal(set) var calc: Babel.CalcBlock?
     /// An sqlite block's `sqlite3` command line, for `SQLiteBlocks`.
     public internal(set) var sqlite: Babel.SQLiteCommand?
+    /// A dot or mermaid block's source, `:file` and `:cmdline`, for drawing it without the program.
+    public internal(set) var diagram: Babel.Diagram?
     /// Files the runner writes, each where its key stands in `input`: `:var` tables as CSV.
     public internal(set) var dataFiles: [String: String] = [:]
 
@@ -577,10 +579,12 @@ public enum Babel {
             finish.file = file
             finish.writesFile = true
             finish.params = params.results.filter { !["table", "scalar", "verbatim", "list", "vector"].contains($0) } + (params.results.contains("file") ? [] : ["file"])
-            return .success(BabelJob(
+            var job = BabelJob(
                 language: language, runner: .process(executable: "/bin/sh", arguments: ["-c", command]),
                 input: input, directory: dir, block: location, blockText: blockText, alwaysAsk: alwaysAsk, finish: finish
-            ))
+            )
+            if language != "plantuml" { job.diagram = Diagram(source: body, file: file, cmdline: params.single[":cmdline"]) }
+            return .success(job)
         }
         if compiled {
             do {
@@ -660,6 +664,13 @@ public enum Babel {
 
     public enum Failure: Error, Equatable {
         case message(String)
+    }
+
+    /// A dot or mermaid block: what to draw, and the file to draw it into.
+    public struct Diagram: Sendable, Equatable {
+        public let source: String
+        public let file: String
+        public let cmdline: String?
     }
 
 }

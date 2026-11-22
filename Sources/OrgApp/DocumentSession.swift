@@ -933,6 +933,9 @@ public final class DocumentSession {
             #if canImport(SQLite3)
             if let output = try SQLiteBlocks.run(job, directory: directory) { return output }
             #endif
+            #if canImport(WebKit)
+            if let output = try await DiagramBlocks.run(job, directory: directory) { return output }
+            #endif
             guard let output = try Babel.evaluateNatively(job) else {
                 #if os(macOS)
                 throw Babel.Failure.message(job.lispForm == nil
