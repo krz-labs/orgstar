@@ -51,12 +51,12 @@ extension GateTests {
     }
 
     /// One pass of the backlinks pane: the file's backlinks and the heading's.
-    static func backlinks(_ model: WorkspaceModel) -> (found: Int, time: Duration) {
+    static func backlinks(_ model: WorkspaceModel) throws -> (found: Int, time: Duration) {
         let path = model.files.first { $0.name == "note-0.org" }!.path
         var found = 0
-        let time = ContinuousClock().measure {
-            found += model.backlinks(to: Backlinks.Target(path: path)).count
-            found += model.backlinks(to: Backlinks.Target(path: path, title: "Heading 0.1", id: "0-1")).count
+        let time = try ContinuousClock().measure {
+            found += try model.backlinks(to: Backlinks.Target(path: path)).count
+            found += try model.backlinks(to: Backlinks.Target(path: path, title: "Heading 0.1", id: "0-1")).count
         }
         return (found, time)
     }
@@ -78,7 +78,7 @@ extension GateTests {
         let items = agenda.days.reduce(0) { $0 + $1.items.count }
         #expect(items > 0)
 
-        let (found, backlinks) = Self.backlinks(model)
+        let (found, backlinks) = try Self.backlinks(model)
         #expect(found > 0)
         print("GATE 10,000 notes: index build \(build), agenda refresh cold \(cold) / warm \(warm) (\(items) items), backlinks over 49,400 links \(backlinks)")
         #expect(build < .seconds(15), "index build")
@@ -92,7 +92,7 @@ extension GateTests {
         let scratch = try Self.scratch()
         defer { try? FileManager.default.removeItem(at: scratch) }
         let (model, _) = try await Self.workspace(1_000, fiveLinks: 1_000, in: scratch)
-        let (found, time) = Self.backlinks(model)
+        let (found, time) = try Self.backlinks(model)
         #expect(found > 0)
         print("GATE 1,000 notes: backlinks over 5,000 links \(time)")
         #expect(time < .milliseconds(150), "backlinks, 5,000 links")
