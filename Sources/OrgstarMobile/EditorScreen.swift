@@ -1100,7 +1100,7 @@ struct CommandPalette: View {
         ("app.publish", "Publish Project…"), ("app.publish.all", "Publish All Projects"), ("app.publish.current-file", "Publish Current File"),
         ("app.publish.current-project", "Publish Current Project"),
         ("app.toggle-markup", "Show or Hide Markup"),
-        ("org.toggle-inline-images", "Show or Hide Inline Images"), ("org.latex-preview", "Show or Hide LaTeX Previews"), ("editor.toggle-truncate-lines", "Truncate or Wrap Long Lines"), ("editor.toggle-auto-fill", "Turn Auto Fill On or Off"),
+        ("org.toggle-inline-images", "Show or Hide Inline Images"), ("org.toggle-inline-images-linked", "Show or Hide Inline Images, Including Described Links"), ("org.latex-preview", "Show or Hide LaTeX Previews"), ("editor.toggle-truncate-lines", "Truncate or Wrap Long Lines"), ("editor.toggle-auto-fill", "Turn Auto Fill On or Off"),
         ("edit.isearch-forward", "Incremental Search"), ("edit.isearch-backward", "Incremental Search Backward"),
         ("org.table.toggle-column-width", "Shrink or Expand Table Column"), ("org.table.shrink", "Shrink Table Columns with Widths"),
         ("org.table.expand", "Expand Table Columns"),

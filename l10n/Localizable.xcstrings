@@ -843,6 +843,12 @@
       },
       "shouldTranslate": false
     },
+    "%@%@": {
+      "shouldTranslate": false
+    },
+    "%@%@%@": {
+      "shouldTranslate": false
+    },
     "%lld": {
       "shouldTranslate": false
     },
@@ -29827,6 +29833,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mostrar ou Ocultar Imagens Embutidas"
+          }
+        }
+      }
+    },
+    "Show or Hide Inline Images, Including Described Links": {
+      "comment": "Command title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eingebettete Bilder ein- oder ausblenden, auch bei Links mit Beschreibung"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar u ocultar imágenes en línea, también en enlaces con descripción"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher ou masquer les images intégrées, y compris pour les liens avec description"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "インライン画像を表示/非表示(説明付きリンクを含む)"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar ou Ocultar Imagens Embutidas, Incluindo Links com Descrição"
           }
         }
       }

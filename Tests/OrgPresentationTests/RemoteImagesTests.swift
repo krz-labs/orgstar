@@ -10,11 +10,10 @@ struct RemoteImagesTests {
     }
 
     @Test func linksNeedTheSetting() {
-        let text = "[[https://example.com/a.png]]\n[[ftp://example.com/b.png]]\n[[file:c.png]]\n" as NSString
-        #expect(InlineImages.image(atLine: 0, in: text) == nil)
-        #expect(InlineImages.image(atLine: 0, in: text, remote: true)?.path == "https://example.com/a.png")
-        #expect(InlineImages.image(atLine: 30, in: text, remote: true) == nil)
-        #expect(InlineImages.image(atLine: 58, in: text, remote: true)?.path == "c.png")
+        let text = "[[https://example.com/a.png]]\n[[ftp://example.com/b.png]]\n[[file:c.png]]\n"
+        let tree = OrgParser.parse(text)
+        #expect(InlineImages.links(tree, in: 0..<75).map(\.image.path) == ["c.png"])
+        #expect(InlineImages.links(tree, in: 0..<75, remote: true).map(\.image.path) == ["https://example.com/a.png", "c.png"])
     }
 
     @Test func downloadsOnceAndCaches() async throws {

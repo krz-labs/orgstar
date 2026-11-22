@@ -8,18 +8,15 @@ extension OrgEditor {
 
     private static let imageCache = NSCache<NSString, NSImage>()
 
-    func toggleImages() {
+    /// `includeLinked` as `org-toggle-inline-images` with a prefix argument: links with a
+    /// description show their image too.
+    func toggleImages(includeLinked: Bool = false) {
         showsImages.toggle()
+        imagesIncludeLinked = showsImages && includeLinked
         refreshImages()
         if showsImages {
-            let ns = textView.string as NSString
-            var count = 0
-            var offset = 0
-            while offset < ns.length {
-                let line = ns.lineRange(for: NSRange(location: offset, length: 0))
-                if let image = InlineImages.image(atLine: line.location, in: ns, remote: remote, attachment: attachment), loadImage(image.path) != nil { count += 1 }
-                offset = NSMaxRange(line)
-            }
+            let count = InlineImages.links(document.tree, in: 0..<utf16Length, includeLinked: imagesIncludeLinked, remote: remote, attachment: attachment)
+                .count { loadImage($0.image.path) != nil }
             onMessage?("\(count) images displayed inline")
         } else {
             onMessage?("Inline image display turned off")
@@ -64,32 +61,49 @@ extension OrgEditor {
         return image
     }
 
-    /// Image lines in `range` show the image over the link, which is hidden unless the caret is
-    /// on the line; then the image goes under it.
+    /// Image links in `range` show their image, and the link is hidden unless the caret is on
+    /// its line. A link that is all its line holds keeps the line, with the image over it, or
+    /// under it while the link shows. A link in a line's text is as wide and as tall as its
+    /// image, which goes under the paragraph while the link shows.
     func applyImages(_ range: Range<Int>, in storage: NSTextStorage, revealed: NSRange) {
         guard showsImages, isOrg else { return }
         let text = storage.string as NSString
         let maxWidth = max(80, (textView.textContainer?.size.width ?? 600) - 40)
-        var location = range.lowerBound
-        while location < range.upperBound, location < text.length {
-            let line = text.lineRange(for: NSRange(location: location, length: 0))
-            location = NSMaxRange(line)
-            guard let image = InlineImages.image(atLine: line.location, in: text, remote: remote, attachment: attachment), let picture = loadImage(image.path) else { continue }
-            var width = image.width.map(CGFloat.init) ?? picture.size.width
-            width = min(width, maxWidth)
-            let height = picture.size.width > 0 ? width * picture.size.height / picture.size.width : 0
+        let links = InlineImages.links(document.tree, in: range, includeLinked: imagesIncludeLinked, remote: remote, attachment: attachment)
+        for placement in Presentation.imagePlacements(links, in: text) {
+            guard let picture = loadImage(placement.link.image.path) else { continue }
+            let size = Presentation.imageSize(natural: picture.size, width: placement.link.image.width, maxWidth: maxWidth)
+            let link = NSRange(placement.link.range)
+            let line = text.lineRange(for: link)
+            let shown = NSLocationInRange(revealed.location, line)
+            let style = (storage.attribute(.paragraphStyle, at: line.location, effectiveRange: nil) as? NSParagraphStyle)?.mutableCopy() as? NSMutableParagraphStyle ?? NSMutableParagraphStyle()
+            defer { storage.addAttribute(.paragraphStyle, value: style, range: line) }
+            guard placement.ownLine else {
+                let first = NSRange(location: link.location, length: 1)
+                storage.addAttribute(.orgImage, value: InlineImageBox(image: picture, size: size, below: shown, inText: true), range: first)
+                if shown {
+                    style.paragraphSpacing = max(style.paragraphSpacing, size.height + 4)
+                    continue
+                }
+                // Pretty entities in the link would draw over the image.
+                storage.removeAttribute(.orgEntityDisplay, range: link)
+                storage.addAttributes(theme.hidden, range: link)
+                storage.addAttribute(.underlineStyle, value: 0, range: link)
+                let lineHeight = theme.font.ascender - theme.font.descender + theme.font.leading
+                let font = NSFont(descriptor: theme.font.fontDescriptor, size: Presentation.imageFontSize(height: size.height, pointSize: theme.font.pointSize, lineHeight: lineHeight)) ?? theme.font
+                let advance = text.substring(with: first).size(withAttributes: [.font: font]).width
+                storage.addAttributes([.font: font, .kern: size.width - advance], range: first)
+                continue
+            }
             let content = NSRange(location: line.location, length: line.length - (text.substring(with: line).hasSuffix("\n") ? 1 : 0))
             // Invisible, keeping the line's height, so line numbers stay apart.
-            let shown = line.location == revealed.location && content.length > 0
-            if !shown, content.length > 0 {
+            if !shown {
                 storage.addAttributes([.foregroundColor: NSColor.clear, .underlineStyle: 0], range: content)
             }
-            storage.addAttribute(.orgImage, value: InlineImageBox(image: picture, size: CGSize(width: width, height: height), below: shown), range: NSRange(location: line.location, length: max(1, content.length)))
-            let style = (storage.attribute(.paragraphStyle, at: line.location, effectiveRange: nil) as? NSParagraphStyle)?.mutableCopy() as? NSMutableParagraphStyle ?? NSMutableParagraphStyle()
+            storage.addAttribute(.orgImage, value: InlineImageBox(image: picture, size: size, below: shown), range: content)
             // The image sits where the line is, or under it while the link shows; the spacing
             // makes room for the rest of it.
-            style.paragraphSpacing = shown ? height + 4 : max(0, height + 4 - theme.font.boundingRectForFont.height)
-            storage.addAttribute(.paragraphStyle, value: style, range: line)
+            style.paragraphSpacing = shown ? size.height + 4 : max(0, size.height + 4 - theme.font.boundingRectForFont.height)
         }
     }
 }

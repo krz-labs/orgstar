@@ -45,7 +45,7 @@ final class ShadedFragment: NSTextLayoutFragment, @unchecked Sendable {
 extension NSAttributedString.Key {
     /// The character an entity shows as, on the entity's last character.
     static let orgEntityDisplay = NSAttributedString.Key("OrgEntityDisplay")
-    /// The image an image link's line shows under it.
+    /// An image link's image, on the link's line or on its first character.
     static let orgImage = NSAttributedString.Key("OrgImage")
     /// A LaTeX fragment's typeset math, on its first character.
     static let orgLatex = NSAttributedString.Key("OrgLatex")
@@ -63,7 +63,7 @@ final class LatexBox: NSObject, @unchecked Sendable {
 
 /// A paragraph with LaTeX previews: each drawn where its hidden fragment starts, on the line's
 /// baseline, or at the top of an environment's first line.
-final class LatexFragment: NSTextLayoutFragment, @unchecked Sendable {
+class LatexFragment: NSTextLayoutFragment, @unchecked Sendable {
     static func hasLatex(_ string: NSAttributedString) -> Bool {
         var found = false
         string.enumerateAttribute(.orgLatex, in: NSRange(location: 0, length: string.length)) { value, _, stop in
@@ -114,42 +114,71 @@ final class LatexFragment: NSTextLayoutFragment, @unchecked Sendable {
 final class InlineImageBox: NSObject, @unchecked Sendable {
     let image: NSImage
     let size: CGSize
-    /// Drawn under the line's text, which shows while the caret is on it.
+    /// Drawn under the text, which shows while the caret is on the line.
     let below: Bool
-    init(image: NSImage, size: CGSize, below: Bool = false) {
+    /// In the line's text where the link is, on a character as wide and as tall as the image;
+    /// otherwise the link is all the line holds.
+    let inText: Bool
+    init(image: NSImage, size: CGSize, below: Bool = false, inText: Bool = false) {
         self.image = image
         self.size = size
         self.below = below
+        self.inText = inText
     }
 }
 
-/// An image link's line drawn as the image, with the paragraph spacing making room for its
-/// height.
-final class ImageFragment: NSTextLayoutFragment, @unchecked Sendable {
-    static func image(_ string: NSAttributedString) -> InlineImageBox? {
-        var found: InlineImageBox?
+/// A paragraph with image links drawn as their images: a line's image with the paragraph
+/// spacing making room for its height, an image in the text on its hidden link.
+final class ImageFragment: LatexFragment, @unchecked Sendable {
+    static func hasImages(_ string: NSAttributedString) -> Bool {
+        var found = false
         string.enumerateAttribute(.orgImage, in: NSRange(location: 0, length: string.length)) { value, _, stop in
-            if let box = value as? InlineImageBox { found = box; stop.pointee = true }
+            if value != nil { found = true; stop.pointee = true }
         }
         return found
     }
 
-    private var frame: CGRect? {
-        guard let box = (textElement as? NSTextParagraph).flatMap({ Self.image($0.attributedString) }), let line = textLineFragments.first else { return nil }
-        return CGRect(x: line.typographicBounds.minX, y: (box.below ? line.typographicBounds.maxY : line.typographicBounds.minY) + 2, width: box.size.width, height: box.size.height)
+    /// Each image and where it goes, in the fragment's coordinates.
+    static func frames(of fragment: NSTextLayoutFragment) -> [(box: InlineImageBox, frame: CGRect)] {
+        guard let string = (fragment.textElement as? NSTextParagraph)?.attributedString, let first = fragment.textLineFragments.first else { return [] }
+        let last = fragment.textLineFragments.last { $0.characterRange.length > 0 } ?? first
+        var out: [(InlineImageBox, CGRect)] = []
+        // Images under the paragraph stand side by side.
+        var under = first.typographicBounds.minX
+        string.enumerateAttribute(.orgImage, in: NSRange(location: 0, length: string.length)) { value, range, _ in
+            guard let box = value as? InlineImageBox else { return }
+            if !box.inText {
+                out.append((box, CGRect(origin: CGPoint(x: first.typographicBounds.minX, y: (box.below ? first.typographicBounds.maxY : first.typographicBounds.minY) + 2), size: box.size)))
+            } else if box.below {
+                out.append((box, CGRect(origin: CGPoint(x: under, y: last.typographicBounds.maxY + 2), size: box.size)))
+                under += box.size.width + 4
+            } else if let line = fragment.textLineFragments.first(where: { NSLocationInRange(range.location, $0.characterRange) }) {
+                let bounds = line.typographicBounds
+                let ascender = (string.attribute(.font, at: range.location, effectiveRange: nil) as? NSFont)?.ascender ?? box.size.height
+                out.append((box, CGRect(origin: CGPoint(x: bounds.minX + line.locationForCharacter(at: range.location).x, y: bounds.minY + line.glyphOrigin.y - ascender), size: box.size)))
+            }
+        }
+        return out
+    }
+
+    static func drawImages(of fragment: NSTextLayoutFragment, at point: CGPoint, in context: CGContext) {
+        let frames = frames(of: fragment)
+        guard !frames.isEmpty else { return }
+        NSGraphicsContext.saveGraphicsState()
+        NSGraphicsContext.current = NSGraphicsContext(cgContext: context, flipped: true)
+        for (box, frame) in frames {
+            box.image.draw(in: frame.offsetBy(dx: point.x, dy: point.y), from: .zero, operation: .sourceOver, fraction: 1, respectFlipped: true, hints: nil)
+        }
+        NSGraphicsContext.restoreGraphicsState()
     }
 
     override var renderingSurfaceBounds: CGRect {
-        frame.map { super.renderingSurfaceBounds.union($0) } ?? super.renderingSurfaceBounds
+        Self.frames(of: self).reduce(super.renderingSurfaceBounds) { $0.union($1.frame) }
     }
 
     override func draw(at point: CGPoint, in context: CGContext) {
         super.draw(at: point, in: context)
-        guard let box = (textElement as? NSTextParagraph).flatMap({ Self.image($0.attributedString) }), let frame else { return }
-        NSGraphicsContext.saveGraphicsState()
-        NSGraphicsContext.current = NSGraphicsContext(cgContext: context, flipped: true)
-        box.image.draw(in: frame.offsetBy(dx: point.x, dy: point.y), from: .zero, operation: .sourceOver, fraction: 1, respectFlipped: true, hints: nil)
-        NSGraphicsContext.restoreGraphicsState()
+        Self.drawImages(of: self, at: point, in: context)
     }
 }
 
@@ -192,6 +221,7 @@ final class FoldedHeadingFragment: NSTextLayoutFragment, @unchecked Sendable {
     override func draw(at point: CGPoint, in context: CGContext) {
         super.draw(at: point, in: context)
         EntityFragment.drawEntities(of: self, at: point, in: context)
+        ImageFragment.drawImages(of: self, at: point, in: context)
         guard let line = textLineFragments.first else { return }
         let bounds = line.typographicBounds
         let ellipsis = NSAttributedString(string: " …", attributes: [

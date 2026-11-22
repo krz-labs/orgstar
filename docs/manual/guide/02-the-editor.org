@@ -64,20 +64,28 @@ Entities are left as typed on the caret's line, in comment lines and inside bloc
 
 Org ▸ Show or Hide Inline Images (=C-c C-x C-v= in the Emacs and Doom presets), as =org-toggle-inline-images= does, draws images in place of their links. The echo area reports how many images it displayed.
 
-A line shows as an image when it holds nothing but a =file:= or =attachment:= link to an image file with no description:
+A =file:= or =attachment:= link to an image file shows as its image wherever the link is: on a line of its own, or in the text of a paragraph, a heading, a list item or a table:
 
 #+BEGIN_SRC org
 #+ATTR_ORG: :width 400
 [[file:images/diagram.png]]
+
+The plot [[file:images/plot.png]] and the photo file:images/photo.jpg share a line.
+
+| Before | [[file:before.png]] |
+| After  | [[file:after.png]]  |
 #+END_SRC
 
 - Recognised extensions: =png=, =jpg=, =jpeg=, =gif=, =svg=, =webp=, =tif=, =tiff=, =bmp=, =heic=, =avif=.
 - Paths are relative to the file's folder; =~= is expanded. Images at http(s) links show when =org-display-remote-inline-images= is =download= or =cache=; see [[file:09-links.org::*Remote images][Remote images]].
 - =attachment:= links, such as =[[attachment:photo.jpg]]=, show the file from the entry's attachment folder, found as following the link finds it: the =DIR= property, else the =ID= folder under =org-attach-id-dir=. See [[file:04-outlines.org][Outlines]] for attachments.
-- =#+ATTR_ORG: :width N= sets the width in points. Images are never wider than the editor.
-- The link text is hidden while its image shows, except on the caret's line.
+- A link with a description shows as a link, unless the description is itself one =file:= or =attachment:= link to an image, plain or in angle brackets: =[[https://example.com][file:thumbnail.png]]= shows =thumbnail.png=. Show or Hide Inline Images, Including Described Links (=C-u C-c C-x C-v= in the Emacs preset, and in the command palette), as =org-toggle-inline-images= with a prefix argument does, also shows the image a described link points to, such as =[[file:plot.png][the plot]]=; the link's path then decides, not its description.
+- Links in verbatim and code text, comments, keyword lines, and source and example blocks stay text.
+- =#+ATTR_ORG: :width N= above a paragraph sets the width in points of each image in it. Images are never wider than the editor.
+- A link that is all its line holds shows its image on that line. An image in a line's text stands where its link is, and its line is as tall as the image.
+- The link text is hidden while its image shows, except on the caret's line. There the image is drawn under the link, or under the paragraph for an image in a line's text.
 
-To show images when a file opens, add =#+STARTUP: inlineimages= to the file, or set =org-startup-with-inline-images = true= in =config.toml=. =#+STARTUP: noinlineimages= turns it off for one file.
+To show images when a file opens, add =#+STARTUP: inlineimages= to the file, or set =org-startup-with-inline-images = true= in =config.toml=. =#+STARTUP: noinlineimages= turns it off for one file. Images shown when a file opens leave described links as links, as in Org.
 
 ** LaTeX previews
 
@@ -96,10 +104,6 @@ The area is $\pi r^2$, and \(\sqrt{2}\) is irrational.
 - Fragments in source and example blocks aren't previewed.
 
 The command switches previews for the whole buffer; Org's =C-u= forms, which act on the section at point, aren't there. To preview when a file opens, add =#+STARTUP: latexpreview= to the file, or set =org-startup-with-latex-preview = true= in =config.toml=. =#+STARTUP: nolatexpreview= turns it off for one file. After switching between light and dark appearance, switch previews off and on to redraw them in the new color.
-
-** What isn't rendered
-
-Images in links that have a description, and images on lines with other text, show as links.
 
 * Folding
 

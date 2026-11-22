@@ -128,8 +128,10 @@ final class MobileEditor: NSObject, DocumentBuffer {
     var spellSkipCache: (revision: Int, ranges: [Range<Int>])?
     /// The line last revealed while markup is hidden, to hide again when the caret leaves.
     var revealedLine: NSRange?
-    /// `org-toggle-inline-images`: lines that are only an image link show the image.
+    /// `org-toggle-inline-images`: image links show their image.
     var showsImages = false
+    /// Links with a description show their image too.
+    var imagesIncludeLinked = false
     /// `org-latex-preview`: LaTeX fragments show as typeset math.
     var showsLatex = false
     /// The view width images were last sized for.
@@ -383,6 +385,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
         case _ where id.hasPrefix("org.fold."): foldCommand(id)
         case "org.link.open": openLinkAtCaret()
         case "org.toggle-inline-images": toggleImages()
+        case "org.toggle-inline-images-linked": toggleImages(includeLinked: true)
         case "org.latex-preview": toggleLatex()
         case "editor.toggle-truncate-lines":
             truncatesLines.toggle()
@@ -417,7 +420,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
         case "org.cycle":
             return Presentation.heading(containing: context.caret, in: context.tree) != nil || Wrappers.toggleable(at: context.caret, in: context.tree) != nil
         case _ where id.hasPrefix("org.fold."): return true
-        case "org.cycle-global", "edit.undo", "edit.redo", "org.toggle-inline-images", "org.latex-preview", "editor.toggle-truncate-lines",
+        case "org.cycle-global", "edit.undo", "edit.redo", "org.toggle-inline-images", "org.toggle-inline-images-linked", "org.latex-preview", "editor.toggle-truncate-lines",
              "editor.toggle-auto-fill", "edit.isearch-forward", "edit.isearch-backward",
              "edit.isearch-forward-regexp", "edit.isearch-backward-regexp": return true
         case "app.clock.in", "app.clock.out", "app.clock.cancel", "app.clock.goto", "app.clock.in-recent", "app.clock.in-last",
@@ -697,7 +700,7 @@ extension MobileEditor: NSTextContentStorageDelegate {
 }
 
 extension MobileEditor: NSTextLayoutManagerDelegate {
-    /// Folded headings, drawers and blocks end with `…`; blocks are on a band; image lines
+    /// Folded headings, drawers and blocks end with `…`; blocks are on a band; image links
     /// show their image; pretty entities draw their character.
     nonisolated func textLayoutManager(
         _ textLayoutManager: NSTextLayoutManager, textLayoutFragmentFor location: NSTextLocation, in textElement: NSTextElement
@@ -708,10 +711,10 @@ extension MobileEditor: NSTextLayoutManagerDelegate {
         let folded = hidden.isFolded(offset)
         let band = shaded.containing(offset) != nil ? fragmentStyle.blockBand : nil
         let string = (textElement as? NSTextParagraph)?.attributedString
-        let image = string.flatMap(OrgLineFragment.image)
+        let image = string.map(OrgLineFragment.hasImages) ?? false
         let entities = string.map(OrgLineFragment.hasEntities) ?? false
         let latex = string.map(OrgLineFragment.hasLatex) ?? false
-        guard folded || band != nil || image != nil || entities || latex else { return NSTextLayoutFragment(textElement: textElement, range: range) }
+        guard folded || band != nil || image || entities || latex else { return NSTextLayoutFragment(textElement: textElement, range: range) }
         let fragment = OrgLineFragment(textElement: textElement, range: range)
         fragment.folded = folded
         fragment.band = band
@@ -719,7 +722,6 @@ extension MobileEditor: NSTextLayoutManagerDelegate {
             fragment.start = offset
             fragment.style = fragmentStyle
         }
-        fragment.image = image
         return fragment
     }
 }

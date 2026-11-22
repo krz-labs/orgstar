@@ -257,8 +257,8 @@ extension MobileEditor {
 
     /// Moving to another line shows its markup and hides the last one's.
     func revealCaretLine() {
-        // LaTeX previews show their source on the caret's line whether or not markup shows.
-        guard !showMarkup || showsLatex else { return }
+        // LaTeX previews and images show their source on the caret's line whether or not markup shows.
+        guard !showMarkup || showsLatex || showsImages else { return }
         let line = caretLine
         guard line != revealedLine else { return }
         let text = textView.textStorage.string as NSString

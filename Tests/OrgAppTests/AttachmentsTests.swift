@@ -237,7 +237,7 @@ struct AttachmentImageTests {
         let second = ns.range(of: "[[attachment", options: .backwards).location
         #expect(DocumentSession.attachmentPath("pic.png", at: first, tree: tree, path: path) == folder.appendingPathComponent("data/202401/01T120000/pic.png").path)
         #expect(DocumentSession.attachmentPath("pic.png", at: second, tree: tree, path: path) == folder.appendingPathComponent("imgs/pic.png").path)
-        #expect(InlineImages.image(atLine: second, in: ns, attachment: { DocumentSession.attachmentPath($0, at: $1, tree: tree, path: path) })?.path
+        #expect(InlineImages.links(tree, in: second..<ns.length, attachment: { DocumentSession.attachmentPath($0, at: $1, tree: tree, path: path) }).first?.image.path
             == folder.appendingPathComponent("imgs/pic.png").path)
     }
 }

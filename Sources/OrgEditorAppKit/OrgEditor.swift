@@ -583,6 +583,7 @@ public final class OrgEditor: NSObject {
             case _ where id.hasPrefix("org.fold."): fold(id)
             case "org.narrow.subtree", "org.narrow.block", "org.narrow.toggle", "org.widen": narrow(id)
             case "org.toggle-inline-images": toggleImages()
+            case "org.toggle-inline-images-linked": toggleImages(includeLinked: true)
             case "org.latex-preview": toggleLatex()
             case "editor.toggle-spell-check": toggleSpellCheck()
             case "editor.complete": completeAtPoint()
@@ -703,8 +704,10 @@ public final class OrgEditor: NSObject {
 
     // MARK: - Inline images
 
-    /// `org-toggle-inline-images`: lines that are only an image link show the image.
+    /// `org-toggle-inline-images`: image links show their image.
     public internal(set) var showsImages = false
+    /// Links with a description show their image too.
+    var imagesIncludeLinked = false
     /// `org-latex-preview`: LaTeX fragments show as typeset math.
     public internal(set) var showsLatex = false
     /// An `attachment:` link's file, from its name, offset and the tree: the app's
@@ -972,7 +975,7 @@ extension OrgEditor: NSTextLayoutManagerDelegate {
             let offset = manager.offset(from: manager.documentRange.location, to: range.location)
             if folded.contains(offset) { return FoldedHeadingFragment(textElement: textElement, range: range) }
             if shaded.containing(offset) != nil { return ShadedFragment(textElement: textElement, range: range) }
-            if let paragraph = textElement as? NSTextParagraph, ImageFragment.image(paragraph.attributedString) != nil {
+            if let paragraph = textElement as? NSTextParagraph, ImageFragment.hasImages(paragraph.attributedString) {
                 return ImageFragment(textElement: textElement, range: range)
             }
             if let paragraph = textElement as? NSTextParagraph, LatexFragment.hasLatex(paragraph.attributedString) {

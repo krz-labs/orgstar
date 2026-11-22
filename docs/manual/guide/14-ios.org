@@ -110,7 +110,7 @@ While markup is hidden, the line with the caret shows its markup, so you can edi
 
 The visibility from =#+STARTUP= applies first, then each heading's =VISIBILITY= property. As on the Mac, =VISIBILITY= properties apply only when =#+STARTUP= sets a visibility (=overview=, =content=, =showall= and the like).
 
-An image line shows its image, and the link text is hidden except on the caret's line. =#+ATTR_ORG: :width N= sets the width in points; images are never wider than the editor. Show or Hide Inline Images in Commands, or =C-c C-x C-v= on a hardware keyboard, switches images in the open file. Truncate or Wrap Long Lines in Commands, or =C-x x t=, switches long lines. See [[file:02-the-editor.org][The editor]] for which lines show as images.
+An image link shows its image, on a line of its own or in a line's text, and the link text is hidden except on the caret's line. =#+ATTR_ORG: :width N= sets the width in points; images are never wider than the editor. Show or Hide Inline Images in Commands, or =C-c C-x C-v= on a hardware keyboard, switches images in the open file; Show or Hide Inline Images, Including Described Links, or =C-u C-c C-x C-v=, shows the images of links with a description too. Truncate or Wrap Long Lines in Commands, or =C-x x t=, switches long lines. The reader shows images as a file opens with them; in a heading, an image link stays a link there. See [[file:02-the-editor.org][The editor]] for which links show as images.
 
 Code in src blocks is highlighted in the theme's =syntax-*= colours, as on the Mac (see [[file:11-code-blocks.org][Code blocks]]).
 

@@ -116,7 +116,7 @@ extension NSAttributedString.Key {
     static let orgEntityDisplay = NSAttributedString.Key("OrgEntityDisplay")
     /// The color the entity's character is drawn in.
     static let orgEntityColor = NSAttributedString.Key("OrgEntityColor")
-    /// The image an image link's line shows under it.
+    /// An image link's image, on the link's line or on its first character.
     static let orgImage = NSAttributedString.Key("OrgImage")
     /// A LaTeX fragment's typeset math, on its first character.
     static let orgLatex = NSAttributedString.Key("OrgLatex")
@@ -135,12 +135,16 @@ final class LatexBox: NSObject, @unchecked Sendable {
 final class InlineImageBox: NSObject, @unchecked Sendable {
     let image: UIImage
     let size: CGSize
-    /// Drawn under the line's text, which shows while the caret is on it.
+    /// Drawn under the text, which shows while the caret is on the line.
     let below: Bool
-    init(image: UIImage, size: CGSize, below: Bool = false) {
+    /// In the line's text where the link is, on a character as wide and as tall as the image;
+    /// otherwise the link is all the line holds.
+    let inText: Bool
+    init(image: UIImage, size: CGSize, below: Bool = false, inText: Bool = false) {
         self.image = image
         self.size = size
         self.below = below
+        self.inText = inText
     }
 }
 
@@ -168,22 +172,44 @@ final class SelectionHighlightView: UIView, UITextSelectionHighlightView {
 }
 
 /// A line drawn with more than its text, as the Mac editor's fragments draw them: a folded
-/// line's ellipsis, a block's band across the view, an image under an image link, and pretty
+/// line's ellipsis, a block's band across the view, image links' images, and pretty
 /// entities' characters where the entities' last (invisible) characters sit.
 final class OrgLineFragment: NSTextLayoutFragment, @unchecked Sendable {
     var folded = false
     var band: (color: UIColor, width: CGFloat)?
-    var image: InlineImageBox?
     /// For a block's lines: where the fragment starts, and where the selection is read.
     var start = 0
     var style: FragmentStyle?
 
-    static func image(_ string: NSAttributedString) -> InlineImageBox? {
-        var found: InlineImageBox?
+    static func hasImages(_ string: NSAttributedString) -> Bool {
+        var found = false
         string.enumerateAttribute(.orgImage, in: NSRange(location: 0, length: string.length)) { value, _, stop in
-            if let box = value as? InlineImageBox { found = box; stop.pointee = true }
+            if value != nil { found = true; stop.pointee = true }
         }
         return found
+    }
+
+    /// Each image and where it goes: a line's image over or under the line, an image in the
+    /// text on its hidden link, or under the paragraph, side by side, while the links show.
+    private var imageFrames: [(box: InlineImageBox, frame: CGRect)] {
+        guard let string = (textElement as? NSTextParagraph)?.attributedString, let first = textLineFragments.first else { return [] }
+        let last = textLineFragments.last { $0.characterRange.length > 0 } ?? first
+        var out: [(InlineImageBox, CGRect)] = []
+        var under = first.typographicBounds.minX
+        string.enumerateAttribute(.orgImage, in: NSRange(location: 0, length: string.length)) { value, range, _ in
+            guard let box = value as? InlineImageBox else { return }
+            if !box.inText {
+                out.append((box, CGRect(origin: CGPoint(x: first.typographicBounds.minX, y: (box.below ? first.typographicBounds.maxY : first.typographicBounds.minY) + 2), size: box.size)))
+            } else if box.below {
+                out.append((box, CGRect(origin: CGPoint(x: under, y: last.typographicBounds.maxY + 2), size: box.size)))
+                under += box.size.width + 4
+            } else if let line = textLineFragments.first(where: { NSLocationInRange(range.location, $0.characterRange) }) {
+                let bounds = line.typographicBounds
+                let ascender = (string.attribute(.font, at: range.location, effectiveRange: nil) as? UIFont)?.ascender ?? box.size.height
+                out.append((box, CGRect(origin: CGPoint(x: bounds.minX + line.locationForCharacter(at: range.location).x, y: bounds.minY + line.glyphOrigin.y - ascender), size: box.size)))
+            }
+        }
+        return out
     }
 
     static func hasLatex(_ string: NSAttributedString) -> Bool {
@@ -232,15 +258,10 @@ final class OrgLineFragment: NSTextLayoutFragment, @unchecked Sendable {
         return CGRect(x: -layoutFragmentFrame.minX, y: 0, width: max(width, layoutFragmentFrame.maxX), height: height)
     }
 
-    private var imageRect: CGRect? {
-        guard let image, let line = textLineFragments.first else { return nil }
-        return CGRect(x: line.typographicBounds.minX, y: (image.below ? line.typographicBounds.maxY : line.typographicBounds.minY) + 2, width: image.size.width, height: image.size.height)
-    }
-
     override var renderingSurfaceBounds: CGRect {
         var bounds = super.renderingSurfaceBounds
         if folded { bounds = bounds.insetBy(dx: -40, dy: 0).offsetBy(dx: 40, dy: 0) }
-        for rect in [bandRect, imageRect].compactMap({ $0 }) + latexBoxes.map(\.frame) { bounds = bounds.union(rect) }
+        for rect in [bandRect].compactMap({ $0 }) + imageFrames.map(\.frame) + latexBoxes.map(\.frame) { bounds = bounds.union(rect) }
         return bounds
     }
 
@@ -256,7 +277,7 @@ final class OrgLineFragment: NSTextLayoutFragment, @unchecked Sendable {
         UIGraphicsPushContext(context)
         defer { UIGraphicsPopContext() }
         drawEntities(at: point)
-        if let image, let rect = imageRect { image.image.draw(in: rect.offsetBy(dx: point.x, dy: point.y)) }
+        for (box, frame) in imageFrames { box.image.draw(in: frame.offsetBy(dx: point.x, dy: point.y)) }
         for (box, frame) in latexBoxes {
             UIImage(cgImage: box.rendering.image, scale: CGFloat(box.rendering.image.width) / max(1, box.rendering.size.width), orientation: .up)
                 .draw(in: frame.offsetBy(dx: point.x, dy: point.y))

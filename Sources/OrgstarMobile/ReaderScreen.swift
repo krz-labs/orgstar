@@ -35,6 +35,8 @@ struct ReaderScreen: View {
     @State private var loadedPath: String?
     /// The file's display: indentation, leading stars, inline images, truncation.
     @State private var startup: StartupDisplay?
+    /// The view's width, which images in a line's text are no wider than.
+    @State private var width: CGFloat = 0
     @State private var showingOutline = false
     @State private var message: String?
     /// A file a link opened, shown in Quick Look.
@@ -95,6 +97,7 @@ struct ReaderScreen: View {
             }
             // Narrower than the view while truncated, the text still starts at the top left.
             .defaultScrollAnchor(truncated ? .topLeading : nil)
+            .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
             .background(theme.swiftColor("background") ?? Color(uiColor: .systemBackground))
             .onChange(of: pane?.revealRequest?.id) {
                 guard let offset = pane?.revealRequest?.offset else { return }
@@ -181,7 +184,7 @@ struct ReaderScreen: View {
                 .font(.caption.weight(.semibold)).foregroundStyle(theme.swiftColor("markup") ?? Color(uiColor: .tertiaryLabel))
                 .opacity(hasContent ? 1 : 0)
                 .frame(width: 2 * theme.column, alignment: .leading)
-            lineText(text.trimmingTrailingNewlines(), theme)
+            lineText(Text(text.trimmingTrailingNewlines()), theme)
         }
         .padding(.leading, headingIndent(entry, theme))
         .padding(.top, entry.level == 1 ? 6 : 0)
@@ -199,16 +202,30 @@ struct ReaderScreen: View {
                         .frame(maxWidth: image.width.map { CGFloat($0) } ?? image.picture.size.width, alignment: .leading)
                         .accessibilityLabel((image.path as NSString).lastPathComponent)
                 } else {
-                    lineText(attributed(ReadingText.segments(tree, in: part.range, folded: folded, open: foldable.filter { !folded.contains($0) }, display: display), heading: nil, theme).trimmingTrailingNewlines(), theme)
+                    lineText(text(tree, part, theme), theme)
                         .textSelection(.enabled)
                 }
             }
         }
     }
 
+    /// A part's text, with each image in it standing where its link is.
+    private func text(_ tree: OrgTree, _ part: Part, _ theme: MobileTheme) -> Text {
+        func styled(_ range: Range<Int>) -> AttributedString {
+            attributed(ReadingText.segments(tree, in: range, folded: folded, open: foldable.filter { !folded.contains($0) }, display: display), heading: nil, theme)
+        }
+        var text = Text("")
+        var start = part.range.lowerBound
+        for image in part.inText {
+            text = Text("\(text)\(Text(styled(start..<image.range.lowerBound)))\(Image(uiImage: image.picture))")
+            start = image.range.upperBound
+        }
+        return Text("\(text)\(Text(styled(start..<part.range.upperBound).trimmingTrailingNewlines()))")
+    }
+
     /// Wrapped to the view's width, or on one line each, scrolling sideways, while truncated.
-    private func lineText(_ text: AttributedString, _ theme: MobileTheme) -> some View {
-        Text(text)
+    private func lineText(_ text: Text, _ theme: MobileTheme) -> some View {
+        text
             .lineSpacing(CGFloat(max(0, theme.spec.lineSpacing)))
             .fixedSize(horizontal: startup?.truncated ?? false, vertical: false)
             .frame(maxWidth: startup?.truncated == true ? nil : .infinity, alignment: .leading)
@@ -216,10 +233,14 @@ struct ReaderScreen: View {
 
     private struct Part {
         let range: Range<Int>
+        /// The image of a link that is all its line holds.
         var image: (picture: UIImage, path: String, width: Int?)?
+        /// Images in the text, at their size, and the links they stand for.
+        var inText: [(range: Range<Int>, picture: UIImage)] = []
     }
 
-    /// Text, and with inline images on, lines that are only an image link shown as the image.
+    /// Text, and with inline images on, image links shown as their images: a link that is all
+    /// its line holds as a part of its own, others in their part's text.
     private func parts(_ tree: OrgTree, _ range: Range<Int>) -> [Part] {
         guard startup?.inlineImages == true, let path = shownPath else { return [Part(range: range)] }
         // Read so that the view draws again when a remote image arrives.
@@ -227,20 +248,30 @@ struct ReaderScreen: View {
         let remote = RemoteImages.Mode(rawValue: session.options.remoteInlineImages) ?? .skip
         let base = URL(fileURLWithPath: path).deletingLastPathComponent()
         let ns = tree.text as NSString
+        let maxWidth = width > 0 ? max(80, width - 72) : .greatestFiniteMagnitude
         var parts: [Part] = []
-        var textStart = range.lowerBound
-        var location = range.lowerBound
-        while location < range.upperBound {
-            let line = ns.lineRange(for: NSRange(location: location, length: 0))
-            location = NSMaxRange(line)
-            guard folded.allSatisfy({ !$0.contains(line.location) }), let image = InlineImages.image(atLine: line.location, in: ns, remote: remote != .skip,
-                                                                                       attachment: { DocumentSession.attachmentPath($0, at: $1, tree: tree, path: path) }),
-                  let picture = MobileEditor.loadImage(image.path, relativeTo: base, remote: remote) else { continue }
-            if textStart < line.location { parts.append(Part(range: textStart..<line.location)) }
-            parts.append(Part(range: line.location..<min(NSMaxRange(line), range.upperBound), image: (picture, image.path, image.width)))
-            textStart = min(NSMaxRange(line), range.upperBound)
+        var pending = Part(range: range.lowerBound..<range.lowerBound)
+        let links = InlineImages.links(tree, in: range, remote: remote != .skip, attachment: { DocumentSession.attachmentPath($0, at: $1, tree: tree, path: path) })
+        for placement in Presentation.imagePlacements(links, in: ns) {
+            let link = placement.link
+            guard link.range.lowerBound >= pending.range.lowerBound, link.range.upperBound <= range.upperBound,
+                  folded.allSatisfy({ !$0.contains(link.range.lowerBound) }),
+                  let picture = MobileEditor.loadImage(link.image.path, relativeTo: base, remote: remote) else { continue }
+            guard placement.ownLine else {
+                let size = Presentation.imageSize(natural: picture.size, width: link.image.width, maxWidth: maxWidth)
+                let sized = picture.cgImage.map { UIImage(cgImage: $0, scale: picture.size.width * picture.scale / max(1, size.width), orientation: picture.imageOrientation) }
+                pending.inText.append((link.range, sized ?? picture))
+                continue
+            }
+            let line = ns.lineRange(for: NSRange(location: link.range.lowerBound, length: 0))
+            if pending.range.lowerBound < line.location {
+                parts.append(Part(range: pending.range.lowerBound..<line.location, inText: pending.inText))
+            }
+            let end = min(NSMaxRange(line), range.upperBound)
+            parts.append(Part(range: line.location..<end, image: (picture, link.image.path, link.image.width)))
+            pending = Part(range: end..<end)
         }
-        if textStart < range.upperBound { parts.append(Part(range: textStart..<range.upperBound)) }
+        if pending.range.lowerBound < range.upperBound { parts.append(Part(range: pending.range.lowerBound..<range.upperBound, inText: pending.inText)) }
         return parts
     }
 

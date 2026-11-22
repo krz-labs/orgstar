@@ -92,7 +92,8 @@ struct ImageYankTests {
         let (text, caret) = ImageYank.inserting([ours[2]], into: ours[3], at: NSMaxRange((ours[3] as NSString).range(of: "Free text.")))
         #expect(DocumentSession.attachmentPath("clipboard-20240101T120000.png", at: caret, tree: OrgParser.parse(text), path: "\(dir)/b.org")
             == "\(dir)/data/6a/1b2c3d-0000-4000-8000-00000000000b/clipboard-20240101T120000.png")
-        #expect(InlineImages.image(atLine: caret - 1, in: text as NSString, attachment: { name, _ in name })?.path == "clipboard-20240101T120000.png")
+        let line = (text as NSString).lineRange(for: NSRange(location: caret - 1, length: 0))
+        #expect(InlineImages.links(OrgParser.parse(text), in: line.location..<NSMaxRange(line), attachment: { name, _ in name }).map(\.image.path) == ["clipboard-20240101T120000.png"])
     }
 
     @Test func aSecondPasteInTheSameSecondGetsANewName() throws {

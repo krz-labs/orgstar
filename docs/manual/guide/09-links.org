@@ -533,18 +533,24 @@ Markdown or plain text, are not supported.
 
 The echo area reports how many images are shown, or that inline display is off.
 
-A line shows an image when it holds nothing but a bracket link, without a description,
-to a file ending in =.png=, =.jpg=, =.jpeg=, =.gif=, =.svg=, =.webp=, =.tif=, =.tiff=,
-=.bmp=, =.heic= or =.avif= (in any case):
+A link without a description shows an image when it points to a file ending in =.png=,
+=.jpg=, =.jpeg=, =.gif=, =.svg=, =.webp=, =.tif=, =.tiff=, =.bmp=, =.heic= or =.avif= (in
+any case), on a line of its own or in a line's text:
 
 #+BEGIN_SRC org
 [[file:images/diagram.png]]
 [[./photo.jpg]]
+See [[file:images/plot.png]] and file:images/detail.png here.
 #+END_SRC
 
 Relative paths are resolved against the file's folder, and =attachment:= links against the
 entry's attachment folder. The link text is hidden while the image is shown, except on the
-line that holds the caret, where the image is drawn under the link.
+line that holds the caret, where the image is drawn under the link or under its paragraph.
+
+A link with a description shows an image when the description is one =file:= or
+=attachment:= link to an image, as in =[[https://example.com][file:thumbnail.png]]=. Show
+or Hide Inline Images, Including Described Links (=C-u C-c C-x C-v= in the Emacs preset)
+shows the image any described link points to. See [[file:02-the-editor.org::*Inline images][Inline images]].
 
 ** Pasting and dropping images
 

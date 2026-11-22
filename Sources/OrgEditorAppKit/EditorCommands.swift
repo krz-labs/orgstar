@@ -53,6 +53,7 @@ public enum EditorCommands {
         EditorCommand(id: "org.widen", title: "Widen", action: .view),
         EditorCommand(id: "org.narrow.toggle", title: "Narrow to Subtree or Widen", action: .view),
         EditorCommand(id: "org.toggle-inline-images", title: "Show or Hide Inline Images", action: .view),
+        EditorCommand(id: "org.toggle-inline-images-linked", title: "Show or Hide Inline Images, Including Described Links", action: .view),
         EditorCommand(id: "org.latex-preview", title: "Show or Hide LaTeX Previews", action: .view),
         EditorCommand(id: "editor.complete", title: "Complete at Point", action: .view),
         EditorCommand(id: "editor.toggle-spell-check", title: "Check Spelling While Typing", action: .view),

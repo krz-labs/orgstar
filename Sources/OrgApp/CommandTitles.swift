@@ -283,6 +283,7 @@ enum CommandTitles {
         String(localized: "Show or Hide Backlinks", comment: "Command title"),
         String(localized: "Show or Hide Columns and Clock", comment: "Command title"),
         String(localized: "Show or Hide Inline Images", comment: "Command title"),
+        String(localized: "Show or Hide Inline Images, Including Described Links", comment: "Command title"),
         String(localized: "Show or Hide LaTeX Previews", comment: "Command title"),
         String(localized: "Show or Hide Line Numbers", comment: "Command title"),
         String(localized: "Show or Hide Markup", comment: "Command title"),

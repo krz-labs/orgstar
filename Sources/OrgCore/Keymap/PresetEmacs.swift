@@ -200,6 +200,9 @@ extension KeymapPreset {
         keys = "C-c C-x C-v"
         command = "org.toggle-inline-images"
         [[bind]]
+        keys = "C-u C-c C-x C-v"
+        command = "org.toggle-inline-images-linked"
+        [[bind]]
         keys = "C-c C-x C-l"
         command = "org.latex-preview"
         [[bind]]

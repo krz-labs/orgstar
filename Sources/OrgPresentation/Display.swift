@@ -44,6 +44,37 @@ extension Presentation {
         return display
     }
 
+    /// An image link and where its image goes.
+    public struct ImagePlacement: Sendable, Equatable {
+        public let link: InlineImages.Link
+        /// The link is all its line holds, so the image takes the line. Otherwise the image
+        /// stands in the text where the link is, as Org's display property puts it.
+        public let ownLine: Bool
+    }
+
+    public static func imagePlacements(_ links: [InlineImages.Link], in text: NSString) -> [ImagePlacement] {
+        links.filter { $0.range.upperBound <= text.length }.map { link in
+            let line = text.lineRange(for: NSRange(location: link.range.lowerBound, length: 0))
+            let before = text.substring(with: NSRange(location: line.location, length: link.range.lowerBound - line.location))
+            let after = NSMaxRange(line) > link.range.upperBound ? text.substring(with: NSRange(location: link.range.upperBound, length: NSMaxRange(line) - link.range.upperBound)) : ""
+            return ImagePlacement(link: link, ownLine: (before + after).allSatisfy { $0 == " " || $0 == "\t" || $0.isNewline })
+        }
+    }
+
+    /// An image's size in points: `width` from `#+ATTR_ORG`, else its own, never wider than
+    /// `maxWidth`, keeping its proportions.
+    public static func imageSize(natural: CGSize, width: Int?, maxWidth: CGFloat) -> CGSize {
+        let shown = min(width.map { CGFloat($0) } ?? natural.width, maxWidth)
+        return CGSize(width: shown, height: natural.width > 0 ? shown * natural.height / natural.width : 0)
+    }
+
+    /// The size of a font whose line is `height` tall, given a font of `pointSize` whose line
+    /// is `lineHeight` tall. An image in the text sits on a hidden character in that font,
+    /// which makes its line, and no other line of the paragraph, as tall as the image.
+    public static func imageFontSize(height: CGFloat, pointSize: CGFloat, lineHeight: CGFloat) -> CGFloat {
+        lineHeight > 0 ? max(0.01, height * pointSize / lineHeight) : pointSize
+    }
+
     /// Whether `role` hides while markup is hidden: link brackets and targets as with
     /// `org-link-descriptive`; emphasis markers only when Emacs hides them too.
     public static func hidesWithMarkup(_ role: StyleRole, options: EditingOptions) -> Bool {
