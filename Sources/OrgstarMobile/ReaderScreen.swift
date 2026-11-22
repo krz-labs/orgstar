@@ -117,12 +117,7 @@ struct ReaderScreen: View {
         }
         .quickLookPreview($previewed)
         .sheet(isPresented: $showingOutline) { outlineSheet }
-        .safeAreaInset(edge: .bottom) {
-            if let message {
-                Text(message).font(.callout).padding(8).frame(maxWidth: .infinity).background(.bar)
-                    .onTapGesture { self.message = nil }
-            }
-        }
+        .message($message)
         .environment(\.openURL, OpenURLAction { url in follow(url) })
         .onAppear(perform: open)
         .onChange(of: pane?.path) { loadFolds() }

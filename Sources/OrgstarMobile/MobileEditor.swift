@@ -366,7 +366,17 @@ final class MobileEditor: NSObject, DocumentBuffer {
         if case .emacsTable(_, _, _, let reason, _, _, _) = request {
             return String(localized: "This table needs Emacs, which runs on the Mac: \(TableReason.localized(reason)).", comment: "Table formulas only Emacs can calculate")
         }
-        return String(localized: "\(CommandTitle.localized(title)) isn't available on iPhone and iPad.", comment: "A command that runs only on the Mac")
+        return unavailable(title)
+    }
+
+    /// The refusal for a command that runs on the Mac and not here, by its title.
+    static func unavailable(_ title: String) -> String {
+        String(localized: "\(CommandTitle.localized(title)) isn't available on iPhone and iPad. It runs on the Mac.", comment: "A command that runs only on the Mac")
+    }
+
+    /// The refusal for a command identifier, named by its title where the app knows one.
+    static func unavailable(command id: String) -> String {
+        unavailable(Commands.command(id)?.title ?? CommandPalette.viewCommands.first { $0.id == id }?.title ?? id)
     }
 
     // MARK: - Commands by name and key
@@ -406,12 +416,12 @@ final class MobileEditor: NSObject, DocumentBuffer {
         case "edit.redo": textView.undoManager?.redo()
         case "org.table.toggle-column-width", "org.table.shrink", "org.table.expand": tableColumnWidth(id)
         case _ where id.hasPrefix("app.") || Self.linkCommands.contains(id):
-            if let onAppCommand { onAppCommand(id) } else { onMessage?("Not available on iOS yet") }
+            if let onAppCommand { onAppCommand(id) } else { onMessage?(Self.unavailable(command: id)) }
         default:
             if let command = Commands.command(id) {
                 _ = perform(command)
             } else {
-                onMessage?("Not available on iOS yet")
+                onMessage?(Self.unavailable(command: id))
             }
         }
     }

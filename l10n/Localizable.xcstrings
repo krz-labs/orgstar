@@ -435,37 +435,37 @@
         }
       }
     },
-    "%@ isn't available on iPhone and iPad.": {
+    "%@ isn't available on iPhone and iPad. It runs on the Mac.": {
       "comment": "A command that runs only on the Mac",
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ ist auf iPhone und iPad nicht verfügbar."
+            "value": "%@ ist auf iPhone und iPad nicht verfügbar, nur auf dem Mac."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ no está disponible en iPhone ni en iPad."
+            "value": "%@ no está disponible en iPhone ni en iPad, solo en el Mac."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ n'est pas disponible sur iPhone et iPad."
+            "value": "%@ n'est pas disponible sur iPhone et iPad, seulement sur Mac."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@はiPhoneとiPadでは利用できません。"
+            "value": "%@はiPhoneとiPadでは利用できません。Macで利用できます。"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ não está disponível no iPhone e no iPad."
+            "value": "%@ não está disponível no iPhone e no iPad, só no Mac."
           }
         }
       }

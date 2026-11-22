@@ -54,7 +54,7 @@ The toolbar has:
 - Undo
 - More :: Commands, Clock In, Show Markup, Recent Entries, Export, Sync Conflict Copies, and Recovered Versions.
 
-Messages from commands show at the top of the editor for a few seconds; tap one to dismiss it.
+Messages from commands show at the top of the editor, and at the bottom of the reader, for a few seconds; tap one to dismiss it.
 
 ** Panes and windows on iPad
 
@@ -173,7 +173,7 @@ With a hardware keyboard, the editor uses the preset =keymap= sets in the folder
 - Command shortcuts are the system's.
 - Keys the keymap leaves to the text system stay with iOS. These include the editing keys =C-a=, =C-e=, =C-k= and similar, which iOS handles itself.
 - After a prefix such as =C-c=, the message line shows =C-c-= while it waits for the next key. An unbound sequence shows =… is undefined=.
-- A sequence bound to a command that can't run at the caret, or that the iOS app doesn't have, shows why, as on the Mac: the command's own message (such as =Not on a heading=), or =Not available on iOS yet=.
+- A sequence bound to a command that can't run at the caret, or that the iOS app doesn't have, shows why, as on the Mac: the command's own message (such as =Not on a heading=), or that it isn't available on iPhone and iPad and runs on the Mac.
 
 See [[file:03-keys.org][Keys and commands]] for the Emacs bindings.
 
@@ -458,4 +458,4 @@ Quick Look in the Files app shows org files as the HTML export renders them.
 - The global capture hotkey and the Settings window.
 - Explicit saving.
 
-Commands the iOS app can't carry out show a message instead, such as "Not available on iOS yet" or "/Command/ isn't available on iPhone and iPad." Only tables that need Emacs say that Emacs is needed. Commands that only appear on the Mac aren't listed in Commands. Refile… in Commands (or =C-c C-w= with a hardware keyboard) refiles the entry at the caret, choosing the target as the agenda's Refile… does.
+Commands the iOS app can't carry out show a message instead: "/Command/ isn't available on iPhone and iPad. It runs on the Mac." Only tables that need Emacs say that Emacs is needed. Commands that only appear on the Mac aren't listed in Commands. Refile… in Commands (or =C-c C-w= with a hardware keyboard) refiles the entry at the caret, choosing the target as the agenda's Refile… does.

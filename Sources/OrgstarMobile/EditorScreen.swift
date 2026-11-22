@@ -217,16 +217,9 @@ struct EditorScreen: View {
                     }
                     .frame(maxWidth: .infinity).padding(4).background(.bar)
                 }
-                if let message {
-                    Text(message).font(.callout).padding(8).frame(maxWidth: .infinity).background(.bar)
-                        .onTapGesture { self.message = nil }
-                        .task(id: message) {
-                            try? await Task.sleep(for: .seconds(4))
-                            if self.message == message { self.message = nil }
-                        }
-                }
             }
         }
+        .message($message, edge: .top)
         .sheet(item: $prompt) { request in
             PromptSheet(prompt: request.prompt) { answer in
                 prompt = nil
@@ -478,7 +471,7 @@ struct EditorScreen: View {
         editor.onAppCommand = { id in
             if let feature = ProFeature.required(byCommand: id), !ProAccess.shared.allows(feature) { return }
             if Self.paneCommands.contains(id) {
-                if let onPaneCommand { onPaneCommand(id) } else { message = "Not available here" }
+                if let onPaneCommand { onPaneCommand(id) } else { message = MobileEditor.unavailable(command: id) }
             } else if id == "app.save" {
                 _ = session.save(path)
             } else if id == "app.archive" {
@@ -520,7 +513,7 @@ struct EditorScreen: View {
             } else if MobileEditor.linkCommands.contains(id) {
                 link(id)
             } else if !MobileClock.run(id, model: model, workspace: workspace, show: { message = $0 }) {
-                message = "Not available on iOS yet"
+                message = MobileEditor.unavailable(command: id)
             }
         }
     }
@@ -1086,7 +1079,7 @@ struct CommandPalette: View {
     @State private var query = ""
     @Environment(\.dismiss) private var dismiss
 
-    private static let viewCommands: [(id: String, title: String)] = [
+    static let viewCommands: [(id: String, title: String)] = [
         ("org.cycle", "Cycle Visibility"), ("org.cycle-global", "Cycle Global Visibility"),
         ("edit.undo", "Undo"), ("edit.redo", "Redo"),
         ("app.clock.in", "Clock In"), ("app.clock.out", "Clock Out"), ("app.clock.cancel", "Cancel Clock"),
@@ -1258,6 +1251,35 @@ final class PaneHolder {
     deinit {
         guard let release else { return }
         Task { @MainActor in release() }
+    }
+}
+
+/// A command's result or refusal, over the screen until it is tapped or for four seconds.
+private struct MessageView: ViewModifier {
+    @Binding var message: String?
+    let edge: VerticalEdge
+
+    func body(content: Content) -> some View {
+        content.overlay(alignment: edge == .top ? .top : .bottom) {
+            if let message {
+                Text(message).font(.callout).multilineTextAlignment(.center)
+                    .padding(.horizontal, 14).padding(.vertical, 8)
+                    .glassEffect(.regular, in: .rect(cornerRadius: 18))
+                    .padding(8)
+                    .onTapGesture { self.message = nil }
+                    .task(id: message) {
+                        try? await Task.sleep(for: .seconds(4))
+                        if self.message == message { self.message = nil }
+                    }
+            }
+        }
+    }
+}
+
+extension View {
+    /// Shows `message` in the one message view, at the top or bottom of the screen.
+    func message(_ message: Binding<String?>, edge: VerticalEdge = .bottom) -> some View {
+        modifier(MessageView(message: message, edge: edge))
     }
 }
 
