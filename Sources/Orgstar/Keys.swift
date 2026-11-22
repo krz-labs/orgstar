@@ -127,7 +127,7 @@ struct StateTag: View {
     var body: some View {
         Text(label)
             .font(.system(.caption, design: .monospaced).bold())
-            .foregroundStyle(.white)
+            .foregroundStyle(labelColor)
             .padding(.horizontal, 6)
             .padding(.vertical, 1)
             .background(color, in: RoundedRectangle(cornerRadius: 4))
@@ -142,13 +142,38 @@ struct StateTag: View {
         }
     }
 
-    private var color: Color {
+    private var slot: String {
         switch state {
-        case "insert": theme.color("state-insert") ?? .green
-        case "replace": theme.color("state-replace") ?? .red
-        case "visual", "visual-line", "visual-block": theme.color("state-visual") ?? .orange
-        default: theme.color("state-normal") ?? .blue
+        case "insert": "state-insert"
+        case "replace": "state-replace"
+        case "visual", "visual-line", "visual-block": "state-visual"
+        default: "state-normal"
         }
+    }
+
+    private var color: Color {
+        theme.color(slot) ?? ["state-insert": Color.green, "state-replace": .red, "state-visual": .orange][slot] ?? .blue
+    }
+
+    /// The theme's background on light fills, white on dark ones: whichever contrasts more.
+    private var labelColor: Color {
+        let (theme, slot) = (theme, slot)
+        return theme.dynamic(.white) { dark in
+            let colors = dark ? theme.dark : theme.light
+            guard let fill = colors[slot], let background = colors["background"] else { return nil }
+            let white = RGBA(red: 1, green: 1, blue: 1)
+            return Self.contrast(background, fill) > Self.contrast(white, fill) ? background : white
+        }
+    }
+
+    /// The WCAG contrast ratio of two opaque colors.
+    nonisolated static func contrast(_ a: RGBA, _ b: RGBA) -> Double {
+        func luminance(_ c: RGBA) -> Double {
+            let linear = [c.red, c.green, c.blue].map { $0 <= 0.03928 ? $0 / 12.92 : pow(($0 + 0.055) / 1.055, 2.4) }
+            return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
+        }
+        let (x, y) = (luminance(a), luminance(b))
+        return (max(x, y) + 0.05) / (min(x, y) + 0.05)
     }
 }
 

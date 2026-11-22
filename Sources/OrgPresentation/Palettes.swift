@@ -150,6 +150,7 @@ extension ThemeSpec {
             "agenda-background": \.bg, "agenda-date": \.fg, "agenda-today": \.accent, "agenda-time": \.secondary, "agenda-category": \.secondary,
             "agenda-overdue": \.red, "agenda-due-soon": \.orange, "agenda-event": \.purple,
             "habit-clear": \.blue, "habit-ready": \.green, "habit-alert": \.yellow, "habit-overdue": \.red,
+            "state-replace": \.red,
         ]
 
         /// Alphas are whole bytes (`#…33`, `#…59`), so a palette written out as a theme file

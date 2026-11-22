@@ -153,6 +153,12 @@ struct ThemeSpecTests {
         #expect(problems.count == 2)
     }
 
+    @Test func readsTheReplaceStateColor() throws {
+        let (spec, problems) = ThemeSpec.reading(try TOML.parse("[theme]\nstate-replace = \"#cf222e\""))
+        #expect(problems.isEmpty)
+        #expect(spec.light["state-replace"]?.hex == "#cf222e")
+    }
+
     @Test func defaultThemeFileReadsBackAsTheDefault() throws {
         let (spec, problems) = ThemeSpec.reading(try TOML.parse(ThemeSpec.defaultThemeFile()), over: ThemeSpec(light: [:], dark: [:]))
         #expect(problems.isEmpty)

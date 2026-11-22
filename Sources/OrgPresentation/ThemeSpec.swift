@@ -119,6 +119,7 @@ public struct ThemeSpec: Equatable, Sendable {
         ("state-normal", "the NORMAL tag"),
         ("state-insert", "the INSERT tag"),
         ("state-visual", "the VISUAL and V-LINE tags"),
+        ("state-replace", "the REPLACE tag"),
         ("agenda-background", "the agenda and board; unset: the system's"),
         ("agenda-date", "agenda day headers"),
         ("agenda-today", "today's header and the current time"),
@@ -137,6 +138,7 @@ public struct ThemeSpec: Equatable, Sendable {
     public static let systemDefaults: Set<String> = [
         "sidebar-background", "sidebar-foreground", "sidebar-header", "modeline-background", "modeline-foreground", "agenda-background",
         "accent",
+        "state-replace",
     ]
 
     // MARK: - The default theme

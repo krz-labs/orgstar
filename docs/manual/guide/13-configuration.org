@@ -801,6 +801,7 @@ The colors stack in this order, each over the one before: the themes chosen with
 | =state-normal=          | the NORMAL tag (Doom keys)                                   |
 | =state-insert=          | the INSERT tag                                               |
 | =state-visual=          | the VISUAL and V-LINE tags                                   |
+| =state-replace=         | the REPLACE tag                                              |
 | =agenda-background=     | the agenda and board; the iOS widgets                        |
 | =agenda-date=           | agenda day headers after today                               |
 | =agenda-today=          | today's header and the now line                              |
@@ -814,7 +815,7 @@ The colors stack in this order, each over the one before: the themes chosen with
 | =habit-alert=           | habit graph: due today, last chance                          |
 | =habit-overdue=         | habit graph: overdue                                         |
 
-The default theme leaves =sidebar-background=, =sidebar-foreground=, =sidebar-header=, =modeline-background=, =modeline-foreground= and =agenda-background= unset, so those parts keep the standard macOS look. Set them to color those parts too. In the views around the editor (sidebar, modeline, agenda), a color you set for one appearance only leaves the other appearance to the system. In the editor, a color set for one appearance only takes the default theme's color in the other.
+The default theme leaves =sidebar-background=, =sidebar-foreground=, =sidebar-header=, =modeline-background=, =modeline-foreground=, =agenda-background= and =state-replace= unset, so those parts keep the standard macOS look. Set them to color those parts too. In the views around the editor (sidebar, modeline, agenda), a color you set for one appearance only leaves the other appearance to the system. In the editor, a color set for one appearance only takes the default theme's color in the other.
 
 An unknown color key, a value that isn't a color, or an unknown table such as =[theme.solarized]= is reported as a problem and skipped.
 
