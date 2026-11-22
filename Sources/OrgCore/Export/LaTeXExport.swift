@@ -1815,10 +1815,9 @@ final class LaTeXRenderer {
             code = "\\includesvg" + code.dropFirst("\\includegraphics".count)
             code = code.replacingOccurrences(of: ".svg}", with: "}")
         }
-        let above = false
         switch float {
         case .env(let env):
-            return "\\begin{\(env)}\(placement)\n\(above ? caption : "")\(center ? "\\centering" : "")\n\(code)\n\(above ? "" : caption)\\end{\(env)}"
+            return "\\begin{\(env)}\(placement)\n\(center ? "\\centering" : "")\n\(code)\n\(caption)\\end{\(env)}"
         case .wrap:
             return "\\begin{wrapfigure}\(placement)\n\(center ? "\\centering" : "")\n\(code)\n\(caption)\\end{wrapfigure}"
         case .sideways:

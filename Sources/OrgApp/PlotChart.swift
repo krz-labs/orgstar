@@ -200,7 +200,7 @@ public struct PlotChart: View {
         }
 
         /// The matrix's value at a fractional column and row, from its four neighbours.
-        static func interpolate(_ m: [[Double]], _ x: Double, _ z: Double) -> Double {
+        nonisolated static func interpolate(_ m: [[Double]], _ x: Double, _ z: Double) -> Double {
             guard !m.isEmpty, !m[0].isEmpty else { return 0 }
             let c = min(max(x - 1, 0), Double(m[0].count - 1)), r = min(max(z - 1, 0), Double(m.count - 1))
             let c0 = Int(c), r0 = Int(r), c1 = min(c0 + 1, m[0].count - 1), r1 = min(r0 + 1, m.count - 1)

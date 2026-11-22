@@ -11,7 +11,7 @@ import SwiftUI
 struct AgendaScreen: View, Equatable {
     let workspace: WorkspaceModel
     let session: DocumentSession
-    @Bindable var agenda: AgendaModel
+    let agenda: AgendaModel
     let scheduler: ReminderScheduler
     @State private var message: String?
     @Environment(ClockModel.self) private var clock
@@ -1142,7 +1142,8 @@ struct DateSheet: View {
     }
 }
 
-extension AgendaItem: Identifiable {
+// Module names on both, so the Xcode target, where OrgCore is another package, doesn't warn.
+extension OrgCore.AgendaItem: Swift.Identifiable {
     public var id: String { "\(path ?? "")|\(headingOffset ?? -1)|\(kind.rawValue)|\(text)" }
 
     /// An entry, not a time-grid line.

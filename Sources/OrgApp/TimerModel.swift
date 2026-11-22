@@ -13,7 +13,7 @@ public final class TimerModel {
     /// The countdown's message when it ends, for the echo area.
     @ObservationIgnored public var onDone: ((String) -> Void)?
     @ObservationIgnored private var countdown: Task<Void, Never>?
-    static let notification = "sh.krz.orgstar.org-timer"
+    nonisolated static let notification = "sh.krz.orgstar.org-timer"
 
     public init() {}
 

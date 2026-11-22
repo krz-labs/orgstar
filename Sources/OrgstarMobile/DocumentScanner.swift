@@ -21,7 +21,7 @@ struct DocumentScanner: UIViewControllerRepresentable {
     func makeCoordinator() -> Coordinator { Coordinator(scanned: scanned) }
 
     /// `pages` as a PDF, each page the size of its image in points.
-    static func pdf(_ pages: [UIImage]) -> Data {
+    nonisolated static func pdf(_ pages: [UIImage]) -> Data {
         UIGraphicsPDFRenderer(bounds: .zero).pdfData { context in
             for page in pages {
                 let bounds = CGRect(origin: .zero, size: page.size)

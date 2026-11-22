@@ -41,14 +41,18 @@ struct ThemePickerScreen: View {
             return Color(.sRGB, red: c.red, green: c.green, blue: c.blue, opacity: c.alpha)
         }
         let font = Font.system(.footnote, design: .monospaced)
+        func run(_ text: String, _ key: String, bold: Bool = false, underline: Bool = false) -> AttributedString {
+            var run = AttributedString(text)
+            run.foregroundColor = color(key)
+            if bold { run.inlinePresentationIntent = .stronglyEmphasized }
+            if underline { run.underlineStyle = .single }
+            return run
+        }
         return VStack(alignment: .leading, spacing: 2) {
-            (Text(verbatim: "* ").foregroundColor(color("heading-1")) + Text(verbatim: "TODO ").foregroundColor(color("todo")).bold()
-                + Text(verbatim: "Plan the trip ").foregroundColor(color("heading-1")).bold() + Text(verbatim: ":travel:").foregroundColor(color("tags")))
-            (Text(verbatim: "  SCHEDULED: ").foregroundColor(color("metadata")) + Text(verbatim: "<2026-10-20 Tue>").foregroundColor(color("timestamp")))
-            (Text(verbatim: "  Book via ").foregroundColor(color("foreground")) + Text(verbatim: "the site").foregroundColor(color("link")).underline()
-                + Text(verbatim: ", ").foregroundColor(color("foreground")) + Text(verbatim: "~code~").foregroundColor(color("code")))
-            (Text(verbatim: "** ").foregroundColor(color("heading-2")) + Text(verbatim: "DONE ").foregroundColor(color("done")).bold()
-                + Text(verbatim: "Passport").foregroundColor(color("heading-2")).bold())
+            Text(run("* ", "heading-1") + run("TODO ", "todo", bold: true) + run("Plan the trip ", "heading-1", bold: true) + run(":travel:", "tags"))
+            Text(run("  SCHEDULED: ", "metadata") + run("<2026-10-20 Tue>", "timestamp"))
+            Text(run("  Book via ", "foreground") + run("the site", "link", underline: true) + run(", ", "foreground") + run("~code~", "code"))
+            Text(run("** ", "heading-2") + run("DONE ", "done", bold: true) + run("Passport", "heading-2", bold: true))
         }
         .font(font)
         .padding(8)

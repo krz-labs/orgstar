@@ -8,7 +8,7 @@ public enum OverdueBadge {
     public static func counts(_ groups: [AgendaDayGroup], today: Int, days: Int) -> [Int] {
         func key(_ row: AgendaRow) -> String? {
             guard let item = row.item, !row.isDone, item.habit == nil, row.planningDay != nil else { return nil }
-            return "\(item.path):\(item.headingOffset ?? item.markerOffset)"
+            return "\(String(describing: item.path)):\(String(describing: item.headingOffset ?? item.markerOffset))"
         }
         var overdue = Set(groups.first { $0.day == today }?.overdue.compactMap(key) ?? [])
         var counts = [overdue.count]

@@ -39,7 +39,6 @@ public struct InsertDrawer: OrgCommand {
             buffer.insert("\n:END:")
             if !buffer.eolp { buffer.insert("\n") }
             buffer.point = buffer.lineStart(buffer.point) - 1
-            if buffer.lookingAtLine("^:END:") == nil { buffer.point = buffer.lineStart(max(0, buffer.point - 1)) - 1 }
         }
     }
 }

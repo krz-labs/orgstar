@@ -105,7 +105,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
     var knownTags: @Sendable () -> [String] = { [] }
 
     var theme: MobileTheme
-    internal(set) var fold = FoldState()
+    var fold = FoldState()
     var globalVisibility: GlobalVisibility?
     let hidden = LockedRanges()
     /// An arrow key moved the caret, and where it was before; the caret skips folds then.
@@ -125,9 +125,9 @@ final class MobileEditor: NSObject, DocumentBuffer {
     /// The line last revealed while markup is hidden, to hide again when the caret leaves.
     var revealedLine: NSRange?
     /// `org-toggle-inline-images`: lines that are only an image link show the image.
-    internal(set) var showsImages = false
+    var showsImages = false
     /// `org-latex-preview`: LaTeX fragments show as typeset math.
-    internal(set) var showsLatex = false
+    var showsLatex = false
     /// The view width images were last sized for.
     var imageWidth: CGFloat = 0
     /// The file's folder, for relative image paths.
