@@ -120,6 +120,9 @@ struct SmallRow: View {
 struct WideRow: View {
     let row: AgendaSnapshot.Row
     @Environment(\.colorScheme) private var scheme
+    @ScaledMetric(relativeTo: .caption2) private var gutterWidth: CGFloat = 72
+    @ScaledMetric(relativeTo: .caption2) private var priorityRing: CGFloat = 16
+    @ScaledMetric(relativeTo: .caption) private var categoryDot: CGFloat = 6
 
     var body: some View {
         HStack(spacing: 6) {
@@ -127,11 +130,11 @@ struct WideRow: View {
                 .font(.caption2.weight(.medium).monospacedDigit())
                 .foregroundStyle(row.statusColor?.color(scheme) ?? .secondary)
                 .lineLimit(1)
-                .frame(width: 72, alignment: .leading)
+                .frame(width: gutterWidth, alignment: .leading)
             if let todo = row.todo {
                 let color = row.todoColor?.color(scheme) ?? .secondary
                 Text(todo)
-                    .font(.system(size: 9, weight: .bold))
+                    .font(.caption2.weight(.bold))
                     .foregroundStyle(color)
                     .padding(.horizontal, 4)
                     .padding(.vertical, 1)
@@ -140,14 +143,14 @@ struct WideRow: View {
             if let priority = row.priority {
                 let color = row.priorityColor?.color(scheme) ?? .orange
                 Text(priority)
-                    .font(.system(size: 9, weight: .bold))
+                    .font(.caption2.weight(.bold))
                     .foregroundStyle(color)
-                    .frame(width: 14, height: 14)
+                    .frame(width: priorityRing, height: priorityRing)
                     .overlay(Circle().strokeBorder(color, lineWidth: 1))
             }
             Text(row.title).font(.caption).lineLimit(1)
             Spacer(minLength: 0)
-            Circle().fill(row.categoryColor?.color(scheme) ?? .secondary).frame(width: 6, height: 6)
+            Circle().fill(row.categoryColor?.color(scheme) ?? .secondary).frame(width: categoryDot, height: categoryDot)
         }
     }
 }
