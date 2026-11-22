@@ -215,29 +215,29 @@ Code blocks (see [[file:11-code-blocks.org][Code blocks]]):
 
 - =:cmdline= is supported only for shells, =dot=, =plantuml=, =mermaid= and C, C++, D, Java, Fortran and Clojure.
 - =:post= isn't supported; =:prologue= and =:epilogue= aren't for =dot=, =plantuml= and =mermaid=; =:stdin= and =:shebang= only for shells.
-- =:session= is supported only for shells and Python. C, C++, D, Java, Fortran and Clojure ignore it, as in Org.
+- =:session= is supported only for shells, Python, Ruby, JavaScript and R; on iOS and in the Mac App Store version, only for JavaScript. C, C++, D, Java, Fortran and Clojure ignore it, as in Org.
 - Clojure runs with babashka or the Clojure CLI only; other =:backend= values are refused.
 - R blocks return their standard output, whatever =:results= says; ob-R returns the value with =:results value=.
 - Header arguments, =:var= values and =:cache= that need Lisp evaluated by Emacs are refused when orgstar's interpreter can't evaluate them: "… is Lisp that only Emacs can evaluate; nothing was run."
 - Noweb references that run a block aren't supported.
-- Tangling refuses =:var= that would run a block, and tables and lists in =:var= for some languages.
-- On iOS and in the Mac App Store version, only Emacs Lisp blocks run, in orgstar's own interpreter.
+- Tangling refuses =:var= that would run a block, tables and lists in a shell block's =:var=, and =:var= in languages other than shells, Python, Emacs Lisp, C, C++, D, Java, Fortran and Clojure.
+- On iOS and in the Mac App Store version, only Emacs Lisp, JavaScript, calc, sqlite, dot and mermaid blocks run: Emacs Lisp in orgstar's own interpreter, JavaScript in JavaScriptCore.
 
 Links (see [[file:09-links.org][Links]]):
 
-- =shell:= links aren't run. =elisp:= links run a form after asking, in Emacs on the Mac
-  when it is installed, otherwise in orgstar's interpreter; command names aren't run.
+- =shell:= links aren't run. =elisp:= links run a form after asking, in Emacs in the Mac
+  download version when it is installed, otherwise in orgstar's interpreter; command names
+  aren't run.
 
 Capture templates (see [[file:08-capture.org][Capture]]):
 
-- =%(= escapes, which run Emacs Lisp, aren't supported.
-- =%[file]= escapes aren't supported.
+- =%(= escapes run in orgstar's Emacs Lisp interpreter, not in Emacs. A form that uses something the interpreter doesn't have stops the capture with a message.
 
 Tables and dynamic blocks (see [[file:10-tables.org][Tables]] and [[file:06-dates-and-clocking.org][Dates and clocking]]):
 
 - Formulas outside orgstar's own calculator go to Emacs in the Mac download version, and are refused in the Mac App Store version and on iOS.
-- Clock tables support the scopes =nil=, =file=, =subtree= and =treeN=; other scopes, =:match= and =:step= aren't supported.
-- Dynamic blocks other than =clocktable=, =columnview= and denote-org's aren't supported. Column views of other files aren't supported.
+- Clock tables ignore =:formatter= and refuse scopes given as functions.
+- Dynamic blocks other than =clocktable=, =columnview= and denote-org's aren't supported. A column view of another file doesn't write its summaries into that file.
 
 Other:
 
@@ -256,5 +256,4 @@ Other:
 - Radio lists are Org 9.8's =#+ATTR_ORG: :radio= checkbox lists. The =#+ORGLST= radio lists of Org 9.1 and earlier, removed in Org 9.2, aren't supported, nor is =org-list-checkbox-radio-mode=.
 - org-attach: =org-attach-method= is always =cp= for Attach File… (the other methods have their own commands), =org-attach-auto-tag= is always =ATTACH=, =org-attach-preferred-new-method= is always =id=, and =org-attach-id-to-path-function-list= is Org's default. The dispatcher's =b=, =O= and =F= keys and =org-attach-archive-delete= aren't supported. Delete All Attachments… asks once and deletes the folder with what's in it.
 - org-crypt works with symmetric encryption only (=org-crypt-key= nil); public keys and =org-crypt-use-before-save-magic= aren't supported. =org-crypt-tag-matcher= is a single tag.
-- =org-track-ordered-property-with-tag= isn't supported; Toggle ORDERED Property sets only the property.
 - When TODO dependencies refuse a change on a =COMMENT= heading, the heading keeps =COMMENT=. Org removes it before the check and doesn't put it back.

@@ -412,7 +412,7 @@ orgstar does not run a block whose arguments it would handle differently from Em
 | =:post=                     | every language                                    | "=:post= isn't supported yet; nothing was run."          |
 | =:stdin=, =:shebang=        | languages other than shells                     | "=:stdin= isn't supported yet; nothing was run."         |
 | =:cmdline=                  | languages other than shells, graphics and the compiled languages | "=:cmdline= isn't supported for /language/ yet; nothing was run." |
-| =:session=                  | =awk=, graphics and Emacs Lisp; the compiled languages ignore it | "=:session= isn't supported for /language/ yet; nothing was run." |
+| =:session=                  | =awk=, =calc=, =sqlite=, graphics and Emacs Lisp; the compiled languages ignore it | "=:session= isn't supported for /language/ yet; nothing was run." |
 
 * Variables
 

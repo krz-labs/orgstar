@@ -531,7 +531,7 @@ Other files are read from disk, so unsaved edits in another open file don't coun
 
 =:match= takes a match such as ="work"=, ="-home"= or ~"TODO=\"DONE\""~. Headings that don't match add none of their own time, but the headings above a matching one are still listed with its time.
 
-Not supported: =:formatter=, which is ignored along with other unknown parameters, and scopes given as functions. Labels are in English only.
+Not supported: =:formatter=, which is ignored along with other unknown parameters, and scopes given as functions.
 
 * Habits
 
