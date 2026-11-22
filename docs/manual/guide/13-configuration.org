@@ -23,7 +23,7 @@ The folder holds these files:
 | =views.toml=         | Saved agenda views                                               | No                                    |
 | =default-theme.toml= | The default theme's colors, for reference                        | Yes, at every launch                  |
 
-=config.toml= is the source of truth. The Settings window writes each change into it, keeping your comments and the order of lines, and edits you make to the file apply while orgstar runs. If the file doesn't exist at launch, orgstar creates it with every setting at its current value and a comment after each one.
+=config.toml= is the source of truth. The Settings window writes each change into it, keeping your comments and the order of lines, and edits you make to the file apply while orgstar runs. If the file doesn't exist at launch, orgstar creates it with every setting at its current value and a comment after each one. A file that is there but can't be read, such as one that isn't UTF-8, is left as it is: the change isn't written and a message says why, as it does when a write fails. Import from Emacs and saving an agenda view treat =capture.toml=, =views.toml= and =keymap.toml= the same way.
 
 When you add the folder to a dotfiles repository, keep =default-theme.toml= out of it or ignore its changes: orgstar rewrites it whenever its contents differ from the built-in theme.
 

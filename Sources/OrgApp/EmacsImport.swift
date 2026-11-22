@@ -1134,7 +1134,8 @@ extension EmacsImport {
     /// Applies `items`: settings to `defaults` (and so config.toml), folders to the workspace,
     /// capture templates and key bindings appended to capture.toml and keymap.toml in
     /// `directory`, leaving out templates whose key is there already and bindings that are
-    /// there already. Returns a summary.
+    /// there already. A file that is there but can't be read is left as it is. Returns a summary,
+    /// which counts only what was written.
     @MainActor
     /// With `writeConfig`, settings and structure templates are written into `config.toml` too,
     /// for where nothing syncs user defaults into it (iOS). With `chosenFolders`, folders chosen in
@@ -1193,8 +1194,28 @@ extension EmacsImport {
             }
         }
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        // Files that are there but can't be read; nothing is written to them.
+        var unreadable: Set<URL> = []
+        func read(_ file: URL) -> String {
+            do {
+                return try UserFile.text(at: file) ?? ""
+            } catch {
+                if unreadable.insert(file).inserted { problems.append("\(file.lastPathComponent) wasn't changed: \(error.localizedDescription)") }
+                return ""
+            }
+        }
+        func write(_ text: String, to file: URL) -> Bool {
+            guard !unreadable.contains(file) else { return false }
+            do {
+                try text.write(to: file, atomically: true, encoding: .utf8)
+                return true
+            } catch {
+                problems.append("\(file.lastPathComponent) wasn't written: \(error.localizedDescription)")
+                return false
+            }
+        }
         let captureFile = directory.appendingPathComponent("capture.toml")
-        var capture = (try? String(contentsOf: captureFile, encoding: .utf8)) ?? ""
+        var capture = read(captureFile)
         let existingKeys = Set((try? TOML.parse(capture))?.compactMap { $0.values["key"]?.string } ?? [])
         var addedCapture = ""
         for item in items {
@@ -1204,10 +1225,10 @@ extension EmacsImport {
         }
         if !addedCapture.isEmpty {
             capture += (capture.isEmpty ? "# Capture templates. Imported from Emacs.\n" : "\n# Imported from Emacs.\n") + addedCapture
-            try? capture.write(to: captureFile, atomically: true, encoding: .utf8)
+            if !write(capture, to: captureFile) { templates = 0 }
         }
         let viewsFile = directory.appendingPathComponent("views.toml")
-        var viewsText = (try? String(contentsOf: viewsFile, encoding: .utf8)) ?? ""
+        var viewsText = read(viewsFile)
         var viewNames = Set((try? TOML.parse(viewsText))?.filter { $0.name == "view" }.compactMap { $0.values["name"]?.string } ?? [])
         var addedViews = ""
         for item in items {
@@ -1217,10 +1238,10 @@ extension EmacsImport {
         }
         if !addedViews.isEmpty {
             viewsText += (viewsText.isEmpty ? "# Agenda views. Imported from Emacs.\n" : "\n# Imported from Emacs.\n") + addedViews
-            try? viewsText.write(to: viewsFile, atomically: true, encoding: .utf8)
+            if !write(viewsText, to: viewsFile) { views = 0 }
         }
         let configFile = directory.appendingPathComponent("config.toml")
-        var config = (try? String(contentsOf: configFile, encoding: .utf8)) ?? ""
+        var config = read(configFile)
         var projectNames = Set((try? TOML.parse(config))?.filter { $0.name == "publish" }.compactMap { $0.values["name"]?.string } ?? [])
         var addedProjects = ""
         for item in items {
@@ -1230,10 +1251,10 @@ extension EmacsImport {
         }
         if !addedProjects.isEmpty {
             config += (config.isEmpty || config.hasSuffix("\n") ? "" : "\n") + "\n# Publishing projects. Imported from Emacs.\n" + addedProjects
-            try? config.write(to: configFile, atomically: true, encoding: .utf8)
+            if !write(config, to: configFile) { projects = 0 }
         }
         let keymapFile = directory.appendingPathComponent("keymap.toml")
-        var keymap = (try? String(contentsOf: keymapFile, encoding: .utf8)) ?? ""
+        var keymap = read(keymapFile)
         func binding(_ keys: String?, _ command: String?, _ mode: String?) -> String { [keys ?? "", command ?? "", mode ?? ""].joined(separator: "\u{0}") }
         var existingBindings = Set((try? TOML.parse(keymap))?.filter { $0.name == "bind" && $0.values["when"] == nil }
             .map { binding($0.values["keys"]?.string, $0.values["command"]?.string, $0.values["mode"]?.string) } ?? [])
@@ -1247,7 +1268,7 @@ extension EmacsImport {
         }
         if !addedKeys.isEmpty {
             keymap += (keymap.isEmpty ? "" : "\n") + "# Imported from Emacs.\n" + addedKeys
-            try? keymap.write(to: keymapFile, atomically: true, encoding: .utf8)
+            if !write(keymap, to: keymapFile) { bindings = 0 }
         }
         // Into user defaults, from where ConfigSync writes them into config.toml.
         var rows = UserConfig.structureTemplates(defaults)
@@ -1267,7 +1288,7 @@ extension EmacsImport {
         }
         if noteTemplates > 0 { UserConfig.setDenoteTemplates(notes, in: defaults) }
         if writeConfig, settings + blocks + noteTemplates > 0 {
-            var text = (try? String(contentsOf: configFile, encoding: .utf8)) ?? ""
+            var text = read(configFile)
             for setting in stored {
                 text = UserConfig.setting(text, section: setting.section, key: setting.key, to: UserConfig.value(setting, in: defaults))
             }
@@ -1279,7 +1300,8 @@ extension EmacsImport {
                 guard case .denoteTemplate(let key, let template) = item.change else { continue }
                 text = UserConfig.setting(text, section: UserConfig.denoteTemplateTable, key: key, to: .string(template))
             }
-            try? text.write(to: configFile, atomically: true, encoding: .utf8)
+            // Here config.toml holds the settings, so one that isn't in it wasn't imported.
+            if !write(text, to: configFile) { (settings, blocks, noteTemplates) = (0, 0, 0) }
         }
         func count(_ n: Int, _ word: String) -> String? { n == 0 ? nil : "\(n) \(word)\(n == 1 ? "" : "s")" }
         let done = [count(settings, "setting"), count(folders, "folder"), count(templates, "capture template"), count(bindings, "key binding"),

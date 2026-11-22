@@ -259,6 +259,10 @@ struct ClockReportView: View {
         let panel = NSSavePanel()
         panel.nameFieldStringValue = "time-report.org"
         guard panel.runModal() == .OK, let url = panel.url else { return }
-        try? report.write(to: url, atomically: true, encoding: .utf8)
+        do {
+            try report.write(to: url, atomically: true, encoding: .utf8)
+        } catch {
+            NSAlert(error: error).runModal()
+        }
     }
 }

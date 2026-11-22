@@ -362,8 +362,7 @@ struct ConfigFileEditor: View {
 
     private func save() {
         guard text != saved else { return }
-        model.saveConfig(text)
-        saved = text
+        if model.saveConfig(text) { saved = text }
     }
 }
 

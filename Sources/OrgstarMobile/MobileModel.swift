@@ -108,16 +108,17 @@ final class MobileModel {
 
     /// Chooses the configuration folder, or with nil stops using one; its settings apply now.
     func setConfigFolder(_ url: URL?) {
+        var problem: String?
         if let url {
             ConfigFolder.set(url)
-            Self.createConfig(in: url)
+            problem = Self.createConfig(in: url)
         } else {
             ConfigFolder.clear()
             // What the folder set no longer applies.
             for setting in UserConfig.settings { UserDefaults.standard.removeObject(forKey: setting.defaultsKey) }
         }
         configFolder = url
-        reloadConfig()
+        _ = reloadConfig(after: problem)
         watchConfig()
     }
 
@@ -168,27 +169,38 @@ final class MobileModel {
         configFolder.flatMap { Self.read($0.appendingPathComponent("config.toml")) }
     }
 
-    /// Writes the folder's `config.toml` and applies it.
-    func saveConfig(_ text: String) {
-        guard let configFolder else { return }
-        var error: NSError?
-        NSFileCoordinator(filePresenter: nil).coordinate(writingItemAt: configFolder.appendingPathComponent("config.toml"), options: [], error: &error) { url in
-            try? text.write(to: url, atomically: true, encoding: .utf8)
+    /// Writes the folder's `config.toml` and applies it. False, with the reason first in
+    /// `configProblems`, when the file can't be written or what it holds can't be read.
+    @discardableResult
+    func saveConfig(_ text: String) -> Bool {
+        guard let configFolder else { return false }
+        return reloadConfig(after: Self.updateConfig(in: configFolder) { _ in text })
+    }
+
+    /// Changes the folder's `config.toml`; returns the problem when it can't be read or written.
+    private static func updateConfig(in folder: URL, _ change: (String) -> String) -> String? {
+        do {
+            try UserFile.update(folder.appendingPathComponent("config.toml"), coordinated: true, change)
+            return nil
+        } catch {
+            return "config.toml wasn't changed: \(error.localizedDescription)"
         }
+    }
+
+    /// Applies the folder's settings, with the `problem` of the write before it first.
+    private func reloadConfig(after problem: String?) -> Bool {
         reloadConfig()
+        if let problem { configProblems.insert(problem, at: 0) }
+        return problem == nil
     }
 
     /// Changes a setting from the app: in the folder's config.toml when there is a folder, as
     /// the Mac's Settings write it, else in this device's settings.
     func set(_ defaultsKey: String, to value: TOML.Value) {
         guard let setting = UserConfig.settings.first(where: { $0.defaultsKey == defaultsKey }) else { return }
+        var problem: String?
         if let configFolder {
-            let file = configFolder.appendingPathComponent("config.toml")
-            var error: NSError?
-            NSFileCoordinator(filePresenter: nil).coordinate(writingItemAt: file, options: [], error: &error) { url in
-                let text = (try? String(contentsOf: url, encoding: .utf8)) ?? ""
-                try? UserConfig.setting(text, section: setting.section, key: setting.key, to: value).write(to: url, atomically: true, encoding: .utf8)
-            }
+            problem = Self.updateConfig(in: configFolder) { UserConfig.setting($0, section: setting.section, key: setting.key, to: value) }
         } else {
             switch value {
             case .bool(let b): UserDefaults.standard.set(b, forKey: defaultsKey)
@@ -196,7 +208,7 @@ final class MobileModel {
             case .integer(let i): UserDefaults.standard.set(i, forKey: defaultsKey)
             }
         }
-        reloadConfig()
+        _ = reloadConfig(after: problem)
     }
 
     /// The capture templates, for the share extension to offer.
@@ -218,14 +230,17 @@ final class MobileModel {
 
     /// Applies the folder's `config.toml` to the settings; returns its problems and the theme's
     /// colors.
-    /// Writes `config.toml` with every setting at its default when the folder has none.
-    private static func createConfig(in folder: URL) {
+    /// Writes `config.toml` with every setting at its default when the folder has none; returns
+    /// the problem when it can't be written.
+    private static func createConfig(in folder: URL) -> String? {
         let file = folder.appendingPathComponent("config.toml")
         var error: NSError?
+        var failure: Error?
         NSFileCoordinator(filePresenter: nil).coordinate(writingItemAt: file, options: [], error: &error) { url in
             guard !FileManager.default.fileExists(atPath: url.path) else { return }
-            try? UserConfig.defaultTemplate.write(to: url, atomically: true, encoding: .utf8)
+            do { try UserConfig.defaultTemplate.write(to: url, atomically: true, encoding: .utf8) } catch { failure = error }
         }
+        return (error ?? failure).map { "config.toml wasn't created: \($0.localizedDescription)" }
     }
 
     private static func readConfig(_ folder: URL?) -> ([String], ThemeSpec) {

@@ -24,6 +24,9 @@ public final class ConfigSync {
     private let defaults: UserDefaults
     @ObservationIgnored private var text: String?
     @ObservationIgnored private var configProblems: [String] = []
+    @ObservationIgnored private var themeProblems: [String] = []
+    /// Why the file couldn't be read or written, the last time a setting was to go into it.
+    @ObservationIgnored private var fileProblem: String?
     @ObservationIgnored private var applying = false
     @ObservationIgnored private var watcher: FSEventsWatcher?
     @ObservationIgnored private var observer: NSObjectProtocol?
@@ -53,15 +56,11 @@ public final class ConfigSync {
             if let text {
                 let migrated = UserConfig.usesLegacyNames(text) ? UserConfig.migratingLegacyNames(text) : text
                 let completed = UserConfig.addingMissingSections(migrated, from: defaults)
-                if completed != text {
-                    try? completed.write(to: target, atomically: true, encoding: .utf8)
-                    self.text = completed
-                }
+                if completed != text, write(completed) { self.text = completed }
             }
         } else {
             let template = UserConfig.template(from: defaults)
-            try? template.write(to: target, atomically: true, encoding: .utf8)
-            text = template
+            if write(template) { text = template }
         }
         observer = NotificationCenter.default.addObserver(forName: UserDefaults.didChangeNotification, object: defaults, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.writeBack() }
@@ -105,6 +104,8 @@ public final class ConfigSync {
         observer = nil
         text = nil
         configProblems = []
+        themeProblems = []
+        fileProblem = nil
         self.url = url
         start(watch: watches)
         readTheme()
@@ -142,13 +143,40 @@ public final class ConfigSync {
             in: url.deletingLastPathComponent()
         ) else { return }
         if read.theme != theme { theme = read.theme }
-        problems = configProblems + read.problems
+        themeProblems = read.problems
+        updateProblems()
+    }
+
+    private func updateProblems() {
+        let all = (fileProblem.map { [$0] } ?? []) + configProblems + themeProblems
+        if all != problems { problems = all }
+    }
+
+    /// Writes the file; false, with the reason among `problems`, when that fails.
+    private func write(_ new: String) -> Bool {
+        do {
+            try new.write(to: target, atomically: true, encoding: .utf8)
+            fileProblem = nil
+        } catch {
+            fileProblem = "\(url.lastPathComponent) wasn't written: \(error.localizedDescription)"
+        }
+        updateProblems()
+        return fileProblem == nil
     }
 
     /// Writes settings that differ from the file into it.
     func writeBack() {
         // The file as it is now, so that tables written into it since, as by Emacs import, stay.
-        guard !applying, var current = (try? String(contentsOf: url, encoding: .utf8)) ?? text else { return }
+        guard !applying else { return }
+        let onDisk: String?
+        do {
+            onDisk = try UserFile.text(at: url)
+        } catch {
+            fileProblem = "\(url.lastPathComponent) wasn't changed: \(error.localizedDescription)"
+            updateProblems()
+            return
+        }
+        guard var current = onDisk ?? text else { return }
         let values = UserConfig.values(in: current)
         let original = current
         for setting in UserConfig.settings where defaults.object(forKey: setting.defaultsKey) != nil {
@@ -164,9 +192,12 @@ public final class ConfigSync {
         for template in UserConfig.denoteTemplates(defaults) where values[UserConfig.path(UserConfig.denoteTemplateTable, template.key)] != .string(template.text) {
             current = UserConfig.setting(current, section: UserConfig.denoteTemplateTable, key: template.key, to: .string(template.text))
         }
-        guard current != original else { return }
+        guard current != original else {
+            fileProblem = nil
+            return updateProblems()
+        }
+        guard write(current) else { return }
         text = current
-        try? current.write(to: target, atomically: true, encoding: .utf8)
         // A theme picked in Settings; the watcher's reload sees the text unchanged and skips it.
         readTheme()
     }

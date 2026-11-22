@@ -251,11 +251,11 @@ public enum AgendaViewLoader {
         guard let table = table(name: name, mode: mode) else {
             throw SaveFailure(description: String(localized: "This view can't be saved from here; write it in views.toml."))
         }
-        var text = (try? String(contentsOf: userFile, encoding: .utf8)) ?? ""
-        if !text.isEmpty { text += text.hasSuffix("\n") ? "\n" : "\n\n" }
         do {
             try FileManager.default.createDirectory(at: userFile.deletingLastPathComponent(), withIntermediateDirectories: true)
-            try (text + table).write(to: userFile, atomically: true, encoding: .utf8)
+            try UserFile.update(userFile) { text in
+                text + (text.isEmpty ? "" : text.hasSuffix("\n") ? "\n" : "\n\n") + table
+            }
         } catch {
             throw SaveFailure(description: error.localizedDescription)
         }
