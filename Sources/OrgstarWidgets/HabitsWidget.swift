@@ -72,7 +72,7 @@ struct HabitsView: View {
         let done = snapshot.habits.filter { $0.habit.doneDates.contains(today) }.count
         return VStack(alignment: .leading, spacing: family == .systemSmall ? 6 : 8) {
             HStack(alignment: .firstTextBaseline) {
-                Text("Habits").font(.subheadline.weight(.semibold))
+                Text("Habits").font(.subheadline.weight(.semibold)).widgetAccentable()
                 Spacer(minLength: 0)
                 Text("\(done)/\(snapshot.habits.count) today").font(.caption2.weight(.semibold)).foregroundStyle(.secondary)
             }
@@ -104,9 +104,9 @@ struct HabitsView: View {
 }
 
 /// org-habit's graph: a bar per day in the due-state color, lighter for days to come, a dot
-/// where it was done, today outlined. With Differentiate Without Colour, the state is also
-/// how solid the bar is, from clear (faintest) to overdue (solid), and days to come are
-/// outlined.
+/// where it was done, today outlined. With Differentiate Without Colour, and in the tinted and
+/// clear styles, which draw every colour in one tint, the state is also how solid the bar is,
+/// from clear (faintest) to overdue (solid), and days to come are outlined.
 struct HabitCells: View {
     let cells: [Habit.Cell]
     let colors: [String: AgendaSnapshot.Hex]
@@ -114,8 +114,9 @@ struct HabitCells: View {
     let height: CGFloat
     @Environment(\.colorScheme) private var scheme
     @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
+    @Environment(\.widgetRenderingMode) private var renderingMode
 
-    private var stepped: Bool { differentiateWithoutColor }
+    private var stepped: Bool { differentiateWithoutColor || renderingMode != .fullColor }
 
     var body: some View {
         HStack(spacing: 1) {

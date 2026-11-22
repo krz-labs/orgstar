@@ -72,6 +72,7 @@ struct TodayView: View {
             Text(entry.date, format: family == .systemSmall ? .dateTime.weekday(.abbreviated).day() : .dateTime.weekday(.wide).day().month())
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(snapshot.color("agenda-today", scheme) ?? .accentColor)
+                .widgetAccentable()
             Spacer(minLength: 0)
             if overdue > 0, family != .systemSmall {
                 Text("\(overdue) overdue")
