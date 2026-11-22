@@ -69,6 +69,7 @@ struct AgendaView: View {
     @State var pickedDate = Date()
     @AppStorage("agendaOverdueExpanded") private var overdueShown = true
     @State private var hovered: String?
+    @ScaledMetric(relativeTo: .callout) private var gutterWidth = AgendaRowView.gutterWidth
     @FocusState private var focused: Bool
     @AppStorage("agendaSpan") var span = 10
     @AppStorage("agendaStartOffset") var startOffset = 0
@@ -307,7 +308,7 @@ struct AgendaView: View {
                                     }
                                 }
                             } header: {
-                                header { Text(block.header).font(.system(size: 13, weight: .semibold)) }
+                                header { Text(block.header).font(.body.weight(.semibold)) }
                             }
                         }
                     } else if isAgenda {
@@ -324,7 +325,7 @@ struct AgendaView: View {
                                 rowView(Line(id: "list:\(index)", row: row, day: agenda.today), showsGutter: false)
                             }
                         } header: {
-                            header { Text(listTitle).font(.system(size: 13, weight: .semibold)) }
+                            header { Text(listTitle).font(.body.weight(.semibold)) }
                         }
                     }
                 }
@@ -477,8 +478,8 @@ struct AgendaView: View {
     private func gridLine(_ time: Int) -> some View {
         HStack(spacing: 6) {
             Text(String(format: "%02d:%02d", time / 100, time % 100))
-                .font(.system(size: 10).monospacedDigit())
-                .frame(width: AgendaRowView.gutterWidth, alignment: .leading)
+                .font(.caption.monospacedDigit())
+                .frame(width: gutterWidth, alignment: .leading)
             GridRule().stroke(style: StrokeStyle(lineWidth: 0.5, dash: [2, 3])).frame(height: 1)
         }
         .foregroundStyle(.tertiary)
@@ -490,7 +491,7 @@ struct AgendaView: View {
     private func header(@ViewBuilder _ content: () -> some View) -> some View {
         HStack(spacing: 6) { content() }
             .padding(.horizontal, 16)
-            .frame(height: 30)
+            .frame(minHeight: 30)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(theme.color("agenda-background") ?? Color(nsColor: .textBackgroundColor))
             .overlay(alignment: .bottom) { Divider() }
@@ -502,19 +503,19 @@ struct AgendaView: View {
         return header {
             if let relative = group.relativeName(today: agenda.today) {
                 Text(relative)
-                    .font(.system(size: 13, weight: .bold))
+                    .font(.body.weight(.bold))
                     .foregroundStyle(color)
                 Text("·").foregroundStyle(.tertiary)
             }
             Text(Self.format(group.day, Days.date(group.day).year == Days.date(agenda.today).year ? "EEEE d MMMM" : "EEEE d MMMM yyyy"))
-                .font(.system(size: 13, weight: group.isToday ? .bold : .semibold))
+                .font(.body.weight(group.isToday ? .bold : .semibold))
                 .foregroundStyle(color)
             Spacer()
             Button {
                 capture(on: group.day)
             } label: {
                 Image(systemName: "plus")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.callout.weight(.semibold))
                     .frame(width: 22, height: 22)
                     .contentShape(Rectangle())
             }
@@ -532,11 +533,11 @@ struct AgendaView: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 10, weight: .bold))
+                    .font(.caption.weight(.bold))
                     .rotationEffect(.degrees(overdueShown ? 90 : 0))
-                Text("Overdue").font(.system(size: 12, weight: .semibold))
+                Text("Overdue").font(.callout.weight(.semibold))
                 Text("\(count)")
-                    .font(.system(size: 10, weight: .bold).monospacedDigit())
+                    .font(.caption.weight(.bold).monospacedDigit())
                     .padding(.horizontal, 6)
                     .padding(.vertical, 1)
                     .background(Capsule().fill(color.opacity(0.15)))
@@ -555,8 +556,8 @@ struct AgendaView: View {
     private var nowLine: some View {
         HStack(spacing: 6) {
             Text(now.formatted(.dateTime.hour(.twoDigits(amPM: .omitted)).minute()))
-                .font(.system(size: 10, weight: .semibold).monospacedDigit())
-                .frame(width: AgendaRowView.gutterWidth, alignment: .leading)
+                .font(.caption.weight(.semibold).monospacedDigit())
+                .frame(width: gutterWidth, alignment: .leading)
             Circle().frame(width: 6, height: 6)
             Rectangle().frame(height: 1)
         }

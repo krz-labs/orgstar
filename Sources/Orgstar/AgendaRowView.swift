@@ -17,6 +17,8 @@ struct AgendaRowView: View {
     /// Marked for a bulk action.
     var marked = false
     @Environment(\.orgTheme) private var theme
+    @ScaledMetric(relativeTo: .callout) private var gutterWidth = AgendaRowView.gutterWidth
+    @ScaledMetric(relativeTo: .caption) private var badgeSize: CGFloat = 18
 
     static let gutterWidth: CGFloat = 92
 
@@ -35,7 +37,7 @@ struct AgendaRowView: View {
             if let todo = row.todo {
                 let color = theme.dynamic(row.isDone ? .systemGreen : .systemRed) { [theme, row] in theme.todoColor(todo, isDone: row.isDone, dark: $0) }
                 Text(todo)
-                    .font(.system(size: 10, weight: .bold))
+                    .font(.caption.weight(.bold))
                     .foregroundStyle(color)
                     .padding(.horizontal, 7)
                     .padding(.vertical, 2)
@@ -43,7 +45,7 @@ struct AgendaRowView: View {
                     .fixedSize()
             }
             priorityBadge
-                .frame(width: 18)
+                .frame(width: badgeSize)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 6)
@@ -70,18 +72,18 @@ struct AgendaRowView: View {
     private var gutter: some View {
         VStack(alignment: .leading, spacing: 3) {
             Text(row.gutter)
-                .font(.system(size: 12, weight: row.status == .overdue || row.status == .dueSoon ? .semibold : .regular).monospacedDigit())
+                .font(.callout.weight(row.status == .overdue || row.status == .dueSoon ? .semibold : .regular).monospacedDigit())
                 .foregroundStyle(statusColor)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
             if let symbol {
                 Image(systemName: symbol)
-                    .font(.system(size: row.icon == .event ? 8 : 10, weight: .semibold))
+                    .font(.caption.weight(.semibold))
+                    .imageScale(row.icon == .event ? .small : .medium)
                     .foregroundStyle(iconColor)
-                    .frame(height: 12)
             }
         }
-        .frame(width: Self.gutterWidth, alignment: .leading)
+        .frame(width: gutterWidth, alignment: .leading)
     }
 
     /// Overdue entries show a warning, done ones a check, as the status says first.
@@ -111,12 +113,12 @@ struct AgendaRowView: View {
                     ?? theme.dynamic { [theme, row] in theme.categoryColor(row.category, dark: $0) })
                 .frame(width: 6, height: 6)
             Text(row.category)
-                .font(.system(size: 11))
+                .font(.subheadline)
                 .foregroundStyle(theme.color("agenda-category") ?? .secondary)
                 .lineLimit(1)
             if let detail = row.prefixDetail {
                 Text(detail)
-                    .font(.system(size: 11))
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .truncationMode(.middle)
@@ -127,14 +129,14 @@ struct AgendaRowView: View {
     private var titleLine: some View {
         HStack(spacing: 6) {
             Text(row.title.isEmpty ? " " : row.title)
-                .font(.system(size: 13))
+                .font(.body)
                 .strikethrough(row.isDone)
                 .foregroundStyle(row.isDone ? AnyShapeStyle(.secondary) : AnyShapeStyle(theme.color("foreground") ?? .primary))
                 .lineLimit(1)
                 .truncationMode(.tail)
             ForEach([row.progress, row.detail].compactMap { $0 }, id: \.self) { progress in
                 Text(progress)
-                    .font(.system(size: 10, weight: .semibold).monospacedDigit())
+                    .font(.caption.weight(.semibold).monospacedDigit())
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 1)
@@ -143,7 +145,7 @@ struct AgendaRowView: View {
             }
             ForEach(row.tags, id: \.self) { tag in
                 Text(tag)
-                    .font(.system(size: 10, weight: .medium))
+                    .font(.caption.weight(.medium))
                     .foregroundStyle(theme.color("tags") ?? .secondary)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 1)
@@ -158,14 +160,14 @@ struct AgendaRowView: View {
         if let priority = row.priority {
             let color = theme.dynamic(.systemOrange) { [theme] in theme.priorityColor(priority, dark: $0) }
             Text(priority)
-                .font(.system(size: 10, weight: .bold))
+                .font(.caption.weight(.bold))
                 .foregroundStyle(color)
-                .frame(width: 18, height: 18)
+                .frame(width: badgeSize, height: badgeSize)
                 .background(Circle().fill(color.opacity(0.14)))
                 .overlay(Circle().strokeBorder(color.opacity(0.6), lineWidth: 1))
                 .help("Priority \(priority)")
         } else {
-            Color.clear.frame(width: 18, height: 18)
+            Color.clear.frame(width: badgeSize, height: badgeSize)
         }
     }
 }
@@ -179,7 +181,7 @@ struct HabitGraph: View {
         HStack(spacing: 1) {
             ForEach(cells, id: \.day) { cell in
                 Text(String(cell.glyph))
-                    .font(.system(size: 9, weight: .bold, design: .monospaced))
+                    .font(.caption2.monospaced().weight(.bold))
                     .frame(width: 8, height: 14)
                     .background(color(cell.face))
                     .help(Self.label(cell))
