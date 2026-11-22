@@ -12,7 +12,7 @@ scheme="Orgstar macOS"
 platform=macos
 configuration=Release
 
-# Runs before the archive, so it can only check build settings.
+# Runs before the archive, so it can only check build settings; then the performance gates.
 preflight() {
     settings="$(command xcodebuild -project "$project" -scheme "$scheme" -configuration "$configuration" \
         -destination 'generic/platform=macOS' -showBuildSettings 2>/dev/null)" || fail "can't read the build settings of $scheme"
@@ -28,6 +28,7 @@ preflight() {
         ios/OrgstarQuickLook/*-macOS.entitlements ios/OrgstarSpotlight/*.entitlements; do
         ! grep -q temporary-exception "$entitlements" || fail "$entitlements has a temporary exception"
     done
+    ORGSTAR_GATES=1 swift test -c release --filter GateTests || fail "a performance gate failed"
 }
 
 # Checks the built app: no Sparkle, no updater keys, no process launching, no temporary exceptions,

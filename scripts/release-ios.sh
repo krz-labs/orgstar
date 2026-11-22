@@ -10,4 +10,9 @@ PUBLISH="${ORGSTAR_PUBLISH:-1}"
 name=orgstar
 project=ios/Orgstar.xcodeproj
 scheme="Orgstar iOS"
+
+# Runs before the archive.
+preflight() {
+    ORGSTAR_GATES=1 swift test -c release --filter GateTests || fail "a performance gate failed"
+}
 . "${APPSTORE_KIT:-$(dirname "$0")/../../appstore-kit}/release-ios.sh"

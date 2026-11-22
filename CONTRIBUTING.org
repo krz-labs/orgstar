@@ -178,6 +178,10 @@ Each release goes out on three channels, in this order, from the same commit:
 2. =scripts/release-ios.sh=, the iOS app.
 3. =scripts/release-macos.sh=, the Mac App Store app.
 
+Each of them runs the performance gates (=ORGSTAR_GATES=1 swift test -c release --filter GateTests=)
+before it builds anything for signing, and stops if one misses. Run releases on a Mac that is
+otherwise idle, since the gates measure time.
+
 The App Store builds take their version from =MARKETING_VERSION= in =ios/Orgstar.xcodeproj=,
 which every target shares and appstore-kit requires to be the same across them. Set it to
 =<version>= before the release.

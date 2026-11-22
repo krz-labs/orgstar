@@ -42,6 +42,8 @@ if [ "$publish" != 0 ]; then
     [ "$(git branch --show-current)" = main ] || { echo "Release from main." >&2; exit 1; }
 fi
 
+ORGSTAR_GATES=1 swift test -c release --filter GateTests || { echo "A performance gate failed." >&2; exit 1; }
+
 # The build number counts commits, so each release's is higher than the last's.
 build="$(git rev-list --count HEAD)"
 ORGSTAR_SIGN="$sign" ORGSTAR_ARCHS="arm64 x86_64" sh scripts/build-app.sh "$version" "$build" > /dev/null

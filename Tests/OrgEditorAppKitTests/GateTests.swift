@@ -10,9 +10,11 @@ import Testing
 ///     ORGSTAR_GATES=1 swift test -c release --filter GateTests
 ///
 /// `ORGSTAR_GATE_FILE` adds a real file to the synthetic ones. Memory limits follow the design:
-/// 10x the file size for typical documents, 45x for the synthetic worst cases.
+/// 10x the file size for typical documents, 45x for the synthetic worst cases. The 10 MB and
+/// workspace budgets are what the code did when they were set, plus headroom. The tests run one
+/// at a time so their timings don't overlap.
 @MainActor
-@Suite(.enabled(if: ProcessInfo.processInfo.environment["ORGSTAR_GATES"] != nil))
+@Suite(.enabled(if: ProcessInfo.processInfo.environment["ORGSTAR_GATES"] != nil), .serialized)
 struct GateTests {
     /// About 1 MB of body text under a single top-level heading.
     /// Entries with property and LOGBOOK drawers, all folded when the file opens.
@@ -42,6 +44,23 @@ struct GateTests {
     static let bigTable: String = {
         var text = "* Table\n| id | name | note |\n|----+------+------|\n"
         for n in 0..<5_000 { text += "| \(n) | row \(n) | *bold* and [[https://example.com][link]] |\n" }
+        return text
+    }()
+
+    /// About 10 MB of headings with planning lines and drawers, paragraphs with markup, lists,
+    /// tables, source blocks and footnotes.
+    static let tenMegabytes: String = {
+        var text = ""
+        var n = 0
+        while text.utf8.count < 10_000_000 {
+            text += "* TODO Heading \(n) :tag:\nSCHEDULED: <2026-10-04 Sun>\n:PROPERTIES:\n:ID:       \(n)-uuid\n:END:\n"
+            text += "Paragraph \(n) with *bold*, /italic/, =code=, a [[https://example.com/\(n)][link]] and a footnote[fn:\(n)].\n\n"
+            text += "- item \(n)\n  - nested [ ] task\n\n"
+            text += "| id | name |\n|----+------|\n| \(n) | row \(n) |\n\n"
+            text += "#+begin_src swift\nlet n = \(n)\n#+end_src\n\n"
+            text += "[fn:\(n)] Footnote \(n).\n\n"
+            n += 1
+        }
         return text
     }()
 
@@ -112,5 +131,11 @@ struct GateTests {
             #expect(result.newlineP95 < .milliseconds(16), "\(name): blank line")
             #expect(result.memoryRatio < memoryLimit, "\(name): memory")
         }
+        let large = measure("10 MB mixed document", Self.tenMegabytes)
+        print("GATE \(large)")
+        #expect(large.open < .milliseconds(1_500), "10 MB: open")
+        #expect(large.typingP95 < .milliseconds(400), "10 MB: typing")
+        #expect(large.newlineP95 < .milliseconds(400), "10 MB: blank line")
+        #expect(large.memoryRatio < 40, "10 MB: memory")
     }
 }
