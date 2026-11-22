@@ -103,6 +103,12 @@ struct AgendaList: View {
                     .foregroundStyle(.secondary)
             }
             .navigationTitle("Today")
+        } else if link.agenda == nil {
+            ScrollView {
+                Text("Open orgstar on your iPhone to show your agenda here.")
+                    .foregroundStyle(.secondary)
+            }
+            .navigationTitle("Today")
         } else {
             list
         }
@@ -147,8 +153,6 @@ struct AgendaList: View {
                     if agenda.rows.isEmpty { Text("Nothing scheduled").foregroundStyle(.secondary) }
                     ForEach(agenda.rows) { EntryRow(entry: $0, link: link) }
                 }
-            } else {
-                Text("Open orgstar on your iPhone to show your agenda here.").foregroundStyle(.secondary)
             }
         }
         .navigationTitle("Today")
