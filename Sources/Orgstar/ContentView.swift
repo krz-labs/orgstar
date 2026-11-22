@@ -207,18 +207,36 @@ struct ContentView: View {
         #endif
     }
 
+    /// The toolbar, which View ▸ Customize Toolbar… can change.
     @ToolbarContentBuilder
-    private var toolbarItems: some ToolbarContent {
-        ToolbarItem(placement: .navigation) {
+    private var toolbarItems: some CustomizableToolbarContent {
+        ToolbarItem(id: "outline", placement: .navigation) {
             Button(outlineShown ? "Hide Outline" : "Show Outline", systemImage: "list.bullet.indent") { toggleOutline() }
                 .help(outlineShown ? "Hide the outline (⌥⌘O)" : "Show the outline (⌥⌘O)")
                 .disabled(!query.isEmpty || previewPath != nil || session.path == nil)
         }
+        ToolbarItem(id: "capture") {
+            Button("Capture", systemImage: "square.and.pencil") { perform("app.capture") }
+                .help("Capture a note (⇧⌘N)")
+        }
+        ToolbarItem(id: "agenda") {
+            Button("Agenda", systemImage: "calendar") { perform("app.agenda") }
+                .help("Open the agenda (⇧⌘A)")
+        }
+        ToolbarItem(id: "commands") {
+            Button("Commands", systemImage: "command") { commands.showingPalette = true }
+                .help("Find a command by name (⇧⌘P)")
+        }
+        ToolbarItem(id: "inspector") {
+            Button(inspectorShown ? "Hide Columns and Clock" : "Show Columns and Clock", systemImage: "sidebar.trailing") { inspectorShown.toggle() }
+                .help(inspectorShown ? "Hide the columns and clocked time (⌥⌘I)" : "Show the columns and clocked time (⌥⌘I)")
+        }
         if workspace.isIndexing {
-            ToolbarItem { ProgressView().controlSize(.small) }
+            ToolbarItem(id: "indexing") { ProgressView().controlSize(.small) }
+                .customizationBehavior(.disabled)
         }
         if let running = clock.running {
-            ToolbarItem {
+            ToolbarItem(id: "clock") {
                 Menu {
                     Button("Clock Out") { perform("app.clock.out") }
                     Button("Cancel Clock") { perform("app.clock.cancel") }
@@ -236,10 +254,11 @@ struct ContentView: View {
             }
         }
         if session.conflict != nil {
-            ToolbarItem {
+            ToolbarItem(id: "conflict") {
                 Button("Conflict", systemImage: "exclamationmark.triangle") { commands.showingConflict = true }
                     .help("The file changed on disk, and the changes conflict with yours")
             }
+            .customizationBehavior(.disabled)
         }
     }
 
@@ -291,7 +310,7 @@ struct ContentView: View {
         .navigationSubtitle(session.isReadOnly ? "Read-only: not UTF-8" : "")
         .searchable(text: $query, placement: .toolbar, prompt: "Search notes")
         .searchFocused($searchFocused)
-        .toolbar { toolbarItems }
+        .toolbar(id: "main") { toolbarItems }
         .onChange(of: session.path) { plainOutlineShown = false }
         .onChange(of: ScanRules(hiddenFiles: showHiddenFiles, ignoredFolders: Set(ignoredFolders.split(separator: " ").map(String.init))), initial: true) { _, rules in
             workspace.scanRules = rules

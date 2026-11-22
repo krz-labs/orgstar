@@ -98,7 +98,7 @@ Type part of a title; matching is fuzzy and the best matches come first. =↑= a
 
 The palette leaves out text-system movement and editing commands (Forward Character, Kill Line, Set Mark and the like), which only make sense from keys. Every other command is in it, including the ones no preset binds, such as Show or Hide Backlinks, Import Table from File…, Recovery Versions… and Delete Property…. The Mac App Store version leaves out the Emacs exports and Attach File as Hard Link… and as Symbolic Link…; a key bound to Export to PDF with Emacs runs Export to PDF. Commands that cannot run at the caret show a message instead.
 
-The Org menu in the menu bar lists every =org.= command with its keys in the current keymap, and is a way to find a key without the palette. Its Clock submenu lists the clock commands the same way, followed by the recently clocked entries.
+The Org menu in the menu bar lists every =org.= command with its keys in the current keymap, and is a way to find a key without the palette. Act at Point and Update at Point come first; the rest are in submenus by subject: Visibility, Headings, TODO and Tags, Properties and Columns, Dates and Timers, Lists, Tables, Links and Footnotes, Blocks and Text, followed by Attachments, Notes and Encryption, which hold the attachment, note and encryption commands. Its Clock submenu lists the clock commands the same way, followed by the recently clocked entries. The search field in the Help menu finds any menu item by name.
 
 * Menu shortcuts
 

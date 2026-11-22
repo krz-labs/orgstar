@@ -585,7 +585,10 @@ struct OrgstarApp: App {
                 CheckForUpdatesItem(updates: delegate.updates)
             }
             #endif
-            CommandGroup(before: .help) {
+            CommandGroup(replacing: .help) {
+                Button("orgstar Manual") { NSWorkspace.shared.open(Manual.home) }
+                Button("Keys") { NSWorkspace.shared.open(Manual.keys) }
+                Divider()
                 Button("What's New in orgstar") { commands.whatsNew = WhatsNew.releases.first }
                     .disabled(!commands.mainWindowOpen)
             }
@@ -600,21 +603,62 @@ struct OrgstarApp: App {
     }
 }
 
-/// The Org menu: every org command, with the keys that run it in the current keymap.
+/// The Org menu: every org command and the app's commands for entries and notes, in submenus by
+/// subject, with the keys that run them in the current keymap.
 struct OrgMenuItems: View {
     let commands: AppCommands
 
+    /// Submenus and the command id prefixes they hold, in menu order. A command goes in the
+    /// first submenu with a prefix it starts with.
+    static let groups: [(title: LocalizedStringKey, prefixes: [String])] = [
+        ("Visibility", ["org.cycle", "org.fold.", "org.narrow.", "org.widen", "org.sparse-tree", "org.toggle-inline-images", "org.latex-preview"]),
+        ("Headings", ["org.heading.", "org.subtree.", "org.element.", "org.goto", "org.sort", "org.archive.", "app.refile", "app.archive"]),
+        ("TODO and Tags", ["org.todo.", "org.priority.", "org.tags.", "org.effort."]),
+        ("Properties and Columns", ["org.property.", "org.columns", "org.drawer."]),
+        ("Dates and Timers", ["org.schedule", "org.deadline", "org.timestamp.", "org.timer."]),
+        ("Lists", ["org.item.", "org.checkbox."]),
+        ("Tables", ["org.table", "app.table-", "app.plot"]),
+        ("Links and Footnotes", ["org.link.", "org.id.", "org.footnote."]),
+        ("Blocks", ["org.babel.", "org.structure-template", "org.edit-special", "org.dblock.", "org.clock.report", "org.denote."]),
+        ("Text", ["org.emphasize", "org.fill-"]),
+        ("Attachments", ["app.attach."]),
+        ("Notes", ["app.dailies.", "app.node."]),
+        ("Encryption", ["app.crypt."]),
+    ]
+
+    private static func group(of id: String) -> Int? {
+        groups.firstIndex { $0.prefixes.contains { id.hasPrefix($0) } }
+    }
+
+    private static let shown = EditorCommands.all.filter { ($0.id.hasPrefix("org.") || group(of: $0.id) != nil) && !hiddenCommandIDs.contains($0.id) }
+
     var body: some View {
-        ForEach(EditorCommands.all.filter { $0.id.hasPrefix("org.") }, id: \.id) { command in
-            Button {
-                commands.editor?.run(command.id)
-            } label: {
-                Text(command.localizedTitle)
-                if let keys = commands.keyLabel(for: command.id) { Text(keys) }
+        // Commands that fit no subject, such as Act at Point, come first.
+        ForEach(Self.shown.filter { Self.group(of: $0.id) == nil }, id: \.id) { item($0) }
+        Divider()
+        ForEach(Self.groups.indices, id: \.self) { index in
+            Menu(Self.groups[index].title) {
+                ForEach(Self.shown.filter { Self.group(of: $0.id) == index }, id: \.id) { item($0) }
             }
-            .disabled(commands.editor == nil)
         }
     }
+
+    private func item(_ command: EditorCommand) -> some View {
+        Button {
+            if command.id.hasPrefix("org.") { commands.editor?.run(command.id) } else { commands.run(command.id) }
+        } label: {
+            Text(command.localizedTitle)
+            if let keys = commands.keyLabel(for: command.id) { Text(keys) }
+        }
+        .disabled(command.id.hasPrefix("org.") && commands.editor == nil)
+    }
+}
+
+/// The user manual, as `scripts/publish-docs.sh` publishes it.
+enum Manual {
+    static let home = URL(string: "https://files.krz.sh/orgstar/")!
+    /// The key reference, with every preset's keys.
+    static let keys = URL(string: "https://files.krz.sh/orgstar/guide/03-keys.html#key-reference")!
 }
 
 /// View ▸ Show Markup (link brackets and targets, emphasis markers) and Show Line Numbers.

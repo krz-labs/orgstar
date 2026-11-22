@@ -4797,6 +4797,41 @@
         }
       }
     },
+    "Blocks": {
+      "comment": "Org menu submenu",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blöcke"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bloques"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blocs"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ブロック"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blocos"
+          }
+        }
+      }
+    },
     "Board": {
       "comment": "Command title",
       "localizations": {
@@ -5686,6 +5721,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Modelo de Captura"
+          }
+        }
+      }
+    },
+    "Capture a note (⇧⌘N)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notiz erfassen (⇧⌘N)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capturar una nota (⇧⌘N)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capturer une note (⇧⌘N)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メモをキャプチャ（⇧⌘N）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capturar uma nota (⇧⌘N)"
           }
         }
       }
@@ -9373,6 +9442,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Data"
+          }
+        }
+      }
+    },
+    "Dates and Timers": {
+      "comment": "Org menu submenu",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daten und Timer"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fechas y temporizadores"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dates et minuteurs"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日付とタイマー"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Datas e Temporizadores"
           }
         }
       }
@@ -13587,6 +13691,40 @@
         }
       }
     },
+    "Find a command by name (⇧⌘P)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Befehl nach Namen suchen (⇧⌘P)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar un comando por su nombre (⇧⌘P)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trouver une commande par son nom (⇧⌘P)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名前でコマンドを検索（⇧⌘P）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Encontrar um comando pelo nome (⇧⌘P)"
+          }
+        }
+      }
+    },
     "Find and Replace": {
       "comment": "Command title",
       "localizations": {
@@ -15032,6 +15170,41 @@
         }
       }
     },
+    "Hide Columns and Clock": {
+      "comment": "Toolbar button for the inspector",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spalten und Zeiterfassung ausblenden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ocultar columnas y registro de tiempo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masquer les colonnes et le chronométrage"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "列とクロックを非表示"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ocultar Colunas e Registro de Tempo"
+          }
+        }
+      }
+    },
     "Hide Folders": {
       "localizations": {
         "de": {
@@ -15199,6 +15372,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ocultar teclado"
+          }
+        }
+      }
+    },
+    "Hide the columns and clocked time (⌥⌘I)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spalten und erfasste Zeit ausblenden (⌥⌘I)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ocultar las columnas y el tiempo registrado (⌥⌘I)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masquer les colonnes et le temps chronométré (⌥⌘I)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "列と記録時間を非表示（⌥⌘I）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ocultar as colunas e o tempo registrado (⌥⌘I)"
           }
         }
       }
@@ -17871,6 +18078,41 @@
         }
       }
     },
+    "Links and Footnotes": {
+      "comment": "Org menu submenu",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Links und Fußnoten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enlaces y notas al pie"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Liens et notes de bas de page"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リンクと脚注"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Links e Notas de Rodapé"
+          }
+        }
+      }
+    },
     "Links to %@": {
       "localizations": {
         "de": {
@@ -18004,6 +18246,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Lista"
+          }
+        }
+      }
+    },
+    "Lists": {
+      "comment": "Org menu submenu",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リスト"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listas"
           }
         }
       }
@@ -22951,6 +23228,40 @@
         }
       }
     },
+    "Open the agenda (⇧⌘A)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agenda öffnen (⇧⌘A)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir la agenda (⇧⌘A)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir l'agenda (⇧⌘A)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アジェンダを開く（⇧⌘A）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir a agenda (⇧⌘A)"
+          }
+        }
+      }
+    },
     "Open with Default App": {
       "localizations": {
         "de": {
@@ -24705,6 +25016,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Promover Subárvore"
+          }
+        }
+      }
+    },
+    "Properties and Columns": {
+      "comment": "Org menu submenu",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eigenschaften und Spalten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Propiedades y columnas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Propriétés et colonnes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プロパティと列"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Propriedades e Colunas"
           }
         }
       }
@@ -29117,6 +29463,41 @@
         }
       }
     },
+    "Show Columns and Clock": {
+      "comment": "Toolbar button for the inspector",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spalten und Zeiterfassung einblenden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar columnas y registro de tiempo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher les colonnes et le chronométrage"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "列とクロックを表示"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar Colunas e Registro de Tempo"
+          }
+        }
+      }
+    },
     "Show Default Theme": {
       "localizations": {
         "de": {
@@ -30348,6 +30729,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mostrar a agenda"
+          }
+        }
+      }
+    },
+    "Show the columns and clocked time (⌥⌘I)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spalten und erfasste Zeit einblenden (⌥⌘I)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar las columnas y el tiempo registrado (⌥⌘I)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher les colonnes et le temps chronométré (⌥⌘I)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "列と記録時間を表示（⌥⌘I）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar as colunas e o tempo registrado (⌥⌘I)"
           }
         }
       }
@@ -31873,6 +32288,41 @@
         }
       }
     },
+    "TODO and Tags": {
+      "comment": "Org menu submenu",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TODO und Tags"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TODO y etiquetas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TODO et étiquettes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TODOとタグ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TODO e Etiquetas"
+          }
+        }
+      }
+    },
     "TODO keywords": {
       "localizations": {
         "de": {
@@ -31937,6 +32387,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tabela"
+          }
+        }
+      }
+    },
+    "Tables": {
+      "comment": "Org menu submenu",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tabellen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tablas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tableaux"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "表"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tabelas"
           }
         }
       }
@@ -35550,6 +36035,41 @@
         }
       }
     },
+    "Visibility": {
+      "comment": "Org menu submenu",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sichtbarkeit"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visibilidad"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visibilité"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "表示"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visibilidade"
+          }
+        }
+      }
+    },
     "Visual": {
       "localizations": {
         "de": {
@@ -38723,6 +39243,41 @@
     },
     "orgstar": {
       "shouldTranslate": false
+    },
+    "orgstar Manual": {
+      "comment": "Help menu item that opens the manual's website",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar-Handbuch"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manual de orgstar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manuel d'orgstar"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstarマニュアル"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manual do orgstar"
+          }
+        }
+      }
     },
     "orgstar asks which entry to attach them to when you next open it.": {
       "localizations": {
