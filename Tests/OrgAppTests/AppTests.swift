@@ -1,7 +1,7 @@
 import Foundation
 import OrgCore
 import OrgDocument
-import OrgIndex
+@testable import OrgIndex
 import os
 import Testing
 @testable import OrgApp
@@ -60,7 +60,7 @@ struct WorkspaceModelTests {
         let model = try WorkspaceModel(directory: support.url)
         try await model.addRoot(notes.url)
         #expect(model.files.count == 3)
-        #expect(model.search("apples").map(\.title) == ["Groceries"])
+        #expect(try model.search("apples").map(\.title) == ["Groceries"])
         #expect(model.quickOpen("bo").map(\.name) == ["b.org"])
         let root = try #require(model.rootPaths.first)
         #expect(model.tree(forRoot: root).children?.map(\.name) == ["sub", "a.org", "c.sync-conflict-1.org"])
@@ -72,7 +72,7 @@ struct WorkspaceModelTests {
         try reopened.removeRoot(path: root)
         #expect(reopened.roots.isEmpty)
         #expect(reopened.files.isEmpty)
-        #expect(reopened.search("apples").isEmpty)
+        #expect(try reopened.search("apples").isEmpty)
     }
 
     @Test func aMovedFolderLeavesNoOldRows() async throws {
@@ -83,13 +83,13 @@ struct WorkspaceModelTests {
         let data = parent.url.appendingPathComponent("data")
         let model = try WorkspaceModel(directory: data)
         try await model.addRoot(original)
-        #expect(model.search("plumber").count == 1)
+        #expect(try model.search("plumber").count == 1)
 
         let moved = parent.url.appendingPathComponent("moved")
         try FileManager.default.moveItem(at: original, to: moved)
         let reopened = try WorkspaceModel(directory: data)
         await reopened.refresh()
-        let found = reopened.search("plumber").map(\.path)
+        let found = try reopened.search("plumber").map(\.path)
         #expect(found.count == 1 && found[0].hasSuffix("/moved/a.org"), "\(found)")
         // Adding it again, under its new path, adds nothing.
         try await reopened.addRoot(moved)
@@ -113,7 +113,7 @@ struct WorkspaceModelTests {
         try await reopened.regrant(root, with: found)
         #expect(reopened.unresolvedRoots.isEmpty)
         #expect(reopened.roots.map(\.path) == [found.path])
-        #expect(reopened.search("plumber").count == 1)
+        #expect(try reopened.search("plumber").count == 1)
         #expect(try WorkspaceModel(directory: data).roots.map(\.path) == [found.path])
 
         // Chosen again as a folder already in the sidebar, the old one just goes.
@@ -146,16 +146,16 @@ struct WorkspaceModelTests {
         let a = try #require(model.files.first { $0.path.hasSuffix("/a.org") }).path
         let c = try #require(model.files.first { $0.path.hasSuffix("/c.org") }).path
         let sink = Backlinks.Target(path: a, title: "Sink", id: "s-1", customID: "sink")
-        #expect(model.backlinks(to: sink).map(\.title) == ["Plumbing", "Other", "c.org"])
-        #expect(model.backlinks(to: Backlinks.Target(path: a)).map(\.title) == ["Plumbing", "c.org"])
-        #expect(model.backlinks(to: Backlinks.Target(path: a, title: "Taps")).map(\.title) == ["Sink"])
-        #expect(model.backlinks(to: sink, excluding: 0).map(\.title) == ["Plumbing", "Other", "c.org"])
+        #expect(try model.backlinks(to: sink).map(\.title) == ["Plumbing", "Other", "c.org"])
+        #expect(try model.backlinks(to: Backlinks.Target(path: a)).map(\.title) == ["Plumbing", "c.org"])
+        #expect(try model.backlinks(to: Backlinks.Target(path: a, title: "Taps")).map(\.title) == ["Sink"])
+        #expect(try model.backlinks(to: sink, excluding: 0).map(\.title) == ["Plumbing", "Other", "c.org"])
         // Off the main actor, as the panes ask.
-        #expect(await Task.detached { model.backlinks(to: sink).map(\.title) }.value == ["Plumbing", "Other", "c.org"])
+        #expect(try await Task.detached { try model.backlinks(to: sink).map(\.title) }.value == ["Plumbing", "Other", "c.org"])
         // Each with the line its link is on, the link as it reads.
-        #expect(model.backlinks(to: sink).map { $0.snippet?.text } == ["the sink and file:a.org", "file:a.org::#sink https://x.org", "About file:a.org::*Sink and file:a.org."])
-        #expect(model.backlinks(to: sink).first?.snippet?.matches == [0..<8])
-        let fromC = try #require(model.backlinks(to: sink).last)
+        #expect(try model.backlinks(to: sink).map { $0.snippet?.text } == ["the sink and file:a.org", "file:a.org::#sink https://x.org", "About file:a.org::*Sink and file:a.org."])
+        #expect(try model.backlinks(to: sink).first?.snippet?.matches == [0..<8])
+        let fromC = try #require(try model.backlinks(to: sink).last)
         #expect(fromC == .file(c, contentHash: fromC.contentHash))
         let session = DocumentSession(recovery: FileRecoveryStore(directory: notes.url.appendingPathComponent(".r")))
         session.show(fromC)
@@ -184,7 +184,7 @@ struct WorkspaceModelTests {
         try await model.trash(folder + "/roadmap.org")
         #expect(!FileManager.default.fileExists(atPath: folder + "/roadmap.org"))
         #expect(!model.files.map(\.path).contains(folder + "/roadmap.org"))
-        #expect(model.search("alpha").count == 1)
+        #expect(try model.search("alpha").count == 1)
     }
 
     /// Watching starts with no folders (a first launch); a folder added afterwards is
@@ -210,8 +210,32 @@ struct WorkspaceModelTests {
         try await model.addRoot(notes.url)
         try notes.write("a.org", "* New\n")
         await model.filesChanged([file], rescan: [])
-        #expect(model.search("new").count == 1)
+        #expect(try model.search("new").count == 1)
         #expect(model.changedFile?.path == file.path)
+    }
+
+    /// A database error is reported, not shown as nothing found.
+    @Test func reportsIndexErrors() async throws {
+        let notes = try Folder()
+        let file = try notes.write("a.org", "* Alpha\n:PROPERTIES:\n:ID: a-1\n:END:\n* Beta\n[[id:a-1]]\n")
+        let model = try WorkspaceModel(directory: nil)
+        try await model.addRoot(notes.url)
+        let a = try #require(model.files.first).path
+        let target = Backlinks.Target(path: a, title: "Alpha", id: "a-1")
+        #expect(try model.nodes(denote: false).map(\.title) == ["Alpha"])
+        #expect(try model.backlinks(to: target).map(\.title) == ["Beta"])
+        #expect(try model.search("gamma").isEmpty)
+        #expect(model.lastError == nil)
+
+        try model.index.database.close()
+        #expect(throws: WorkspaceModel.FileError.self) { try model.search("alpha") }
+        #expect(throws: WorkspaceModel.FileError.self) { try model.nodes(denote: false) }
+        #expect(throws: WorkspaceModel.FileError.self) { try model.backlinks(to: target) }
+        await model.filesChanged([file], rescan: [])
+        #expect(model.lastError?.hasPrefix("Indexing ") == true)
+        model.lastError = nil
+        await model.filesChanged([], rescan: [notes.url])
+        #expect(model.lastError?.hasPrefix("Indexing ") == true)
     }
 }
 
@@ -233,6 +257,19 @@ struct DocumentSessionTests {
         #expect(session.outline.map(\.start) == [6, 12])
         session.show(location)
         #expect(session.revealRequest?.offset == 12)
+    }
+
+    /// A change that can't be read is reported, and the buffer keeps its text.
+    @Test func unreadableChangeIsReported() throws {
+        let notes = try Folder()
+        let file = try notes.write("a.org", "* One\n")
+        let session = DocumentSession(recovery: FileRecoveryStore(directory: notes.url.appendingPathComponent(".r")))
+        session.open(file.path)
+        try notes.write("a.org", "* Two\n")
+        try FileManager.default.setAttributes([.posixPermissions: 0], ofItemAtPath: file.path)
+        session.fileChanged(file.path)
+        #expect(session.lastError?.hasPrefix("Can't read a.org: ") == true)
+        #expect(session.document?.text == "* One\n")
     }
 
     @Test func sameFileByAnotherPathSharesItsBuffer() throws {
@@ -400,8 +437,8 @@ struct SessionSavingTests {
         try await workspace.addRoot(notes.url)
         try type("* Unsaved heading\n", at: 0)
         let overlay = workspace.overlay(path: session.path, document: session.document)
-        #expect(workspace.search("unsaved").isEmpty)
-        #expect(workspace.search("unsaved", overlay: overlay).map(\.title) == ["Unsaved heading"])
+        #expect(try workspace.search("unsaved").isEmpty)
+        #expect(try workspace.search("unsaved", overlay: overlay).map(\.title) == ["Unsaved heading"])
     }
 }
 

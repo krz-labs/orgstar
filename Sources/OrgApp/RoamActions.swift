@@ -11,7 +11,7 @@ public struct RoamActions {
     /// The sidebar folders, the first being `org-roam-directory` unless it's set.
     public var roots: () -> [String]
     /// Headings and files with IDs.
-    public var nodes: () -> [IndexStore.Node]
+    public var nodes: () throws -> [IndexStore.Node]
     public var show: (String) -> Void
     public var ask: (Prompt, @escaping (String?) -> Void) -> Void
     /// Opens a file with the caret at an offset.
@@ -26,7 +26,7 @@ public struct RoamActions {
     public var reachFolders: ([String]) -> Bool = { _ in true }
 
     public init(
-        session: DocumentSession, roots: @escaping () -> [String], nodes: @escaping () -> [IndexStore.Node], show: @escaping (String) -> Void,
+        session: DocumentSession, roots: @escaping () -> [String], nodes: @escaping () throws -> [IndexStore.Node], show: @escaping (String) -> Void,
         ask: @escaping (Prompt, @escaping (String?) -> Void) -> Void, open: @escaping (String, Int) -> Void,
         insertLink: @escaping (String, String) -> Void, refresh: @escaping () -> Void
     ) {
@@ -111,7 +111,7 @@ public struct RoamActions {
                 guard id == "app.node.silo-create" else { return chooseNode("Node: ", silo: silo, opened) }
                 ask(Prompt(key: "title", message: "New file TITLE: ", requireMatch: false)) { title in
                     guard let title = title?.trimmingCharacters(in: .whitespaces) else { return }
-                    createDenote(title, known: nodes(), silo: silo, opened)
+                    do { createDenote(title, known: try nodes(), silo: silo, opened) } catch { show(error.localizedDescription) }
                 }
             }
         case "app.node.insert":
@@ -186,7 +186,9 @@ public struct RoamActions {
     /// title no node has makes a node with it, as org-roam's default capture template does;
     /// with Denote, `denote` asks for its keywords and makes the note.
     private func chooseNode(_ message: String, silo: String? = nil, _ then: @escaping (NodeChoice) -> Void) {
-        let all = silo.map { silo in nodes().filter { $0.location.path.hasPrefix(silo.hasSuffix("/") ? silo : silo + "/") } } ?? nodes()
+        let known: [IndexStore.Node]
+        do { known = try nodes() } catch { return show(error.localizedDescription) }
+        let all = silo.map { silo in known.filter { $0.location.path.hasPrefix(silo.hasSuffix("/") ? silo : silo + "/") } } ?? known
         let counts = Dictionary(all.map { ($0.title, 1) }, uniquingKeysWith: +)
         let labels = all.map { node in
             counts[node.title, default: 0] > 1 ? "\(node.title) (\((node.location.path as NSString).lastPathComponent))" : node.title

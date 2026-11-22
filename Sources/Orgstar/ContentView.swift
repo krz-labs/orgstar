@@ -270,7 +270,7 @@ struct ContentView: View {
                                 }
                             }
                         } else {
-                            SearchResults(results: workspace.search(query, overlay: workspace.overlay(session.openDocuments))) { location in
+                            SearchResults(results: Result { try workspace.search(query, overlay: workspace.overlay(session.openDocuments)) }) { location in
                                 selectedFile = location.path
                                 session.show(location)
                             }
@@ -872,7 +872,7 @@ struct ContentView: View {
     private var roamActions: RoamActions {
         var actions = RoamActions(
             session: session, roots: { [workspace] in workspace.rootPaths },
-            nodes: { [workspace, session] in workspace.nodes(overlay: workspace.overlay(session.openDocuments)) },
+            nodes: { [workspace, session] in try workspace.nodes(overlay: workspace.overlay(session.openDocuments)) },
             show: { [commands] in commands.show($0) }, ask: { [commands] in commands.ask($0, reply: $1) },
             open: { [commands] path, offset in commands.jump(path: path, offset: offset) },
             insertLink: { [commands] link, title in

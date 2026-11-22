@@ -23,9 +23,14 @@ struct SearchScreen: View {
                         }
                     }
                 }
-                let headings = Perf.measure("search.headings") { workspace.search(trimmed, overlay: workspace.overlay(session.openDocuments)) }
+                let results = Perf.measure("search.headings") { Result { try workspace.search(trimmed, overlay: workspace.overlay(session.openDocuments)) } }
+                let headings = (try? results.get()) ?? []
                 Section("Notes") {
-                    if headings.isEmpty { Text("No notes match").foregroundStyle(.secondary) }
+                    if case .failure(let error) = results {
+                        Text(error.localizedDescription).foregroundStyle(.secondary)
+                    } else if headings.isEmpty {
+                        Text("No notes match").foregroundStyle(.secondary)
+                    }
                     ForEach(headings, id: \.self) { location in
                         NavigationLink(value: ReaderRoute.heading(location)) {
                             VStack(alignment: .leading, spacing: 2) {

@@ -1,5 +1,6 @@
 import Foundation
 import OrgCore
+import OrgIndex
 
 /// denote-sequence's commands, `app.node.sequence-…`: notes numbered in a hierarchy through
 /// their signatures.
@@ -39,7 +40,9 @@ extension RoamActions {
         do { signature = try sequence() } catch { return show("\(error)") }
         ask(Prompt(key: "title", message: "New file TITLE: ", requireMatch: false)) { title in
             guard let title else { return }
-            createDenote(title.trimmingCharacters(in: .whitespaces), known: nodes(), signature: signature) { choice in
+            let known: [IndexStore.Node]
+            do { known = try nodes() } catch { return show(error.localizedDescription) }
+            createDenote(title.trimmingCharacters(in: .whitespaces), known: known, signature: signature) { choice in
                 if case .created(let path, _, _) = choice { open(path, (session.text(of: path).map { ($0 as NSString).length }) ?? 0) }
             }
         }

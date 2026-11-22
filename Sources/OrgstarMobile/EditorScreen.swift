@@ -565,7 +565,7 @@ extension EditorScreen {
     private var roamActions: RoamActions {
         RoamActions(
             session: session, roots: { workspace.rootPaths },
-            nodes: { workspace.nodes(overlay: workspace.overlay(session.openDocuments)) },
+            nodes: { try workspace.nodes(overlay: workspace.overlay(session.openDocuments)) },
             show: { message = $0 }, ask: { prompt = PromptRequest(prompt: $0, reply: $1) },
             open: { file, offset in
                 if file == path { editor?.reveal(offset) } else { model.openRequest = .offset(file, offset) }

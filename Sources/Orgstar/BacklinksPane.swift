@@ -12,6 +12,8 @@ struct BacklinksPane: View {
     let open: (HeadingLocation) -> Void
     @State private var toHeading: [HeadingLocation] = []
     @State private var toFile: [HeadingLocation] = []
+    /// Why the index couldn't be read, shown in place of the lists.
+    @State private var failure: String?
     @Environment(\.orgTheme) private var theme
     @Environment(\.colorScheme) private var colorScheme
 
@@ -27,10 +29,14 @@ struct BacklinksPane: View {
 
     var body: some View {
         List {
-            if let heading {
-                Section("Links to \(heading.title.isEmpty ? "(untitled)" : heading.title)") { rows(toHeading) }
+            if let failure {
+                Text(failure).foregroundStyle(.secondary)
+            } else {
+                if let heading {
+                    Section("Links to \(heading.title.isEmpty ? "(untitled)" : heading.title)") { rows(toHeading) }
+                }
+                Section("Links to this file") { rows(toFile) }
             }
-            Section("Links to this file") { rows(toFile) }
         }
         .themedListBackground(theme.color("sidebar-background", in: colorScheme))
         .task(id: Key(path: session.path, heading: heading?.start, title: heading?.title, index: workspace.indexVersion)) { await refresh() }
@@ -61,24 +67,32 @@ struct BacklinksPane: View {
         guard let path = session.path else {
             toHeading = []
             toFile = []
+            failure = nil
             return
         }
         let overlay = workspace.overlay(session.openDocuments)
-        let found = await Self.backlinks(in: workspace, path: path, tree: session.document?.tree, heading: heading?.start, overlay: overlay)
-        guard !Task.isCancelled else { return }
-        (toFile, toHeading) = found
+        do {
+            let found = try await Self.backlinks(in: workspace, path: path, tree: session.document?.tree, heading: heading?.start, overlay: overlay)
+            guard !Task.isCancelled else { return }
+            (toFile, toHeading) = found
+            failure = nil
+        } catch {
+            guard !Task.isCancelled else { return }
+            (toFile, toHeading) = ([], [])
+            failure = error.localizedDescription
+        }
     }
 
     @concurrent
     private nonisolated static func backlinks(
         in workspace: WorkspaceModel, path: String, tree: OrgTree?, heading: Int?, overlay: [String: FileRecord]
-    ) async -> (toFile: [HeadingLocation], toHeading: [HeadingLocation]) {
+    ) async throws -> (toFile: [HeadingLocation], toHeading: [HeadingLocation]) {
         let model = tree.map { DocumentModel(tree: $0) }
         // The file's own ID, as an org-roam file node.
-        let toFile = workspace.backlinks(to: Backlinks.Target(path: path, id: model?.property("ID", of: nil)?.value), overlay: overlay)
+        let toFile = try workspace.backlinks(to: Backlinks.Target(path: path, id: model?.property("ID", of: nil)?.value), overlay: overlay)
         guard let heading, let info = model?.headings.first(where: { $0.headingRange.lowerBound == heading }) else { return (toFile, []) }
         let customID = info.properties.last { $0.key.uppercased() == "CUSTOM_ID" }?.value
         let target = Backlinks.Target(path: path, title: info.title, id: info.id, customID: customID)
-        return (toFile, workspace.backlinks(to: target, excluding: heading, overlay: overlay))
+        return (toFile, try workspace.backlinks(to: target, excluding: heading, overlay: overlay))
     }
 }

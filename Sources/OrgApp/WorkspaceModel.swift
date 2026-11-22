@@ -289,14 +289,23 @@ public final class WorkspaceModel {
         let reconciler = Reconciler(index: index, settings: settings, rules: scanRules)
         var pending = downloading
         for rootURL in roots {
-            let report = try? await Task.detached { try reconciler.reconcile(root: rootURL) }.value
-            pending = pending.filter { !$0.hasPrefix(rootURL.path + "/") }.union(report?.placeholders.map(\.path) ?? [])
+            var placeholders: [String] = []
+            do {
+                placeholders = try await Task.detached { try reconciler.reconcile(root: rootURL) }.value.placeholders.map(\.path)
+            } catch {
+                lastError = "Indexing \(rootURL.path) failed: \(error.localizedDescription)"
+            }
+            pending = pending.filter { !$0.hasPrefix(rootURL.path + "/") }.union(placeholders)
         }
         for (rootPath, rootURL) in resolvedRoots where !roots.contains(rootURL) {
             let inRoot = paths.filter { $0.path.hasPrefix(rootPath + "/") }
             guard !inRoot.isEmpty else { continue }
-            let report = try? await Task.detached { try reconciler.reconcile(root: rootURL, paths: inRoot) }.value
-            pending.formUnion(report?.placeholders.map(\.path) ?? [])
+            do {
+                let report = try await Task.detached { try reconciler.reconcile(root: rootURL, paths: inRoot) }.value
+                pending.formUnion(report.placeholders.map(\.path))
+            } catch {
+                lastError = "Indexing \(rootURL.path) failed: \(error.localizedDescription)"
+            }
         }
         try? reloadFiles()
         setDownloading(pending)
@@ -446,9 +455,11 @@ public final class WorkspaceModel {
     /// Headings with links to `target`, the target heading's own links left out, each with
     /// the line its link is on as its snippet. Reads every link in the index, so call it off
     /// the main actor; a cancelled task gets what was found so far.
-    public nonisolated func backlinks(to target: Backlinks.Target, excluding start: Int? = nil, overlay: [String: FileRecord] = [:]) -> [HeadingLocation] {
+    public nonisolated func backlinks(to target: Backlinks.Target, excluding start: Int? = nil, overlay: [String: FileRecord] = [:]) throws -> [HeadingLocation] {
         var seen = Set<HeadingLocation>()
-        return ((try? index.links(overlay: overlay)) ?? []).compactMap { link in
+        let links: [(source: HeadingLocation, target: String)]
+        do { links = try index.links(overlay: overlay) } catch { throw Self.indexFailed(error) }
+        return links.compactMap { link in
             guard !Task.isCancelled, !(link.source.path == target.path && link.source.start == start),
                   Backlinks.links(link.target, from: link.source.path, to: target), seen.insert(link.source).inserted else { return nil }
             var source = link.source
@@ -460,12 +471,17 @@ public final class WorkspaceModel {
     }
 
     /// Headings and files with IDs (org-roam's nodes), or Denote's notes.
-    public func nodes(overlay: [String: FileRecord] = [:], denote: Bool = OrgPreferences.usesDenote()) -> [IndexStore.Node] {
-        (try? denote ? index.denoteNodes(overlay: overlay) : index.nodes(overlay: overlay)) ?? []
+    public func nodes(overlay: [String: FileRecord] = [:], denote: Bool = OrgPreferences.usesDenote()) throws -> [IndexStore.Node] {
+        do { return try denote ? index.denoteNodes(overlay: overlay) : index.nodes(overlay: overlay) } catch { throw Self.indexFailed(error) }
     }
 
-    public func search(_ query: String, overlay: [String: FileRecord] = [:]) -> [HeadingLocation] {
-        (try? index.search(query, overlay: overlay)) ?? []
+    public func search(_ query: String, overlay: [String: FileRecord] = [:]) throws -> [HeadingLocation] {
+        do { return try index.search(query, overlay: overlay) } catch { throw Self.indexFailed(error) }
+    }
+
+    /// A query's database error, as the screen showing the query's results says it.
+    private nonisolated static func indexFailed(_ error: any Error) -> FileError {
+        FileError(message: "Can't read the index: \(error.localizedDescription)")
     }
 
     /// Index rows for an open file's unsaved text, keyed by path, for queries to use in place

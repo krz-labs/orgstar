@@ -5,11 +5,12 @@ import OrgWorkspace
 import SwiftUI
 
 struct SearchResults: View {
-    let results: [HeadingLocation]
+    let results: Result<[HeadingLocation], any Error>
     let open: (HeadingLocation) -> Void
 
     var body: some View {
-        List(results, id: \.self) { location in
+        let found = (try? results.get()) ?? []
+        List(found, id: \.self) { location in
             Button {
                 open(location)
             } label: {
@@ -24,7 +25,11 @@ struct SearchResults: View {
             .buttonStyle(.plain)
         }
         .overlay {
-            if results.isEmpty { ContentUnavailableView.search }
+            if case .failure(let error) = results {
+                ContentUnavailableView(error.localizedDescription, systemImage: "exclamationmark.triangle")
+            } else if found.isEmpty {
+                ContentUnavailableView.search
+            }
         }
     }
 }

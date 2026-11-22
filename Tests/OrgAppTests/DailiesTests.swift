@@ -293,6 +293,22 @@ struct DailiesTests {
         #expect(text.hasSuffix(":END:\n#+title: 2026-10-11\n* \n"))
         #expect(opened?.0 == path && opened?.1 == (text as NSString).length - 1)
     }
+
+    /// An index that can't be read is reported, not offered as an empty list of nodes.
+    @MainActor
+    @Test func nodeFindReportsAnIndexError() throws {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("orgstar-roam-\(UUID().uuidString)").resolvingSymlinksInPath()
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let session = DocumentSession(recovery: FileRecoveryStore(directory: folder.appendingPathComponent(".r")))
+        var shown: [String] = []
+        var asked: [String] = []
+        let actions = RoamActions(session: session, roots: { [folder.path] },
+                                  nodes: { throw WorkspaceModel.FileError(message: "Can't read the index: closed") },
+                                  show: { shown.append($0) }, ask: { prompt, _ in asked.append(prompt.key) },
+                                  open: { _, _ in }, insertLink: { _, _ in }, refresh: {})
+        actions.run("app.node.find")
+        #expect(shown == ["Can't read the index: closed"] && asked.isEmpty)
+    }
 }
 
 struct NodeIndexTests {

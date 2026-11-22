@@ -162,7 +162,7 @@ public struct RoamGraph: Sendable, Equatable {
 extension WorkspaceModel {
     /// The graph of the workspace's nodes, with unsaved buffers' in place of their files'.
     public func roamGraph(overlay: [String: FileRecord] = [:], denote: Bool = OrgPreferences.usesDenote()) -> RoamGraph {
-        RoamGraph(nodes: nodes(overlay: overlay, denote: denote), links: (try? index.links(overlay: overlay)) ?? [],
+        RoamGraph(nodes: (try? nodes(overlay: overlay, denote: denote)) ?? [], links: (try? index.links(overlay: overlay)) ?? [],
                   sections: denote ? [:] : (try? index.nodeSections(overlay: overlay)) ?? [:], denote: denote)
     }
 }

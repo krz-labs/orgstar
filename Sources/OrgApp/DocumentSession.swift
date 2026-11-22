@@ -1099,10 +1099,18 @@ public final class DocumentSession {
     public func fileChanged(_ path: String) {
         let interval = Perf.begin("session.fileChanged")
         defer { interval.end((path as NSString).lastPathComponent) }
-        guard let entry = entry(path), let bytes = try? fileSystem.read(URL(fileURLWithPath: path)) else { return }
+        guard let entry = entry(path) else { return }
+        let name = (path as NSString).lastPathComponent
+        let read: [UInt8]?
+        do {
+            read = try fileSystem.read(URL(fileURLWithPath: path))
+        } catch {
+            lastError = "Can't read \(name): \(error.localizedDescription)"
+            return
+        }
+        guard let bytes = read else { return }
         let buffer = entry.buffer
         guard bytes != buffer.document.mergeBase else { return }
-        let name = (path as NSString).lastPathComponent
         switch buffer.update({ $0.diskChanged(to: bytes) }) {
         case .conflict:
             entry.autosave?.cancel()
