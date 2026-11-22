@@ -40,7 +40,7 @@ With =save = "automatic"= (the default), orgstar saves a file one second after y
 orgstar watches your folders. On the Mac it uses FSEvents; on iOS it is told of changes by file coordination and reads the folders again when you return to the app. When a file that is open in orgstar changes on disk:
 
 - If you have no unsaved edits in it, orgstar reloads it. Undo history for the file is cleared.
-- If you have unsaved edits, orgstar merges the disk version into them and saves the result.
+- If you have unsaved edits, orgstar merges the disk version into them and, with automatic saving, saves the result.
 - If the changes conflict, nothing is saved and the conflict sheet opens.
 
 The merge is a line-based three-way merge between the version orgstar last read or wrote, your edits, and the disk version. A run of lines changed on one side only takes that side; changed the same way on both, it is taken once; changed differently on both, it is a conflict. Lines keep their endings, so CRLF files and a missing final newline survive a merge. A disk version that isn't valid UTF-8 always conflicts.
@@ -56,7 +56,7 @@ The sheet shows what differs, with lines marked - on disk and + in your version,
 | Keep Mine          | Writes your version over the disk version. The disk version goes to the recovery folder.        |
 | Use Disk Version   | Loads the disk version. Your version goes to the recovery folder.                                |
 | Merge with Markers | Puts both sets of changes in the buffer, with conflicting lines between =<<<<<<< yours= and =>>>>>>> disk= markers, as =git merge= leaves them. Edit and save. Your version as it was goes to the recovery folder. |
-| Decide Later       | Closes the sheet. Automatic saving stops for the file until you decide; the Conflict button in the toolbar opens the sheet again. |
+| Decide Later       | Closes the sheet. Automatic saving stops for the file until you decide; the Conflict button in the toolbar opens the sheet again. On iOS the button is Later. |
 
 On the Mac, File ▸ Revert to File on Disk loads the disk version at any time; unsaved changes go to the recovery folder.
 
@@ -113,7 +113,7 @@ File ▸ Recovery Versions… (More ▸ Recovered Versions on iOS) lists the ope
 
 * Features that use Emacs on the Mac
 
-Some features run Emacs in batch mode on the Mac. Everything else works without Emacs installed. The [[file:../install.org][Mac App Store version]] never runs Emacs and does without these features.
+Some features run Emacs in batch mode on the Mac. Everything else works without Emacs installed. The [[file:../install.org][Mac App Store version]] never runs Emacs; it does what the download version does without Emacs, described below.
 
 | Feature                                                        | What runs                                                                                     |
 |----------------------------------------------------------------+-----------------------------------------------------------------------------------------------|
@@ -121,6 +121,8 @@ Some features run Emacs in batch mode on the Mac. Everything else works without 
 | Table formulas outside what orgstar computes itself            | =org-table-recalculate= on a copy of the file; the table's new text replaces the old one if the table didn't change meanwhile |
 | Lisp table formulas that orgstar's Emacs Lisp interpreter can't evaluate | The same; orgstar first asks whether to run Lisp (yes, no, always)                  |
 | Export to PDF, and LaTeX and plain text orgstar can't write itself | =org-latex-export-to-pdf=, =org-latex-export-to-latex= or =org-ascii-export-to-ascii= |
+| =calc= source blocks that orgstar's Calc refuses               | The block, in =emacs -Q --batch=                                                              |
+| =elisp:= links                                                 | The form, after asking, in =emacs -Q --batch= in a copy of the file                           |
 
 HTML, Markdown, ODT, LaTeX and ASCII export don't use Emacs. See [[file:11-code-blocks.org][Code blocks]], [[file:10-tables.org][Tables]] and [[file:12-export.org][Export]].
 
@@ -135,7 +137,7 @@ orgstar uses the first of these that is an executable file:
 5. =/run/current-system/sw/bin/emacs=,
 6. =/usr/bin/emacs=.
 
-An app started from the Dock doesn't see your shell's =PATH=, which is why orgstar looks in fixed places. Without Emacs, these features report "Emacs isn't installed, so …" and change nothing.
+An app started from the Dock doesn't see your shell's =PATH=, which is why orgstar looks in fixed places. Without Emacs, Emacs Lisp blocks and =elisp:= links run in orgstar's own Emacs Lisp interpreter, and a block or form that uses something the interpreter doesn't have fails with a message. A table is recalculated up to the first formula orgstar can't compute, and the echo area names the formula and the reason. A =calc= block that orgstar's Calc refuses isn't run. Export to PDF with Emacs, which the Mac App Store version leaves out, reports "Emacs isn't installed, so this format can't be exported.", and a LaTeX or plain text export orgstar can't write itself stops with the reason.
 
 ** What Emacs sees
 
@@ -191,21 +193,20 @@ orgstar's defaults follow a common Doom Emacs setup rather than plain Emacs in s
 | =org-startup-truncated=              | =false=                             | =t=                             |
 | =electric-pair-mode=                 | =true=                              | off                             |
 | =org-agenda-span=                    | 10 days                             | a week                          |
-| =org-agenda-start-day=               | ="+0d"=                             | today                           |
 | =org-agenda-show-all-dates=          | =false=                             | =t=                             |
 
 =org-hide-emphasis-markers= and =org-pretty-entities= matter for files you also edit in Emacs: orgstar aligns tags and tables, and fills paragraphs, by the width text has on screen in your Emacs. If they don't match your Emacs, tags and tables that orgstar aligns look misaligned in Emacs.
 
-These behave as Emacs's defaults and can't be changed: =org-log-repeat= is =time=, fast TODO selection is on when keywords have keys, priorities are =A= to =C= with =B= as default unless =#+PRIORITIES= says otherwise, and =org-use-sub-superscripts= is ={}= for display (only =x_{1}= and =x^{2}= are lowered and raised).
+These behave as Emacs's defaults and have no setting in =config.toml=: =org-log-repeat= is =time= unless =#+STARTUP= says otherwise, fast TODO selection is on when keywords have keys, priorities are =A= to =C= with =B= as default unless =#+PRIORITIES= says otherwise, and =org-use-sub-superscripts= is ={}= for display (only =x_{1}= and =x^{2}= are lowered and raised).
 
 ** How the agenda looks
 
 The agenda selects the same entries as Org's, but shows them its own way (see [[file:07-agenda.org][The agenda]]):
 
-- Rows have their own layout: the time or a status such as =Due in 2d= on the left, the category above the title, and the keyword and priority as badges. =org-agenda-prefix-format= doesn't change it; only =%t= in its =agenda= entry still decides whether a time in the heading text leaves the title.
-- Days without entries are hidden unless =org-agenda-show-all-dates= is =true=.
+- Rows have their own layout: the time or a status such as =Due in 2d= on the left, the category above the title, and the keyword and priority as badges. =org-agenda-prefix-format= doesn't change the layout; what the format has besides =%c=, =%t=, =%s= and =%i=, such as =%e= or =%b=, shows after the category, and =%t= in its =agenda= entry decides whether a time in the heading text leaves the title.
+- Days without entries are hidden unless =org-agenda-show-all-dates= is =true=; today always shows.
 - Today's past deadlines and past scheduled entries are gathered in an Overdue group, oldest first, rather than sorted among today's entries by urgency.
-- The time grid isn't shown. The now line is, between today's timed entries.
+- The time grid and the now line are drawn as lines among a day's timed entries, where =org-agenda-time-grid=, =org-agenda-use-time-grid= and =org-agenda-show-current-time-in-grid= put them. orgstar draws the lines itself, so the strings in =org-agenda-time-grid= and =org-agenda-current-time-string= have no equivalent.
 
 ** Known differences from Emacs Org
 

@@ -128,7 +128,7 @@ See Themes and Fonts below.
 | Control                             | Range                  | Default      | Key                         |
 |-------------------------------------+------------------------+--------------+-----------------------------|
 | Agenda shows N days                 | 1 to 366               | 10           | =org-agenda-span=           |
-| Agenda starts N days before today   | 0 to 14 days before    | 3 days       | =org-agenda-start-day=      |
+| Agenda starts N days before today   | 0 to 14 days before    | Today        | =org-agenda-start-day=      |
 | Include files in subfolders         | On or off              | Off          | =agenda-include-subfolders= |
 | Show days without entries           | On or off              | Off          | =org-agenda-show-all-dates= |
 | Habits only today                   | On or off              | On           | =org-habit-show-habits-only-for-today= |
