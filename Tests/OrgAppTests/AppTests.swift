@@ -595,6 +595,34 @@ struct AgendaModelTests {
         #expect(agenda.list.map(\.text) == ["TODO One"])
     }
 
+    /// A refresh over cached files leaves the main actor free while it checks them on disk.
+    @Test func checksFilesOffTheMainActor() async throws {
+        let notes = try Folder()
+        for file in 0..<1_500 { try notes.write("f\(file).org", "* TODO Item\n") }
+        let model = try WorkspaceModel(directory: nil)
+        try await model.addRoot(notes.url)
+        let agenda = AgendaModel(workspace: model)
+        agenda.mode = .todo(keywords: nil)
+        await agenda.refresh(open: [:])
+        let clock = ContinuousClock()
+        var longest = Duration.zero
+        let beat = Task { @MainActor in
+            var last = clock.now
+            while !Task.isCancelled {
+                await Task.yield()
+                longest = max(longest, clock.now - last)
+                last = clock.now
+            }
+        }
+        await Task.yield()
+        let start = clock.now
+        await agenda.refresh(open: [:])
+        let took = clock.now - start
+        beat.cancel()
+        #expect(agenda.list.count == 1_500)
+        #expect(longest < took / 2, "main actor held for \(longest) of \(took)")
+    }
+
     @Test func entriesKnowTheirDoneKeyword() async throws {
         let notes = try Folder()
         try notes.write("setup.org", "#+TODO: NEXT | FINISHED\n")

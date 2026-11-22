@@ -177,39 +177,35 @@ public final class AgendaModel {
         defer { interval.end("\(files.count) files") }
         let defaults = workspace.settings.org
         let blocking = options.dimBlockedTasks != .off && (options.enforceTodoDependencies || options.enforceTodoCheckboxDependencies)
-        var reads: [(path: String, cached: AgendaSource?, mtime: Date, size: Int, text: String?)] = []
-        for path in files {
-            if let text = open[path] {
-                // The same text parsed before, as the buffer or as the file on disk.
-                func reusable(_ source: AgendaSource?, _ parsedWith: OrgSettings?, _ parsedBlocking: Bool?) -> AgendaSource? {
-                    guard let source, parsedWith == defaults, parsedBlocking == blocking, !source.readsSetupFiles, source.text == text else { return nil }
-                    return source
-                }
-                let fromOpen = cache.open[path]
-                let fromDisk = cache.entries[path]
-                let cached = reusable(fromOpen?.source, fromOpen?.defaults, fromOpen?.blocking) ?? reusable(fromDisk?.source, fromDisk?.defaults, fromDisk?.blocking)
-                reads.append((path, cached, .distantPast, -1, text))
-                continue
-            }
-            let attributes = try? FileManager.default.attributesOfItem(atPath: path)
-            let mtime = attributes?[.modificationDate] as? Date ?? .distantPast
-            let size = (attributes?[.size] as? NSNumber)?.intValue ?? -1
-            // A file reading setup files is read again: they may have changed.
-            let cached = cache.entries[path].flatMap { entry in
-                entry.mtime == mtime && entry.size == size && entry.defaults == defaults && entry.blocking == blocking && !entry.source.readsSetupFiles ? entry.source : nil
-            }
-            reads.append((path, cached, mtime, size, nil))
-        }
+        let files = files
+        let (openCache, diskCache) = (cache.open, cache.entries)
         let loaded = await Task.detached {
             var sources: [(path: String, mtime: Date, size: Int, source: AgendaSource, fromDisk: Bool)] = []
-            for read in reads {
-                if let cached = read.cached {
-                    sources.append((read.path, read.mtime, read.size, cached, read.text == nil))
-                } else if let text = read.text {
-                    sources.append((read.path, read.mtime, read.size, AgendaSource(path: read.path, text: text, defaults: defaults.resolvingSetupFiles(in: text, path: read.path, read: OrgSettings.readFile), checksBlocking: blocking), false))
-                } else if let data = FileManager.default.contents(atPath: read.path) {
+            for path in files {
+                if let text = open[path] {
+                    // The same text parsed before, as the buffer or as the file on disk.
+                    func reusable(_ source: AgendaSource?, _ parsedWith: OrgSettings?, _ parsedBlocking: Bool?) -> AgendaSource? {
+                        guard let source, parsedWith == defaults, parsedBlocking == blocking, !source.readsSetupFiles, source.text == text else { return nil }
+                        return source
+                    }
+                    let fromOpen = openCache[path]
+                    let fromDisk = diskCache[path]
+                    let cached = reusable(fromOpen?.source, fromOpen?.defaults, fromOpen?.blocking) ?? reusable(fromDisk?.source, fromDisk?.defaults, fromDisk?.blocking)
+                    sources.append((path, .distantPast, -1, cached ?? AgendaSource(path: path, text: text, defaults: defaults.resolvingSetupFiles(in: text, path: path, read: OrgSettings.readFile), checksBlocking: blocking), false))
+                    continue
+                }
+                let attributes = try? FileManager.default.attributesOfItem(atPath: path)
+                let mtime = attributes?[.modificationDate] as? Date ?? .distantPast
+                let size = (attributes?[.size] as? NSNumber)?.intValue ?? -1
+                // A file reading setup files is read again: they may have changed.
+                let cached = diskCache[path].flatMap { entry in
+                    entry.mtime == mtime && entry.size == size && entry.defaults == defaults && entry.blocking == blocking && !entry.source.readsSetupFiles ? entry.source : nil
+                }
+                if let cached {
+                    sources.append((path, mtime, size, cached, true))
+                } else if let data = FileManager.default.contents(atPath: path) {
                     let text = SourceText(bytes: [UInt8](data)).text
-                    sources.append((read.path, read.mtime, read.size, AgendaSource(path: read.path, text: text, defaults: defaults.resolvingSetupFiles(in: text, path: read.path, read: OrgSettings.readFile), checksBlocking: blocking), true))
+                    sources.append((path, mtime, size, AgendaSource(path: path, text: text, defaults: defaults.resolvingSetupFiles(in: text, path: path, read: OrgSettings.readFile), checksBlocking: blocking), true))
                 }
             }
             return sources
