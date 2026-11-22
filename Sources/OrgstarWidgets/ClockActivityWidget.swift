@@ -66,7 +66,11 @@ struct ElapsedText: View {
 struct ClockOutButton: View {
     var body: some View {
         Button(intent: ClockOutIntent()) {
-            Label("Clock Out", systemImage: "stop.fill").font(.caption.weight(.semibold))
+            Label(
+                String(localized: "clock-activity.clock-out", defaultValue: "Clock Out", comment: "Live Activity button that stops the running clock; keep it short"),
+                systemImage: "stop.fill"
+            )
+            .font(.caption.weight(.semibold))
         }
         .tint(.orange)
     }
