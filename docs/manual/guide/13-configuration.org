@@ -356,10 +356,10 @@ These mirror the four elements of =org-stuck-projects=. See [[file:07-agenda.org
 
 | Key     | Type   | Default                                | Effect                                    |
 |---------+--------+----------------------------------------+-------------------------------------------|
-| =when=  | string | ="daily today require-timed"=          | Which days get a grid, separated by spaces |
-| =times= | string | ="800 1000 1200 1400 1600 1800 2000"=  | The grid's times as =HHMM=                |
+| =when=  | string | ="daily today require-timed remove-match"= | Which days get a grid, separated by spaces |
+| =times= | string | ="800 1000 1200 1400 1600 1800 2000"=      | The grid's times as =HHMM=                 |
 
-These mirror the first two elements of =org-agenda-time-grid=. =when= takes =daily= (views of one day), =today=, =weekly= (every day), =require-timed= (only days with a timed entry) and =remove-match= (no line at a time an entry has). orgstar draws the lines itself, so Emacs's third and fourth elements, the strings for the lines, have no equivalent.
+These mirror the first two elements of =org-agenda-time-grid=. =when= takes =daily= (views of one day), =today=, =weekly= (every day), =require-timed= (only days with a timed entry) and =remove-match= (no line at a time an entry has). The default adds =remove-match= to Org's, so that a grid line doesn't repeat an entry's time; ="daily today require-timed"= gives Org's grid. orgstar draws the lines itself, so Emacs's third and fourth elements, the strings for the lines, have no equivalent.
 
 ** [org-structure-template-alist]
 

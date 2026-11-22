@@ -331,7 +331,7 @@ public enum UserConfig {
                 comment: "a heading in the project with one of these tags unsticks it; * for any tag", legacy: ""),
         Setting(section: "org-stuck-projects", key: "regexp", defaultsKey: "stuckProjectsRegexp", kind: .string, fallback: .string(""),
                 comment: "text in the project matching this Emacs regexp unsticks it", legacy: ""),
-        Setting(section: "org-agenda-time-grid", key: "when", defaultsKey: "agendaTimeGridWhen", kind: .string, fallback: .string("daily today require-timed"),
+        Setting(section: "org-agenda-time-grid", key: "when", defaultsKey: "agendaTimeGridWhen", kind: .string, fallback: .string("daily today require-timed remove-match"),
                 comment: "daily (one-day views), today, weekly (every day), require-timed (only with timed entries), remove-match (no line at an entry's time)", legacy: ""),
         Setting(section: "org-agenda-time-grid", key: "times", defaultsKey: "agendaTimeGridTimes", kind: .string, fallback: .string("800 1000 1200 1400 1600 1800 2000"),
                 comment: "the grid's times as HHMM, separated by spaces", legacy: ""),

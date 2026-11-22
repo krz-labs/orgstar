@@ -1078,7 +1078,7 @@ struct GridLineRow: View {
         .foregroundStyle(.tertiary)
         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
         .listRowSeparator(.hidden)
-        .frame(height: 14)
+        .padding(.vertical, 5)
         .accessibilityHidden(true)
     }
 }
@@ -1098,7 +1098,7 @@ struct NowLine: View {
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
         .listRowSeparator(.hidden)
-        .frame(height: 16)
+        .padding(.vertical, 5)
         .accessibilityLabel("Now")
     }
 }

@@ -483,7 +483,7 @@ struct AgendaView: View {
         }
         .foregroundStyle(.tertiary)
         .padding(.horizontal, 16)
-        .frame(height: 10)
+        .padding(.vertical, 4)
         .accessibilityHidden(true)
     }
 
@@ -562,7 +562,7 @@ struct AgendaView: View {
         }
         .foregroundStyle(todayColor)
         .padding(.horizontal, 16)
-        .frame(height: 10)
+        .padding(.vertical, 4)
         .accessibilityLabel("Now")
     }
 
