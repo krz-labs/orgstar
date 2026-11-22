@@ -172,6 +172,7 @@ final class AppCommands {
         messageID += 1
         let id = messageID
         message = text
+        AccessibilityNotification.Announcement(text).post()
         Task {
             try? await Task.sleep(for: .seconds(4))
             if messageID == id { message = nil }

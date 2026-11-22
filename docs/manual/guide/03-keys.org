@@ -82,6 +82,8 @@ The echo area is the line at the bottom of the window, below the modeline. It sh
 - The pending prefix, such as =C-c C-x-=.
 - The last message from a command or from the keymap, for four seconds.
 
+VoiceOver reads each message as it appears.
+
 In the Doom preset the modeline shows the evil state as a tag: =NORMAL=, =INSERT=, =VISUAL=, =V-LINE= or =V-BLOCK=. See [[file:02-the-editor.org][The editor]] for the rest of the modeline.
 
 * The command palette
