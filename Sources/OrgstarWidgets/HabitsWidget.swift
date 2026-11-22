@@ -104,30 +104,71 @@ struct HabitsView: View {
 }
 
 /// org-habit's graph: a bar per day in the due-state color, lighter for days to come, a dot
-/// where it was done, today outlined.
+/// where it was done, today outlined. With Differentiate Without Colour, the state is also
+/// how solid the bar is, from clear (faintest) to overdue (solid), and days to come are
+/// outlined.
 struct HabitCells: View {
     let cells: [Habit.Cell]
     let colors: [String: AgendaSnapshot.Hex]
     let width: CGFloat
     let height: CGFloat
     @Environment(\.colorScheme) private var scheme
+    @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
+
+    private var stepped: Bool { differentiateWithoutColor }
 
     var body: some View {
         HStack(spacing: 1) {
             ForEach(cells, id: \.day) { cell in
-                RoundedRectangle(cornerRadius: 1.5)
-                    .fill(color(cell.face))
-                    .frame(width: width, height: height)
-                    .overlay {
-                        if cell.glyph == "*" { Circle().fill(.white.opacity(0.9)).frame(width: min(width, height) * 0.6) }
-                    }
-                    .overlay {
-                        if cell.glyph == "!" { RoundedRectangle(cornerRadius: 1.5).strokeBorder(Color.primary, lineWidth: 1) }
-                    }
+                if stepped {
+                    steppedCell(cell)
+                } else {
+                    RoundedRectangle(cornerRadius: 1.5)
+                        .fill(color(cell.face))
+                        .frame(width: width, height: height)
+                        .overlay {
+                            if cell.glyph == "*" { Circle().fill(.white.opacity(0.9)).frame(width: min(width, height) * 0.6) }
+                        }
+                        .overlay {
+                            if cell.glyph == "!" { RoundedRectangle(cornerRadius: 1.5).strokeBorder(Color.primary, lineWidth: 1) }
+                        }
+                }
             }
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Done \(cells.filter { $0.glyph == "*" }.count) of \(cells.count) days")
+    }
+
+    /// A filled bar for past days and an outline for days to come, at the state's step; a
+    /// done day has a dot, cut out of the darker steps.
+    private func steppedCell(_ cell: Habit.Cell) -> some View {
+        let (key, fallback, step, future) = Self.state(cell.face)
+        let color = (colors[key]?.color(scheme) ?? fallback).opacity(step)
+        let shape = RoundedRectangle(cornerRadius: 1.5)
+        let dot = Circle().frame(width: min(width, height) * 0.6)
+        return ZStack {
+            if future { shape.strokeBorder(color, lineWidth: 1) } else { shape.fill(color) }
+            if cell.glyph == "*" {
+                if step >= 0.75 { dot.blendMode(.destinationOut) } else { dot.foregroundStyle(Color.primary) }
+            }
+            if cell.glyph == "!" { shape.strokeBorder(Color.primary, lineWidth: 1) }
+        }
+        .compositingGroup()
+        .frame(width: width, height: height)
+    }
+
+    /// The theme key, its fallback, the opacity step and whether the day is to come.
+    private static func state(_ face: Habit.Face) -> (String, Color, Double, Bool) {
+        switch face {
+        case .clear: ("habit-clear", .blue, 0.25, false)
+        case .clearFuture: ("habit-clear", .blue, 0.25, true)
+        case .ready: ("habit-ready", .green, 0.5, false)
+        case .readyFuture: ("habit-ready", .green, 0.5, true)
+        case .alert: ("habit-alert", .yellow, 0.75, false)
+        case .alertFuture: ("habit-alert", .yellow, 0.75, true)
+        case .overdue: ("habit-overdue", .red, 1, false)
+        case .overdueFuture: ("habit-overdue", .red, 1, true)
+        }
     }
 
     private func color(_ face: Habit.Face) -> Color {

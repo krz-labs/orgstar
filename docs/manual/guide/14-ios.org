@@ -225,6 +225,8 @@ Tapping a row in the medium or large Today widget opens that entry; tapping else
 
 Widgets can't read your folders, so the app writes the next seven days of the agenda (today included) for them to read: while it is open, when files, edits or settings change, when you return to the app, and every hour. Between those times the widgets move on by themselves as timed entries end and at midnight, but they show nothing new until you open orgstar. Until the app has written the agenda once, they say =Open orgstar to show your agenda here.= The widgets ignore the agenda's filter and show no days without entries. The Habits widget's graphs move on at midnight by themselves.
 
+In the Habits graph a day's bar has the colour of its state: not yet due, due, due today for the last time, or overdue; days to come are lighter. With Differentiate Without Colour on (Settings ▸ Accessibility ▸ Display & Text Size), the states are also told apart by how solid the bar is, from not yet due (faintest) to overdue (solid), and days to come are outlined.
+
 ** Controls
 
 orgstar has two controls for Control Center, the Lock Screen and the Action button. Add them as any control: in Control Center, touch and hold an empty space and tap Add a Control, then choose orgstar.
