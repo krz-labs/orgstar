@@ -14,6 +14,7 @@ struct ModeLine: View {
     let perform: (String) -> Void
     @Environment(\.orgTheme) private var theme
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.appearsActive) private var appearsActive
     @State private var words: Int?
     @State private var characters = 0
     @State private var crlf = false
@@ -102,9 +103,10 @@ struct ModeLine: View {
         .frame(height: 22)
         .background { if let bg = theme.color("modeline-background", in: colorScheme) { bg } else { Rectangle().fill(.bar) } }
         .overlay(alignment: .top) { Divider() }
-        .task(id: session.path) {
-            // HEAD changes outside the app, so look again every few seconds.
-            while !Task.isCancelled {
+        .task(id: BranchKey(path: session.path, active: appearsActive)) {
+            // HEAD changes outside the app, so look again every few seconds while the window is
+            // active, and once when it becomes active again.
+            while appearsActive, !Task.isCancelled {
                 let path = session.path
                 branch = await Task.detached(priority: .utility) { path.flatMap(GitBranch.current) }.value
                 try? await Task.sleep(for: .seconds(5))
@@ -118,6 +120,11 @@ struct ModeLine: View {
             let counts = await Task.detached(priority: .utility) { (TextStats.region(text), text.contains("\r\n")) }.value
             (words, characters, crlf) = (counts.0.words, counts.0.characters, counts.1)
         }
+    }
+
+    private struct BranchKey: Hashable {
+        var path: String?
+        var active: Bool
     }
 
     private struct WordsKey: Hashable {

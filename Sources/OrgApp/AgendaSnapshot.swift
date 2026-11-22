@@ -242,6 +242,13 @@ public struct AgendaSnapshot: Codable, Equatable, Sendable {
         return true
     }
 
+    /// Whether the widgets' timelines need reloading after an update: when orgstar+ locked or
+    /// unlocked since the last update, or on the first update, or when unlocked and the snapshot
+    /// changed.
+    public static func reloadsWidgets(locked: Bool, wasLocked: Bool?, snapshotChanged: Bool) -> Bool {
+        locked != wasLocked || (!locked && snapshotChanged)
+    }
+
     static var encoder: JSONEncoder {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601

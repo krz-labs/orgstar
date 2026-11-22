@@ -104,6 +104,16 @@ struct AgendaSnapshotTests {
         #expect(AgendaSnapshot.read(from: file)?.days.count == 1)
     }
 
+    @Test func reloadsWidgetsWhenTheLockOrTheSnapshotChanges() {
+        #expect(AgendaSnapshot.reloadsWidgets(locked: true, wasLocked: nil, snapshotChanged: false))
+        #expect(AgendaSnapshot.reloadsWidgets(locked: false, wasLocked: nil, snapshotChanged: false))
+        #expect(!AgendaSnapshot.reloadsWidgets(locked: true, wasLocked: true, snapshotChanged: false))
+        #expect(AgendaSnapshot.reloadsWidgets(locked: true, wasLocked: false, snapshotChanged: false))
+        #expect(AgendaSnapshot.reloadsWidgets(locked: false, wasLocked: true, snapshotChanged: false))
+        #expect(!AgendaSnapshot.reloadsWidgets(locked: false, wasLocked: false, snapshotChanged: false))
+        #expect(AgendaSnapshot.reloadsWidgets(locked: false, wasLocked: false, snapshotChanged: true))
+    }
+
     @Test func whatIsLeftOfToday() {
         let snapshot = Self.snapshot()
         let morning = Self.date(Self.today, 7)

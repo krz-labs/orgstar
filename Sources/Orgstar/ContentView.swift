@@ -501,6 +501,8 @@ struct ContentView: View {
             enabled: remindersEnabled, lead: reminderLead, subfolders: agendaSubfolders, hidden: HiddenFolders.shared.all, files: workspace.files.count,
             changed: workspace.changedFile?.version, edits: session.editVersion, hour: hour, theme: theme
         )) {
+            // Once edits pause.
+            try? await Task.sleep(for: .seconds(2))
             await updateReminders()
             await updateWidgets()
         }
@@ -1171,7 +1173,6 @@ struct ContentView: View {
             await scheduler.clear()
             return
         }
-        try? await Task.sleep(for: .seconds(2))
         guard !Task.isCancelled, !workspace.files.isEmpty else { return }
         let agenda = reminderAgenda ?? AgendaModel(workspace: workspace)
         reminderAgenda = agenda

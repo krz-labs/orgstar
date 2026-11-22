@@ -63,6 +63,8 @@ final class MobileModel {
     /// `org-stored-links`, most recent first; kept while the app runs, as in Emacs.
     var storedLinks: [StoredLink] = []
     @ObservationIgnored private var configShowMarkup: Bool?
+    /// Whether orgstar+ was locked at the last widget update; nil before the first.
+    @ObservationIgnored private var widgetsLocked: Bool?
     @ObservationIgnored private var presenter: FolderPresenter?
     @ObservationIgnored private var sizeObserver: NSObjectProtocol?
 
@@ -313,11 +315,14 @@ final class MobileModel {
         }
         await days.refresh(open: session.openTexts)
         let groups = days.groups()
-        guard ProAccess.shared.isUnlocked else {
+        let locked = !ProAccess.shared.isUnlocked
+        let wasLocked = widgetsLocked
+        widgetsLocked = locked
+        guard !locked else {
             // Widgets read the flag and show that they need Pro.
             WatchLink.shared.send(.locked(generated: Date()))
             await updateBadge(OverdueBadge.counts(groups, today: days.today, days: AgendaSnapshot.dayCount))
-            WidgetCenter.shared.reloadAllTimelines()
+            if AgendaSnapshot.reloadsWidgets(locked: true, wasLocked: wasLocked, snapshotChanged: false) { WidgetCenter.shared.reloadAllTimelines() }
             return
         }
         WatchLink.shared.send(WatchAgenda(groups: groups, today: days.today, clock: clock.running, lastClocked: clock.history.first?.title, generated: Date()))
@@ -326,7 +331,8 @@ final class MobileModel {
         _ = try? TemplateList(templates: CaptureTemplates.load().templates.map { .init(key: $0.key, name: $0.name) }).write()
         guard let file = AgendaSnapshot.file() else { return }
         let snapshot = AgendaSnapshot(groups: groups, today: days.today, theme: theme, generated: Date())
-        if (try? snapshot.write(to: file)) == true { WidgetCenter.shared.reloadAllTimelines() }
+        let changed = (try? snapshot.write(to: file)) == true
+        if AgendaSnapshot.reloadsWidgets(locked: false, wasLocked: wasLocked, snapshotChanged: changed) { WidgetCenter.shared.reloadAllTimelines() }
     }
 
     /// Today's count on the icon, and each later day's set for its midnight by a notification
