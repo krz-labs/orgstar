@@ -20,8 +20,11 @@ extension Babel {
     /// `tangling` expands the blocks it brings in as tangling would (`:noweb tangle`), not as
     /// evaluation does.
     /// `links` gives a block's begin and end comments, for `:comments noweb` when tangling.
+    /// `<<name()>>` and `<<name(arg=value)>>` become the result of the block named so, which
+    /// `refs` resolves as it does a `:var` (`org-babel-ref-resolve`); without `refs` nothing
+    /// may run, and they are refused.
     static func expandNoweb(_ block: SrcBlockInfo, params: Params, model: DocumentModel, text: NSString, tangling: Bool = false, depth: Int = 0,
-                            links: ((SrcBlockInfo, Params) throws -> (begin: String, end: String))? = nil) throws -> String {
+                            links: ((SrcBlockInfo, Params) throws -> (begin: String, end: String))? = nil, refs: References? = nil) throws -> String {
         guard depth < 32 else { throw Failure.message("Noweb references nest too deeply") }
         let body = normalizedBody(block)
         let prefixing = params.single[":noweb-prefix"].map { $0 != "no" && $0 != "nil" } ?? true
@@ -30,7 +33,7 @@ extension Babel {
             let otherParams = try Params(block: other, model: model, text: text)
             let expands = tangling ? nowebTangles(otherParams.single[":noweb"]) : nowebEvaluates(otherParams.single[":noweb"])
             let b = expands
-                ? try expandNoweb(other, params: otherParams, model: model, text: text, tangling: tangling, depth: depth + 1, links: links)
+                ? try expandNoweb(other, params: otherParams, model: model, text: text, tangling: tangling, depth: depth + 1, links: links, refs: refs)
                 : normalizedBody(other)
             guard commenting, let links else { return b }
             // `c-wrap`: commented in this block's language, trimmed.
@@ -49,18 +52,24 @@ extension Babel {
             guard let h = b.heading else { return false }
             return ([h] + model.ancestors(of: h)).contains { model.headings[$0].title == "COMMENT" || model.headings[$0].title.hasPrefix("COMMENT ") }
         }
-        let regex = try! NSRegularExpression(pattern: "(.*?)(<<([^ \\t\\n](?:.*?[^ \\t\\n])?)>>)")
         let ns = body as NSString
         var out = ""
         var at = 0
-        for m in regex.matches(in: body, range: NSRange(location: 0, length: ns.length)) {
+        for m in nowebReference.matches(in: body, range: NSRange(location: 0, length: ns.length)) {
             let prefix = ns.substring(with: m.range(at: 1))
             let id = ns.substring(with: m.range(at: 3))
             out += ns.substring(with: NSRange(location: at, length: m.range(at: 2).location - at))
             at = NSMaxRange(m.range)
             var expansion = ""
             if id.range(of: "\\(.*\\)", options: .regularExpression) != nil {
-                throw Failure.message("Noweb references that run a block (\(id)) aren't supported yet; nothing was run.")
+                guard let refs else {
+                    throw Failure.message("The noweb reference <<\(id)>> would run a block while tangling, which isn't supported yet; nothing was tangled.")
+                }
+                // The value as it is when a string, else printed with `%S`.
+                switch try resolve(id, model: model, text: text, refs: refs, through: "a noweb reference") {
+                case .scalar(let s): expansion = s
+                case let value: expansion = lispLiteral(value)
+                }
             } else if let heading = model.headings.firstIndex(where: { h in
                 h.properties.contains { ($0.key.uppercased() == "ID" && $0.value == id) || ($0.key.uppercased() == "CUSTOM_ID" && "#" + $0.value == id) }
             }) {
@@ -84,6 +93,30 @@ extension Babel {
             out += prefixing ? expansion.components(separatedBy: CharacterSet(charactersIn: "\n\r")).joined(separator: "\n" + prefix) : expansion
         }
         return out + ns.substring(from: at)
+    }
+
+    /// `org-babel-noweb-wrap` after the text before it on its line.
+    static let nowebReference = try! NSRegularExpression(pattern: "(.*?)(<<([^ \\t\\n](?:.*?[^ \\t\\n])?)>>)")
+
+    /// The references that run a block in the body of `block`, and in the bodies its other
+    /// references bring in when evaluation expands them.
+    static func nowebCalls(_ block: SrcBlockInfo, model: DocumentModel, text: NSString, seen: inout Set<Int>) -> [String] {
+        guard seen.insert(block.range.lowerBound).inserted else { return [] }
+        var calls: [String] = []
+        let body = block.body as NSString
+        for m in nowebReference.matches(in: block.body, range: NSRange(location: 0, length: body.length)) {
+            let id = body.substring(with: m.range(at: 3))
+            if id.range(of: "\\(.*\\)", options: .regularExpression) != nil {
+                calls.append(id)
+                continue
+            }
+            for other in model.srcBlocks {
+                guard let params = try? Params(block: other, model: model, text: text), other.name == id || params.single[":noweb-ref"] == id,
+                      nowebEvaluates(params.single[":noweb"]) else { continue }
+                calls += nowebCalls(other, model: model, text: text, seen: &seen)
+            }
+        }
+        return calls
     }
 
     /// `org-babel-ref-headline-body`: the entry after its planning and drawers.

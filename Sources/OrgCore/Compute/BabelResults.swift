@@ -43,6 +43,14 @@ extension Babel {
 
     /// The language's result handling: `org-babel-result-cond` and the table import.
     static func value(_ finish: BabelJob.Finish, _ output: BabelOutput) -> Value {
+        // The value of `:post` goes in as it is; a list is a table of one row.
+        if let post = finish.post, !finish.params.contains("file") {
+            switch post {
+            case .scalar(let s), .number(let s): return .string(s)
+            case .list(let items): return .table([items.map(cellText)])
+            case .table(let rows): return .table(rows.map { $0?.map(cellText) })
+            }
+        }
         let value = reassemble(rawValue(finish, output), finish)
         switch (finish.kind, value) {
         case (.calc, .string(let s)), (.sqlite, .string(let s)):
@@ -58,7 +66,7 @@ extension Babel {
         let params = finish.params
         if params.contains("file") {
             // `org-babel-result-to-file`: a link to `:file`, or to the result as a path.
-            let path = finish.file ?? rawResult(finish, output)
+            let path = finish.file ?? finish.post.map { shellString($0) } ?? rawResult(finish, output)
             var link = "[[file:" + path + "]"
             if let description = finish.fileDescription { link += "[" + (description.isEmpty ? path : description) + "]" }
             return .string(link + "]")
@@ -442,7 +450,7 @@ extension Babel {
         switch value {
         case .none:
             break
-        case .string(let s) where params.contains("list") && finish.kind.givesRows:
+        case .string(let s) where params.contains("list") && finish.givesRows:
             // `split-string` without empty lines, each an item; `org-trim` of the list.
             var items = s.components(separatedBy: "\n").filter { !$0.isEmpty }.map { "- " + $0 }.joined(separator: "\n")
             while let last = items.unicodeScalars.last, " \r\t\n".unicodeScalars.contains(last) { items.unicodeScalars.removeLast() }
@@ -451,7 +459,7 @@ extension Babel {
             if s.last != "\n" { s += "\n" }
             let items = s.split(separator: "\n", omittingEmptySubsequences: true)
             buffer.insert(items.map { "- " + $0 }.joined(separator: "\n") + "\n")
-        case .table(let rows) where params.contains("list") && finish.kind.givesRows:
+        case .table(let rows) where params.contains("list") && finish.givesRows:
             // Each row an item, its first cell the text and the others lines under it.
             listed = true
             var items = rows.map { row in

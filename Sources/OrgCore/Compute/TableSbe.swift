@@ -139,6 +139,7 @@ extension Babel {
             throw sbeError(failure, text: text)
         }
         if params.single[":cache"] == "yes" { throw Elisp.Unsupported(what: "org-sbe with :cache") }
+        if params.single[":post"] != nil { throw Elisp.Unsupported(what: "org-sbe with :post") }
         var refs = References(resolved: [:], options: options)
         refs.visiting = [name]
         // The blocks its `:var`s refer to run first, as `DocumentSession.runBabel` runs them.
@@ -149,6 +150,7 @@ extension Babel {
             case .success(let job):
                 if job.needsFile { throw Elisp.Unsupported(what: "org-sbe with Lisp that needs the file's name") }
                 if let need = job.needs.first {
+                    if need.reference.hasPrefix(thisPrefix) { throw Elisp.Unsupported(what: "org-sbe with :post") }
                     refs.resolved[need.reference] = varValue(need.job.finish, try sbeRun(need.job))
                     continue
                 }

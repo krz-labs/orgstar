@@ -395,6 +395,7 @@ A string or number takes the place of the form. Lisp that the interpreter cannot
 | =:return=         | expression                                     | Python: the value to return.                                                               |
 | =:cache=          | =yes=, =no=                                    | Skip the run when the result is current (see Caching below).                               |
 | =:eval=           | =never=, =no=, =query=, …                      | Whether and how to ask before running (see =:eval= above).                                 |
+| =:post=           | =name(arg=*this*)=                             | Passes the result through another block (see Post-processing below).                       |
 | =:noweb=          | see Noweb below                                | Expands =<<name>>= references.                                                             |
 | =:noweb-ref=      | name                                           | Makes the block part of =<<name>>=.                                                        |
 | =:noweb-sep=      | text                                           | Separator between blocks joined under one =:noweb-ref=; a newline by default.             |
@@ -409,7 +410,6 @@ orgstar does not run a block whose arguments it would handle differently from Em
 | Argument                    | Refused for                                     | Message                                                  |
 |-----------------------------+-------------------------------------------------+----------------------------------------------------------|
 | =:prologue=, =:epilogue=    | graphics (=dot=, =plantuml=, =mermaid=)           | "=:prologue= isn't supported yet; nothing was run."      |
-| =:post=                     | every language                                    | "=:post= isn't supported yet; nothing was run."          |
 | =:stdin=, =:shebang=        | languages other than shells                     | "=:stdin= isn't supported yet; nothing was run."         |
 | =:cmdline=                  | languages other than shells, graphics and the compiled languages | "=:cmdline= isn't supported for /language/ yet; nothing was run." |
 | =:session=                  | =awk=, =calc=, =sqlite=, graphics and Emacs Lisp; the compiled languages ignore it | "=:session= isn't supported for /language/ yet; nothing was run." |
@@ -437,7 +437,9 @@ return [[c * scale for c in row] for row in t]
 ,#+end_src
 #+END_SRC
 
-A referenced block runs before the block that refers to it, after the one trust prompt that covers them all. A block with =:cache yes= and a current result gives that result without running. A chain that leads back to itself is refused with "/name/ refers to itself through :var".
+A referenced block runs before the block that refers to it, after the one trust prompt that covers them all. A block with =:cache yes= and a current result gives that result without running. A chain that leads back to itself is refused with "/name/ refers to itself through :var"; a chain through =:post= or a noweb reference names that instead.
+
+A referenced block with =:results file= gives the name of its =:file=, or without =:file= its result as text. The file is written when the block runs.
 
 These are not supported and are refused:
 
@@ -537,6 +539,36 @@ Change the block or its arguments and it runs again. Results inserted with =appe
 
 The hash of a C, C++, D, Java, Fortran or Clojure block is taken over the body as the language expands it (see Tangling below), with the =IMPORTS=, =INCLUDES= and =DEFINES= properties where the block is, and Java's default header arguments, as Emacs does. A result Emacs wrote for such a block with =:cache yes= is recognised as current, and =C-c C-c= shows it.
 
+* Post-processing
+
+=:post= names a reference that is resolved after the block has run (=org-babel-execute-src-block=). The block's result is bound to =*this*=, and the value of the reference becomes the block's result. The reference is usually a call to a named block that takes =*this*= as an argument; it can pass other arguments as well.
+
+#+BEGIN_SRC org
+,#+NAME: total
+,#+begin_src emacs-lisp :var rows='()
+(append rows (list 'hline (list "sum" (apply #'+ (mapcar #'cadr rows)))))
+,#+end_src
+
+,#+begin_src sh :post total(rows=*this*)
+printf 'a 1\nb 2\n'
+,#+end_src
+
+,#+RESULTS:
+| a   | 1 |
+| b   | 2 |
+|-----+---|
+| sum | 3 |
+#+END_SRC
+
+- =*this*= is the result as a =:var= would get it: a string, a number or a table.
+- With =:results file= and =:file=, the file is written first and =*this*= is the link to it, with its =:file-desc=. The value of the reference then goes in as text, not as a link; use =:results drawer= or =raw= when it is Org markup, such as an =#+ATTR_= line above the link. With =:results file= and no =:file=, =*this*= is the result as text, and the value of the reference becomes the link.
+- The value is inserted according to the block's own =:results=.
+- The block that =:post= calls can have its own =:post=, and =:var= references in it can use =*this*=.
+- With =:cache yes= and a current result, neither the block nor the reference runs.
+- =#+CALL:= lines, inline calls and inline source blocks take =:post= too.
+
+The one trust prompt covers the block and every block the reference runs, and asks every time when any of them has =:eval query=. Before anything runs, orgstar resolves the reference with an empty =*this*=; when that fails, the message says why and nothing runs. That covers a name that isn't a block in the file, a block with =:eval never=, a language orgstar can't run, and a reference that leads back to its own block ("/name/ refers to itself through :post").
+
 * Noweb
 
 A noweb reference =<<name>>= in a block's body stands for other code. Whether references expand depends on =:noweb= and on what is happening:
@@ -575,7 +607,29 @@ echo world
 ,#+end_src
 #+END_SRC
 
-A reference that runs a block, =<<name()>>=, is refused: "Noweb references that run a block (…) aren't supported yet; nothing was run."
+** References that run a block
+
+=<<name()>>= stands for the result of the block named =name=, which runs first, and =<<name(arg=value)>>= runs it with arguments, as =:var x=name(arg=value)= does (=org-babel-ref-resolve=). A result that is a string goes in as it is; a number, list or table goes in as Emacs Lisp prints it, such as =42= or =((1 2) (3 4))=. Text before the reference is repeated before each line of a result of several lines, unless =:noweb-prefix no=.
+
+#+BEGIN_SRC org
+,#+NAME: port
+,#+begin_src emacs-lisp :var base=8000
+(+ base 80)
+,#+end_src
+
+,#+begin_src sh :noweb yes
+echo "listening on <<port(base=3000)>>"
+,#+end_src
+
+,#+RESULTS:
+: listening on 3080
+#+END_SRC
+
+These references expand when the others do for running: with =:noweb= =yes=, =eval=, =no-export=, =strip-export= or =strip-tangle=. With =no= or =tangle=, the text stays as written and nothing runs. A block brought in by =<<name>>= has its own references run in the same way, according to its own =:noweb=.
+
+The rules for =:var= references apply: one trust prompt covers every block that would run, a referenced block with =:cache yes= and a current result gives that result without running, =:eval never= on a referenced block stops the run, and a reference that leads back to its own block is refused with "/name/ refers to itself through a noweb reference".
+
+Export shows these references as written and runs nothing. Tangling does not run blocks; see What tangling refuses below.
 
 * Calls
 
@@ -796,6 +850,7 @@ Comments need the language's comment syntax. orgstar knows it for: =emacs-lisp=,
 Tangling stops, writes nothing and says why when:
 
 - =:var= refers to a source block, which would have to run: "would run a block while tangling".
+- A noweb reference runs a block, =<<name()>>=, in a block whose =:noweb= expands when tangling: "The noweb reference <<…>> would run a block while tangling, which isn't supported yet; nothing was tangled."
 - A shell block's =:var= is a table or list.
 - =:var= is used in a language other than shells, Python, Emacs Lisp, C, C++, D, Java, Fortran and Clojure.
 - A C, C++, D or Fortran block's =:var= table keeps rules (with =:hlines yes=), or a value has no type the language takes.
@@ -816,7 +871,7 @@ See [[file:14-ios.org][iOS]] for the rest of the iOS app.
 
 * In the Mac App Store version
 
-- Only Emacs Lisp blocks, in the same interpreter as on iOS, JavaScript blocks, in JavaScriptCore, and calc, sqlite, dot and mermaid blocks run. Any other language, compiled languages included, fails with "/language/ blocks don't run in this version of orgstar."
+- Only Emacs Lisp blocks, in the same interpreter as on iOS, JavaScript blocks, in JavaScriptCore, and calc, sqlite, dot and mermaid blocks run. Any other language, compiled languages included, fails with "/language/ blocks don't run in this version of orgstar." A block whose =:var=, =:post= or noweb reference runs a block in another language runs nothing: "This block needs a /language/ block, and /language/ blocks don't run in this version of orgstar; nothing was run."
 - JavaScript blocks can use =:session=. There are no other sessions, and no graphics other than dot and mermaid.
 - The trust prompt works the same way.
 - Tangling works as in the download version, =:shebang= included. A target outside your folders needs access to its folder first: orgstar asks with Grant Access…, as described in [[file:../install.org][Install]]. So does a =:file= result outside them.

@@ -111,8 +111,14 @@ extension Babel {
 
     // MARK: - Variables
 
-    /// A referenced block's result as a `:var` value.
-    static func varValue(_ finish: BabelJob.Finish, _ output: BabelOutput) -> VarValue {
+    /// A referenced block's result as `org-babel-execute-src-block` returns it: with
+    /// `:results file`, the name of `:file`, or without one the result as the program left it.
+    /// `this` gives the value of `*this*`, where `:file` is a link.
+    static func varValue(_ finish: BabelJob.Finish, _ output: BabelOutput, this: Bool = false) -> VarValue {
+        if finish.params.contains("file") {
+            guard let file = finish.file else { return .scalar(rawResult(finish, output)) }
+            if !this { return .scalar(file) }
+        }
         switch value(finish, output) {
         case .none: return .scalar("")
         case .string(let s): return number(s).map(VarValue.number) ?? .scalar(s)
@@ -169,16 +175,21 @@ extension Babel {
         return (block, m.2.map(String.init))
     }
 
-    /// The blocks `params`' references run, directly or through theirs.
-    static func referencedBlocks(_ params: Params, model: DocumentModel, text: NSString, seen: Set<String>) -> [SrcBlockInfo] {
+    /// The blocks the references of `block` run, directly or through theirs: its `:var`,
+    /// `:stdin` and `:post`, and the noweb references that run a block.
+    static func referencedBlocks(_ block: SrcBlockInfo, _ params: Params, model: DocumentModel, text: NSString, seen: inout Set<Int>) -> [SrcBlockInfo] {
         var found: [SrcBlockInfo] = []
-        var seen = seen
-        for value in params.vars.map(\.value) + [params.single[":stdin"]].compactMap({ $0 }) {
-            guard let (block, arguments) = referencedBlock(value, model: model), let name = block.name, seen.insert(name).inserted else { continue }
-            found.append(block)
+        var values = params.vars.map(\.value) + [params.single[":stdin"], params.single[":post"]].compactMap { $0 }
+        if nowebEvaluates(params.single[":noweb"]) {
+            var included: Set<Int> = []
+            values += nowebCalls(block, model: model, text: text, seen: &included)
+        }
+        for value in values {
+            guard let (other, arguments) = referencedBlock(value, model: model), seen.insert(other.range.lowerBound).inserted else { continue }
+            found.append(other)
             let extra = arguments.map { [splitArguments($0).map { (":var", $0) }] } ?? []
-            if let inner = try? Params(block: block, model: model, text: text, extra: extra) {
-                found += referencedBlocks(inner, model: model, text: text, seen: seen)
+            if let inner = try? Params(block: other, model: model, text: text, extra: extra) {
+                found += referencedBlocks(other, inner, model: model, text: text, seen: &seen)
             }
         }
         return found
@@ -186,13 +197,17 @@ extension Babel {
 
     /// `org-babel-ref-resolve` for literals, named tables and lists in the file, and named src
     /// blocks, which run first (`Needed`) and give their result.
-    static func resolve(_ value: String, model: DocumentModel, text: NSString, refs: References) throws -> VarValue {
+    /// `through` names the kind of reference when it leads back to its own block.
+    static func resolve(_ value: String, model: DocumentModel, text: NSString, refs: References, through: String = ":var") throws -> VarValue {
         if value.hasPrefix("\""), value.hasSuffix("\""), value.count >= 2 { return .scalar(Params.unescape(String(value.dropFirst().dropLast()))) }
         if let n = number(value) { return .number(n) }
         if let first = value.first, "('`[".contains(first) { return try lispValue(value) }
-        if let known = refs.resolved[value] { return known }
+        if value == "*this*", let this = refs.this { return this }
+        // A reference that passes `*this*` on has a value for each run `*this*` came from.
+        let key = value.contains("*this*") ? refs.thisKey + value : value
+        if let known = refs.resolved[key] { return known }
         if let (block, arguments) = referencedBlock(value, model: model), let name = block.name {
-            guard !refs.visiting.contains(name) else { throw Failure.message("\(name) refers to itself through :var") }
+            guard !refs.visiting.contains(name) else { throw Failure.message("\(name) refers to itself through \(through)") }
             let extra = arguments.map { [splitArguments($0).map { (":var", $0) }] } ?? []
             var inner = refs
             inner.visiting.insert(name)
@@ -202,7 +217,7 @@ extension Babel {
             var useCache = true
             if params.single[":cache"] == "yes", let language = block.language {
                 let tables = try disassemble(params.vars.map { ($0.name, try resolve($0.value, model: model, text: text, refs: inner)) }, params: params)
-                let body = nowebEvaluates(params.single[":noweb"]) ? try expandNoweb(block, params: params, model: model, text: text) : normalizedBody(block)
+                let body = nowebEvaluates(params.single[":noweb"]) ? try expandNoweb(block, params: params, model: model, text: text, refs: inner) : normalizedBody(block)
                 let state = try cacheState(language: language, params: params, tables: tables, body: body, location: block.range, name: name, call: false, text: text, options: refs.options, model: model)
                 if state.current {
                     if let value = state.value { return value }
@@ -213,7 +228,8 @@ extension Babel {
                         options: refs.options, location: block.range, name: name, refs: inner, useCache: useCache) {
             case .failure(let failure): throw failure
             case .success(let job):
-                throw Needed(need: job.needs.first ?? BabelJob.Need(reference: value, job: job))
+                if let posted = job.finish.post, job.needs.isEmpty { return posted }
+                throw Needed(need: job.needs.first ?? BabelJob.Need(reference: key, job: job))
             }
         }
         if value.contains("(") || value.contains("[") { throw Failure.message("References like \(value) aren't supported yet.") }

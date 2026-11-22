@@ -34,7 +34,7 @@ public struct BabelJob: Sendable, Equatable {
     public let blockText: String
     /// Asks every time (`:eval query`) rather than trusting by content.
     public let alwaysAsk: Bool
-    public let finish: Finish
+    public internal(set) var finish: Finish
     /// A named block a `:var` refers to: run it first, then `Babel.resume` with its output.
     public var needs: [Need] = []
     /// With `needs`: the text of every block the run may execute, the one asked about and
@@ -61,6 +61,10 @@ public struct BabelJob: Sendable, Equatable {
     public internal(set) var diagram: Babel.Diagram?
     /// Files the runner writes, each where its key stands in `input`: `:var` tables as CSV.
     public internal(set) var dataFiles: [String: String] = [:]
+    /// With `needs`: the languages of the blocks the references reach.
+    public internal(set) var referenced: [String] = []
+    /// The output of a block whose `:post` reference has given its result: nothing is left to run.
+    public var known: BabelOutput? { finish.post.map { BabelOutput(stdout: Babel.shellString($0)) } }
 
     public struct Need: Sendable, Equatable {
         /// The `:var` value, `name` or `name(args)`.
@@ -105,6 +109,10 @@ public struct BabelJob: Sendable, Equatable {
         /// (`org-babel-reassemble-table`).
         var colnames: [String]?
         var rownames: [String]?
+        /// The value of the `:post` reference, which is the result.
+        var post: Babel.VarValue?
+        /// The value is a list of rows when it is a list, as a `:post` value is too.
+        var givesRows: Bool { post != nil || kind.givesRows }
     }
 }
 
@@ -165,7 +173,7 @@ public enum Babel {
     /// `need.job`, as `org-babel-ref-resolve` reads it.
     public static func resume(_ job: BabelJob, need: BabelJob.Need, output: BabelOutput, text: String, tree: OrgTree) -> Result<BabelJob, Failure> {
         var resolved = job.resolved
-        resolved[need.reference] = varValue(need.job.finish, output)
+        resolved[need.reference] = varValue(need.job.finish, output, this: need.reference.hasPrefix(thisPrefix))
         let context = EditContext(revision: 0, text: text, tree: tree, selection: [job.caret..<job.caret])
         return plan(context, options: job.options, resolved: resolved)
     }
@@ -344,7 +352,14 @@ public enum Babel {
         var options: Options
         /// Blocks being planned for a reference, to stop cycles.
         var visiting: Set<String> = []
+        /// `*this*` while a `:post` reference is resolved, and the key of the run it came from,
+        /// which goes before the references that use it in `resolved`.
+        var this: VarValue?
+        var thisKey = ""
     }
+
+    /// Starts the key in `References.resolved` of a block's result before its `:post`.
+    static let thisPrefix = "*this*\u{1}"
 
     /// A reference to a block that has to run first.
     struct Needed: Error {
@@ -357,11 +372,63 @@ public enum Babel {
         evaluated.evaluateLisp(file: options.file)
         let needsFile = options.file == nil && evaluated.lisp.contains { evaluated.evaluated[$0] == nil }
         return planBlock(block, params: params, model: model, text: ns, options: options, location: location, name: name, inline: inline,
-                         refs: refs, useCache: useCache).map { job in
+                         refs: refs, useCache: useCache).flatMap { job in
+            guard let post = evaluated.single[":post"] else { return .success(job) }
+            return posted(job, post: post, block: block, params: evaluated, model: model, text: ns, refs: refs ?? References(resolved: [:], options: options))
+        }.map { job in
             var job = job
             job.needsFile = needsFile
             return job
         }
+    }
+
+    /// `:post` (`org-babel-execute-src-block`): the block runs first, as a need; then the
+    /// reference is resolved with the block's result as `*this*`, and its value is the result.
+    /// Before the block or anything it needs runs, the reference is resolved with an empty
+    /// `*this*`, so that one that can't be resolved stops the run.
+    static func posted(_ job: BabelJob, post: String, block: SrcBlockInfo, params: Params, model: DocumentModel, text: NSString,
+                       refs: References) -> Result<BabelJob, Failure> {
+        let key = thisPrefix + refs.thisKey + job.blockText + "\u{1}" + params.vars.map { "\($0.name)=\($0.value)" }.joined(separator: " ")
+        let this = refs.resolved[key]
+        var inner = refs
+        (inner.this, inner.thisKey) = (this ?? .scalar(""), key)
+        var need = BabelJob.Need(reference: key, job: job)
+        do {
+            let value = try resolve(post, model: model, text: text, refs: inner, through: ":post")
+            if this != nil {
+                var done = job
+                done.finish.post = value
+                // The link to `:file` went to the reference as `*this*`.
+                if done.finish.file != nil { done.finish.params.removeAll { $0 == "file" } }
+                return .success(done)
+            }
+        } catch let needed as Needed {
+            if this != nil { need = needed.need }
+        } catch let error as Failure {
+            return .failure(error)
+        } catch {
+            return .failure(.message("\(error)"))
+        }
+        guard job.needs.isEmpty else { return .success(job) }
+        return .success(waiting(on: need, language: job.language, directory: job.directory, location: job.block, ask: job.alwaysAsk, finish: job.finish,
+                                block: block, params: params, model: model, text: text))
+    }
+
+    /// A job that waits on `need`. It is asked about once, with every block the references
+    /// reach, and every time when any of them has `:eval query`.
+    static func waiting(on need: BabelJob.Need, language: String, directory: String?, location: Range<Int>, ask: Bool, finish: BabelJob.Finish,
+                        block: SrcBlockInfo, params: Params, model: DocumentModel, text ns: NSString) -> BabelJob {
+        var seen: Set<Int> = []
+        let reached = referencedBlocks(block, params, model: model, text: ns, seen: &seen)
+        let texts = [ns.substring(with: NSRange(location))] + reached.map { ns.substring(with: NSRange($0.range)) }
+        let query = ask || reached.contains { (try? Params(block: $0, model: model, text: ns))?.single[":eval"]?.lowercased() == "query" }
+        var job = BabelJob(
+            language: language, runner: .process(executable: "", arguments: []), input: "", directory: directory,
+            block: location, blockText: texts.joined(separator: "\n"), alwaysAsk: query, finish: finish, needs: [need]
+        )
+        job.approved = texts
+        job.referenced = reached.compactMap(\.language)
+        return job
     }
 
     static func planBlock(_ block: SrcBlockInfo, params: Params, model: DocumentModel, text ns: NSString, options: Options,
@@ -380,7 +447,7 @@ public enum Babel {
             return .failure(.message(":cmdline isn't supported for \(language) yet; nothing was run."))
         }
         let wraps = compiled || shells.contains(language) || ["python", "emacs-lisp", "elisp", "calc", "sqlite"].contains(language) || generic[language] != nil
-        for key in [":prologue", ":epilogue", ":post", ":stdin", ":shebang"] where params.single[key] != nil
+        for key in [":prologue", ":epilogue", ":stdin", ":shebang"] where params.single[key] != nil
             && !(shells.contains(language) && [":stdin", ":shebang"].contains(key)) && !(wraps && [":prologue", ":epilogue"].contains(key)) {
             return .failure(.message("\(key) isn't supported yet; nothing was run."))
         }
@@ -390,15 +457,6 @@ public enum Babel {
             return .failure(.message(":session isn't supported for \(language) yet; nothing was run."))
         }
         var body = normalizedBody(block)
-        if nowebEvaluates(params.single[":noweb"]) {
-            do {
-                body = try expandNoweb(block, params: params, model: model, text: ns)
-            } catch let error as Failure {
-                return .failure(error)
-            } catch {
-                return .failure(.message("\(error)"))
-            }
-        }
         let output = params.results.contains("output")
         let file = params.single[":file"].map { name in
             params.single[":output-dir"].map { $0.hasSuffix("/") ? $0 + name : $0 + "/" + name } ?? name
@@ -414,21 +472,13 @@ public enum Babel {
         let vars: [(String, VarValue)]
         var stdin: VarValue?
         do {
+            if nowebEvaluates(params.single[":noweb"]) { body = try expandNoweb(block, params: params, model: model, text: ns, refs: refs) }
             tables = try disassemble(params.vars.map { ($0.name, try resolve($0.value, model: model, text: ns, refs: refs)) }, params: params)
             vars = tables.vars
             stdin = try params.single[":stdin"].map { try resolve($0, model: model, text: ns, refs: refs) }
         } catch let needed as Needed {
-            // Asked about once, with every block the references reach; asked every time when
-            // any of them has `:eval query`.
-            let reached = referencedBlocks(params, model: model, text: ns, seen: [])
-            let texts = [ns.substring(with: NSRange(location))] + reached.map { ns.substring(with: NSRange($0.range)) }
-            let query = eval == "query" || reached.contains { (try? Params(block: $0, model: model, text: ns))?.single[":eval"]?.lowercased() == "query" }
-            var job = BabelJob(
-                language: language, runner: .process(executable: "", arguments: []), input: "", directory: params.single[":dir"],
-                block: location, blockText: texts.joined(separator: "\n"), alwaysAsk: query, finish: finishBase(.generic), needs: [needed.need]
-            )
-            job.approved = texts
-            return .success(job)
+            return .success(waiting(on: needed.need, language: language, directory: params.single[":dir"], location: location, ask: eval == "query",
+                                    finish: finishBase(.generic), block: block, params: params, model: model, text: ns))
         } catch let error as Failure {
             return .failure(error)
         } catch {

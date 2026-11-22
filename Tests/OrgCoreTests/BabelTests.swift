@@ -55,6 +55,7 @@ enum TestBabelRunner {
     /// `native` runs Emacs Lisp blocks with `Babel.evaluateNatively` instead of Emacs.
     static func execute(_ text: String, caret: Int, directory: URL, native: Bool = false) throws -> (text: String, failure: String?) {
         func run(_ job: BabelJob, directory: URL) throws -> BabelOutput {
+            if let output = job.known { return output }
             guard native else { return try TestBabelRunner.run(job, directory: directory) }
             if job.calc != nil { return try Babel.evaluateCalc(job) }
             guard let output = try Babel.evaluateNatively(job) else { throw NativeUnsupported() }
@@ -65,7 +66,11 @@ enum TestBabelRunner {
         case .failure(.message(let message)): return (text, message)
         case .success(var job):
             while let need = job.needs.first {
-                switch Babel.resume(job, need: need, output: try run(need.job, directory: directory), text: text, tree: context.tree) {
+                let output = try run(need.job, directory: directory)
+                if let file = Babel.fileResult(need.job, output: output) {
+                    try file.contents.write(to: directory.appendingPathComponent(file.path), atomically: true, encoding: .utf8)
+                }
+                switch Babel.resume(job, need: need, output: output, text: text, tree: context.tree) {
                 case .failure(.message(let message)): return (text, message)
                 case .success(let next): job = next
                 }
@@ -405,7 +410,6 @@ struct BabelTests {
         for (text, message) in [
             ("#+begin_src sh :eval never\necho\n#+end_src\n", "Evaluation of this sh code block is disabled."),
             ("#+begin_src awk :session s\nBEGIN { print 1 }\n#+end_src\n", ":session isn't supported for awk yet; nothing was run."),
-            ("#+begin_src sh :noweb yes\n<<x()>>\n#+end_src\n", "Noweb references that run a block (x()) aren't supported yet; nothing was run."),
             ("#+begin_src python :cmdline -x\nreturn 1\n#+end_src\n", ":cmdline isn't supported for python yet; nothing was run."),
             ("#+begin_src cobol\nDISPLAY\n#+end_src\n", "No way to run cobol blocks yet."),
             ("#+begin_src sh :var x=loop\necho\n#+end_src\n#+NAME: loop\n#+begin_src sh :var y=loop\necho\n#+end_src\n", "loop refers to itself through :var"),

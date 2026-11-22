@@ -1034,6 +1034,41 @@ struct NativeProgramsTests {
         #expect(await session.runBabel(js) == "Code block evaluation complete.")
         #expect(session.document?.text.hasSuffix("#+RESULTS:\n: 5\n") == true)
     }
+
+    /// A block whose `:post` or noweb reference runs a block that needs a program runs nothing;
+    /// with blocks that run in-process, the reference's value is the result.
+    @Test func refusesReferencesToBlocksThatNeedARunner() async throws {
+        #expect(DocumentSession.runner == nil)
+        let notes = try Folder()
+        let helpers = "#+NAME: sh\n#+begin_src sh :var x=\"\"\necho hi\n#+end_src\n\n#+NAME: double\n#+begin_src emacs-lisp :var n=0\n(* 2 n)\n#+end_src\n\n"
+        let blocks = [
+            "#+begin_src emacs-lisp :post sh(x=*this*)\n(error \"ran\")\n#+end_src\n",
+            "#+begin_src emacs-lisp :noweb yes\n(concat \"<<sh()>>\")\n#+end_src\n",
+            "#+begin_src emacs-lisp :var v=double(n=1) :post sh(x=*this*)\n(error \"ran\")\n#+end_src\n",
+            "#+begin_src js :post double(n=*this*)\nreturn 2 + 3\n#+end_src\n",
+            "#+begin_src emacs-lisp :noweb yes\n(+ 1 <<double(n=4)>>)\n#+end_src\n",
+        ]
+        var messages: [String] = []
+        var texts: [String] = []
+        for block in blocks {
+            let file = try notes.write("p\(messages.count).org", helpers + block)
+            let session = DocumentSession(recovery: FileRecoveryStore(directory: notes.url.appendingPathComponent(".r")))
+            session.open(file.path)
+            guard case .external(.babel(let job)) = session.perform(ExecuteSrcBlock(), path: file.path, at: helpers.utf16.count + 3, expect: nil) else {
+                Issue.record("not planned: \(block)")
+                return
+            }
+            messages.append(await session.runBabel(job))
+            texts.append(String((session.document?.text ?? "").dropFirst(helpers.count + block.count)))
+        }
+        #if os(macOS)
+        let refusal = "This block needs a sh block, and sh blocks don't run in this version of orgstar; nothing was run."
+        #else
+        let refusal = "This block needs a sh block, and sh blocks need the Mac to run; nothing was run."
+        #endif
+        #expect(messages == [refusal, refusal, refusal, "Code block evaluation complete.", "Code block evaluation complete."])
+        #expect(texts == ["", "", "", "\n#+RESULTS:\n: 10\n", "\n#+RESULTS:\n: 9\n"])
+    }
 }
 
 @MainActor

@@ -925,6 +925,7 @@ public final class DocumentSession {
         /// A program through `programs`; without it, Emacs Lisp in `Elisp` and js in
         /// JavaScriptCore, and nothing else.
         func run(_ job: BabelJob) async throws -> BabelOutput {
+            if let output = job.known { return output }
             if let programs { return try await programs.runBabel(job, fileDirectory: directory) }
             #if canImport(JavaScriptCore)
             if let output = try await JavaScriptBlocks.run(job, directory: directory) { return output }
@@ -949,8 +950,26 @@ public final class DocumentSession {
             }
             return output
         }
+        /// Writes the result to `:file`, when the block asks for that; a message when it can't.
+        func write(_ job: BabelJob, _ output: BabelOutput) -> String? {
+            guard let file = Babel.fileResult(job, output: output) else { return nil }
+            do {
+                try file.contents.write(to: Self.resultFile(file.path, job: job, directory: directory), atomically: true, encoding: .utf8)
+                return nil
+            } catch {
+                return "Can't write \(file.path): \(error.localizedDescription)"
+            }
+        }
+        // Without programs, a block that refers to one that can't run here runs nothing.
+        if programs == nil, !job.needs.isEmpty, let language = ([job.language] + job.referenced).first(where: { !Self.inProcess.contains($0) }) {
+            #if os(macOS)
+            return "This block needs a \(language) block, and \(language) blocks don't run in this version of orgstar; nothing was run."
+            #else
+            return "This block needs a \(language) block, and \(language) blocks need the Mac to run; nothing was run."
+            #endif
+        }
         do {
-            // Blocks the `:var`s refer to run first, one at a time.
+            // Blocks the `:var`s, `:post` and noweb references refer to run first, one at a time.
             // Each is one of the blocks agreed to, or the run stops: the text may have changed
             // while a block ran.
             var job = job
@@ -967,6 +986,7 @@ public final class DocumentSession {
                 guard agreed(need.job) else { return "The blocks changed while running; nothing more was run." }
                 let output = try await run(need.job)
                 guard entries.contains(where: { $0 === entry }) else { return "The file was closed before the block finished." }
+                if let message = write(need.job, output) { return message }
                 let document = entry.buffer.document
                 switch Babel.resume(job, need: need, output: output, text: document.text, tree: document.tree) {
                 case .failure(.message(let message)): return message
@@ -976,14 +996,7 @@ public final class DocumentSession {
             guard agreed(job) else { return "The blocks changed while running; nothing more was run." }
             let output = try await run(job)
             guard entries.contains(where: { $0 === entry }) else { return "The file was closed before the block finished." }
-            if let file = Babel.fileResult(job, output: output) {
-                let target = Self.resultFile(file.path, job: job, directory: directory)
-                do {
-                    try file.contents.write(to: target, atomically: true, encoding: .utf8)
-                } catch {
-                    return "Can't write \(file.path): \(error.localizedDescription)"
-                }
-            }
+            if let message = write(job, output) { return message }
             let current = entry.buffer
             let document = current.document
             let done = output.problem ?? "Code block evaluation complete."
@@ -1005,6 +1018,9 @@ public final class DocumentSession {
             return "\(error)"
         }
     }
+
+    /// The languages that run without programs.
+    static let inProcess: Set<String> = ["emacs-lisp", "elisp", "js", "javascript", "calc", "sqlite", "dot", "mermaid"]
 
     /// Where a block's `:file` result goes: relative to `:dir`, itself relative to `directory`.
     static func resultFile(_ name: String, job: BabelJob, directory: URL) -> URL {

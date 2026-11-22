@@ -348,6 +348,7 @@ Publishing works from Commands as on the Mac, with the =[[publish]]= projects in
 On iOS, only Emacs Lisp, JavaScript, calc, sqlite, dot and mermaid blocks run. orgstar evaluates Emacs Lisp with its own interpreter, which covers a subset of the language, JavaScript in JavaScriptCore, as =node= would run it, sessions included, calc with its own Calc, sqlite with the SQLite library, as =sqlite3= would, and dot and mermaid with Graphviz and mermaid built in, as SVG or PNG; see [[file:11-code-blocks.org][Code blocks]]. Other results:
 
 - A block in another language: "/language/ blocks need the Mac to run."
+- A block whose =:var=, =:post= or noweb reference runs a block in another language: "This block needs a /language/ block, and /language/ blocks need the Mac to run; nothing was run."
 - Emacs Lisp the interpreter doesn't have: "This block uses Emacs Lisp that runs only in Emacs, on the Mac."
 - JavaScript that uses something only node has, such as =Buffer=: "This block uses /name/, which runs only in node."
 - A calc or sqlite block orgstar can't run as Emacs would: "This calc block can't be calculated here: /reason/." or "This sqlite block can't run here: /reason/."
