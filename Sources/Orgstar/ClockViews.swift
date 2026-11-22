@@ -15,6 +15,10 @@ func clockElapsed(_ running: ClockModel.Running, now: Date) -> String {
 struct ClockMenuState: Equatable {
     let running: ClockModel.Running?
     let history: [ClockTask]
+    /// `menu-bar-item`: the item stays when no clock runs.
+    var always = false
+    /// Today's agenda, overdue entries first.
+    var today: [AgendaSnapshot.Row] = []
 }
 
 /// `org-user-idle-seconds` on macOS: time since the last keyboard or mouse input anywhere.
@@ -62,21 +66,27 @@ struct ClockMenu: View {
     }
 }
 
-/// The menu bar item while a clock runs: elapsed time, and clock out, cancel and go to.
+/// The menu bar item: while a clock runs, the elapsed time and the clock commands; with
+/// `always`, there all the time, with capture, the agenda and today's entries too.
 @MainActor
 final class ClockStatusItem: NSObject {
+    /// Today's entries the menu lists before "more".
+    static let rowLimit = 12
+
     private var item: NSStatusItem?
     private var timer: Timer?
     private var running: ClockModel.Running?
     private let run: (String) -> Void
+    private let jump: (String, Int) -> Void
 
-    init(run: @escaping (String) -> Void) {
+    init(run: @escaping (String) -> Void, jump: @escaping (String, Int) -> Void) {
         self.run = run
+        self.jump = jump
     }
 
-    func update(_ running: ClockModel.Running?, recent: [String] = []) {
-        self.running = running
-        guard let running else {
+    func update(_ state: ClockMenuState) {
+        running = state.running
+        guard state.running != nil || state.always else {
             timer?.invalidate()
             timer = nil
             if let item { NSStatusBar.system.removeStatusItem(item) }
@@ -90,18 +100,41 @@ final class ClockStatusItem: NSObject {
             }
         }
         let menu = NSMenu()
-        menu.addItem(withTitle: running.heading, action: nil, keyEquivalent: "")
-        menu.addItem(.separator())
-        for (title, id) in [
-            ("Clock Out", "app.clock.out"), ("Cancel Clock", "app.clock.cancel"), ("Go to Clocked Entry", "app.clock.goto"),
-            ("Clock In to Recent Entry…", "app.clock.in-recent"), ("Clock Report", "app.clock.report"),
-        ] {
-            add(title, id, to: menu)
+        if state.always {
+            add(String(localized: "Capture…"), "app.capture", to: menu)
+            add(String(localized: "Agenda"), "app.agenda", to: menu)
+            menu.addItem(.separator())
+            menu.addItem(NSMenuItem.sectionHeader(title: String(localized: "Today")))
+            let rows = state.today.filter { !$0.isDone }
+            if rows.isEmpty { menu.addItem(withTitle: String(localized: "Nothing scheduled"), action: nil, keyEquivalent: "") }
+            for row in rows.prefix(Self.rowLimit) {
+                let title = [row.gutter, row.todo ?? "", row.title].filter { !$0.isEmpty }.joined(separator: "  ")
+                let entry = NSMenuItem(title: title, action: row.link == nil ? nil : #selector(open(_:)), keyEquivalent: "")
+                entry.target = self
+                entry.representedObject = row.link
+                menu.addItem(entry)
+            }
+            if rows.count > Self.rowLimit { add(String(localized: "\(rows.count - Self.rowLimit) more…"), "app.agenda", to: menu) }
+            menu.addItem(.separator())
         }
+        var commands = [("Clock In to Recent Entry…", "app.clock.in-recent"), ("Clock Report", "app.clock.report")]
+        if let running = state.running {
+            menu.addItem(withTitle: running.heading, action: nil, keyEquivalent: "")
+            menu.addItem(.separator())
+            commands.insert(contentsOf: [("Clock Out", "app.clock.out"), ("Cancel Clock", "app.clock.cancel"), ("Go to Clocked Entry", "app.clock.goto")], at: 0)
+        }
+        for (title, id) in commands { add(title, id, to: menu) }
+        let recent = state.history.map(\.title)
         if !recent.isEmpty {
             menu.addItem(.separator())
             menu.addItem(NSMenuItem.sectionHeader(title: "Recent Entries"))
             for (index, title) in recent.enumerated() { add(title, "app.clock.history.\(index)", to: menu) }
+        }
+        if state.always {
+            menu.addItem(.separator())
+            let show = NSMenuItem(title: String(localized: "Open orgstar"), action: #selector(activate), keyEquivalent: "")
+            show.target = self
+            menu.addItem(show)
         }
         item?.menu = menu
         refresh()
@@ -115,8 +148,14 @@ final class ClockStatusItem: NSObject {
     }
 
     private func refresh() {
-        guard let running else { return }
-        item?.button?.title = "⏱ " + clockElapsed(running, now: Date())
+        guard let button = item?.button else { return }
+        if let running {
+            button.image = nil
+            button.title = "⏱ " + clockElapsed(running, now: Date())
+        } else {
+            button.image = NSImage(systemSymbolName: "star", accessibilityDescription: "orgstar")
+            button.title = ""
+        }
     }
 
     @objc private func choose(_ sender: NSMenuItem) {
@@ -124,6 +163,17 @@ final class ClockStatusItem: NSObject {
             NSApp.activate()
             run(id)
         }
+    }
+
+    @objc private func open(_ sender: NSMenuItem) {
+        if case .entry(let path, let offset)? = sender.representedObject as? AppLink {
+            NSApp.activate()
+            jump(path, offset)
+        }
+    }
+
+    @objc private func activate() {
+        NSApp.activate()
     }
 }
 

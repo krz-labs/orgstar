@@ -707,6 +707,7 @@ struct SettingsView: View {
     @AppStorage("clockIdleTime") private var clockIdleTime = 0
     @AppStorage("clockHistoryLength") private var clockHistoryLength = 5
     @AppStorage("globalCapture") private var globalCapture = true
+    @AppStorage("menuBarItem") private var menuBarItem = false
     @AppStorage("settingsTab") private var tab = "general"
     @AppStorage("showHiddenFiles") private var showHiddenFiles = true
     @AppStorage("themeFont") private var themeFont = ""
@@ -821,6 +822,8 @@ struct SettingsView: View {
                     ForEach(KeymapPreset.allCases, id: \.self) { Text($0.title).tag($0) }
                 }
                 Toggle("Show hidden files and folders", isOn: $showHiddenFiles)
+                Toggle("Keep orgstar in the menu bar", isOn: $menuBarItem)
+                    .help("Capture, the agenda, today's entries and the clock, from any app. When off, the menu bar shows orgstar only while a clock runs.")
                 Picker("Option as Meta", selection: $optionAsMeta) {
                     Text("Left Option").tag(OptionAsMeta.left.rawValue)
                     Text("Right Option").tag(OptionAsMeta.right.rawValue)

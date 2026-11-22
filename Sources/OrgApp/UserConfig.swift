@@ -391,6 +391,8 @@ public enum UserConfig {
                 comment: "the Reminders lists shown, by title or identifier, separated by commas; \"\" for all", legacy: ""),
         Setting(section: "orgstar", key: "global-capture-hotkey", defaultsKey: "globalCapture", kind: .bool, fallback: .bool(true),
                 comment: "⌃⌥Space opens Capture from any app; templates go in capture.toml", legacy: "capture.global-hotkey"),
+        Setting(section: "orgstar", key: "menu-bar-item", defaultsKey: "menuBarItem", kind: .bool, fallback: .bool(false),
+                comment: "keep orgstar in the menu bar, with capture and today's agenda; off shows it only while a clock runs", legacy: ""),
     ]
 
     /// `"-3d"` as -3; nil for anything else.

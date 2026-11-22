@@ -63,6 +63,7 @@ Open it with orgstar ▸ Settings (=⌘,=). It has six panes. The last, orgstar+
 | Save files                                 | Automatically, when typing stops; Only with File ▸ Save (=⌘S=)             | Automatically                   | =save=           |
 | Keys                                       | Emacs; Mac; Doom (Vim keys)                                                  | Emacs                           | =keymap=         |
 | Show hidden files and folders              | On or off                                                                    | On                              | =show-hidden-files= |
+| Keep orgstar in the menu bar               | On or off                                                                    | Off                             | =menu-bar-item=     |
 | Option as Meta                             | Left Option; Right Option; Both; Neither                                     | Left Option                     | =option-as-meta= |
 
 Automatic saving writes a file one second after you stop typing. The keymap presets and =keymap.toml= are covered in [[file:03-keys.org][Keys and commands]].
@@ -426,6 +427,7 @@ Any other key in =[theme]= is a color; see Themes below.
 | =agenda-reminders=          | boolean | =false=       | Show incomplete reminders with a due date from Reminders in the agenda, read-only.      |
 | =agenda-reminder-lists=     | string  | =""=          | The Reminders lists shown, by title or identifier, separated by commas; =""= for all.  |
 | =global-capture-hotkey=     | boolean | =true=        | =⌃⌥Space= opens Capture from any app.                                                   |
+| =menu-bar-item=             | boolean | =false=       | Keep orgstar in the menu bar, with capture and today's agenda; off shows it only while a clock runs. |
 
 The default =ignored-folders= is:
 

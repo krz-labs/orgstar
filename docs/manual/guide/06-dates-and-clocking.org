@@ -320,6 +320,8 @@ While a clock runs, orgstar shows it in three places, refreshed every 30 seconds
 
 The time shown is the time since you clocked in, not the entry's total. Each of them opens a menu with Clock Out, Cancel Clock and Go to Clocked Entry. The toolbar's menu also has Clock In to Recent Entry…, Go to Recent Clocked Entry… and the recent entries. The menu bar item also has Clock In to Recent Entry…, Clock Report and a Recent Entries section. Choosing a recent entry clocks in to it.
 
+With Settings ▸ General ▸ Keep orgstar in the menu bar (=menu-bar-item=), the menu bar item stays when no clock runs, as a star, and its menu starts with Capture…, Agenda and today's agenda entries that aren't done, overdue ones first; choosing an entry shows it in the main window. It is there while orgstar is running.
+
 ** Recent entries
 
 orgstar keeps a clock history, as =org-clock-history=. Every clock-in, including one from the agenda or a capture template, puts the entry first in the history and removes its other entries there. The history holds =org-clock-history-length= entries (5 by default); the oldest go first.

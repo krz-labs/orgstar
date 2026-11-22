@@ -28,6 +28,9 @@ struct ContentView: View {
     @State private var hotKey: GlobalHotKey?
     @State private var statusItem: ClockStatusItem?
     @AppStorage("globalCapture") private var globalCapture = true
+    @AppStorage("menuBarItem") private var menuBarItem = false
+    /// Today's agenda for the menu bar item.
+    @State private var menuToday: [AgendaSnapshot.Row] = []
     @State private var hour = 0
     @AppStorage("saveMode") private var saveMode = SaveMode.automatic
     @AppStorage("keymap") private var preset = KeymapPreset.emacs
@@ -428,10 +431,11 @@ struct ContentView: View {
     var body: some View {
         main
         .task(id: workspace.files.count) { syncClock(paths: workspace.agendaFilePaths()) }
-        .onChange(of: ClockMenuState(running: clock.running, history: clock.history), initial: true) { _, state in
-            if statusItem == nil { statusItem = ClockStatusItem { commands.run($0) } }
-            statusItem?.update(state.running, recent: state.history.map(\.title))
+        .onChange(of: ClockMenuState(running: clock.running, history: clock.history, always: menuBarItem, today: menuToday), initial: true) { _, state in
+            if statusItem == nil { statusItem = ClockStatusItem(run: { commands.run($0) }, jump: { commands.jump(path: $0, offset: $1) }) }
+            statusItem?.update(state)
         }
+        .task(id: menuBarItem) { if menuBarItem { await updateWidgets() } }
         .onChange(of: globalCapture, initial: true) { _, enabled in
             hotKey?.unregister()
             hotKey = enabled ? GlobalHotKey { perform("app.capture") } : nil
@@ -1172,9 +1176,10 @@ struct ContentView: View {
     }
 
     /// The desktop widgets' agenda and habits, written where the widget extension reads them,
-    /// with the widgets reloaded when they changed.
+    /// with the widgets reloaded when they changed; and today's agenda for the menu bar item.
     private func updateWidgets() async {
-        guard !Task.isCancelled, ProAccess.shared.isUnlocked, !workspace.files.isEmpty, let file = AgendaSnapshot.file() else { return }
+        let file = ProAccess.shared.isUnlocked ? AgendaSnapshot.file() : nil
+        guard !Task.isCancelled, !workspace.files.isEmpty, file != nil || menuBarItem else { return }
         let days = widgetAgenda ?? AgendaModel(workspace: workspace)
         widgetAgenda = days
         days.mode = .agenda(span: AgendaSnapshot.dayCount, startOffset: 0)
@@ -1192,10 +1197,12 @@ struct ContentView: View {
         let open = session.openTexts
         await days.refresh(open: open)
         guard !Task.isCancelled else { return }
+        let snapshot = AgendaSnapshot(groups: days.groups(), today: days.today, theme: theme, generated: Date())
+        menuToday = snapshot.days.first.map { $0.overdue + $0.rows } ?? []
+        guard let file else { return }
         if (try? HabitSnapshot(habits: await days.habits(open: open), theme: theme).write()) == true {
             WidgetCenter.shared.reloadTimelines(ofKind: "sh.krz.orgstar.habits")
         }
-        let snapshot = AgendaSnapshot(groups: days.groups(), today: days.today, theme: theme, generated: Date())
         if (try? snapshot.write(to: file)) == true { WidgetCenter.shared.reloadAllTimelines() }
     }
 

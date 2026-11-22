@@ -1409,6 +1409,40 @@
         }
       }
     },
+    "%lld more…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld weitere …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld más…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld de plus…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ほか%lld件…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mais %lld…"
+          }
+        }
+      }
+    },
     "%lld open": {
       "localizations": {
         "de": {
@@ -5753,6 +5787,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Capturar no orgstar"
+          }
+        }
+      }
+    },
+    "Capture, the agenda, today's entries and the clock, from any app. When off, the menu bar shows orgstar only while a clock runs.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erfassen, die Agenda, die heutigen Einträge und die Zeiterfassung aus jeder App. Wenn deaktiviert, zeigt die Menüleiste orgstar nur, während eine Zeiterfassung läuft."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Captura, la agenda, las entradas de hoy y el registro de tiempo, desde cualquier app. Si está desactivado, la barra de menús muestra orgstar solo mientras hay un registro de tiempo en curso."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La capture, l'agenda, les entrées du jour et le chronométrage, depuis n'importe quelle app. Si désactivé, la barre des menus n'affiche orgstar que pendant un chronométrage."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "どのアプリからでも、キャプチャ、アジェンダ、今日のエントリ、クロックを使えます。オフの場合、クロックの実行中のみメニューバーにorgstarが表示されます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Captura, a agenda, as entradas de hoje e o registro de tempo, a partir de qualquer app. Quando desativado, a barra de menus mostra o orgstar apenas enquanto um registro de tempo está em andamento."
           }
         }
       }
@@ -16419,6 +16487,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Manter a Minha"
+          }
+        }
+      }
+    },
+    "Keep orgstar in the menu bar": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar in der Menüleiste behalten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mantener orgstar en la barra de menús"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder orgstar dans la barre des menus"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstarをメニューバーに常に表示"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manter o orgstar na barra de menus"
           }
         }
       }
