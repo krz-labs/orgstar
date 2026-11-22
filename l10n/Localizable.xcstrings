@@ -3658,36 +3658,36 @@
         }
       }
     },
-    "Applies to files as they open. View ▸ Truncate or Wrap Long Lines switches the current file.": {
+    "Applies to files as they open. View ▸ Truncate Long Lines switches the current file.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gilt für Dateien beim Öffnen. Darstellung ▸ Lange Zeilen abschneiden oder umbrechen schaltet die aktuelle Datei um."
+            "value": "Gilt für Dateien beim Öffnen. Darstellung ▸ Lange Zeilen abschneiden schaltet die aktuelle Datei um."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Se aplica a los archivos al abrirlos. Visualización ▸ Truncar o ajustar líneas largas cambia el archivo actual."
+            "value": "Se aplica a los archivos al abrirlos. Visualización ▸ Truncar líneas largas cambia el archivo actual."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "S'applique aux fichiers à leur ouverture. Présentation ▸ Tronquer ou renvoyer à la ligne les lignes longues modifie le réglage du fichier actuel."
+            "value": "S'applique aux fichiers à leur ouverture. Présentation ▸ Tronquer les lignes longues modifie le réglage du fichier actuel."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ファイルを開くときに適用されます。「表示」▸「長い行を切り詰める/折り返す」で現在のファイルを切り替えます。"
+            "value": "ファイルを開くときに適用されます。「表示」▸「長い行を切り詰める」で現在のファイルを切り替えます。"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aplica-se aos arquivos quando são abertos. Visualizar ▸ Truncar ou Quebrar Linhas Longas alterna o arquivo atual."
+            "value": "Aplica-se aos arquivos quando são abertos. Visualizar ▸ Truncar Linhas Longas alterna o arquivo atual."
           }
         }
       }
@@ -6310,36 +6310,36 @@
         }
       }
     },
-    "Check spelling while typing (spell-check)": {
+    "Check spelling while typing": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rechtschreibung während der Eingabe prüfen (spell-check)"
+            "value": "Rechtschreibung während der Eingabe prüfen"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Revisar ortografía al escribir (spell-check)"
+            "value": "Revisar ortografía al escribir"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vérifier l'orthographe lors de la frappe (spell-check)"
+            "value": "Vérifier l'orthographe lors de la frappe"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "入力中にスペルチェック（spell-check）"
+            "value": "入力中にスペルチェック"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Verificar ortografia ao digitar (spell-check)"
+            "value": "Verificar ortografia ao digitar"
           }
         }
       }
@@ -11624,70 +11624,70 @@
         }
       }
     },
-    "Emacs hides emphasis markers (org-hide-emphasis-markers)": {
+    "Emacs hides emphasis markers": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Emacs blendet Hervorhebungszeichen aus (org-hide-emphasis-markers)"
+            "value": "Emacs blendet Hervorhebungszeichen aus"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Emacs oculta los marcadores de énfasis (org-hide-emphasis-markers)"
+            "value": "Emacs oculta los marcadores de énfasis"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Emacs masque les marqueurs d'emphase (org-hide-emphasis-markers)"
+            "value": "Emacs masque les marqueurs d'emphase"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "Emacsで強調マーカーを隠す（org-hide-emphasis-markers）"
+            "value": "Emacsで強調マーカーを隠す"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "O Emacs oculta os marcadores de ênfase (org-hide-emphasis-markers)"
+            "value": "O Emacs oculta os marcadores de ênfase"
           }
         }
       }
     },
-    "Emacs shows entities as characters (org-pretty-entities)": {
+    "Emacs shows entities as characters": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Emacs zeigt Entitäten als Zeichen (org-pretty-entities)"
+            "value": "Emacs zeigt Entitäten als Zeichen"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Emacs muestra las entidades como caracteres (org-pretty-entities)"
+            "value": "Emacs muestra las entidades como caracteres"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Emacs affiche les entités sous forme de caractères (org-pretty-entities)"
+            "value": "Emacs affiche les entités sous forme de caractères"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "Emacsでエンティティを文字として表示（org-pretty-entities）"
+            "value": "Emacsでエンティティを文字として表示"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "O Emacs mostra entidades como caracteres (org-pretty-entities)"
+            "value": "O Emacs mostra entidades como caracteres"
           }
         }
       }
@@ -12105,70 +12105,70 @@
         }
       }
     },
-    "Entries can't be done before their TODO children (org-enforce-todo-dependencies)": {
+    "Entries can't be done before their TODO children": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Einträge sind erst nach ihren TODO-Untereinträgen erledigt (org-enforce-todo-dependencies)"
+            "value": "Einträge sind erst nach ihren TODO-Untereinträgen erledigt"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Las entradas no pueden completarse antes que sus hijas TODO (org-enforce-todo-dependencies)"
+            "value": "Las entradas no pueden completarse antes que sus hijas TODO"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Une entrée ne peut pas être terminée avant ses sous-entrées TODO (org-enforce-todo-dependencies)"
+            "value": "Une entrée ne peut pas être terminée avant ses sous-entrées TODO"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "TODOの子エントリが完了するまでエントリを完了にできない（org-enforce-todo-dependencies）"
+            "value": "TODOの子エントリが完了するまでエントリを完了にできない"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "As entradas não podem ser concluídas antes dos filhos TODO (org-enforce-todo-dependencies)"
+            "value": "As entradas não podem ser concluídas antes dos filhos TODO"
           }
         }
       }
     },
-    "Entries can't be done with unchecked boxes (org-enforce-todo-checkbox-dependencies)": {
+    "Entries can't be done with unchecked boxes": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Einträge mit offenen Kontrollkästchen sind nicht erledigt (org-enforce-todo-checkbox-dependencies)"
+            "value": "Einträge mit offenen Kontrollkästchen sind nicht erledigt"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Las entradas no pueden completarse con casillas sin marcar (org-enforce-todo-checkbox-dependencies)"
+            "value": "Las entradas no pueden completarse con casillas sin marcar"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Une entrée ne peut pas être terminée avec des cases non cochées (org-enforce-todo-checkbox-dependencies)"
+            "value": "Une entrée ne peut pas être terminée avec des cases non cochées"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "未チェックのボックスがあるエントリは完了にできない（org-enforce-todo-checkbox-dependencies）"
+            "value": "未チェックのボックスがあるエントリは完了にできない"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "As entradas não podem ser concluídas com caixas desmarcadas (org-enforce-todo-checkbox-dependencies)"
+            "value": "As entradas não podem ser concluídas com caixas desmarcadas"
           }
         }
       }
@@ -13445,6 +13445,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Preencher Parágrafo"
+          }
+        }
+      }
+    },
+    "Fill Paragraph wraps lines at column %lld": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Absatz umbrechen bricht Zeilen bei Spalte %lld um"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rellenar párrafo ajusta las líneas en la columna %lld"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remplir le paragraphe coupe les lignes à la colonne %lld"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「段落を詰めて折り返す」は%lld列目で行を折り返す"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preencher Parágrafo quebra as linhas na coluna %lld"
           }
         }
       }
@@ -18457,36 +18491,36 @@
         }
       }
     },
-    "Long lines run off the edge instead of wrapping (org-startup-truncated)": {
+    "Long lines run off the edge instead of wrapping": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lange Zeilen laufen über den Rand, statt umzubrechen (org-startup-truncated)"
+            "value": "Lange Zeilen laufen über den Rand, statt umzubrechen"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Las líneas largas sobrepasan el borde en lugar de ajustarse (org-startup-truncated)"
+            "value": "Las líneas largas sobrepasan el borde en lugar de ajustarse"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Les lignes longues dépassent du bord au lieu d'être renvoyées à la ligne (org-startup-truncated)"
+            "value": "Les lignes longues dépassent du bord au lieu d'être renvoyées à la ligne"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "長い行を折り返さずに端からはみ出させる（org-startup-truncated）"
+            "value": "長い行を折り返さずに端からはみ出させる"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Linhas longas ultrapassam a borda em vez de quebrar (org-startup-truncated)"
+            "value": "Linhas longas ultrapassam a borda em vez de quebrar"
           }
         }
       }
@@ -18522,108 +18556,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Diminuir Prioridade"
-          }
-        }
-      }
-    },
-    "M-RET adds the new heading after the subtree": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "M-RET fügt die neue Überschrift nach dem Teilbaum ein"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "M-RET añade el nuevo encabezado después del subárbol"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "M-RET ajoute le nouveau titre après le sous-arbre"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "M-RETでサブツリーの後に新しい見出しを追加"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "M-RET adiciona o novo cabeçalho após a subárvore"
-          }
-        }
-      }
-    },
-    "M-RET splits the line at the caret": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "M-RET teilt die Zeile an der Einfügemarke"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "M-RET divide la línea en el punto de inserción"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "M-RET coupe la ligne au point d'insertion"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "M-RETでキャレット位置の行を分割"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "M-RET divide a linha no cursor"
-          }
-        }
-      }
-    },
-    "M-q fills to column %lld": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "M-q füllt bis Spalte %lld"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "M-q rellena hasta la columna %lld"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "M-q remplit jusqu'à la colonne %lld"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "M-qで%lld列目まで詰めて折り返す"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "M-q preenche até a coluna %lld"
           }
         }
       }
@@ -20624,6 +20556,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "Novo cabeçalho “%1$@” em %2$@"
+          }
+        }
+      }
+    },
+    "New headings and items split the line at the caret": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neue Überschriften und Einträge teilen die Zeile an der Einfügemarke"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los encabezados y elementos nuevos dividen la línea en el punto de inserción"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les nouveaux titres et éléments coupent la ligne au point d'insertion"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新しい見出しと項目でキャレット位置の行を分割"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Novos cabeçalhos e itens dividem a linha no cursor"
+          }
+        }
+      }
+    },
+    "New headings go after the subtree": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neue Überschriften kommen nach den Teilbaum"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los encabezados nuevos van después del subárbol"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les nouveaux titres vont après le sous-arbre"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新しい見出しをサブツリーの後に追加"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Novos cabeçalhos vão após a subárvore"
           }
         }
       }
@@ -31354,36 +31354,36 @@
         }
       }
     },
-    "Speed keys: single letters at the start of a heading line run commands (org-use-speed-commands)": {
+    "Speed keys: single letters at the start of a heading line run commands": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schnelltasten: Einzelne Buchstaben am Anfang einer Überschriftszeile führen Befehle aus (org-use-speed-commands)"
+            "value": "Schnelltasten: Einzelne Buchstaben am Anfang einer Überschriftszeile führen Befehle aus"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Teclas rápidas: letras sueltas al principio de una línea de encabezado ejecutan comandos (org-use-speed-commands)"
+            "value": "Teclas rápidas: letras sueltas al principio de una línea de encabezado ejecutan comandos"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Touches rapides : une lettre seule au début d'une ligne de titre exécute une commande (org-use-speed-commands)"
+            "value": "Touches rapides : une lettre seule au début d'une ligne de titre exécute une commande"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "スピードキー：見出し行の先頭で1文字入力するとコマンドを実行（org-use-speed-commands）"
+            "value": "スピードキー：見出し行の先頭で1文字入力するとコマンドを実行"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Teclas rápidas: letras únicas no início de uma linha de cabeçalho executam comandos (org-use-speed-commands)"
+            "value": "Teclas rápidas: letras únicas no início de uma linha de cabeçalho executam comandos"
           }
         }
       }
@@ -31698,36 +31698,36 @@
         }
       }
     },
-    "State notes go in a LOGBOOK drawer (org-log-into-drawer)": {
+    "State notes go in a LOGBOOK drawer": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Statusnotizen kommen in ein LOGBOOK-Fach (org-log-into-drawer)"
+            "value": "Statusnotizen kommen in ein LOGBOOK-Fach"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Las notas de estado van en un cajón LOGBOOK (org-log-into-drawer)"
+            "value": "Las notas de estado van en un cajón LOGBOOK"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Les notes d'état vont dans un tiroir LOGBOOK (org-log-into-drawer)"
+            "value": "Les notes d'état vont dans un tiroir LOGBOOK"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "状態メモをLOGBOOKドロワーに記録（org-log-into-drawer）"
+            "value": "状態メモをLOGBOOKドロワーに記録"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "As notas de estado vão para uma gaveta LOGBOOK (org-log-into-drawer)"
+            "value": "As notas de estado vão para uma gaveta LOGBOOK"
           }
         }
       }
@@ -32736,36 +32736,36 @@
         }
       }
     },
-    "Tags, tables and M-q measure text as your Emacs displays it, so both write the same file.": {
+    "Tags, tables and Fill Paragraph measure text as your Emacs displays it, so both write the same file.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tags, Tabellen und M-q messen Text so, wie dein Emacs ihn anzeigt, damit beide dieselbe Datei schreiben."
+            "value": "Tags, Tabellen und Absatz umbrechen messen Text so, wie dein Emacs ihn anzeigt, damit beide dieselbe Datei schreiben."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Las etiquetas, las tablas y M-q miden el texto como lo muestra tu Emacs, para que ambos escriban el mismo archivo."
+            "value": "Las etiquetas, las tablas y Rellenar párrafo miden el texto como lo muestra tu Emacs, para que ambos escriban el mismo archivo."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Les tags, les tableaux et M-q mesurent le texte comme votre Emacs l'affiche, pour que les deux écrivent le même fichier."
+            "value": "Les tags, les tableaux et Remplir le paragraphe mesurent le texte comme votre Emacs l'affiche, pour que les deux écrivent le même fichier."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "タグ、表、M-qはEmacsでの表示と同じ方法でテキスト幅を測るため、どちらで編集しても同じファイルになります。"
+            "value": "タグ、表、段落を詰めて折り返すはEmacsでの表示と同じ方法でテキスト幅を測るため、どちらで編集しても同じファイルになります。"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Etiquetas, tabelas e M-q medem o texto como o seu Emacs o exibe, para que ambos gravem o mesmo arquivo."
+            "value": "Etiquetas, tabelas e Preencher Parágrafo medem o texto como o seu Emacs o exibe, para que ambos gravem o mesmo arquivo."
           }
         }
       }
@@ -35279,36 +35279,36 @@
         }
       }
     },
-    "Under a parent with the ORDERED property (Toggle ORDERED Property, C-c C-x o), TODO children are also done in order.": {
+    "Under a parent with the ORDERED property (Org ▸ Properties and Columns ▸ Toggle ORDERED Property), TODO children are also done in order.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Unter einem Eintrag mit der Eigenschaft ORDERED (ORDERED umschalten, C-c C-x o) werden TODO-Untereinträge auch der Reihe nach erledigt."
+            "value": "Unter einem Eintrag mit der Eigenschaft ORDERED (Org ▸ Eigenschaften und Spalten ▸ ORDERED umschalten) werden TODO-Untereinträge auch der Reihe nach erledigt."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bajo una entrada padre con la propiedad ORDERED (Alternar propiedad ORDERED, C-c C-x o), las hijas TODO también se completan en orden."
+            "value": "Bajo una entrada padre con la propiedad ORDERED (Org ▸ Propiedades y columnas ▸ Alternar propiedad ORDERED), las hijas TODO también se completan en orden."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sous un parent ayant la propriété ORDERED (Basculer la propriété ORDERED, C-c C-x o), les sous-entrées TODO sont aussi terminées dans l'ordre."
+            "value": "Sous un parent ayant la propriété ORDERED (Org ▸ Propriétés et colonnes ▸ Basculer la propriété ORDERED), les sous-entrées TODO sont aussi terminées dans l'ordre."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ORDEREDプロパティを持つ親（ORDEREDプロパティを切り替え、C-c C-x o）の下では、TODOの子エントリも順番に完了する必要があります。"
+            "value": "ORDEREDプロパティを持つ親（Org ▸ プロパティと列 ▸ ORDEREDプロパティを切り替え）の下では、TODOの子エントリも順番に完了する必要があります。"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sob um pai com a propriedade ORDERED (Alternar Propriedade ORDERED, C-c C-x o), os filhos TODO também são concluídos em ordem."
+            "value": "Sob um pai com a propriedade ORDERED (Org ▸ Propriedades e Colunas ▸ Alternar Propriedade ORDERED), os filhos TODO também são concluídos em ordem."
           }
         }
       }
@@ -36550,36 +36550,36 @@
         }
       }
     },
-    "When an entry is done (org-log-done)": {
+    "When an entry is done": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wenn ein Eintrag erledigt ist (org-log-done)"
+            "value": "Wenn ein Eintrag erledigt ist"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cuando una entrada se completa (org-log-done)"
+            "value": "Cuando una entrada se completa"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Quand une entrée est terminée (org-log-done)"
+            "value": "Quand une entrée est terminée"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "エントリが完了したとき（org-log-done）"
+            "value": "エントリが完了したとき"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Quando uma entrada é concluída (org-log-done)"
+            "value": "Quando uma entrada é concluída"
           }
         }
       }

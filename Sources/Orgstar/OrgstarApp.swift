@@ -935,22 +935,30 @@ struct SettingsView: View {
                     Text("Aligned to end at column 77").tag(-77)
                     Text("One space after the title").tag(0)
                 }
-                Toggle("M-RET adds the new heading after the subtree", isOn: $headingAfterSubtree)
-                Toggle("M-RET splits the line at the caret", isOn: $splitLine)
+                .help(Text(verbatim: "org-tags-column"))
+                Toggle(isOn: $headingAfterSubtree) { keyed("New headings go after the subtree", "org.heading.insert") }
+                    .help(Text(verbatim: "org-insert-heading-respect-content"))
+                Toggle(isOn: $splitLine) { keyed("New headings and items split the line at the caret", "org.heading.insert") }
+                    .help(Text(verbatim: "org-M-RET-may-split-line"))
                 Toggle("Lists can use letters (a. b. c.)", isOn: $alphabeticalLists)
-                Stepper("M-q fills to column \(fillColumn)", value: $fillColumn, in: 40...200)
+                    .help(Text(verbatim: "org-list-allow-alphabetical"))
+                Stepper(value: $fillColumn, in: 40...200) { keyed("Fill Paragraph wraps lines at column \(fillColumn)", "org.fill-paragraph") }
+                    .help(Text(verbatim: "fill-column"))
             }
             Section {
-                Toggle("Long lines run off the edge instead of wrapping (org-startup-truncated)", isOn: $startupTruncated)
+                Toggle("Long lines run off the edge instead of wrapping", isOn: $startupTruncated)
+                    .help(Text(verbatim: "org-startup-truncated"))
             } footer: {
-                Text("Applies to files as they open. View ▸ Truncate or Wrap Long Lines switches the current file.")
+                Text("Applies to files as they open. View ▸ Truncate Long Lines switches the current file.")
                     .settingsFooter()
             }
             Section {
-                Toggle("Emacs hides emphasis markers (org-hide-emphasis-markers)", isOn: $hiddenMarkers)
-                Toggle("Emacs shows entities as characters (org-pretty-entities)", isOn: $prettyEntities)
+                Toggle("Emacs hides emphasis markers", isOn: $hiddenMarkers)
+                    .help(Text(verbatim: "org-hide-emphasis-markers"))
+                Toggle("Emacs shows entities as characters", isOn: $prettyEntities)
+                    .help(Text(verbatim: "org-pretty-entities"))
             } footer: {
-                Text("Tags, tables and M-q measure text as your Emacs displays it, so both write the same file.")
+                Text("Tags, tables and Fill Paragraph measure text as your Emacs displays it, so both write the same file.")
                     .settingsFooter()
             }
             Section {
@@ -960,26 +968,32 @@ struct SettingsView: View {
                     .settingsFooter()
             }
             Section {
-                Toggle("Entries can't be done before their TODO children (org-enforce-todo-dependencies)", isOn: $enforceTodoDependencies)
-                Toggle("Entries can't be done with unchecked boxes (org-enforce-todo-checkbox-dependencies)", isOn: $enforceTodoCheckboxDependencies)
+                Toggle("Entries can't be done before their TODO children", isOn: $enforceTodoDependencies)
+                    .help(Text(verbatim: "org-enforce-todo-dependencies"))
+                Toggle("Entries can't be done with unchecked boxes", isOn: $enforceTodoCheckboxDependencies)
+                    .help(Text(verbatim: "org-enforce-todo-checkbox-dependencies"))
             } footer: {
-                Text("Under a parent with the ORDERED property (Toggle ORDERED Property, C-c C-x o), TODO children are also done in order.")
+                Text("Under a parent with the ORDERED property (Org ▸ Properties and Columns ▸ Toggle ORDERED Property), TODO children are also done in order.")
                     .settingsFooter()
             }
             Section {
-                Picker("When an entry is done (org-log-done)", selection: $logDone) {
+                Picker("When an entry is done", selection: $logDone) {
                     Text("Record nothing").tag("nil")
                     Text("Record the time, as CLOSED").tag("time")
                     Text("Record the time and ask for a note").tag("note")
                 }
-                Toggle("State notes go in a LOGBOOK drawer (org-log-into-drawer)", isOn: logIntoDrawerOn)
+                .help(Text(verbatim: "org-log-done"))
+                Toggle("State notes go in a LOGBOOK drawer", isOn: logIntoDrawerOn)
+                    .help(Text(verbatim: "org-log-into-drawer"))
             } footer: {
                 Text("Keyword flags such as DONE(d!) and #+STARTUP words in a file override these. org-log-reschedule and org-log-redeadline are in config.toml.")
                     .settingsFooter()
             }
             Section {
-                Toggle("Speed keys: single letters at the start of a heading line run commands (org-use-speed-commands)", isOn: $useSpeedCommands)
-                Toggle("Check spelling while typing (spell-check)", isOn: $spellCheck)
+                Toggle("Speed keys: single letters at the start of a heading line run commands", isOn: $useSpeedCommands)
+                    .help(Text(verbatim: "org-use-speed-commands"))
+                Toggle("Check spelling while typing", isOn: $spellCheck)
+                    .help(Text(verbatim: "spell-check"))
             } footer: {
                 Text("Spell checking applies to files as they open; Check Spelling While Typing switches the current file. Code, links, dates, tags and keywords aren't checked.")
                     .settingsFooter()
@@ -987,6 +1001,16 @@ struct SettingsView: View {
         }
         .formStyle(.grouped)
         .frame(height: 860)
+    }
+
+    /// `label`, then the keys that run `command` in the current preset, if any.
+    private func keyed(_ label: LocalizedStringKey, _ command: String) -> some View {
+        HStack(spacing: 6) {
+            Text(label)
+            if let keys = commands.keyLabel(for: command) {
+                Text(verbatim: keys).font(.system(.body, design: .monospaced)).foregroundStyle(.secondary)
+            }
+        }
     }
 
     /// `org-log-into-drawer` as a switch: on is "LOGBOOK" (Emacs's t); a drawer name of its own counts as on.
