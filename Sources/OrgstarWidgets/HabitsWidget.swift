@@ -91,14 +91,16 @@ struct HabitsView: View {
             let cells = habit.habit.graph(today: today, preceding: 6, following: 1)
             VStack(alignment: .leading, spacing: 2) {
                 Text(habit.title).font(.caption).lineLimit(1)
-                HabitCells(cells: cells, colors: snapshot.colors, width: 12, height: 8)
+                HabitCells(cells: cells, today: today, colors: snapshot.colors, width: 12, height: 8)
             }
+            .accessibilityElement(children: .combine)
         } else {
             HStack(spacing: 8) {
                 Text(habit.title).font(.caption).lineLimit(1)
                 Spacer(minLength: 4)
-                HabitCells(cells: habit.habit.graph(today: today), colors: snapshot.colors, width: 5, height: 12)
+                HabitCells(cells: habit.habit.graph(today: today), today: today, colors: snapshot.colors, width: 5, height: 12)
             }
+            .accessibilityElement(children: .combine)
         }
     }
 }
@@ -109,6 +111,7 @@ struct HabitsView: View {
 /// from clear (faintest) to overdue (solid), and days to come are outlined.
 struct HabitCells: View {
     let cells: [Habit.Cell]
+    let today: Int
     let colors: [String: AgendaSnapshot.Hex]
     let width: CGFloat
     let height: CGFloat
@@ -137,7 +140,19 @@ struct HabitCells: View {
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Done \(cells.filter { $0.glyph == "*" }.count) of \(cells.count) days")
+        .accessibilityLabel(Text("Done \(cells.filter { $0.glyph == "*" }.count) of \(cells.count) days") + Text(verbatim: ", ") + todayState)
+    }
+
+    /// Today's state in words.
+    private var todayState: Text {
+        guard let cell = cells.first(where: { $0.day == today }) else { return Text(verbatim: "") }
+        if cell.glyph == "*" { return Text("Done today") }
+        switch cell.face {
+        case .clear, .clearFuture: return Text("Not due today")
+        case .ready, .readyFuture: return Text("Due today")
+        case .alert, .alertFuture: return Text("Last chance today")
+        case .overdue, .overdueFuture: return Text("Overdue")
+        }
     }
 
     /// A filled bar for past days and an outline for days to come, at the state's step; a

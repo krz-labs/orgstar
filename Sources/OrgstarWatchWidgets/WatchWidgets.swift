@@ -68,14 +68,18 @@ struct NextEntryView: View {
                     Text("open").font(.caption2)
                 }
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text("\(open) open today"))
         case .accessoryCorner:
             Text("\(open)").font(.title3.weight(.semibold)).widgetLabel { Text(next?.title ?? String(localized: "Agenda clear")) }
+                .accessibilityLabel(Text("\(open) open today") + Text(verbatim: next.map { ", \($0.title)" } ?? ""))
         default:
             VStack(alignment: .leading, spacing: 0) {
                 Text(next?.gutter ?? String(localized: "Agenda")).font(.headline).widgetAccentable().lineLimit(1)
                 Text(next?.title ?? (entry.agenda == nil ? String(localized: "Open orgstar") : String(localized: "Nothing left today"))).lineLimit(2)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityElement(children: .combine)
         }
     }
 }
@@ -109,6 +113,8 @@ struct ClockView: View {
                     Image(systemName: "stopwatch").font(.title3)
                 }
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(clock.map { Text("Clocked in") + Text(verbatim: ", \($0.heading), ") + Text($0.startedAt, style: .timer) } ?? Text("Not clocked in"))
         default:
             VStack(alignment: .leading, spacing: 0) {
                 if let clock {
@@ -120,6 +126,7 @@ struct ClockView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityElement(children: .combine)
         }
     }
 }

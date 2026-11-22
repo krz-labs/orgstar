@@ -114,6 +114,7 @@ struct SmallRow: View {
                 .foregroundStyle(row.statusColor?.color(scheme) ?? .secondary)
             Text(row.title).font(.caption).lineLimit(1)
         }
+        .accessibilityElement(children: .combine)
     }
 }
 
@@ -153,6 +154,18 @@ struct WideRow: View {
             Spacer(minLength: 0)
             Circle().fill(row.categoryColor?.color(scheme) ?? .secondary).frame(width: categoryDot, height: categoryDot)
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(label)
+    }
+
+    /// The time or status, keyword, priority, title and category, as one phrase.
+    private var label: Text {
+        var parts = [Text(verbatim: row.gutter)]
+        if let todo = row.todo { parts.append(Text(verbatim: todo)) }
+        if let priority = row.priority { parts.append(Text("Priority \(priority)")) }
+        parts.append(Text(verbatim: row.title))
+        if !row.category.isEmpty { parts.append(Text(verbatim: row.category)) }
+        return parts.dropFirst().reduce(parts[0]) { $0 + Text(verbatim: ", ") + $1 }
     }
 }
 
