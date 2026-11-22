@@ -2972,6 +2972,40 @@
         }
       }
     },
+    "Agenda in the sidebar": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agenda in der Seitenleiste"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agenda en la barra lateral"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'agenda dans la barre latérale"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サイドバーのアジェンダ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agenda na barra lateral"
+          }
+        }
+      }
+    },
     "Agenda shows %lld days": {
       "localizations": {
         "de": {
@@ -22055,6 +22089,40 @@
         }
       }
     },
+    "Open Agenda Window": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agenda-Fenster öffnen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir ventana de agenda"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir la fenêtre de l'agenda"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アジェンダウインドウを開く"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir Janela da Agenda"
+          }
+        }
+      }
+    },
     "Open Attachment…": {
       "comment": "Command title",
       "localizations": {
@@ -28358,6 +28426,40 @@
         }
       }
     },
+    "Show Agenda or Files in Sidebar": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agenda oder Dateien in der Seitenleiste anzeigen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar agenda o archivos en la barra lateral"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher l'agenda ou les fichiers dans la barre latérale"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サイドバーにアジェンダまたはファイルを表示"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar Agenda ou Arquivos na Barra Lateral"
+          }
+        }
+      }
+    },
     "Show Attachment Folder": {
       "comment": "Command title",
       "localizations": {
@@ -29693,6 +29795,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Encolher ou Expandir Coluna da Tabela"
+          }
+        }
+      }
+    },
+    "Sidebar": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seitenleiste"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barra lateral"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barre latérale"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サイドバー"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barra Lateral"
           }
         }
       }
@@ -31764,6 +31900,40 @@
         }
       }
     },
+    "The Agenda button at the top of the sidebar shows your agenda, or a view from views.toml, beside the editor.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Taste „Agenda“ oben in der Seitenleiste zeigt deine Agenda oder eine Ansicht aus views.toml neben dem Editor."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El botón Agenda en la parte superior de la barra lateral muestra tu agenda, o una vista de views.toml, junto al editor."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le bouton Agenda en haut de la barre latérale affiche votre agenda, ou une vue de views.toml, à côté de l'éditeur."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サイドバー上部のアジェンダボタンで、アジェンダまたはviews.tomlのビューをエディタの横に表示します。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O botão Agenda no topo da barra lateral mostra sua agenda, ou uma visualização do views.toml, ao lado do editor."
+          }
+        }
+      }
+    },
     "The App Store can't be reached right now.": {
       "localizations": {
         "de": {
@@ -31930,6 +32100,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "A agenda lê os arquivos Org do nível superior de cada pasta adicionada."
+          }
+        }
+      }
+    },
+    "The agenda view shown here; add views in views.toml": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die hier gezeigte Agenda-Ansicht; Ansichten in views.toml hinzufügen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La vista de agenda que se muestra aquí; añade vistas en views.toml"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La vue d'agenda affichée ici ; ajoutez des vues dans views.toml"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ここに表示するアジェンダビュー。ビューはviews.tomlで追加します"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A visualização da agenda mostrada aqui; adicione visualizações em views.toml"
           }
         }
       }

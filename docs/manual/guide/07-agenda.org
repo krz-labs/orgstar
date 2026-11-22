@@ -467,6 +467,14 @@ The search covers the agenda files only, not =org-agenda-text-search-extra-files
 
 The view menu lists the built-in views, Agenda, TODO List and Stuck Projects, then the views in =views.toml=, then Match…, TODO Match…, Search… and TODO Search…. Saved views mirror =org-agenda-custom-commands=, with fewer options.
 
+*In the sidebar.* On the Mac, the Agenda button at the top of the main window's sidebar shows an agenda in place of the files, beside the editor; Files brings the files back, and Show Agenda or Files in Sidebar (=app.sidebar-agenda=) switches between them.
+
+- Its menu lists the built-in views and those in =views.toml=, and Open Agenda Window. The view chosen is remembered.
+- Days with entries are listed with their entries, today's overdue ones first; a list view or a block shows under its title. Each line has the time or status, the TODO keyword, the title and the category.
+- A click on an entry shows it in the editor.
+- It uses the Agenda window's span, start, folders and agenda files. Calendar events and Reminders show once the Agenda window has been given access to them.
+- It has no filters, bulk actions or keys of its own; those are in the Agenda window.
+
 =views.toml= lives in the configuration folder beside =config.toml= (=~/.config/orgstar/= by default; see [[file:13-configuration.org][Configuration]]). Each view is a =[[view]]= table:
 
 #+BEGIN_SRC toml

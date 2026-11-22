@@ -270,6 +270,7 @@ enum CommandTitles {
         String(localized: "Set Property…", comment: "Command title"),
         String(localized: "Set Tags", comment: "Command title"),
         String(localized: "Shift Timer Values in Region…", comment: "Command title"),
+        String(localized: "Show Agenda or Files in Sidebar", comment: "Command title"),
         String(localized: "Show Attachment Folder", comment: "Command title"),
         String(localized: "Show Backlinks", comment: "Command title"),
         String(localized: "Show Node Graph", comment: "Command title"),

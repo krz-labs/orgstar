@@ -29,6 +29,8 @@ struct ContentView: View {
     @State private var statusItem: ClockStatusItem?
     @AppStorage("globalCapture") private var globalCapture = true
     @AppStorage("menuBarItem") private var menuBarItem = false
+    /// The sidebar shows the agenda in place of the files.
+    @AppStorage("sidebarAgenda") private var sidebarAgenda = false
     /// Today's agenda for the menu bar item.
     @State private var menuToday: [AgendaSnapshot.Row] = []
     @State private var hour = 0
@@ -243,8 +245,24 @@ struct ContentView: View {
 
     private var main: some View {
         NavigationSplitView {
-            Sidebar(workspace: workspace, session: session, selection: $selectedFile) { commands.showingFolderPicker = true }
-                .navigationSplitViewColumnWidth(min: 200, ideal: 260)
+            Group {
+                if sidebarAgenda {
+                    AgendaSidebar(workspace: workspace, session: session, commands: commands, hour: hour)
+                } else {
+                    Sidebar(workspace: workspace, session: session, selection: $selectedFile) { commands.showingFolderPicker = true }
+                }
+            }
+            .safeAreaInset(edge: .top, spacing: 0) {
+                Picker("Sidebar", selection: $sidebarAgenda) {
+                    Text("Files").tag(false)
+                    Text("Agenda").tag(true)
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .padding(.horizontal, 10)
+                .padding(.bottom, 6)
+            }
+            .navigationSplitViewColumnWidth(min: 200, ideal: 260)
         } detail: {
             HStack(spacing: 0) {
                 if outlineShown {
@@ -1409,6 +1427,8 @@ struct ContentView: View {
             openWindow(id: "board")
         case "app.node.graph":
             openWindow(id: "graph")
+        case "app.sidebar-agenda":
+            sidebarAgenda.toggle()
         case "app.capture":
             NSApp.activate()
             openWindow(id: "capture")

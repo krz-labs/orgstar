@@ -67,6 +67,8 @@ public enum WhatsNew {
     #else
     private static let ios: [ReleaseNotes.Item] = []
     private static let mac = [
+        ReleaseNotes.Item("sidebar.left", "Agenda in the sidebar",
+                          "The Agenda button at the top of the sidebar shows your agenda, or a view from views.toml, beside the editor."),
         ReleaseNotes.Item("menubar.rectangle", "orgstar in the menu bar",
                           "Settings ▸ General ▸ Keep orgstar in the menu bar adds capture, the agenda and today's entries to the menu bar."),
     ]

@@ -1104,6 +1104,7 @@ No preset binds these. Run them from the palette or a menu, or bind them in =key
 | Command | What it does |
 |-+-|
 | Board (=app.board=) | Opens the Board window. Window ▸ Board, =⇧⌘B=. |
+| Show Agenda or Files in Sidebar (=app.sidebar-agenda=) | Switches the sidebar between the files and the agenda, as its Files and Agenda buttons do. |
 | Verbatim, Code, Strike-Through (=org.emphasize.verbatim=, =org.emphasize.code=, =org.emphasize.strike-through=) | =org-emphasize= with ===, =~= or =+=. |
 | Cancel Running Task (=app.babel.cancel=) | Stops the src block that is running, or an export or table recalculation running in Emacs. Edit ▸ Cancel Running Task, =⌘.=. |
 | Edit Config File (=app.edit-config=) | Opens =config.toml= in the editor. =⌥⌘,=. |

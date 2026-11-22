@@ -125,6 +125,7 @@ public enum EditorCommands {
         EditorCommand(id: "app.node.find", title: "Find Node…", action: .app),
         EditorCommand(id: "app.node.insert", title: "Insert Node Link…", action: .app),
         EditorCommand(id: "app.node.graph", title: "Show Node Graph", action: .app),
+        EditorCommand(id: "app.sidebar-agenda", title: "Show Agenda or Files in Sidebar", action: .app),
         EditorCommand(id: "app.node.rename-from-front-matter", title: "Rename Note from Front Matter", action: .app),
         EditorCommand(id: "app.node.rename", title: "Rename Note…", action: .app),
         EditorCommand(id: "app.node.rename-folder-from-front-matter", title: "Rename Notes in Folder from Front Matter…", action: .app),
