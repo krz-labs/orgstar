@@ -40,7 +40,7 @@ Tap a file in Folders or Search, or Open in File in an agenda entry's sheet, to 
 - Text is styled as in the editor, in the theme's colours, font, size, line spacing and heading sizes, on the theme's background: TODO keywords, priorities, tags, emphasis, code, timestamps, links, and the code in src blocks. Text can be selected and copied.
 - The reader follows the editor's display settings (see Themes and display below): Show Markup, hidden emphasis markers, pretty entities, indentation, leading stars, inline images and truncated lines. Tables show at full width, without narrowed columns.
 - Tap a link to follow it. Links to headings and files in your folders open in the reader; links to other files, such as an attached PDF or image, open in Quick Look; web links open in the browser.
-- The toolbar has Outline (a list of headings to jump to), Export, and Edit.
+- The toolbar has Outline (a list of headings to jump to), Export, and Edit (the pencil).
 
 * The editor
 
@@ -271,7 +271,7 @@ They read the agenda the watch app last got, and move on by themselves as timed 
 
 * Capture
 
-Tap Capture (the pencil icon) in the Agenda or Folders tab.
+Tap Capture (the square with a pencil) in the Agenda or Folders tab.
 
 1. Choose a template. The first template is selected.
 2. Answer the template's questions (=%^{…}=, =%^g=, =%^t= and the like), then tap Continue. A template without questions skips this step.

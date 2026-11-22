@@ -145,8 +145,8 @@ struct EditorScreen: View {
                     Button("Commands", systemImage: "command") { sheet = .palette }
                     Button("Word Count", systemImage: "textformat.123") { message = wordCount() }
                     Button("Clock In", systemImage: "stopwatch") { editor?.run("app.clock.in") }
-                    Button("Column View", systemImage: "tablecells") { editor?.run("org.columns") }
-                    Button("Column View of File", systemImage: "tablecells.badge.ellipsis") { editor?.run("org.columns.global") }
+                    Button("Column View", systemImage: "rectangle.split.3x3") { editor?.run("org.columns") }
+                    Button("Column View of File", systemImage: "rectangle.split.3x3") { editor?.run("org.columns.global") }
                     Menu("Table", systemImage: "tablecells") {
                         Button("Import Table from File…", systemImage: "square.and.arrow.down") { importingTable = true }
                         Button("Export Table as CSV…", systemImage: "square.and.arrow.up") { exportTable(csv: true) }
@@ -154,12 +154,12 @@ struct EditorScreen: View {
                         Button("Plot Table", systemImage: "chart.xyaxis.line") { plotTable() }
                     }
                     Toggle(isOn: Binding(get: { model.showMarkup }, set: { model.showMarkup = $0 })) {
-                        Label("Show Markup", systemImage: "chevron.left.forwardslash.chevron.right")
+                        Label("Show Markup", systemImage: "eye")
                     }
                     RecentClockMenu(clock: clock) { editor?.run($0) }
                     Button("Backlinks", systemImage: "arrow.uturn.backward.circle") { if ProAccess.shared.allows(.roam) { sheet = .backlinks } }
-                    Menu("Daily Notes", systemImage: "calendar") {
-                        Button("Today", systemImage: "calendar") { roam("app.dailies.today") }
+                    Menu("Daily Notes", systemImage: "book.closed") {
+                        Button("Today", systemImage: "smallcircle.filled.circle") { roam("app.dailies.today") }
                         Button("Yesterday", systemImage: "chevron.backward") { roam("app.dailies.yesterday") }
                         Button("Tomorrow", systemImage: "chevron.forward") { roam("app.dailies.tomorrow") }
                         Button("Date…", systemImage: "calendar.badge.clock") { roam("app.dailies.date") }
@@ -180,7 +180,7 @@ struct EditorScreen: View {
                             Button("Scan Document…", systemImage: "doc.viewfinder") { scanning = true }
                         }
                         Button("Attach File from URL…", systemImage: "link.badge.plus") { attachActions.run("app.attach.url") }
-                        Button("New Attachment…", systemImage: "square.and.pencil") { attachActions.run("app.attach.new") }
+                        Button("New Attachment…", systemImage: "note.text.badge.plus") { attachActions.run("app.attach.new") }
                         Button("Open Attachment…", systemImage: "paperclip") { attachActions.run("app.attach.open") }
                         Button("Show Attachment Folder", systemImage: "folder") { attachActions.run("app.attach.reveal") }
                         Button("Delete Attachment…", systemImage: "trash") { attachActions.run("app.attach.delete") }

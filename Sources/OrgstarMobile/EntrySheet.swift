@@ -73,7 +73,7 @@ struct EntrySheet: View {
                     Button("Redo", systemImage: "arrow.uturn.forward", action: redo).disabled(undone == 0)
                 }
                 ToolbarItem(placement: .primaryAction) {
-                    Menu("More", systemImage: "ellipsis") {
+                    Menu("More", systemImage: "ellipsis.circle") {
                         Button("Open in File", systemImage: "doc.text") { save(open: true) }
                     }
                     .disabled(draft == nil)
