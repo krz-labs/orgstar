@@ -350,16 +350,7 @@ struct RootView: View {
             model.reloadConfig()
             Task { await workspace.refresh() }
         }
-        .onOpenURL { url in
-            if let link = AppLink(url: url) {
-                open(link)
-            } else if let request = CaptureRequest(link: url.absoluteString) {
-                capture = request
-            } else if case .storeLink(let link, let title)? = OrgProtocol.parse(url.absoluteString) {
-                message = StoredLink.add(StoredLink(link: link, description: title), to: &model.storedLinks)
-                UIPasteboard.general.string = link
-            }
-        }
+        .onOpenURL(perform: handle)
         // The Live Activity follows the clock, wherever it starts or stops.
         .task {
             LiveClock.publish(model.clock)
@@ -399,6 +390,20 @@ struct RootView: View {
         if let shared { model.inbox?.remove(shared.link) }
         shared = nil
         showWaiting()
+    }
+
+    /// A widget's or the Live Activity's link, or an org-protocol URL.
+    private func handle(_ url: URL) {
+        if let link = AppLink(url: url) {
+            open(link)
+        } else if let request = CaptureRequest(link: url.absoluteString) {
+            capture = request
+        } else if case .storeLink(let link, let title)? = OrgProtocol.parse(url.absoluteString) {
+            message = StoredLink.add(StoredLink(link: link, description: title), to: &model.storedLinks)
+            UIPasteboard.general.string = link
+        } else if url.scheme == "org-protocol" {
+            message = "orgstar handles org-protocol capture and store-link"
+        }
     }
 
     /// A widget's or the Live Activity's link.

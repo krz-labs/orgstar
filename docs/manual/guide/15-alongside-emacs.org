@@ -31,6 +31,8 @@ Emacs and Syncthing don't use file coordination, so these checks can't lock them
 
 If the file keeps changing through all three attempts, the save fails with an error and your edits stay unsaved.
 
+In the Mac App Store version, when the folder doesn't let orgstar create the temporary file, orgstar writes the file in place instead.
+
 ** Automatic and explicit saving
 
 With =save = "automatic"= (the default), orgstar saves a file one second after you stop typing. With ="explicit"=, only =⌘S= (Save) and =⌥⌘S= (Save All) save. See [[file:13-configuration.org][Configuration]]. The iOS app always saves automatically.
