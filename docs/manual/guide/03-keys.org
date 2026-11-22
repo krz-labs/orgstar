@@ -14,7 +14,7 @@ Choose a preset in Settings ▸ General ▸ Keys, or with =keymap= in the =[orgs
 
 | Preset | =config.toml= value | What it is |
 |-+-+-|
-| Emacs | ="emacs"= | Emacs and Org keys: =C-f=, =C-k=, =C-x C-s=, =C-c C-t=, =M-RET=, =M-<left>=. The default. |
+| Emacs | ="emacs"= | Emacs and Org keys: =C-f=, =C-k=, =C-x C-s=, =C-c C-t=, =M-RET=, =M-<left>=. The default when nothing else is chosen. |
 | Mac | ="mac"= | Standard macOS text keys stay as they are. Org commands use Control-Command chords (=⌃⌘T=, =⌃⌘←=), which macOS text editing leaves free. |
 | Doom (Vim keys) | ="doom"= | Modal editing as in Doom Emacs with evil and evil-org: normal, insert and visual states, the =SPC= leader and =SPC m= local leader, plus the Emacs preset's Org keys in every state. |
 

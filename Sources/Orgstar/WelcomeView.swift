@@ -25,11 +25,12 @@ struct WelcomeView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Welcome to orgstar").font(.title2.bold())
-            Text("orgstar edits a folder of plain-text org files in place. Add the folder your notes are in, or start a new one. Nothing is copied or moved, and you can add more folders later with File ▸ Add Folder….")
+            Text("orgstar edits a folder of plain-text org files in place. Add the folder your notes are in, or start a new one. Nothing is copied or moved, and you can add more folders later with File ▸ Add Folder…")
             Picker("Keys", selection: $preset) {
                 ForEach(KeymapPreset.allCases, id: \.self) { Text($0.title).tag($0) }
             }
             Text(presetNote).font(.callout).foregroundStyle(.secondary)
+            Text("⇧⌘P finds any command. The Org menu lists them with their keys.").font(.callout).foregroundStyle(.secondary)
             #if APPSTORE
             Text("orgstar keeps its settings in a folder of its own. To use the ones in ~/.config/orgstar, choose that folder in Settings ▸ General ▸ Choose Configuration Folder….")
                 .font(.callout).foregroundStyle(.secondary)
@@ -65,6 +66,17 @@ struct WelcomeView: View {
         }
         .padding(20)
         .frame(width: 480)
+        .onAppear {
+            if UserDefaults.standard.object(forKey: "keymap") == nil { preset = Self.suggestedPreset }
+        }
+    }
+
+    /// Doom keys when a Doom configuration is found, Emacs keys for another Emacs
+    /// configuration, and Mac keys without one.
+    static var suggestedPreset: KeymapPreset {
+        guard let found = EmacsImport.defaultLocations().first else { return .mac }
+        let doom = [ProcessInfo.processInfo.environment["DOOMDIR"], OrgPaths.home + "/.config/doom", OrgPaths.home + "/.doom.d"]
+        return doom.contains(found.path) ? .doom : .emacs
     }
 
     private var presetNote: LocalizedStringKey {

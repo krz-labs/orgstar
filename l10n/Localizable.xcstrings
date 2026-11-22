@@ -38931,7 +38931,7 @@
         }
       }
     },
-    "orgstar edits a folder of plain-text org files in place. Add the folder your notes are in, or start a new one. Nothing is copied or moved, and you can add more folders later with File ▸ Add Folder….": {
+    "orgstar edits a folder of plain-text org files in place. Add the folder your notes are in, or start a new one. Nothing is copied or moved, and you can add more folders later with File ▸ Add Folder…": {
       "localizations": {
         "de": {
           "stringUnit": {
@@ -38942,13 +38942,13 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "orgstar edita en su sitio una carpeta de archivos Org en texto plano. Añade la carpeta donde están tus notas o empieza una nueva. No se copia ni se mueve nada, y puedes añadir más carpetas después con Archivo ▸ Añadir carpeta…."
+            "value": "orgstar edita en su sitio una carpeta de archivos Org en texto plano. Añade la carpeta donde están tus notas o empieza una nueva. No se copia ni se mueve nada, y puedes añadir más carpetas después con Archivo ▸ Añadir carpeta…"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "orgstar modifie sur place un dossier de fichiers Org en texte brut. Ajoutez le dossier contenant vos notes, ou commencez-en un nouveau. Rien n'est copié ni déplacé, et vous pourrez ajouter d'autres dossiers plus tard avec Fichier ▸ Ajouter un dossier…."
+            "value": "orgstar modifie sur place un dossier de fichiers Org en texte brut. Ajoutez le dossier contenant vos notes, ou commencez-en un nouveau. Rien n'est copié ni déplacé, et vous pourrez ajouter d'autres dossiers plus tard avec Fichier ▸ Ajouter un dossier…"
           }
         },
         "ja": {
@@ -38960,7 +38960,7 @@
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "O orgstar edita uma pasta de arquivos Org em texto simples no próprio lugar. Adicione a pasta onde estão suas notas ou comece uma nova. Nada é copiado ou movido, e você pode adicionar mais pastas depois com Arquivo ▸ Adicionar Pasta…."
+            "value": "O orgstar edita uma pasta de arquivos Org em texto simples no próprio lugar. Adicione a pasta onde estão suas notas ou comece uma nova. Nada é copiado ou movido, e você pode adicionar mais pastas depois com Arquivo ▸ Adicionar Pasta…"
           }
         }
       }
@@ -40355,6 +40355,40 @@
     },
     "·": {
       "shouldTranslate": false
+    },
+    "⇧⌘P finds any command. The Org menu lists them with their keys.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⇧⌘P findet jeden Befehl. Das Menü „Org“ listet sie mit ihren Tasten auf."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⇧⌘P encuentra cualquier comando. El menú Org los muestra con sus teclas."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⇧⌘P trouve n'importe quelle commande. Le menu Org les liste avec leurs raccourcis."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⇧⌘Pで任意のコマンドを検索できます。Orgメニューにはコマンドとそのキーが一覧表示されます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⇧⌘P encontra qualquer comando. O menu Org lista os comandos com suas teclas."
+          }
+        }
+      }
     },
     "⋯": {
       "shouldTranslate": false

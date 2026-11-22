@@ -20,9 +20,14 @@ Finder or the sidebar.
 
 Open orgstar ▸ Settings… (=⌘,=) and pick *Keys* under General:
 
-- *Emacs*: Org's own bindings, =C-c C-t= and friends. The default.
+- *Emacs*: Org's own bindings, =C-c C-t= and friends.
 - *Mac*: standard Mac editing keys, with Org commands on =⌃⌘= combinations.
 - *Doom (Vim keys)*: modal editing as in Doom Emacs, with =SPC= as the leader.
+
+The welcome sheet starts on Doom keys when it finds a Doom configuration (=~/.config/doom= or
+=~/.doom.d=), on Emacs keys when it finds another Emacs configuration (=~/.config/emacs=,
+=~/.emacs.d= or =~/.emacs=), and on Mac keys otherwise. In every preset, =⇧⌘P= finds any
+command, and the Org menu lists them with their keys.
 
 [[file:guide/03-keys.org][Keys and commands]] lists every binding in each preset. If you
 already use Emacs, Settings ▸ General ▸ Import from Emacs… reads your configuration:
