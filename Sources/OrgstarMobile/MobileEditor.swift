@@ -144,6 +144,9 @@ final class MobileEditor: NSObject, DocumentBuffer {
     static let imageCache = NSCache<NSString, UIImage>()
     var loading = false
     var restyleScheduled: Range<Int>?
+    /// Text before its end is styled; after it, the text waits for the background passes.
+    var styled = StyledExtent()
+    var stylingScheduled = false
     /// Narrowed table columns (`org-table-shrink`).
     var shrunk = ShrunkColumns()
     /// A command's edits being applied, which keep shrunk columns narrow.
@@ -284,7 +287,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
             textView.undoManager?.removeAllActions()
             setFolds(fold)
         } else if document.defaults != defaultsBefore {
-            restyle(0..<(document.text as NSString).length)
+            restartStyling()
         }
         return result
     }
@@ -566,6 +569,8 @@ final class MobileEditor: NSObject, DocumentBuffer {
         let old = range.location..<(range.location + range.length - delta)
         let replacement = (textView.textStorage.string as NSString).substring(with: range)
         let edit = TextEdit(range: old, replacement: replacement)
+        let oldTree = document.tree
+        let oldText = document.text as NSString
         do {
             try document.apply([edit], baseRevision: document.revision)
         } catch {
@@ -574,13 +579,16 @@ final class MobileEditor: NSObject, DocumentBuffer {
             load(textView.textStorage.string)
             return
         }
+        let newText = textView.textStorage.string as NSString
+        styled.map(through: edit, in: newText)
+        let affected = Presentation.restyleRange(for: edit, old: (oldTree, oldText), new: (document.tree, newText))
         vim.changed(edit)
         for table in shrunk.map(through: edit, in: textView.textStorage.string, command: commandEditing) { scheduleRestyle(table) }
         fold = FoldState(
             folds: Self.map(fold.folds, old, delta), bodyFolds: Self.map(fold.bodyFolds, old, delta),
             wrapperFolds: Self.map(fold.wrapperFolds, old, delta)
         )
-        scheduleRestyle(range.location..<NSMaxRange(range))
+        scheduleRestyle(affected.lowerBound..<min(affected.upperBound, newText.length))
         onChange?()
     }
 

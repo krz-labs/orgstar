@@ -14,8 +14,38 @@ extension MobileEditor {
         textView.textStorage.setAttributedString(NSAttributedString(string: text, attributes: theme.base))
         loading = false
         shaded.set(Presentation.shadedBlocks(document.tree), folded: [])
-        restyle(0..<(text as NSString).length)
+        restartStyling()
         textView.typingAttributes = theme.base
+    }
+
+    /// Styled before the first render: more than a screenful.
+    static let firstStyleChunk = 30_000
+    /// Styled per run-loop turn afterwards, short enough to keep scrolling and typing smooth.
+    static let styleChunk = 50_000
+
+    /// Styles the whole file again, a screenful now and the rest in the background.
+    func restartStyling() {
+        styled.reset()
+        revealedLine = caretLine
+        styleNextChunk(Self.firstStyleChunk)
+        scheduleStyling()
+    }
+
+    /// Styles whole lines from the end of the styled text onward, about `size` units.
+    private func styleNextChunk(_ size: Int) {
+        guard let range = styled.next(size, in: textView.textStorage.string as NSString) else { return }
+        restyle(range)
+    }
+
+    private func scheduleStyling() {
+        guard !stylingScheduled, styled.end < textView.textStorage.length else { return }
+        stylingScheduled = true
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.stylingScheduled = false
+            self.styleNextChunk(Self.styleChunk)
+            self.scheduleStyling()
+        }
     }
 
     /// The text view's own colors, and the block band's.
@@ -87,7 +117,7 @@ extension MobileEditor {
             return
         }
         keepingTopLine {
-            if showsImages { restyle(0..<textView.textStorage.length) }
+            if showsImages { restartStyling() }
             for manager in layoutManagers {
                 manager.invalidateRenderingAttributes(for: manager.documentRange)
                 manager.invalidateLayout(for: manager.documentRange)
@@ -95,12 +125,12 @@ extension MobileEditor {
         }
     }
 
-    /// Styles the whole file again.
+    /// Styles the whole file again, a screenful now and the rest in the background.
     func restyleAll() {
         let interval = Perf.begin("editor.restyleAll")
         defer { interval.end() }
         keepingTopLine {
-            restyle(0..<textView.textStorage.length)
+            restartStyling()
             for manager in layoutManagers { manager.invalidateLayout(for: manager.documentRange) }
         }
     }
@@ -139,6 +169,8 @@ extension MobileEditor {
         change()
         guard let anchor, anchor.offset > 0, let location = content.location(start, offsetBy: anchor.offset),
               let above = NSTextRange(location: start, end: location) else { return }
+        // Styled now, not in the background passes, which would lay the text out again.
+        while styled.end < anchor.offset { styleNextChunk(Self.styleChunk) }
         manager.ensureLayout(for: above)
         guard let fragment = manager.textLayoutFragment(for: location) else { return }
         let frame = fragment.layoutFragmentFrame
@@ -161,15 +193,13 @@ extension MobileEditor {
             guard let self, let range = self.restyleScheduled else { return }
             self.restyleScheduled = nil
             self.shaded.set(Presentation.shadedBlocks(self.document.tree), folded: [])
-            // Small files are restyled whole: a heading or block line changes what follows it.
-            let length = self.textView.textStorage.length
-            self.restyle(length < 60_000 ? 0..<length : range)
+            self.restyle(range)
             self.updateHidden()
             self.textView.typingAttributes = self.theme.base
         }
     }
 
-    private var caretLine: NSRange {
+    var caretLine: NSRange {
         let text = textView.textStorage.string as NSString
         return text.lineRange(for: NSRange(location: min(textView.selectedRange.location, text.length), length: 0))
     }
@@ -186,23 +216,17 @@ extension MobileEditor {
         let whole = lines.location..<NSMaxRange(lines)
         storage.beginEditing()
         storage.setAttributes(theme.base, range: lines)
-        if indented {
-            for line in Presentation.lineIndents(document.tree, in: whole) {
-                storage.addAttribute(.paragraphStyle, value: paragraphStyle(line.firstLine, line.wrapped), range: NSRange(line.range))
-            }
-        }
         let revealed = caretLine
-        var scriptExclusions: [Range<Int>] = []
-        for run in Presentation.styles(document.tree, in: whole, highlighter: Self.highlighter) {
-            let clipped = NSIntersectionRange(NSRange(run.range), lines)
-            guard clipped.length > 0 else { continue }
-            if Presentation.skipsLeadingStars(run.role, indented: indented, hideStars: hideStars) { continue }
-            if !showMarkup, Presentation.hidesWithMarkup(run.role, options: options), NSIntersectionRange(clipped, revealed).length == 0 {
-                storage.addAttributes(theme.hidden, range: clipped)
-            } else {
-                theme.apply(run.role, to: storage, range: clipped)
+        let (changes, scriptExclusions) = Presentation.styleChanges(
+            document.tree, in: whole, highlighter: Self.highlighter, indented: indented, hideStars: hideStars,
+            showMarkup: showMarkup, options: options, revealed: revealed.location..<NSMaxRange(revealed)
+        )
+        for change in changes {
+            switch change {
+            case .indent(let line): storage.addAttribute(.paragraphStyle, value: paragraphStyle(line.firstLine, line.wrapped), range: NSRange(line.range))
+            case .role(let role, let range): theme.apply(role, to: storage, range: NSRange(range))
+            case .hidden(let range): storage.addAttributes(theme.hidden, range: NSRange(range))
             }
-            if Presentation.excludesScripts(run.role) { scriptExclusions.append(run.range) }
         }
         if theme.mixedPitch {
             for prefix in Presentation.fixedPitchPrefixes(ns, in: whole) {
@@ -265,7 +289,7 @@ extension MobileEditor {
         // The old line may have moved with edits since; restyle the line now at its start.
         let old = revealedLine.flatMap { $0.location <= text.length ? text.lineRange(for: NSRange(location: $0.location, length: 0)) : nil }
         revealedLine = line
-        for range in [old, line].compactMap({ $0 }) {
+        for range in [old, line].compactMap({ $0 }) where range.location < styled.end {
             restyle(range.location..<NSMaxRange(range))
         }
     }

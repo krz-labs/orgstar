@@ -26,42 +26,18 @@ extension OrgEditor {
             }
             return
         }
-        // Indents and roles go on together in ascending order, so each change lands at the end
-        // of the runs made so far instead of moving the ones after it.
-        var indents = (indented ? Presentation.lineIndents(document.tree, in: range) : [])[...]
-        func indent(before offset: Int) {
-            while let line = indents.first, line.range.lowerBound <= offset {
-                storage.addAttribute(.paragraphStyle, value: paragraphStyle(line.firstLine, line.wrapped), range: NSRange(line.range))
-                indents.removeFirst()
-            }
-        }
         let revealed = caretLine
-        var scriptExclusions: [Range<Int>] = []
-        // Outer before inner still: an outer role never starts after an inner one, and the
-        // index keeps the order of roles that start together. A src block's code runs come in
-        // the highlighter's order, where later wins, so they sort as one.
-        let styles = Presentation.styles(document.tree, in: range, highlighter: highlighter)
-        var starts: [Int] = []
-        for (index, run) in styles.enumerated() {
-            if case .syntax = run.role, index > 0, case .syntax = styles[index - 1].role {
-                starts.append(starts[index - 1])
-            } else {
-                starts.append(run.range.lowerBound)
+        let (changes, scriptExclusions) = Presentation.styleChanges(
+            document.tree, in: range, highlighter: highlighter, indented: indented, hideStars: hideStars,
+            showMarkup: showMarkup, options: options, revealed: revealed.location..<NSMaxRange(revealed)
+        )
+        for change in changes {
+            switch change {
+            case .indent(let line): storage.addAttribute(.paragraphStyle, value: paragraphStyle(line.firstLine, line.wrapped), range: NSRange(line.range))
+            case .role(let role, let range): theme.apply(role, to: storage, range: NSRange(range))
+            case .hidden(let range): storage.addAttributes(theme.hidden, range: NSRange(range))
             }
         }
-        for index in styles.indices.sorted(by: { (starts[$0], $0) < (starts[$1], $1) }) {
-            let run = styles[index]
-            indent(before: run.range.lowerBound)
-            guard let clipped = clip(run.range, to: range) else { continue }
-            if Presentation.skipsLeadingStars(run.role, indented: indented, hideStars: hideStars) { continue }
-            if !showMarkup, Presentation.hidesWithMarkup(run.role, options: options), NSIntersectionRange(clipped, revealed).length == 0 {
-                storage.addAttributes(theme.hidden, range: clipped)
-            } else {
-                theme.apply(run.role, to: storage, range: clipped)
-            }
-            if Presentation.excludesScripts(run.role) { scriptExclusions.append(run.range) }
-        }
-        indent(before: range.upperBound)
         if theme.mixedPitch {
             for prefix in Presentation.fixedPitchPrefixes(storage.string as NSString, in: range) {
                 guard let clipped = clip(prefix, to: range) else { continue }
@@ -137,44 +113,6 @@ extension OrgEditor {
     private func clip(_ run: Range<Int>, to range: Range<Int>) -> NSRange? {
         let clipped = run.clamped(to: range)
         return clipped.isEmpty ? nil : NSRange(clipped)
-    }
-
-    /// The region an edit affects in one version of the tree: inside the innermost section
-    /// holding the edited lines (plus the line after), every element that overlaps them or the
-    /// line on either side. A changed heading line, or an added or removed heading, widens it
-    /// to that section's whole own body. Run on the old and the new tree, the union covers
-    /// elements that grew and elements that shrank.
-    static func affectedRange(_ tree: OrgTree, _ text: NSString, _ start: Int, _ end: Int, touchedHeadings: Bool) -> Range<Int> {
-        let lines = text.lineRange(for: NSRange(location: start, length: min(end + 1, text.length) - start))
-        let lineRange = lines.location..<(lines.location + lines.length)
-        let around = max(0, lineRange.lowerBound - 1)..<min(text.length, lineRange.upperBound + 1)
-        var container = tree.root
-        while let child = container.child(containing: lineRange.lowerBound),
-              child.kind == .section || child.kind == .zerothSection,
-              lineRange.upperBound <= child.range.upperBound {
-            container = child
-        }
-        var lower = lineRange.lowerBound
-        var upper = lineRange.upperBound
-        // Tables and lists carry no styling of their own, so inside them only the rows or
-        // items around the edit change, however large they are.
-        func overlapping(_ nodes: [SyntaxNode]) -> [SyntaxNode] {
-            nodes.filter { $0.range.overlaps(around) }.flatMap { node -> [SyntaxNode] in
-                guard [.table, .plainList, .item].contains(node.kind) else { return [node] }
-                let inner = overlapping(node.children(overlapping: around))
-                return inner.isEmpty ? [node] : inner
-            }
-        }
-        for child in overlapping(container.children(overlapping: around)) {
-            lower = min(lower, child.range.lowerBound)
-            upper = max(upper, child.range.upperBound)
-        }
-        let heading = container.firstChild(.heading)
-        if touchedHeadings || heading.map({ $0.range.overlaps(lineRange) }) == true {
-            lower = min(lower, container.range.lowerBound)
-            upper = max(upper, container.firstChild(.section)?.range.lowerBound ?? container.range.upperBound)
-        }
-        return lower..<min(upper, text.length)
     }
 }
 #endif

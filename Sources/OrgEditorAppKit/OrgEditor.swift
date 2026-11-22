@@ -51,9 +51,10 @@ public final class OrgEditor: NSObject {
     var previousSelection = 0
     /// The selection shaded block lines last drew.
     private var previousSelectionRange = NSRange(location: 0, length: 0)
-    /// Text before this offset is styled; after it, only base attributes until the background
-    /// passes reach it. Always at a line start.
-    private(set) var styledUpTo = 0
+    /// Text before its end is styled; after it, only base attributes until the background
+    /// passes reach it.
+    private var styled = StyledExtent()
+    var styledUpTo: Int { styled.end }
     private var stylingScheduled = false
     /// One paragraph style object per indent pair, shared by every line that uses it.
     var paragraphStyles: [IndentKey: NSParagraphStyle] = [:]
@@ -265,7 +266,7 @@ public final class OrgEditor: NSObject {
             view.lineIndex = lines
             view.updateGutter()
         }
-        styledUpTo = 0
+        styled.reset()
         revealedLine = caretLine
         styleNextChunk(Self.firstStyleChunk)
         scheduleStyling()
@@ -275,12 +276,8 @@ public final class OrgEditor: NSObject {
 
     /// Styles whole lines from the watermark onward, about `size` units.
     func styleNextChunk(_ size: Int) {
-        let text = textView.textStorage!.string as NSString
-        guard styledUpTo < text.length else { return }
-        let target = min(text.length, styledUpTo + size)
-        let end = target == text.length ? target : NSMaxRange(text.lineRange(for: NSRange(location: target, length: 0)))
-        restyleOutsideEditing(styledUpTo..<end)
-        styledUpTo = end
+        guard let range = styled.next(size, in: textView.textStorage!.string as NSString) else { return }
+        restyleOutsideEditing(range)
     }
 
     /// Every text view's own colors and font, and the line numbers'.
@@ -304,7 +301,7 @@ public final class OrgEditor: NSObject {
 
     /// Styles the whole file again, a screenful now and the rest in the background.
     private func restyleEverything() {
-        styledUpTo = 0
+        styled.reset()
         revealedLine = caretLine
         styleNextChunk(Self.firstStyleChunk)
         scheduleStyling()
@@ -781,9 +778,7 @@ public final class OrgEditor: NSObject {
         let oldText = document.text as NSString
         let newText = storage.string as NSString
         let newEnd = edit.range.lowerBound + replacement.utf16.count
-        let touchedHeadings = Self.headingLineNear(edit.range.lowerBound, edit.range.upperBound, in: oldText)
-            || Self.headingLineNear(edit.range.lowerBound, newEnd, in: newText)
-        let oldAffected = Self.affectedRange(document.tree, oldText, edit.range.lowerBound, edit.range.upperBound, touchedHeadings: touchedHeadings)
+        let oldTree = document.tree
         do {
             try document.apply([edit], baseRevision: document.revision)
         } catch {
@@ -792,17 +787,11 @@ public final class OrgEditor: NSObject {
         }
         // Keep the watermark on unstyled text: shift it past the edit, or pull it back to the
         // edited line when the edit reaches into unstyled text.
-        if styledUpTo >= edit.range.upperBound {
-            styledUpTo += edit.replacement.utf16.count - edit.range.count
-        } else if styledUpTo > edit.range.lowerBound {
-            styledUpTo = (storage.string as NSString).lineRange(for: NSRange(location: edit.range.lowerBound, length: 0)).location
-        }
+        styled.map(through: edit, in: newText)
         let oldHidden = hidden.all
-        let newAffected = Self.affectedRange(document.tree, newText, edit.range.lowerBound, newEnd, touchedHeadings: touchedHeadings)
-        let delta = edit.replacement.utf16.count - edit.range.count
-        let oldMapped = oldAffected.lowerBound..<(oldAffected.upperBound >= edit.range.upperBound ? oldAffected.upperBound + delta : newEnd)
+        let affected = Presentation.restyleRange(for: edit, old: (oldTree, oldText), new: (document.tree, newText))
         view = view.mapped(through: [edit]).pruned(to: document.tree, wrappers: false)
-        mapWrapperFolds(through: edit, near: min(oldMapped.lowerBound, newAffected.lowerBound)..<max(oldMapped.upperBound, newAffected.upperBound))
+        mapWrapperFolds(through: edit, near: affected)
         if let narrowed { self.narrowed = ViewState(selection: [narrowed]).mapped(through: [edit]).selection[0] }
         mapVimPositions(through: edit)
         vim.changed(edit)
@@ -810,7 +799,7 @@ public final class OrgEditor: NSObject {
         let oldHighlights = ViewState(selection: highlights).mapped(through: [edit]).selection
         highlights = []
         updateHidden()
-        restyle(min(oldMapped.lowerBound, newAffected.lowerBound)..<min(max(oldMapped.upperBound, newAffected.upperBound), newText.length), in: storage)
+        restyle(affected.lowerBound..<min(affected.upperBound, newText.length), in: storage)
         for table in shrunk.map(through: edit, in: storage.string, command: commandEditing) { restyle(table.lowerBound..<min(table.upperBound, newText.length), in: storage) }
         for range in oldHighlights where range.upperBound <= newText.length {
             let lines = newText.lineRange(for: NSRange(range))
@@ -837,19 +826,6 @@ public final class OrgEditor: NSObject {
             view.redrawLineNumbers()
         }
         onChange?()
-    }
-
-    /// Whether a heading line touches `start..<end` or starts right after it, where joining
-    /// lines could take it away.
-    static func headingLineNear(_ start: Int, _ end: Int, in text: NSString) -> Bool {
-        let length = min(end + 1, text.length) - start
-        guard length >= 0 else { return false }
-        let lines = text.substring(with: text.lineRange(for: NSRange(location: start, length: length)))
-        return lines.split(separator: "\n", omittingEmptySubsequences: false).contains { line in
-            let stars = line.prefix { $0 == "*" }
-            let after = line.dropFirst(stars.count)
-            return !stars.isEmpty && (after.isEmpty || after.first == " " || after.first == "\t" || after.first == "\r")
-        }
     }
 
     private func mapRange(_ range: Range<Int>, through edit: TextEdit) -> Range<Int> {
