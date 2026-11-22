@@ -28,7 +28,7 @@ struct BacklinksScreen: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
         }
-        .task { refresh() }
+        .task { await refresh() }
     }
 
     @ViewBuilder
@@ -52,15 +52,24 @@ struct BacklinksScreen: View {
         }
     }
 
-    private func refresh() {
+    private func refresh() async {
         let overlay = workspace.overlay(session.openDocuments)
         guard let document = session.openDocuments.first(where: { $0.path == path })?.document else { return }
-        let model = DocumentModel(tree: document.tree)
-        toFile = workspace.backlinks(to: Backlinks.Target(path: path, id: model.property("ID", of: nil)?.value), overlay: overlay)
-        guard let info = model.headings.last(where: { $0.headingRange.lowerBound <= caret }) else { return heading = nil }
+        let found = await Self.backlinks(in: workspace, path: path, tree: document.tree, caret: caret, overlay: overlay)
+        guard !Task.isCancelled else { return }
+        (toFile, heading) = found
+    }
+
+    @concurrent
+    private nonisolated static func backlinks(
+        in workspace: WorkspaceModel, path: String, tree: OrgTree, caret: Int, overlay: [String: FileRecord]
+    ) async -> (toFile: [HeadingLocation], heading: (title: String, links: [HeadingLocation])?) {
+        let model = DocumentModel(tree: tree)
+        let toFile = workspace.backlinks(to: Backlinks.Target(path: path, id: model.property("ID", of: nil)?.value), overlay: overlay)
+        guard let info = model.headings.last(where: { $0.headingRange.lowerBound <= caret }) else { return (toFile, nil) }
         let customID = info.properties.last { $0.key.uppercased() == "CUSTOM_ID" }?.value
         let target = Backlinks.Target(path: path, title: info.title, id: info.id, customID: customID)
-        heading = (info.title, workspace.backlinks(to: target, excluding: info.headingRange.lowerBound, overlay: overlay))
+        return (toFile, (info.title, workspace.backlinks(to: target, excluding: info.headingRange.lowerBound, overlay: overlay)))
     }
 }
 #endif

@@ -21,7 +21,8 @@ struct BacklinksPane: View {
     private struct Key: Equatable {
         var path: String?
         var heading: Int?
-        var version: Int
+        var title: String?
+        var index: Int
     }
 
     var body: some View {
@@ -32,7 +33,7 @@ struct BacklinksPane: View {
             Section("Links to this file") { rows(toFile) }
         }
         .themedListBackground(theme.color("sidebar-background", in: colorScheme))
-        .task(id: Key(path: session.path, heading: heading?.start, version: session.editVersion)) { refresh() }
+        .task(id: Key(path: session.path, heading: heading?.start, title: heading?.title, index: workspace.indexVersion)) { await refresh() }
     }
 
     @ViewBuilder
@@ -56,23 +57,28 @@ struct BacklinksPane: View {
         }
     }
 
-    private func refresh() {
+    private func refresh() async {
         guard let path = session.path else {
             toHeading = []
             toFile = []
             return
         }
         let overlay = workspace.overlay(session.openDocuments)
+        let found = await Self.backlinks(in: workspace, path: path, tree: session.document?.tree, heading: heading?.start, overlay: overlay)
+        guard !Task.isCancelled else { return }
+        (toFile, toHeading) = found
+    }
+
+    @concurrent
+    private nonisolated static func backlinks(
+        in workspace: WorkspaceModel, path: String, tree: OrgTree?, heading: Int?, overlay: [String: FileRecord]
+    ) async -> (toFile: [HeadingLocation], toHeading: [HeadingLocation]) {
+        let model = tree.map { DocumentModel(tree: $0) }
         // The file's own ID, as an org-roam file node.
-        let fileID = session.document.map { DocumentModel(tree: $0.tree).property("ID", of: nil)?.value }
-        toFile = workspace.backlinks(to: Backlinks.Target(path: path, id: fileID ?? nil), overlay: overlay)
-        guard let heading, let tree = session.document?.tree,
-              let info = DocumentModel(tree: tree).headings.first(where: { $0.headingRange.lowerBound == heading.start }) else {
-            toHeading = []
-            return
-        }
+        let toFile = workspace.backlinks(to: Backlinks.Target(path: path, id: model?.property("ID", of: nil)?.value), overlay: overlay)
+        guard let heading, let info = model?.headings.first(where: { $0.headingRange.lowerBound == heading }) else { return (toFile, []) }
         let customID = info.properties.last { $0.key.uppercased() == "CUSTOM_ID" }?.value
         let target = Backlinks.Target(path: path, title: info.title, id: info.id, customID: customID)
-        toHeading = workspace.backlinks(to: target, excluding: heading.start, overlay: overlay)
+        return (toFile, workspace.backlinks(to: target, excluding: heading, overlay: overlay))
     }
 }

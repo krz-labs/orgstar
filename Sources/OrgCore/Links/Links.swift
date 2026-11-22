@@ -33,12 +33,14 @@ public enum Links {
         pattern: "^(" + types.sorted { $0.count > $1.count }.map(NSRegularExpression.escapedPattern(for:)).joined(separator: "|") + "):"
     )
 
+    /// Runs of backslashes before a bracket or the end.
+    private static let escapes = try! NSRegularExpression(pattern: "(\\\\+)(?=$|[\\[\\]])")
+
     /// `org-link-unescape`: halves each run of backslashes before a bracket or the end.
     static func unescape(_ s: String) -> String {
-        let regex = try! NSRegularExpression(pattern: "(\\\\+)(?=$|[\\[\\]])")
         let ns = s as NSString
         var out = s
-        for m in regex.matches(in: s, range: NSRange(location: 0, length: ns.length)).reversed() {
+        for m in escapes.matches(in: s, range: NSRange(location: 0, length: ns.length)).reversed() {
             let run = m.range(at: 1)
             out = (out as NSString).replacingCharacters(in: run, with: String(repeating: "\\", count: run.length / 2))
         }

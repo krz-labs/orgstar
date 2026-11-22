@@ -19,6 +19,8 @@ public final class WorkspaceModel {
     public var lastError: String?
     /// Bumped when an indexed file changes on disk, with its path.
     public private(set) var changedFile: (path: String, version: Int)?
+    /// Bumped when the index may hold other rows: after a reconcile, or a root's removal.
+    public private(set) var indexVersion = 0
 
     public let index: IndexStore
     /// A change (other TODO keywords) reindexes the files it affects.
@@ -279,6 +281,7 @@ public final class WorkspaceModel {
             guard let root = roots.first(where: { file.path.hasPrefix($0 + "/") }) else { return nil }
             return FileEntry(path: file.path, root: root, kind: file.kind)
         }
+        indexVersion += 1
     }
 
     /// Reconciles the paths a batch of file events named, or whole roots when events were lost.
@@ -441,11 +444,12 @@ public final class WorkspaceModel {
     }
 
     /// Headings with links to `target`, the target heading's own links left out, each with
-    /// the line its link is on as its snippet.
-    public func backlinks(to target: Backlinks.Target, excluding start: Int? = nil, overlay: [String: FileRecord] = [:]) -> [HeadingLocation] {
+    /// the line its link is on as its snippet. Reads every link in the index, so call it off
+    /// the main actor; a cancelled task gets what was found so far.
+    public nonisolated func backlinks(to target: Backlinks.Target, excluding start: Int? = nil, overlay: [String: FileRecord] = [:]) -> [HeadingLocation] {
         var seen = Set<HeadingLocation>()
         return ((try? index.links(overlay: overlay)) ?? []).compactMap { link in
-            guard !(link.source.path == target.path && link.source.start == start),
+            guard !Task.isCancelled, !(link.source.path == target.path && link.source.start == start),
                   Backlinks.links(link.target, from: link.source.path, to: target), seen.insert(link.source).inserted else { return nil }
             var source = link.source
             if let text = try? index.text(of: source, overlay: overlay), let context = Backlinks.context(in: text, link: link.target) {

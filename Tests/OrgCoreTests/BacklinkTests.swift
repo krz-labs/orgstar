@@ -24,6 +24,25 @@ struct BacklinkTests {
         #expect(!links("*Fix the sink", from: "/notes/b.org", to: heading))
     }
 
+    /// The patterns are compiled once, not for each link: testing the links takes less time
+    /// than compiling them that often would.
+    @Test func testsManyLinksWithoutCompilingPatterns() throws {
+        let links = (0..<20_000).map { ["id:abc-\($0)", "file:a.org::*Fix the sink", "https://example.org/\($0)", "Fix the sink"][$0 % 4] }
+        let clock = ContinuousClock()
+        let compiling = try clock.measure {
+            for index in links.indices {
+                _ = try NSRegularExpression(pattern: "(\\\\+)(?=$|[\\[\\]])")
+                if index % 2 == 0 { _ = try Regex("^[a-zA-Z][-a-zA-Z0-9+]*:") }
+            }
+        }
+        var hits = 0
+        let testing = clock.measure {
+            for link in links where Backlinks.links(link, from: "/notes/b.org", to: heading, home: "/home") { hits += 1 }
+        }
+        #expect(hits == 5_000)
+        #expect(testing < compiling / 2, "\(testing) against \(compiling)")
+    }
+
     @Test func followsDenoteLinks() {
         let file = Backlinks.Target(path: "/notes/20261119T120000--a-note__kw.org")
         let heading = Backlinks.Target(path: file.path, title: "Inside", customID: "in")

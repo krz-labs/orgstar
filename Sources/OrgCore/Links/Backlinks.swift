@@ -19,6 +19,11 @@ public enum Backlinks {
         }
     }
 
+    /// A link type and its colon.
+    nonisolated(unsafe) private static let typePrefix = /^[a-zA-Z][-a-zA-Z0-9+]*:/
+    /// A bracket link: what it links to, and its description.
+    nonisolated(unsafe) private static let bracketLink = /\[\[((?:[^\]\\]|\\.)+)\](?:\[([^\]]*)\])?\]/
+
     /// Whether `link`, written in the file at `source`, leads to `target`.
     public static func links(_ link: String, from source: String, to target: Target, home: String = OrgPaths.home) -> Bool {
         let link = Links.unescape(link)
@@ -42,7 +47,7 @@ public enum Backlinks {
             let parts = link.components(separatedBy: "::")
             path = parts[0]
             search = parts.dropFirst().joined(separator: "::")
-        } else if link.firstMatch(of: /^[a-zA-Z][-a-zA-Z0-9+]*:/) != nil {
+        } else if link.firstMatch(of: typePrefix) != nil {
             return false
         } else {
             // Within the file.
@@ -66,13 +71,12 @@ public enum Backlinks {
     /// description, else what they link to), and the range of that link in the line. A line
     /// longer than `width` keeps the part around the link.
     public static func context(in body: String, link: String, width: Int = 160) -> (text: String, link: Range<Int>)? {
-        let pattern = /\[\[((?:[^\]\\]|\\.)+)\](?:\[([^\]]*)\])?\]/
         for line in body.split(whereSeparator: \.isNewline) {
             guard line.contains("[[" + link + "]") else { continue }
             var text = ""
             var found: Range<Int>?
             var rest = Substring(line)
-            while let match = rest.firstMatch(of: pattern) {
+            while let match = rest.firstMatch(of: bracketLink) {
                 text += rest[..<match.range.lowerBound]
                 let shown = match.2.map(String.init) ?? String(match.1)
                 let start = text.utf16.count
