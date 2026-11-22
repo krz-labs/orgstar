@@ -12,7 +12,7 @@ func tokens(of kind: SyntaxKind, in text: String) -> [SyntaxToken] {
 struct ParserSectionTests {
     @Test func emptyDocument() {
         let tree = OrgParser.parse("")
-        #expect(tree.text == "")
+        #expect(tree.root.text == "")
         #expect(nodeKinds("") == [.document])
     }
 
@@ -63,11 +63,11 @@ struct ParserSectionTests {
     }
 
     @Test func headingWithoutNewlineAtEnd() {
-        #expect(OrgParser.parse("* a").text == "* a")
+        #expect(OrgParser.parse("* a").root.text == "* a")
     }
 
     @Test(arguments: ["* a\n", "*\n", "* TODO\n", "text\r\n* a\r\n** b\r\n", "\n\n* a\n\n"])
     func roundTrip(text: String) {
-        #expect(OrgParser.parse(text).text == text)
+        #expect(OrgParser.parse(text).root.text == text)
     }
 }

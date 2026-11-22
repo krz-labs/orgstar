@@ -120,15 +120,24 @@ public struct SyntaxToken: Sendable, Equatable {
 public struct OrgTree: Sendable {
     public let green: GreenNode
     public let settings: OrgSettings
-    private let textCache = TextCache()
+    private let textCache: TextCache
 
     public init(green: GreenNode, settings: OrgSettings) {
         self.green = green
         self.settings = settings
+        textCache = TextCache()
+    }
+
+    /// A tree parsed from `text`, which its tokens spell out exactly.
+    init(green: GreenNode, settings: OrgSettings, text: String) {
+        self.green = green
+        self.settings = settings
+        textCache = TextCache(text)
     }
 
     public var root: SyntaxNode { SyntaxNode(green: green, offset: 0, parent: nil) }
-    /// Built from the tree on first use, then kept: views read it once per heading.
+    /// The text the tree was parsed from, or for a tree made another way, built from it on
+    /// first use and kept: views read it once per heading.
     public var text: String { textCache.text(of: green) }
 }
 
@@ -136,6 +145,10 @@ public struct OrgTree: Sendable {
 private final class TextCache: @unchecked Sendable {
     private let lock = NSLock()
     private var text: String?
+
+    init(_ text: String? = nil) {
+        self.text = text
+    }
 
     func text(of green: GreenNode) -> String {
         lock.withLock {

@@ -50,7 +50,7 @@ struct RoundTripTests {
         for n in 0..<2_000 {
             let text = randomDocument(&rng)
             let tree = OrgParser.parse(text)
-            #expect(tree.text == text, "document \(n)")
+            #expect(tree.root.text == text, "document \(n)")
             #expect(checkLengths(tree.root), "document \(n)")
             _ = DocumentModel(tree: tree)
         }
@@ -66,7 +66,7 @@ struct RoundTripTests {
     func encodingFixturesRoundTrip(bytes: [UInt8]) {
         let source = SourceText(bytes: bytes)
         let tree = OrgParser.parse(source.text)
-        #expect(source.encode(tree.text) == bytes)
+        #expect(source.encode(tree.root.text) == bytes)
     }
 
     /// Private corpus: `ORGSTAR_CORPUS=/path/to/org swift test --filter corpus`.
@@ -81,7 +81,7 @@ struct RoundTripTests {
             let bytes = try [UInt8](Data(contentsOf: file))
             let source = SourceText(bytes: bytes)
             let tree = OrgParser.parse(source.text)
-            #expect(source.encode(tree.text) == bytes, "\(file.path)")
+            #expect(source.encode(tree.root.text) == bytes, "\(file.path)")
             _ = DocumentModel(tree: tree)
         }
     }

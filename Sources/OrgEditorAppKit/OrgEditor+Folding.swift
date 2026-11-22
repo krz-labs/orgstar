@@ -15,8 +15,9 @@ extension OrgEditor {
         setFolds(state, wrappers: nil)
     }
 
-    /// `wrappers`, when given, holds every folded drawer and block.
-    func setFolds(_ state: FoldState, wrappers: [Wrapper]?) {
+    /// `wrappers`, when given, holds every folded drawer and block. `layout` is false when
+    /// nothing has been laid out since the text loaded, so there is no layout to invalidate.
+    func setFolds(_ state: FoldState, wrappers: [Wrapper]?, layout: Bool = true) {
         sparseHidden = nil
         view.folds = state.folds
         view.bodyFolds = state.bodyFolds
@@ -27,7 +28,7 @@ extension OrgEditor {
             : state.wrapperFolds.compactMap { Wrappers.starting(at: $0, in: document.tree) })
         wrapperHidden = Dictionary(found.map { ($0.start, $0.hidden) }) { a, _ in a }
         view.wrapperFolds = Set(wrapperHidden.keys)
-        updateHiddenAndLayout()
+        if layout { updateHiddenAndLayout() } else { updateHidden() }
         redrawViews()
         caretsOutOfHiddenText()
     }

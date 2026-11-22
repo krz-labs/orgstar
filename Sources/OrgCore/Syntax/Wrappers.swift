@@ -45,8 +45,13 @@ public enum Wrappers {
     public static func all(_ tree: OrgTree) -> [Wrapper] {
         var result: [Wrapper] = []
         let text = tree.text as NSString
+        // Nodes are made only for drawers, blocks and containers, not for every paragraph.
         func walk(_ node: SyntaxNode) {
-            for child in node.children {
+            var at = node.offset
+            for element in node.green.children {
+                defer { at += element.length }
+                guard case .node(let green) = element, kind(green.kind) != nil || containers.contains(green.kind) else { continue }
+                let child = SyntaxNode(green: green, offset: at, parent: node)
                 if let wrapper = wrapper(child, in: text) { result.append(wrapper) }
                 if containers.contains(child.kind) { walk(child) }
             }

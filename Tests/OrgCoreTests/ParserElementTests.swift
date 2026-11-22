@@ -52,6 +52,12 @@ struct ParserElementTests {
         #expect(table.children.map(\.kind) == [.tableRow, .tableRow, .tableRow, .tableFormula, .tableFormula])
     }
 
+    @Test func pipeWithACombiningMarkIsCellText() {
+        let row = OrgParser.parse("| a |\u{301} b | ü |\n").root.children[0].children[0].children[0]
+        #expect(row.tokens.filter { $0.kind == .marker }.count == 3)
+        #expect(row.children.filter { $0.kind == .tableCell }.map(\.text) == [" a |\u{301} b ", " ü "])
+    }
+
     @Test func footnoteDefinition() {
         #expect(childKinds("[fn:1] note\ncontinued\n\nafter\n") == [.footnoteDefinition, .paragraph])
     }

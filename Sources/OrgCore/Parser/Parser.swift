@@ -1,7 +1,8 @@
 public enum OrgParser {
     public static func parse(_ text: String, defaults: OrgSettings = .default) -> OrgTree {
         var parser = Parser(text: text, defaults: defaults)
-        return parser.run()
+        let tree = parser.run()
+        return OrgTree(green: tree.green, settings: tree.settings, text: text)
     }
 }
 
@@ -330,15 +331,18 @@ struct Parser {
         if rest.hasPrefix("|-") {
             builder.token(.text, rest)
         } else {
+            // Pipes are found by byte; one counts only where the Character there is a lone `|`,
+            // as a walk by Character would find it.
             var cellStart = rest.startIndex
-            var index = rest.startIndex
-            while index < rest.endIndex {
-                if rest[index] == "|" {
+            let bytes = rest.utf8
+            var index = bytes.startIndex
+            while index < bytes.endIndex {
+                if bytes[index] == UInt8(ascii: "|"), rest[index] == "|" {
                     if index > rest.startIndex { tableCell(rest[cellStart..<index]) }
                     builder.token(.marker, "|")
-                    cellStart = rest.index(after: index)
+                    cellStart = bytes.index(after: index)
                 }
-                index = rest.index(after: index)
+                index = bytes.index(after: index)
             }
             if cellStart < rest.endIndex { tableCell(rest[cellStart...]) }
         }
@@ -451,6 +455,7 @@ struct Parser {
     /// A description item's tag and separator: the text before the last ` ::` on the line
     /// that ends it or has blanks after it, and that blank with the `::`.
     static func descriptionTag(_ s: Substring) -> (tag: Substring, separator: Substring)? {
+        guard containsBytes(s.utf8, UInt8(ascii: ":"), count: 2) else { return nil }
         let line = s.prefix { $0 != "\n" && $0 != "\r" }
         var k = line.endIndex
         while k > line.startIndex {

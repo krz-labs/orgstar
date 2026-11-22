@@ -125,10 +125,11 @@ public final class OrgEditor: NSObject {
         // Files open at their start, as in Emacs; replacing the storage leaves it at the end.
         textView.setSelectedRange(NSRange(location: 0, length: 0))
         if let startup {
-            if startup.folds != FoldState() { setFolds(startup.folds, wrappers: startup.wrappers) }
+            if startup.folds != FoldState() { setFolds(startup.folds, wrappers: startup.wrappers, layout: false) }
             if startup.alignTables { _ = perform(AlignAllTables()) }
         }
-        spellChecking = options.spellCheck
+        // Turning it off clears spelling marks from the whole text; a new view has none.
+        if spellChecking != options.spellCheck { spellChecking = options.spellCheck }
         truncatesLines = options.startupTruncated
     }
 

@@ -223,20 +223,24 @@ public enum Presentation {
 
     private static func computeShadedBlocks(_ tree: OrgTree) -> [Range<Int>] {
         var ranges: [Range<Int>] = []
-        func walk(_ node: SyntaxNode) {
-            for child in node.children {
+        // Over green nodes, so no node object is made for each paragraph.
+        func walk(_ node: GreenNode, at offset: Int) {
+            var at = offset
+            for element in node.children {
+                defer { at += element.length }
+                guard case .node(let child) = element else { continue }
                 switch child.kind {
                 case .block, .dynamicBlock, .fixedWidth:
                     // Without the blank lines org counts as part of the element.
                     let text = child.text
                     let trimmed = text.utf16.count - String(text.reversed().prefix { $0.isWhitespace }).utf16.count
-                    ranges.append(child.range.lowerBound..<(child.range.lowerBound + trimmed))
+                    ranges.append(at..<(at + trimmed))
                 case .paragraph, .table, .heading, .planning, .propertyDrawer, .drawer, .keyword, .comment: continue
-                default: walk(child)
+                default: walk(child, at: at)
                 }
             }
         }
-        walk(tree.root)
+        walk(tree.green, at: 0)
         return ranges
     }
 

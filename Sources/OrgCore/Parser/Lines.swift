@@ -84,7 +84,9 @@ func classifyLine(_ line: Substring, alphabetical: Bool = false) -> ClassifiedLi
 let inlineTaskLevel = 15
 
 private func lineClass(_ rest: Substring, columnZero: Bool, alphabetical: Bool) -> LineClass {
-    let trimmed = rest.trimmingTrailingWhitespace
+    lazy var trimmed = rest.trimmingTrailingWhitespace
+    // Every test below needs a particular first character; the first byte rules most out.
+    let first = rest.utf8.first
 
     // As org's `org-outline-regexp`: stars and then a space. A lone `*`, or stars before a tab,
     // is not a heading.
@@ -96,7 +98,7 @@ private func lineClass(_ rest: Substring, columnZero: Bool, alphabetical: Bool) 
         }
     }
 
-    if rest.hasPrefix("#+") {
+    if first == UInt8(ascii: "#"), rest.hasPrefix("#+") {
         let lower = trimmed.lowercased()
         if lower.hasPrefix("#+begin_") {
             let name = lower.dropFirst(8).prefix { !$0.isWhitespace }
@@ -114,9 +116,9 @@ private func lineClass(_ rest: Substring, columnZero: Bool, alphabetical: Bool) 
         }
     }
 
-    if trimmed == "#" || rest.hasPrefix("# ") || rest.hasPrefix("#\t") { return .comment }
+    if first == UInt8(ascii: "#"), trimmed == "#" || rest.hasPrefix("# ") || rest.hasPrefix("#\t") { return .comment }
 
-    if rest.hasPrefix("\\begin{") || rest.hasPrefix("\\end{") {
+    if first == UInt8(ascii: "\\"), rest.hasPrefix("\\begin{") || rest.hasPrefix("\\end{") {
         let begin = rest.hasPrefix("\\begin{")
         let after = rest.dropFirst(begin ? 7 : 5)
         let name = after.prefix { $0.isLetter || $0.isNumber || $0 == "*" }
@@ -141,16 +143,17 @@ private func lineClass(_ rest: Substring, columnZero: Bool, alphabetical: Bool) 
 
     if rest.first == "|" { return .tableRow }
     if rest.first == "+", trimmed.wholeMatch(of: /\+(?:-+\+)+/) != nil { return .tableElRule }
-    if columnZero, rest.hasPrefix("%%(") { return .diarySexp }
-    if trimmed.count >= 5, trimmed.allSatisfy({ $0 == "-" }) { return .horizontalRule }
+    if columnZero, first == UInt8(ascii: "%"), rest.hasPrefix("%%(") { return .diarySexp }
+    if rest.first == "-", trimmed.count >= 5, trimmed.allSatisfy({ $0 == "-" }) { return .horizontalRule }
 
-    if columnZero, rest.hasPrefix("[fn:"), let close = rest.firstIndex(of: "]"),
+    if columnZero, first == UInt8(ascii: "["), rest.hasPrefix("[fn:"), let close = rest.firstIndex(of: "]"),
        close > rest.index(rest.startIndex, offsetBy: 4) {
         return .footnoteDefinition
     }
 
-    if rest.hasPrefix("CLOCK:") { return .clock }
-    if rest.hasPrefix("SCHEDULED:") || rest.hasPrefix("DEADLINE:") || rest.hasPrefix("CLOSED:") { return .planning }
+    if first == UInt8(ascii: "C"), rest.hasPrefix("CLOCK:") { return .clock }
+    if first == UInt8(ascii: "S") || first == UInt8(ascii: "D") || first == UInt8(ascii: "C"),
+       rest.hasPrefix("SCHEDULED:") || rest.hasPrefix("DEADLINE:") || rest.hasPrefix("CLOSED:") { return .planning }
     if isListBullet(rest, indented: !columnZero, alphabetical: alphabetical) { return .listItem }
     return .plain
 }
@@ -173,6 +176,17 @@ private func isListBullet(_ rest: Substring, indented: Bool, alphabetical: Bool)
         return false
     }
     return afterBullet.isEmpty || afterBullet.first == " " || afterBullet.first == "\t"
+}
+
+/// Whether `bytes` holds a run of `count` copies of `byte`. A cheap test before a search by
+/// Character.
+func containsBytes(_ bytes: Substring.UTF8View, _ byte: UInt8, count: Int) -> Bool {
+    var run = 0
+    for b in bytes {
+        run = b == byte ? run + 1 : 0
+        if run == count { return true }
+    }
+    return false
 }
 
 extension Substring {

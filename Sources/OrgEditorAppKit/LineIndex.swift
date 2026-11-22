@@ -14,13 +14,15 @@ final class LineIndex {
         appendStarts(in: text, from: 0, to: text.length)
     }
 
+    /// Reads the text in blocks: a search per line costs more than reading every character.
     private func appendStarts(in text: NSString, from: Int, to end: Int) {
+        var buffer = [unichar](repeating: 0, count: 4096)
         var location = from
         while location < end {
-            let found = text.range(of: "\n", options: .literal, range: NSRange(location: location, length: end - location))
-            guard found.location != NSNotFound else { break }
-            starts.append(found.location + 1)
-            location = found.location + 1
+            let count = min(buffer.count, end - location)
+            text.getCharacters(&buffer, range: NSRange(location: location, length: count))
+            for i in 0..<count where buffer[i] == 10 { starts.append(location + i + 1) }
+            location += count
         }
     }
 
