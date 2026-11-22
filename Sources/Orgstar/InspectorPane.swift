@@ -7,6 +7,8 @@ import SwiftUI
 struct InspectorPane: View {
     let session: DocumentSession
     let commands: AppCommands
+    /// Whether the inspector is on screen; nothing is computed while it isn't.
+    let shown: Bool
     @AppStorage("inspectorTab") private var tab = Tab.columns
     @AppStorage("inspectorColumnsScope") private var subtree = false
     @AppStorage("inspectorClockSpan") private var span = Span.week
@@ -17,6 +19,7 @@ struct InspectorPane: View {
     enum Span: String, CaseIterable { case today = "Today", week = "This Week", all = "All" }
 
     private struct Key: Equatable {
+        var shown: Bool
         var path: String?
         var version: Int
         var caret: Int?
@@ -41,7 +44,9 @@ struct InspectorPane: View {
             case .clock: clockView
             }
         }
-        .task(id: Key(path: session.path, version: session.editVersion, caret: subtree ? heading : nil, subtree: subtree, span: span)) { refresh() }
+        .task(id: Key(shown: shown, path: session.path, version: shown ? session.editVersion : 0, caret: shown && subtree ? heading : nil, subtree: subtree, span: span)) {
+            if shown { await refresh() }
+        }
     }
 
     @ViewBuilder
@@ -120,14 +125,22 @@ struct InspectorPane: View {
         }
     }
 
-    private func refresh() {
+    private func refresh() async {
         guard session.isOrg, let document = session.document else {
             columns = nil
             clocked = []
             return
         }
-        let text = document.text
-        columns = (try? ColumnView.capture(text: text, tree: document.tree, at: heading ?? 0, global: !subtree || heading == nil))?.view
+        let found = await Self.content(text: document.text, tree: document.tree, heading: heading, subtree: subtree, span: span)
+        guard !Task.isCancelled else { return }
+        (columns, clocked) = found
+    }
+
+    @concurrent
+    private nonisolated static func content(
+        text: String, tree: OrgTree, heading: Int?, subtree: Bool, span: Span
+    ) async -> (columns: ColumnView.View?, clocked: [(start: Int, heading: String, minutes: Int)]) {
+        let columns = (try? ColumnView.capture(text: text, tree: tree, at: heading ?? 0, global: !subtree || heading == nil))?.view
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy-MM-dd"
@@ -140,6 +153,6 @@ struct InspectorPane: View {
         case .week: calendar.dateInterval(of: .weekOfYear, for: today)?.start
         case .all: nil
         }
-        clocked = ClockReport.byHeading(ClockReport.entries(text), from: from.map(formatter.string), to: span == .all ? nil : formatter.string(from: today))
+        return (columns, ClockReport.byHeading(ClockReport.entries(text), from: from.map(formatter.string), to: span == .all ? nil : formatter.string(from: today)))
     }
 }

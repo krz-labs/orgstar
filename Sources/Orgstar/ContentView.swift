@@ -282,7 +282,7 @@ struct ContentView: View {
                 detail
                     .frame(maxWidth: .infinity)
                     .inspector(isPresented: $inspectorShown) {
-                        InspectorPane(session: session, commands: commands)
+                        InspectorPane(session: session, commands: commands, shown: inspectorShown)
                             .inspectorColumnWidth(min: 240, ideal: 340, max: 600)
                     }
             }
