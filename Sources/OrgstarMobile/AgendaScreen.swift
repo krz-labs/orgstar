@@ -959,6 +959,11 @@ struct AgendaRowView: View {
     @Environment(\.dynamicTypeSize) private var typeSize
     @ScaledMetric(relativeTo: .subheadline) private var gutterWidth: CGFloat = 82
     @ScaledMetric(relativeTo: .caption2) private var badgeSize: CGFloat = 18
+    @Environment(\.colorSchemeContrast) private var contrast
+    @Environment(\.accessibilityDifferentiateWithoutColor) private var withoutColor
+
+    /// Increase Contrast: keyword and priority badges are filled with their colour.
+    private var highContrast: Bool { contrast == .increased }
 
     /// TODO and match lists have no times or statuses.
     private var hasGutter: Bool { !row.gutter.isEmpty || row.icon != nil }
@@ -1026,19 +1031,24 @@ struct AgendaRowView: View {
         HStack(spacing: 5) {
             if let todo = row.todo {
                 let color = theme.todoColor(todo, isDone: row.isDone, dark: dark)?.swiftUI ?? .secondary
-                Text(todo)
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(color)
-                    .padding(.horizontal, 6).padding(.vertical, 2)
-                    .background(color.opacity(0.14), in: Capsule())
+                HStack(spacing: 2) {
+                    // Done or not without telling green from red.
+                    if withoutColor, row.isDone { Image(systemName: "checkmark") }
+                    Text(todo)
+                }
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(highContrast ? Color(.systemBackground) : color)
+                .padding(.horizontal, 6).padding(.vertical, 2)
+                .background(highContrast ? color : color.opacity(0.14), in: Capsule())
+                .overlay { if withoutColor, !highContrast { Capsule().strokeBorder(color, lineWidth: 1) } }
             }
             if let priority = row.priority {
                 let color = theme.priorityColor(priority, dark: dark)?.swiftUI ?? .orange
                 Text(priority)
                     .font(.caption2.weight(.bold))
-                    .foregroundStyle(color)
+                    .foregroundStyle(highContrast ? Color(.systemBackground) : color)
                     .frame(width: badgeSize, height: badgeSize)
-                    .background(color.opacity(0.14), in: Circle())
+                    .background(highContrast ? color : color.opacity(0.14), in: Circle())
                     .overlay(Circle().strokeBorder(color, lineWidth: 1.2))
                     .accessibilityLabel("Priority \(priority)")
             }

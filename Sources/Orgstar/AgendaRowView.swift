@@ -18,6 +18,8 @@ struct AgendaRowView: View {
     var marked = false
     @Environment(\.orgTheme) private var theme
     @ScaledMetric(relativeTo: .callout) private var gutterWidth = AgendaRowView.gutterWidth
+    @Environment(\.colorSchemeContrast) private var contrast
+    @Environment(\.accessibilityDifferentiateWithoutColor) private var withoutColor
     @ScaledMetric(relativeTo: .caption) private var badgeSize: CGFloat = 18
 
     static let gutterWidth: CGFloat = 92
@@ -59,6 +61,11 @@ struct AgendaRowView: View {
         }
         .accessibilityElement(children: .combine)
     }
+
+    /// Increase Contrast: keyword and priority badges are filled with their colour, tags outlined in full.
+    private var highContrast: Bool { contrast == .increased }
+
+    private var background: Color { theme.color("agenda-background") ?? Color(nsColor: .textBackgroundColor) }
 
     private var statusColor: Color {
         theme.dynamic(.secondaryLabelColor) { [theme, row] in theme.statusColor(row.status, dark: $0) }
@@ -127,7 +134,7 @@ struct AgendaRowView: View {
                     .foregroundStyle(theme.color("tags") ?? .secondary)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 1)
-                    .background(Capsule().strokeBorder((theme.color("tags") ?? .secondary).opacity(0.35), lineWidth: 0.5))
+                    .background(Capsule().strokeBorder((theme.color("tags") ?? .secondary).opacity(highContrast ? 1 : 0.35), lineWidth: highContrast ? 1 : 0.5))
             }
         }
     }
@@ -137,12 +144,17 @@ struct AgendaRowView: View {
         HStack(spacing: 6) {
             if let todo = row.todo {
                 let color = theme.dynamic(row.isDone ? .systemGreen : .systemRed) { [theme, row] in theme.todoColor(todo, isDone: row.isDone, dark: $0) }
-                Text(todo)
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(color)
-                    .padding(.horizontal, 7)
-                    .padding(.vertical, 2)
-                    .background(Capsule().fill(color.opacity(0.14)))
+                HStack(spacing: 2) {
+                    // Done or not without telling green from red.
+                    if withoutColor, row.isDone { Image(systemName: "checkmark") }
+                    Text(todo)
+                }
+                .font(.caption.weight(.bold))
+                .foregroundStyle(highContrast ? background : color)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 2)
+                .background(Capsule().fill(highContrast ? color : color.opacity(0.14)))
+                .overlay { if withoutColor, !highContrast { Capsule().strokeBorder(color, lineWidth: 1) } }
             }
             priorityBadge
         }
@@ -155,10 +167,10 @@ struct AgendaRowView: View {
             let color = theme.dynamic(.systemOrange) { [theme] in theme.priorityColor(priority, dark: $0) }
             Text(priority)
                 .font(.caption.weight(.bold))
-                .foregroundStyle(color)
+                .foregroundStyle(highContrast ? background : color)
                 .frame(width: badgeSize, height: badgeSize)
-                .background(Circle().fill(color.opacity(0.14)))
-                .overlay(Circle().strokeBorder(color.opacity(0.6), lineWidth: 1))
+                .background(Circle().fill(highContrast ? color : color.opacity(0.14)))
+                .overlay(Circle().strokeBorder(color.opacity(highContrast ? 1 : 0.6), lineWidth: 1))
                 .help("Priority \(priority)")
         } else {
             Color.clear.frame(width: badgeSize, height: badgeSize)

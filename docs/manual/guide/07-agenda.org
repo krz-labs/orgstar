@@ -185,6 +185,8 @@ Rows look the same on the Mac and iOS. Each shows:
 - The title: the heading without its TODO keyword, priority cookie, statistics cookies, timestamps and tags, with links shown as their descriptions. A done entry's title is struck through.
 - Under the title, the habit's consistency graph, for habits.
 
+With Increase Contrast on in the system's accessibility settings, the keyword and priority badges are filled with their color, and on the Mac tags have a full outline. With Differentiate Without Color on, keyword badges are outlined and a done keyword shows a check mark.
+
 The status sets the color of the left column:
 
 | Status   | When                                                                    | Theme key         |
