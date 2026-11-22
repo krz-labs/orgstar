@@ -52,6 +52,8 @@ out=".build/release"
 dmg="$out/orgstar-$version.dmg"
 rm -rf "${out:?}"
 mkdir -p "$out/dmg"
+# The debug symbols of the stripped executables, for symbolicating crash reports; not uploaded.
+ditto -c -k --keepParent .build/app/dSYMs "$out/orgstar-$version-dSYMs.zip"
 ditto "$app" "$out/dmg/orgstar.app"
 ln -s /Applications "$out/dmg/Applications"
 hdiutil create -quiet -volname "orgstar $version" -srcfolder "$out/dmg" -format UDZO -fs HFS+ "$dmg"

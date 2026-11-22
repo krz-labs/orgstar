@@ -31,9 +31,11 @@ swift build -c release $arch_flags --product OrgstarWidgets
 # shellcheck disable=SC2086
 binary="$(swift build -c release $arch_flags --show-bin-path)/Orgstar"
 
-rm -rf "$app"
-mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources" "$app/Contents/Frameworks"
+rm -rf "$app" .build/app/dSYMs
+mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources" "$app/Contents/Frameworks" .build/app/dSYMs
 cp "$binary" "$app/Contents/MacOS/Orgstar"
+# The build's debug symbols, for symbolicating crash reports; the executables ship stripped.
+for dsym in "$(dirname "$binary")"/*.dSYM; do ditto "$dsym" ".build/app/dSYMs/$(basename "$dsym")"; done
 
 # Sparkle, from its SwiftPM artifact: the framework beside the binary, found through an rpath.
 sparkle="$(find .build/artifacts -path '*Sparkle.xcframework/macos-*/Sparkle.framework' -maxdepth 7 | head -1)"
@@ -41,6 +43,7 @@ sparkle="$(find .build/artifacts -path '*Sparkle.xcframework/macos-*/Sparkle.fra
 ditto "$sparkle" "$app/Contents/Frameworks/Sparkle.framework"
 otool -l "$app/Contents/MacOS/Orgstar" | grep -q '@executable_path/../Frameworks' \
     || install_name_tool -add_rpath @executable_path/../Frameworks "$app/Contents/MacOS/Orgstar"
+strip -x "$app/Contents/MacOS/Orgstar"
 
 # SwiftMath's math fonts, which it finds in the app's resources.
 cp -R "$(dirname "$binary")/SwiftMath_SwiftMath.bundle" "$app/Contents/Resources/"
@@ -176,6 +179,7 @@ appex() { # name, extension point, principal class (or ""), attributes, extra en
     dir="$app/Contents/PlugIns/$1.appex/Contents"
     mkdir -p "$dir/MacOS" "$dir/Resources"
     cp "$(dirname "$binary")/$1" "$dir/MacOS/$1"
+    strip -x "$dir/MacOS/$1"
     scripts/localize.sh "$dir/Resources"
     cat > "$dir/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>

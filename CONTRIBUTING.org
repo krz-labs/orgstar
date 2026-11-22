@@ -161,6 +161,10 @@ There is no CI; run these before committing.
 keychain's Developer ID, notarizes a DMG, tags =v<version>=, uploads the DMG to the
 gitbay release and updates the cask in krz/homebrew-tap.
 
+=scripts/build-app.sh= strips the executables and copies their dSYMs to =.build/app/dSYMs=;
+the release zips them to =.build/release/orgstar-<version>-dSYMs.zip= and doesn't upload
+them. Keep the zip to symbolicate that release's crash reports.
+
 Set =ORGSTAR_NOTES= to an HTML file of release notes for the appcast, which Sparkle's
 update window shows, and =ORGSTAR_RELEASE_NOTES= to a Markdown file for the gitbay
 release. Without them both get the one-line platform note.
