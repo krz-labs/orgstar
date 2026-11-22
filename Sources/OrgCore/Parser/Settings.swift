@@ -54,6 +54,9 @@ public struct OrgSettings: Sendable, Equatable {
     /// `org-use-tag-inheritance` and `org-tags-exclude-from-inheritance`.
     public var tagInheritance: SemanticSettings.TagInheritance = .all
     public var tagsExcludedFromInheritance: Set<String> = []
+    /// `org-attach-id-dir` and `org-attach-use-inheritance` (nil for `selective`), for export.
+    public var attachIDDir = "data/"
+    public var attachUseInheritance: Bool?
 
     /// `org-remove-uninherited-tags` for one tag.
     public func inheritsTag(_ tag: String) -> Bool {
@@ -149,6 +152,8 @@ enum SettingsScanner {
         settings.deadlineWarningDays = defaults.deadlineWarningDays
         settings.tagInheritance = defaults.tagInheritance
         settings.tagsExcludedFromInheritance = defaults.tagsExcludedFromInheritance
+        settings.attachIDDir = defaults.attachIDDir
+        settings.attachUseInheritance = defaults.attachUseInheritance
         settings.setupKeywords = defaults.setupKeywords
         settings.startup = startup
         return settings

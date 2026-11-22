@@ -126,6 +126,36 @@ public enum ExportPreprocess {
         return text.replacingOccurrences(of: "\r\n", with: "\n")
     }
 
+    /// `org-attach-expand-links`, which Org runs before it parses an export: every `attachment:`
+    /// link of the file at `path` as a `file:` link to the file in its entry's attachment folder,
+    /// or in the file's own folder when the entry has none.
+    public static func attachments(
+        _ text: String, path: String?, settings: OrgSettings,
+        isDirectory: (String) -> Bool = { path in
+            var directory: ObjCBool = false
+            return FileManager.default.fileExists(atPath: path, isDirectory: &directory) && directory.boolValue
+        }
+    ) -> String {
+        guard let path, text.contains("attachment:") else { return text }
+        let ns = text as NSString
+        let tree = OrgParser.parse(text)
+        var edits: [(range: Range<Int>, link: String)] = []
+        var search = NSRange(location: 0, length: ns.length)
+        while case let found = ns.range(of: "attachment:", range: search), found.location != NSNotFound {
+            search = NSRange(location: NSMaxRange(found), length: ns.length - NSMaxRange(found))
+            guard let (link, range) = Links.link(at: found.location, text: text, tree: tree), link.type == "attachment",
+                  range.lowerBound >= (edits.last?.range.upperBound ?? 0),
+                  let file = Links.attachmentFile(link, tree: tree, path: path, idDir: settings.attachIDDir, inherit: settings.attachUseInheritance, isDirectory: isDirectory)
+            else { continue }
+            let written = ns.substring(with: NSRange(location: range.lowerBound, length: range.count))
+            let description = written.hasPrefix("[[") ? written.range(of: "][").map { "[" + written[$0.upperBound...].dropLast(2) + "]" } : nil
+            edits.append((range, "[[file:" + file.path + (file.searchOption.map { "::" + $0 } ?? "") + "]" + (description ?? "") + "]"))
+        }
+        return edits.reversed().reduce(into: NSMutableString(string: text)) {
+            $0.replaceCharacters(in: NSRange(location: $1.range.lowerBound, length: $1.range.count), with: $1.link)
+        } as String
+    }
+
     /// `#+INCLUDE: "file" [example|export FORMAT|src LANG] [:lines "A-B"] [:minlevel N]`, with
     /// `file::*Heading` or `file::#custom-id` for one subtree. Relative to `directory`.
     /// `includer` is the exported file's directory, `directory` at the top.

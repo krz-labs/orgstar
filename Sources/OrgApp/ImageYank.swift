@@ -110,7 +110,8 @@ public enum ImageYank {
     /// caret after the last link.
     public static func inserting(_ links: [String], into text: String, at offset: Int) -> (text: String, caret: Int) {
         let ns = text as NSString
-        let offset = min(max(offset, 0), ns.length)
+        // On a heading's line they go under it, in the entry the files were attached to.
+        let offset = OrgAttach.belowHeading(text, at: min(max(offset, 0), ns.length))
         let line = ns.lineRange(for: NSRange(location: offset, length: 0))
         var contentEnd = NSMaxRange(line)
         while contentEnd > line.location, [0x0A, 0x0D].contains(ns.character(at: contentEnd - 1)) { contentEnd -= 1 }

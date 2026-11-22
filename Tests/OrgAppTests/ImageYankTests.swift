@@ -144,6 +144,26 @@ struct ImageYankTests {
         #expect(ImageYank.inserting([link], into: "  - item\n  ", at: 11) == ("  - item\n  \(link)", 31))
     }
 
+    /// At the start of a heading's line the file is attached to that heading, so its link goes
+    /// under the heading too, where it resolves to the same folder.
+    @Test func linksOnAHeadingLineGoUnderTheHeading() throws {
+        let link = "[[attachment:a.png]]"
+        #expect(ImageYank.inserting([link], into: "* Task\nBody.\n", at: 0).text == "* Task\n\(link)\nBody.\n")
+        #expect(ImageYank.inserting([link], into: "* Task", at: 3).text == "* Task\n\(link)")
+        #expect(ImageYank.inserting([link], into: "* Task\nSCHEDULED: <2026-11-21 Sat>\n:PROPERTIES:\n:ID: x\n:END:\n* Next\n", at: 0).text
+            == "* Task\nSCHEDULED: <2026-11-21 Sat>\n:PROPERTIES:\n:ID: x\n:END:\n\(link)\n* Next\n")
+
+        let folder = try Self.folder()
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let path = folder.appendingPathComponent("n.org").path
+        let original = "Free text.\n* Task\nBody.\n"
+        var entry = Attachments.Entry(text: original, offset: 11, path: path, idDir: "data/")
+        let saved = try ImageYank.save(Data("PDF".utf8), ext: "pdf", method: .attach, in: &entry, date: Self.noon, prefix: "scan")
+        let (text, caret) = ImageYank.inserting([saved], into: entry.text, at: ImageYank.map(entry.offset, from: original, to: entry.text))
+        let file = try #require(DocumentSession.attachmentPath("scan-20240101T120000.pdf", at: caret, tree: OrgParser.parse(text), path: path))
+        #expect(FileManager.default.fileExists(atPath: file))
+    }
+
     @Test func caretFollowsTheChangeAboveIt() {
         let old = "* Task\nBody."
         let new = "* Task\n:PROPERTIES:\n:ID: x\n:END:\nBody."

@@ -99,6 +99,18 @@ public enum OrgAttach {
         }
     }
 
+    /// Where text under a heading goes when `offset` is on its line: after the planning line,
+    /// drawers and clock lines (`org-end-of-meta-data` with FULL). `offset` itself on any other line.
+    public static func belowHeading(_ text: String, at offset: Int) -> Int {
+        let buffer = EmacsBuffer(text, point: min(offset, (text as NSString).length))
+        return buffer.saveExcursion {
+            buffer.forwardLine(0)
+            guard buffer.atHeading else { return offset }
+            buffer.endOfMetaDataFull()
+            return buffer.point
+        }
+    }
+
     /// `org-attach-tag`: the text with `tag` added to or removed from the entry's heading;
     /// unchanged before the first heading.
     public static func tagging(_ text: String, at offset: Int, on: Bool, tag: String = "ATTACH", options: EditingOptions = .org) -> String {

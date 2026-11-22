@@ -161,6 +161,8 @@ A table.el table (one drawn with =+=, =-= and =|=) becomes a table with each cel
 
 A link to an image file without a description becomes an =<img>=. The image types are =png=, =jpg=, =jpeg=, =gif=, =svg=, =webp=, =bmp=, =tif=, =tiff= and =avif=. =#+ATTR_HTML:= before the paragraph adds attributes (=:width 300 :alt "Map"=); without an =:alt=, the file name is used.
 
+An =attachment:= link is exported as a =file:= link to the file in its entry's attachment folder, with its full path, as Org's =org-attach-expand-links= does; when the entry has no attachment folder, to that name in the Org file's folder. An attached image therefore shows as an image.
+
 An image paragraph with =#+CAPTION:= or =#+ATTR_HTML:= becomes a =<figure>=; a caption is numbered "Figure 1:", "Figure 2:" and so on.
 
 Links to =.org= files point to the =.html= file of the same name. Links to headings (=[[*Heading]]=), to =CUSTOM_ID= targets and to radio targets point to the heading's or target's =id= on the page. =id:= links point to =#= and the ID. Other links are written as they are.

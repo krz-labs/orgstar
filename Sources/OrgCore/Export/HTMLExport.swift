@@ -52,7 +52,8 @@ public enum HTMLExport {
         codeStyle: HTMLCodeStyle? = nil, language: String = "en"
     ) -> String {
         let directory = path.map { URL(fileURLWithPath: $0).deletingLastPathComponent() }
-        let text = ExportPreprocess.macros(ExportPreprocess.includes(text, directory: directory), path: path, now: now, setup: settings.setupKeywords)
+        let expanded = ExportPreprocess.macros(ExportPreprocess.includes(text, directory: directory), path: path, now: now, setup: settings.setupKeywords)
+        let text = ExportPreprocess.attachments(expanded, path: path, settings: settings)
         let options = ExportOptions.parse(settings.setupKeywords + text)
         let meta = metadata(text, settings: settings)
         let title = meta.title ?? fallbackTitle

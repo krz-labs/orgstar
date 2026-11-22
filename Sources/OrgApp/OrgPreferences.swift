@@ -16,6 +16,8 @@ public enum OrgPreferences {
         settings.deadlineWarningDays = integer("deadlineWarningDays", defaults)
         settings.tagInheritance = .init(string("tagInheritance", defaults))
         settings.tagsExcludedFromInheritance = Set(string("tagsExcludedFromInheritance", defaults).split(whereSeparator: \.isWhitespace).map(String.init))
+        settings.attachIDDir = attachIDDir(defaults)
+        settings.attachUseInheritance = attachUseInheritance(defaults)
         return settings
     }
 

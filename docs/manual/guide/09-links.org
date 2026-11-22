@@ -540,7 +540,7 @@ line that holds the caret, where the image is drawn under the link.
 
 Paste (⌘V, or Edit ▸ Paste on iOS) with an image on the clipboard and no text runs
 =yank-media=, as in Emacs 29 and later: the image is saved as =org-yank-image-save-method=
-says and a link to it is inserted at the caret. M-x =yank-media= does the same on the Mac.
+says and a link to it is inserted at the caret; with the caret on a heading's line, under the heading, after its planning line and drawers. M-x =yank-media= does the same on the Mac.
 
 | =org-yank-image-save-method= | Where the image goes                                                     | Link                    |
 |------------------------------+--------------------------------------------------------------------------+-------------------------|
