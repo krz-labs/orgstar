@@ -45,8 +45,11 @@ otool -l "$app/Contents/MacOS/Orgstar" | grep -q '@executable_path/../Frameworks
     || install_name_tool -add_rpath @executable_path/../Frameworks "$app/Contents/MacOS/Orgstar"
 strip -x "$app/Contents/MacOS/Orgstar"
 
-# SwiftMath's math fonts, which it finds in the app's resources.
+# SwiftMath's math fonts, which it finds in the app's resources. LatexPreview uses only the
+# default, Latin Modern.
 cp -R "$(dirname "$binary")/SwiftMath_SwiftMath.bundle" "$app/Contents/Resources/"
+find "$app/Contents/Resources/SwiftMath_SwiftMath.bundle" -path '*/mathFonts.bundle/*' \
+    \( -name '*.otf' -o -name '*.plist' \) ! -name 'latinmodern-math.*' -delete
 # MathJax, for PDF export.
 cp -R "$(dirname "$binary")/Orgstar_OrgMathJax.bundle" "$app/Contents/Resources/"
 
