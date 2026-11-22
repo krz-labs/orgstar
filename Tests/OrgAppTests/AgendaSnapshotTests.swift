@@ -74,7 +74,7 @@ struct AgendaSnapshotTests {
         let lunch = try #require(rows.first { $0.title == "Lunch" })
         #expect(lunch.isEvent && lunch.link == nil)
         #expect(lunch.categoryColor == .init(light: "#336699", dark: "#336699"))
-        #expect(snapshot.colors["agenda-today"] == .init(light: "#007aff", dark: "#0a84ff"))
+        #expect(snapshot.colors["agenda-today"] == .init(light: "#0969da", dark: "#0a84ff"))
         #expect(snapshot.colors["agenda-background"] == nil)
     }
 

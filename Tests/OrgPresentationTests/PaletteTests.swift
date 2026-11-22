@@ -62,6 +62,27 @@ struct PaletteTests {
         }
     }
 
+    /// WCAG AA for text: 4.5:1 for every slot drawn as text, in every built-in theme; in
+    /// Default, for keywords, priorities and the agenda's colours too.
+    @Test func textSlotsReachAA() throws {
+        let text = ["foreground", "table", "line-number-current", "tags", "comment", "keyword", "metadata", "syntax-comment",
+                    "todo-cancelled", "priority-c", "agenda-date", "agenda-time", "agenda-category"]
+        let defaults = ["todo", "todo-next", "todo-waiting", "done", "priority", "priority-a", "priority-b", "link", "timestamp",
+                        "agenda-today", "agenda-overdue", "agenda-due-soon", "agenda-event"]
+        for palette in ThemeSpec.palettes(.light) + ThemeSpec.palettes(.dark) {
+            let background = try #require(palette.colors["background"])
+            for key in text + (palette.id.hasPrefix("default-") ? defaults : []) {
+                let ratio = Self.contrast(try #require(palette.colors[key], "\(palette.id) \(key)"), background)
+                #expect(ratio >= 4.5, "\(palette.id) \(key): \(ratio)")
+            }
+        }
+    }
+
+    @Test func onlySolarizedIsMarkedLowContrast() {
+        let marked = (ThemeSpec.palettes(.light) + ThemeSpec.palettes(.dark)).filter(\.lowContrast).map(\.id)
+        #expect(marked == ["solarized-light", "solarized-dark"])
+    }
+
     @Test func baseTakesEachAppearanceFromItsPalette() throws {
         let (spec, problems) = ThemeSpec.base(light: "paper", dark: "nord")
         #expect(problems.isEmpty)

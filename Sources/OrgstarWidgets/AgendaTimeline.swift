@@ -102,7 +102,7 @@ extension AgendaSnapshot {
         )
         return AgendaSnapshot(
             generated: now, days: [today, tomorrow],
-            colors: ["agenda-today": Hex(light: "#007aff", dark: "#0a84ff"), "agenda-time": gray, "foreground": Hex(light: "#1f2328", dark: "#e6edf3")]
+            colors: ["agenda-today": Hex(light: "#0969da", dark: "#0a84ff"), "agenda-time": gray, "foreground": Hex(light: "#1f2328", dark: "#e6edf3")]
         )
     }
 }
