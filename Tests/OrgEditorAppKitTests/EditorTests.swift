@@ -475,6 +475,27 @@ struct RestyleFuzzTests {
 }
 
 @MainActor
+struct SourceHighlightTests {
+    struct Overlapping: CodeHighlighter {
+        func highlights(language: String, code: String) -> [(range: Range<Int>, category: SyntaxCategory)] {
+            [(5..<7, .string), (0..<7, .keyword), (2..<4, .comment)]
+        }
+    }
+
+    /// Later runs win over earlier ones, wherever they start.
+    @Test func laterHighlighterRunsWin() throws {
+        let text = "* a\n#+begin_src sh\necho hi\n#+end_src\n"
+        let editor = OrgEditor(document: DocumentState(bytes: Array(text.utf8)), highlighter: Overlapping())
+        editor.finishStyling()
+        let storage = try #require(editor.textView.textStorage)
+        let code = (text as NSString).range(of: "echo").location
+        func color(_ offset: Int) -> NSColor? { storage.attribute(.foregroundColor, at: code + offset, effectiveRange: nil) as? NSColor }
+        #expect(color(0) == color(5) && color(0) == color(4))
+        #expect(color(2) != color(0) && color(2) == color(3))
+    }
+}
+
+@MainActor
 struct InitialStylingTests {
     @Test func stylesTheFirstScreenThenTheRest() throws {
         let line = "* heading *bold*\nbody text\n"

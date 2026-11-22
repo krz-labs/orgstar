@@ -26,14 +26,32 @@ extension OrgEditor {
             }
             return
         }
-        if indented {
-            for line in Presentation.lineIndents(document.tree, in: range) {
+        // Indents and roles go on together in ascending order, so each change lands at the end
+        // of the runs made so far instead of moving the ones after it.
+        var indents = (indented ? Presentation.lineIndents(document.tree, in: range) : [])[...]
+        func indent(before offset: Int) {
+            while let line = indents.first, line.range.lowerBound <= offset {
                 storage.addAttribute(.paragraphStyle, value: paragraphStyle(line.firstLine, line.wrapped), range: NSRange(line.range))
+                indents.removeFirst()
             }
         }
         let revealed = caretLine
         var scriptExclusions: [Range<Int>] = []
-        for run in Presentation.styles(document.tree, in: range, highlighter: highlighter) {
+        // Outer before inner still: an outer role never starts after an inner one, and the
+        // index keeps the order of roles that start together. A src block's code runs come in
+        // the highlighter's order, where later wins, so they sort as one.
+        let styles = Presentation.styles(document.tree, in: range, highlighter: highlighter)
+        var starts: [Int] = []
+        for (index, run) in styles.enumerated() {
+            if case .syntax = run.role, index > 0, case .syntax = styles[index - 1].role {
+                starts.append(starts[index - 1])
+            } else {
+                starts.append(run.range.lowerBound)
+            }
+        }
+        for index in styles.indices.sorted(by: { (starts[$0], $0) < (starts[$1], $1) }) {
+            let run = styles[index]
+            indent(before: run.range.lowerBound)
             guard let clipped = clip(run.range, to: range) else { continue }
             if Presentation.skipsLeadingStars(run.role, indented: indented, hideStars: hideStars) { continue }
             if !showMarkup, Presentation.hidesWithMarkup(run.role, options: options), NSIntersectionRange(clipped, revealed).length == 0 {
@@ -43,6 +61,7 @@ extension OrgEditor {
             }
             if Presentation.excludesScripts(run.role) { scriptExclusions.append(run.range) }
         }
+        indent(before: range.upperBound)
         if theme.mixedPitch {
             for prefix in Presentation.fixedPitchPrefixes(storage.string as NSString, in: range) {
                 guard let clipped = clip(prefix, to: range) else { continue }
