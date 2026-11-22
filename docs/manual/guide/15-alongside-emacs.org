@@ -153,7 +153,7 @@ An app started from the Dock doesn't see your shell's =PATH=, which is why orgst
 
 * Quick Look
 
-orgstar includes a Quick Look extension for org files (=.org= and =.org_archive=). Pressing Space on an org file in Finder, or in the Files app on iOS, shows the file as the HTML export renders it, with its =#+SETUPFILE= keywords applied. The preview reads only UTF-8 files.
+orgstar includes a Quick Look extension for org files (=.org= and =.org_archive=). Pressing Space on an org file in Finder, or in the Files app on iOS, shows the file as the HTML export renders it, with its =#+SETUPFILE= keywords applied. The preview reads a file as UTF-8, or as Latin-1 when it isn't valid UTF-8.
 
 Inside orgstar, selecting a file in the sidebar that isn't text shows a Quick Look preview, with Open with Default App and Show in Finder below it.
 
