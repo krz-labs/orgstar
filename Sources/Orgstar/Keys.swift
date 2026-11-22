@@ -9,15 +9,13 @@ struct KeyHint: Hashable {
     let title: String
 }
 
-/// The minibuffer line: a pending prefix, or the last message for a few seconds. After a
-/// short pause on a prefix, the keys that can follow it.
+/// The minibuffer line: a question, a pending prefix, or the last message until the next key
+/// or click. After a short pause on a prefix, the keys that can follow it.
 struct EchoArea: View {
     let commands: AppCommands
     @Environment(\.orgTheme) private var theme
     @Environment(\.colorScheme) private var colorScheme
     @State private var showingHints = false
-    @State private var answer = ""
-    @FocusState private var answerFocused: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -34,71 +32,9 @@ struct EchoArea: View {
                 }
                 .padding(10)
             }
-            if let request = commands.prompt, let fast = request.prompt.fast {
-                Divider()
-                FastSelectionView(selection: fast, message: request.prompt.message) { commands.answer($0) }
+            if let request = commands.prompt {
+                PromptView(commands: commands, request: request)
                     .id(request.id)
-            } else if let request = commands.prompt {
-                if !request.prompt.choices.isEmpty {
-                    Divider()
-                    let matches = filteredChoices(request.prompt.choices)
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 2) {
-                            ForEach(matches.prefix(12), id: \.self) { choice in
-                                Button(choice) {
-                                    if request.prompt.completionSeparator != nil { complete(choice, request.prompt) } else { commands.answer(choice) }
-                                }
-                                    .buttonStyle(.plain)
-                                    .font(.system(.callout, design: .monospaced))
-                                    .foregroundStyle(choice == matches.first ? .primary : .secondary)
-                            }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(10)
-                    }
-                    .frame(maxHeight: 200)
-                }
-                if let read = request.prompt.date {
-                    Divider()
-                    DatePickerView(answer: answer, read: read) { commands.answer($0) }
-                }
-                Divider()
-                HStack(spacing: 6) {
-                    Text(request.prompt.message).font(.system(.callout, design: .monospaced)).foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-                    TextField("", text: $answer)
-                        .frame(minWidth: 240)
-                        .textFieldStyle(.plain)
-                        .font(.system(.callout, design: .monospaced))
-                        .focused($answerFocused)
-                        .onSubmit {
-                            if request.prompt.choices.isEmpty || !request.prompt.requireMatch {
-                                commands.answer(answer)
-                            } else if let first = filteredChoices(request.prompt.choices).first {
-                                commands.answer(first)
-                            }
-                        }
-                        .onKeyPress(.tab) {
-                            guard let first = filteredChoices(request.prompt.choices).first else { return .ignored }
-                            complete(first, request.prompt)
-                            return .handled
-                        }
-                        .onKeyPress(keys: [.leftArrow, .rightArrow, .upArrow, .downArrow]) { press in
-                            guard let read = request.prompt.date, press.modifiers == .shift else { return .ignored }
-                            let days = [KeyEquivalent.leftArrow: -1, .rightArrow: 1, .upArrow: -7, .downArrow: 7][press.key]!
-                            answer = DatePickerView.shifted(answer, read, by: days)
-                            return .handled
-                        }
-                        .onExitCommand { commands.answer(nil) }
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 4)
-                .onAppear {
-                    answer = request.prompt.initial
-                    answerFocused = true
-                }
-                .id(request.id)
             } else if let text = commands.pendingKeys.map({ $0 + "-" }) ?? commands.message {
                 Text(text)
                     .font(.system(.callout, design: .monospaced))
@@ -177,7 +113,108 @@ struct StateTag: View {
     }
 }
 
-extension EchoArea {
+/// A question a command asks: fast selection, or a text field with its choices, filtered as
+/// it is typed, and a calendar for dates. Any window with an echo area can show it.
+struct PromptView: View {
+    let commands: AppCommands
+    let request: PromptRequest
+    @State private var answer = ""
+    @FocusState private var answerFocused: Bool
+    /// The highlighted choice, moved by ↑/↓ or C-p/C-n.
+    @State private var selected = 0
+    /// The highlight was moved, so Return answers with it even where any text is accepted.
+    @State private var moved = false
+
+    private var prompt: Prompt { request.prompt }
+
+    var body: some View {
+        if let fast = prompt.fast {
+            Divider()
+            FastSelectionView(selection: fast, message: prompt.message) { commands.answer($0) }
+        } else {
+            let matches = filteredChoices(prompt.choices)
+            let current = min(selected, matches.count - 1)
+            if !prompt.choices.isEmpty {
+                Divider()
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        LazyVStack(alignment: .leading, spacing: 2) {
+                            ForEach(matches.indices, id: \.self) { index in
+                                let choice = matches[index]
+                                Button {
+                                    if prompt.completionSeparator != nil { complete(choice) } else { commands.answer(choice) }
+                                } label: {
+                                    Text(choice)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.horizontal, 4)
+                                        .background(index == current ? Color.accentColor.opacity(0.25) : .clear, in: RoundedRectangle(cornerRadius: 3))
+                                        .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
+                                .font(.system(.callout, design: .monospaced))
+                                .accessibilityAddTraits(index == current ? .isSelected : [])
+                            }
+                        }
+                        .padding(10)
+                    }
+                    .frame(maxHeight: 200)
+                    .onChange(of: current) { if current >= 0 { proxy.scrollTo(current) } }
+                }
+            }
+            if let read = prompt.date {
+                Divider()
+                DatePickerView(answer: answer, read: read) { commands.answer($0) }
+            }
+            Divider()
+            HStack(spacing: 6) {
+                Text(prompt.message).font(.system(.callout, design: .monospaced)).foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                TextField("", text: $answer)
+                    .frame(minWidth: 240)
+                    .textFieldStyle(.plain)
+                    .font(.system(.callout, design: .monospaced))
+                    .focused($answerFocused)
+                    .onSubmit {
+                        if current >= 0, moved || prompt.requireMatch {
+                            commands.answer(matches[current])
+                        } else if prompt.choices.isEmpty || !prompt.requireMatch {
+                            commands.answer(answer)
+                        }
+                    }
+                    .onKeyPress(.tab) {
+                        guard current >= 0 else { return .ignored }
+                        complete(matches[current])
+                        return .handled
+                    }
+                    .movesSelection(Binding(get: { selected }, set: { selected = $0; moved = true }), current: current, count: matches.count)
+                    .onKeyPress(keys: [.leftArrow, .rightArrow, .upArrow, .downArrow]) { press in
+                        guard let read = prompt.date, press.modifiers == .shift else { return .ignored }
+                        let days = [KeyEquivalent.leftArrow: -1, .rightArrow: 1, .upArrow: -7, .downArrow: 7][press.key]!
+                        answer = DatePickerView.shifted(answer, read, by: days)
+                        return .handled
+                    }
+                    .onExitCommand { commands.answer(nil) }
+                    .onChange(of: answer) {
+                        selected = 0
+                        moved = false
+                    }
+                if !prompt.choices.isEmpty {
+                    Text(verbatim: "\(max(current + 1, 0))/\(matches.count)")
+                        .font(.system(.callout, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                        .accessibilityLabel("Choice \(max(current + 1, 0)) of \(matches.count)")
+                }
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .onAppear {
+                answer = prompt.initial
+                answerFocused = true
+            }
+        }
+    }
+
     /// What completion matches: the text after the last separator, or all of it.
     private func completing(_ separator: Character?) -> Substring {
         guard let separator, let last = answer.lastIndex(of: separator) else { return answer[...] }
@@ -185,7 +222,7 @@ extension EchoArea {
     }
 
     /// Puts `choice` in place of what's being completed; with a separator, adds one after it.
-    func complete(_ choice: String, _ prompt: Prompt) {
+    func complete(_ choice: String) {
         guard let separator = prompt.completionSeparator else {
             answer = choice
             return
@@ -196,11 +233,43 @@ extension EchoArea {
 
     /// Choices matching what's typed, best first.
     func filteredChoices(_ choices: [String]) -> [String] {
-        let typed = String(completing(commands.prompt?.prompt.completionSeparator))
+        let typed = String(completing(prompt.completionSeparator))
         guard !typed.isEmpty else { return choices }
         return choices.compactMap { choice in FuzzyMatch.score(typed, choice).map { (choice, $0) } }
             .sorted { $0.1 > $1.1 }
             .map(\.0)
+    }
+}
+
+/// Messages: the echo area's recent messages, newest last (`view-echo-area-messages`).
+struct MessagesView: View {
+    let messages: [String]
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("Messages").font(.headline).padding(12)
+            Divider()
+            if messages.isEmpty {
+                ContentUnavailableView("No messages", systemImage: "text.bubble")
+            } else {
+                ScrollView {
+                    Text(messages.joined(separator: "\n"))
+                        .font(.system(.callout, design: .monospaced))
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(12)
+                }
+                .defaultScrollAnchor(.bottom)
+            }
+            Divider()
+            HStack {
+                Spacer()
+                Button("Done") { dismiss() }.keyboardShortcut(.defaultAction)
+            }
+            .padding(12)
+        }
+        .frame(width: 560, height: 360)
     }
 }
 

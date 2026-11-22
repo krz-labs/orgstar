@@ -166,6 +166,7 @@ enum CommandTitles {
         String(localized: "Lower Priority", comment: "Command title"),
         String(localized: "Mark Subtree", comment: "Command title"),
         String(localized: "Mark as Default Clock Task", comment: "Command title"),
+        String(localized: "Messages", comment: "Command title"),
         String(localized: "Move Item Down", comment: "Command title"),
         String(localized: "Move Item Up", comment: "Command title"),
         String(localized: "Move Subtree Down", comment: "Command title"),

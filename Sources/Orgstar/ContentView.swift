@@ -422,6 +422,7 @@ struct ContentView: View {
                 }
             }
         }
+        .sheet(isPresented: $commands.showingMessages) { MessagesView(messages: commands.messages) }
         .onChange(of: commands.showingPalette) { _, showing in if showing { sheetTarget = session.focused } }
         .onChange(of: commands.showingQuickOpen) { _, showing in if showing { sheetTarget = session.focused } }
         .onChange(of: session.conflict) { _, conflict in
@@ -1327,6 +1328,7 @@ struct ContentView: View {
         case "app.edit-config": commands.jump(path: UserConfig.configFile.path, offset: 0)
         case "app.quick-open": commands.showingQuickOpen = true
         case "app.palette": commands.showingPalette = true
+        case "app.messages": commands.showingMessages = true
         case "app.search": commands.focusSearch = true
         case "app.reload-keymap":
             loadKeymap()

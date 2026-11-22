@@ -98,6 +98,7 @@ public enum EditorCommands {
         EditorCommand(id: "app.palette", title: "Command Palette…", action: .app),
         EditorCommand(id: "app.search", title: "Search Notes", action: .app),
         EditorCommand(id: "app.reload-keymap", title: "Reload Keymap", action: .app),
+        EditorCommand(id: "app.messages", title: "Messages", action: .app),
         EditorCommand(id: "app.refile", title: "Refile…", action: .app),
         EditorCommand(id: "app.refile.copy", title: "Copy to Refile Target…", action: .app),
         EditorCommand(id: "app.refile.goto", title: "Go to Refile Target…", action: .app),

@@ -77,12 +77,12 @@ A key bound by itself cannot also be a prefix. When a keymap binds both =C-c= an
 
 The echo area is the line at the bottom of the window, below the modeline. It shows, in order of priority:
 
-- A question a command is asking, with a text field: a refile target, a date, a property value, a sparse-tree match, a Vim search or ex command. =Return= answers, =Esc= cancels. When the question has choices, they are listed above the field and filtered as you type with fuzzy matching; =Tab= completes the best match. Date questions show a calendar, and =S-<left>=, =S-<right>=, =S-<up>= and =S-<down>= move the date by a day or a week, as in =org-read-date=.
+- A question a command is asking, with a text field: a refile target, a date, a property value, a sparse-tree match, a Vim search or ex command. =Return= answers, =Esc= cancels. When the question has choices, they are listed above the field and filtered as you type with fuzzy matching, best first; the count at the right shows which one is highlighted and how many match (=3/40=). =↑= and =↓= (or =C-p= and =C-n=) move the highlight, =Tab= completes the highlighted choice, and =Return= answers with it, or with the text as typed when the question accepts any text and the highlight has not been moved. Date questions show a calendar, and =S-<left>=, =S-<right>=, =S-<up>= and =S-<down>= move the date by a day or a week, as in =org-read-date=.
 - Fast selection for TODO keywords and tags when the file defines keys for them (see [[file:05-todos-and-tags.org][TODOs and tags]]).
 - The pending prefix, such as =C-c C-x-=.
-- The last message from a command or from the keymap, for four seconds.
+- The last message from a command or from the keymap, until the next key or click.
 
-VoiceOver reads each message as it appears.
+VoiceOver reads each message as it appears. View ▸ Messages (=app.messages=) lists the last 100 messages.
 
 In the Doom preset the modeline shows the evil state as a tag: =NORMAL=, =INSERT=, =VISUAL=, =V-LINE= or =V-BLOCK=. See [[file:02-the-editor.org][The editor]] for the rest of the modeline.
 
@@ -1135,6 +1135,7 @@ No preset binds these. Run them from the palette or a menu, or bind them in =key
 | Command | What it does |
 |-+-|
 | Board (=app.board=) | Opens the Board window. Window ▸ Board, =⇧⌘B=. |
+| Messages (=app.messages=) | Lists the last 100 messages of the echo area (=view-echo-area-messages=). View ▸ Messages. |
 | Show Agenda or Files in Sidebar (=app.sidebar-agenda=) | Switches the sidebar between the files and the agenda, as the button at the right of its bar does. |
 | Verbatim, Code, Strike-Through (=org.emphasize.verbatim=, =org.emphasize.code=, =org.emphasize.strike-through=) | =org-emphasize= with ===, =~= or =+=. |
 | Cancel Running Task (=app.babel.cancel=) | Stops the src block that is running, or an export or table recalculation running in Emacs. Edit ▸ Cancel Running Task, =⌘.=. |

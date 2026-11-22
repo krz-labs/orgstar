@@ -212,7 +212,7 @@ The running clock is covered in [[file:06-dates-and-clocking.org][Dates and cloc
 
 The line under the modeline is the echo area, as Emacs's minibuffer. It shows:
 
-- *Messages* from commands, such as =Stored: …= or =Not an org file=. A message stays for 4 seconds.
+- *Messages* from commands, such as =Stored: …= or =Not an org file=. A message stays until the next key or click. View ▸ Messages lists the last 100.
 - *A pending key prefix*. After =C-c= it shows =C-c-=. If you pause for about 0.6 seconds, a grid of the keys that can follow appears, each with the command it would run at the caret, or =+prefix= for a further prefix, as =which-key= shows them. =C-g= cancels the prefix and shows =Quit=. A sequence that isn't bound shows, for example, =C-c z is undefined=, and does nothing; in the Doom preset this includes sequences after =SPC=.
 - *Prompts*, when a command asks a question.
 
@@ -221,7 +221,7 @@ The line under the modeline is the echo area, as Emacs's minibuffer. It shows:
 A prompt shows its question and a text field, which takes the keyboard.
 
 - Type an answer and press =Return=.
-- When the prompt has choices (buffers, refile targets, tags), up to 12 of them list above the field, filtered as you type: characters match in order, and the best match is listed first. =Tab= completes the field to the first match. =Return= accepts the first match when the prompt requires one of its choices, and the typed text otherwise. Clicking a choice accepts it.
+- When the prompt has choices (buffers, refile targets, tags), they list above the field, filtered as you type: characters match in order, and the best match is listed first and highlighted. The count at the right of the field shows the highlighted choice and the number of matches. =↑= and =↓= (or =C-p= and =C-n=) move the highlight, and =Tab= completes the field to the highlighted choice. =Return= accepts the highlighted choice when the prompt requires one of its choices or the highlight was moved, and the typed text otherwise. Clicking a choice accepts it.
 - Prompts that take several values, such as tags separated by colons, complete only the part after the last separator.
 - =Escape= cancels the prompt; the command reports =Quit=.
 

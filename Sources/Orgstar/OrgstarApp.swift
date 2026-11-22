@@ -23,6 +23,7 @@ final class AppCommands {
     var focusSearch = false
     var showingConflict = false
     var showingPalette = false
+    var showingMessages = false
     /// A location another window asked the main window to show.
     private(set) var jumpRequest: (path: String, offset: Int, id: Int)?
     private var jumpID = 0
@@ -74,9 +75,12 @@ final class AppCommands {
     var keyHints: [KeyHint] = []
     /// A question a command asked, answered in the echo area.
     private(set) var prompt: PromptRequest?
-    /// The last message from a command or the keymap, cleared after a few seconds.
+    /// The last message from a command or the keymap, kept until the next key or click, as
+    /// Emacs keeps it.
     private(set) var message: String?
-    private var messageID = 0
+    /// Recent messages, oldest first, for Messages.
+    private(set) var messages: [String] = []
+    @ObservationIgnored private var inputMonitor: Any?
 
     func ask(_ prompt: Prompt, reply: @escaping (String?) -> Void) {
         self.prompt = PromptRequest(prompt: prompt, reply: reply)
@@ -169,13 +173,19 @@ final class AppCommands {
     }
 
     func show(_ text: String) {
-        messageID += 1
-        let id = messageID
         message = text
+        messages.append(text)
+        if messages.count > 100 { messages.removeFirst(messages.count - 100) }
         AccessibilityNotification.Announcement(text).post()
-        Task {
-            try? await Task.sleep(for: .seconds(4))
-            if messageID == id { message = nil }
+        // A local monitor sees an event before it is handled, so a message the key or click
+        // itself shows is set after this clears the last one.
+        if inputMonitor == nil {
+            inputMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .leftMouseDown, .rightMouseDown]) { [weak self] event in
+                MainActor.assumeIsolated {
+                    if self?.message != nil { self?.message = nil }
+                }
+                return event
+            }
         }
     }
 }
@@ -539,6 +549,8 @@ struct OrgstarApp: App {
                 Button("Turn Auto Fill On or Off") { commands.run("editor.toggle-auto-fill") }
                 Button("Check Spelling While Typing") { commands.editor?.run("editor.toggle-spell-check") }
                     .disabled(commands.editor == nil)
+                Divider()
+                Button("Messages") { commands.run("app.messages") }
             }
             CommandGroup(after: .pasteboard) {
                 Divider()
