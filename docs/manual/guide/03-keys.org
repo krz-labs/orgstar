@@ -343,10 +343,12 @@ Motions move the caret in normal state, extend the selection in visual states, a
 | =s= /xy/, =S= /xy/ | evil-snipe: to the next or previous /xy/ on the line. Each character matches its variants as for =f=, and /xy/ without a capital matches case-insensitively. =SPC= and =TAB= are read as a space and a tab. Not available after an operator. |
 | =%= | The bracket matching the next =()=, =[]= or ={}= on the line. |
 | ={=, =}= | Previous, next blank line. |
+| =(=, =)= | Previous, next beginning of a sentence. A sentence ends at =.=, =?= or =!=, with any closing quotes or brackets, before a blank or the line's end (Doom's =sentence-end-double-space= is off), and at a blank line. The blank line after a paragraph is a stop for =)= and the one before it for =(=. In Org files a heading and a list item begin sentences of their own. |
 | =/=, =?= | Searches forward or backward as you type a regular expression, the match selected and the others highlighted; =RET= goes there, wrapping around the file, and =Esc= goes back. On iOS, asks in the echo area instead. |
 | =n=, =N= | Repeats the last search in the same or the opposite direction. |
 | =*=, =#= | Searches forward or backward for the whole word under the caret. |
 | =C-d=, =C-u= | Down, up half the window's height; with a count, that many lines. |
+| =g;=, =g,= | =g;= goes to the place of the last change, and again to the one before it; =g,= comes back towards the latest (goto-chg, as evil binds it). A change within 8 characters of a later one is passed over, and any other command starts over from the latest change. Normal state only; counts are ignored. |
 | =H=, =M=, =L= | First non-blank of the top, middle or bottom line the window shows. With a count, =H= goes to that line from the top and =L= from the bottom. Lines are text lines, not wrapped screen lines. Linewise after an operator. |
 | ='= /a/, =`= /a/ | To mark /a/: its line's first non-blank, or its exact position. See [[*Marks and jumps][Marks and jumps]]. |
 
@@ -378,11 +380,16 @@ Single-key changes:
 | =Y= | Yanks to the end of the line (=evil-want-Y-yank-to-eol=, as Doom sets it). |
 | =p=, =P= | Pastes after or before the caret; whole lines go below or above the current line. A count pastes that many times. |
 | =J= | Joins the next line (count: that many lines) with one space. |
+| =gJ= | Joins the next line (count: that many lines) without adding or removing blanks. Also in visual state. |
+| =gi= | Enters insert state where insert state was last left (the =^= mark, which moves with the text as you edit). |
+| =&=, =g&= | =&= repeats the last =:s= on the caret's line, without its flags; =g&= repeats it on every line, with its flags. |
 | =~= | Toggles the case of the character under the caret and moves right. |
 | =r= /x/ | Replaces the character under the caret (count: that many) with /x/; =r RET= splits the line. |
 | =R= | Replace state: what you type overwrites the line's characters, and past the line's end adds to it. =RET= breaks the line, =DEL= gives back what was overwritten, =ESC= returns to normal state. A count types the text that many times. |
 | =g==, =g-=, =C-a= | Adds the count (1) to the number at or after the caret on its line, or with =g-= takes it away, as evil-numbers does on Doom's =g== and =g-=: decimal, =0x= hex and =0b= binary numbers, keeping leading zeros and the hex digits' case. In visual state =g== and =g-= change every number in the selection, the nth by n times the count; =g+= and =C-a= by the count. =C-x= stays the Emacs prefix, as in Doom. |
 | =zz=, =zt=, =zb= | Scrolls the caret's line to the middle, top or bottom of the window. =z.=, =z RET= and =z-= do the same and go to its first non-blank. A count names the line. |
+| =C-e=, =C-y= | Scrolls the window down or up a line (count: that many). The caret moves only to stay in the window. Also in visual state, where the caret stays put. |
+| =zl=, =zh=, =zL=, =zH= | Scrolls the window right or left a column (count: that many), or with =zL= and =zH= half its width. This needs Truncate or Wrap Long Lines to be truncating: nothing moves while lines wrap. |
 | =u=, =C-r= | Undo, redo, with counts. |
 | =.= | Repeats the last change. |
 | =ZZ= | Saves the file and closes the window, as =:wq=. |
@@ -403,12 +410,12 @@ After an operator, or in visual state to select, =i= takes the inner object and 
 | =i{=, =a{=, =i}=, =a}=, =iB=, =aB= | Braces. |
 | =i<=, =a<=, =i>=, =a>= | Angle brackets. |
 | =ip=, =ap= | Paragraph: lines up to a blank line. |
+| =is=, =as= | Sentence, as =(= and =)= find them. For =is= the blanks between two sentences are an object too. =as= takes the sentence with the blanks after it on its line, or else those before it; on blanks, it takes them and the sentence after. |
+| =it=, =at= | XML tags: the text between the nearest =<tag>= and its =</tag>= around the caret, or with =at= the tags as well. A count takes that many pairs outward. The caret on a tag counts as inside its pair, and self-closing tags are skipped. =at= on a pair that fills two or more whole lines takes the lines. |
 | =ie=, =ae= | Org object at the caret: emphasis, a link, a timestamp, a footnote reference, an entity, a macro and the like (=evil-org-inner-object=, =evil-org-an-object=). =ie= on emphasis takes the text inside the markers, on a link its description. With no object at the caret, the element. |
 | =iE=, =aE= | Org element: a paragraph, a list, a table, a block, a drawer (=evil-org-inner-element=, =evil-org-an-element=). |
 | =ir=, =ar= | Org greater element: the list, table, drawer, block or section that contains the element (=evil-org-inner-greater-element=, =evil-org-a-greater-element=). |
 | =iR=, =aR= | Org subtree: =aR= is the heading and its subtree, =iR= its contents without the heading line (=evil-org-inner-subtree=, =evil-org-a-subtree=). |
-
-Tag objects (=it=, =at=) and sentence objects (=is=, =as=) are not available.
 
 ** Counts and registers
 
@@ -418,10 +425,16 @@ A count is digits before a command; =0= only counts after another digit. A regis
 |-+-|
 | ="a= to ="z= | Named registers. Yanking or deleting into =A= to =Z= appends to the lowercase one. Writing to a named register leaves the clipboard alone. |
 | ="0= | The last yank. |
+| ="1= to ="9= | The last nine yanks, deletes and changes made without a register, ="1= the latest. Evil reads these from the kill ring, so yanks are in them and small deletes too. |
+| ="-= | The last delete within a line made without a register. |
+| =".= | The text last typed in insert state. Read-only. |
+| =":= | The last ex command. Read-only. |
+| ="%= | The file's path. Read-only. |
+| ="/= | The last search pattern. Read-only. |
 | =""=, ="+=, ="*= | The system clipboard. This is the unnamed register: every yank, delete and change without a register goes to the clipboard, and =p= without a register pastes from it. |
 | ="_= | The black hole: deletes without saving the text. |
 
-Pasting from the clipboard is linewise when its text is what the last linewise yank or delete put there; text copied in another app pastes as characters. Numbered registers ="1= to ="9=, and the read-only registers such as ="%=, are not available.
+Pasting from the clipboard is linewise when its text is what the last linewise yank or delete put there; text copied in another app pastes as characters. Pasting from an empty register does nothing.
 
 Registers and macros are shared by every buffer, as in evil: a yank into ="a= in one file pastes with ="ap= in another. Lowercase marks and the jump list belong to the buffer and are gone when it closes. Nothing is kept when orgstar quits.
 
@@ -446,7 +459,7 @@ A macro replays the keys you typed, including keymap commands, leader keys and i
 
 =m= /a/ sets mark /a/ (any letter) at the caret. Marks move with the text as you edit. ='= /a/ goes to the first non-blank of the mark's line, =`= /a/ to its exact position. =''= and =``= go back to where the last jump started.
 
-Jumps are =G=, =gg=, =%=, ={=, =}=, =n=, =N=, =*=, =#=, ='=, =`=, =H=, =M=, =L=, the snipes =s=, =S=, =f=, =F=, =t= and =T=, and searches with =/= and =?=. Each jump adds its starting point to the jump list, which keeps the last 100. =C-o= goes back through the list and =C-i= forward again. A new jump after =C-o= drops the places you went back past.
+Jumps are =G=, =gg=, =%=, ={=, =}=, =(=, =)=, =gi=, =g;=, =g,=, =n=, =N=, =*=, =#=, ='=, =`=, =H=, =M=, =L=, the snipes =s=, =S=, =f=, =F=, =t= and =T=, and searches with =/= and =?=. Each jump adds its starting point to the jump list, which keeps the last 100. =C-o= goes back through the list and =C-i= forward again. A new jump after =C-o= drops the places you went back past.
 
 Lowercase marks belong to the buffer, and so do =C-o= and =C-i=. Uppercase marks (=mA= to =mZ=) are file marks, shared by every buffer: ='A= or =`A= in another buffer shows the buffer the mark was set in, at the mark. A file mark goes away when its buffer closes.
 
@@ -531,6 +544,12 @@ Besides the leader, the preset binds these evil-org and Doom keys in normal stat
 | =z a= | Toggle Fold (=+org/toggle-fold=). On a heading line: a folded heading opens one level, showing its body and its child headings folded; an open one folds. |
 | =z o= | Open Fold (=+org/open-fold=). On a heading line, a folded heading opens one level; an open one stays as it is. |
 | =z c= | Close Fold (=outline-hide-subtree=). Folds the subtree the caret is in, from anywhere inside it. |
+| =z C= | Close Fold, as =z c=. |
+| =z O= | Open Subtree Folds (=outline-show-subtree=). Opens the whole subtree the caret is in. |
+| =z R= | Open All Folds (=+org/open-all-folds=). Every heading opens; folded drawers and blocks stay folded. |
+| =z M= | Close All Folds (=+org/close-all-folds=). Only top-level headings show. |
+| =z r= | Show Next Fold Level (=+org/show-next-fold-level=). Headings one level deeper than the deepest folded heading that shows, without bodies. |
+| =z m= | Hide Next Fold Level (=+org/hide-next-fold-level=). Headings one level less deep, without bodies. |
 | =z A= | Cycle Global Visibility. |
 | =g h= | Up to Parent Heading. |
 | =] h=, =[ h= | Next or previous heading at the same level. |
@@ -657,6 +676,8 @@ Besides the leader, the preset binds these evil-org and Doom keys in normal stat
 | =:= /N/ | Goes to line /N/. |
 | =:s/= /pattern/ =/= /replacement/ =/= /flags/ | Replaces on the current line. Flags: =g= for every match on the line, =i= to ignore case. =\1= in the replacement is the first group. |
 | =:%s/= /pattern/ =/= /replacement/ =/= /flags/ | The same on every line. |
+| =:s=, =:&= | Repeats the last substitution on the current line, without its flags. |
+| =:&&=, =:%&&= | Repeats it with its flags, on the current line or on every line. |
 | =:noh=, =:nohlsearch= | Accepted; does nothing. |
 
 =q:= opens the ex prompt with your earlier commands listed, most recent first, to pick and edit; =q/= and =q?= do the same for searches.
@@ -665,7 +686,7 @@ Anything else shows =Not an editor command=. Ranges other than =%=, the =c= flag
 
 ** Not available
 
-Things evil users may reach for that orgstar does not have: the fold =z= commands other than =za=, =zc=, =zo= and =zA=, and scrolling by lines (=zh=, =zl=, =C-e=, =C-y=); =gi=, =g;=, =gJ=; =&=; the numbered and read-only registers; tag and sentence text objects.
+Things evil users may reach for that orgstar does not have: counts before the fold =z= keys, Doom's =zn=, =zN=, =zi=, =zx=, =zj= and =zk=, and the vimish-fold keys (=zf=, =zF=, =zd=, =zE=); the scrolls =z+=, =z^=, =ze= and =zs=; counts for =gi=, =g;= and =&=; the ="#= and ="== registers, and =C-r= /register/ in insert state.
 
 * Keys in other windows
 
@@ -789,7 +810,12 @@ When a key appears in several rows, it runs the command whose condition holds at
 | Cycle Visibility (=org.cycle=) | =TAB= | =⇥= | =TAB= (N, V) | On a heading, cycles its subtree through folded, children and everything; on the first or last line of a drawer or block, folds or unfolds it (=org-cycle=). Elsewhere, =TAB= types a tab in the Emacs and Mac presets. |
 | Toggle Fold (=org.fold.toggle=) | — | — | =z a= (N) | On a heading line, opens a folded heading one level or folds an open one (=+org/toggle-fold=). |
 | Open Fold (=org.fold.open=) | — | — | =z o= (N) | On a heading line, opens a folded heading one level (=+org/open-fold=). |
-| Close Fold (=org.fold.close=) | — | — | =z c= (N) | Folds the subtree the caret is in (=outline-hide-subtree=). |
+| Close Fold (=org.fold.close=) | — | — | =z c=, =z C= (N) | Folds the subtree the caret is in (=outline-hide-subtree=). |
+| Open Subtree Folds (=org.fold.open-subtree=) | — | — | =z O= (N) | Opens the whole subtree the caret is in (=outline-show-subtree=). |
+| Open All Folds (=org.fold.open-all=) | — | — | =z R= (N) | Opens every heading; folded drawers and blocks stay folded (=+org/open-all-folds=). |
+| Close All Folds (=org.fold.close-all=) | — | — | =z M= (N) | Shows only top-level headings (=+org/close-all-folds=). |
+| Show Next Fold Level (=org.fold.more=) | — | — | =z r= (N) | Shows headings one level deeper than the deepest folded heading that shows, without bodies (=+org/show-next-fold-level=). |
+| Hide Next Fold Level (=org.fold.less=) | — | — | =z m= (N) | Shows headings one level less deep, without bodies (=+org/hide-next-fold-level=). |
 | Cycle Global Visibility (=org.cycle-global=) | =S-TAB= | =⇧⇥= | =S-TAB=, =z A= (N) | Cycles the whole file through overview, contents and everything (=org-global-cycle=). |
 | Narrow to Subtree (=org.narrow.subtree=) | =C-x n s= | — | =SPC m s n= (N) | Shows only the current subtree (=org-narrow-to-subtree=). |
 | Narrow to Block (=org.narrow.block=) | =C-x n b= | — | — | Shows only the current block (=org-narrow-to-block=). |

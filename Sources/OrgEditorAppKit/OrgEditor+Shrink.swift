@@ -80,15 +80,23 @@ extension OrgEditor {
         return true
     }
 
-    /// Doom's `za`, `zo` (on a heading line) and `zc` (anywhere in a subtree).
+    /// Doom's `za`, `zo` (on a heading line), `zc` and `zO` (anywhere in a subtree), and `zR`,
+    /// `zM`, `zr` and `zm` for the whole buffer.
     func fold(_ id: String) {
         leaveSparseTree()
         let caret = textView.selectedRange().location
         let tree = document.tree
         let next: FoldState?
-        if id == "org.fold.close" {
+        if id == "org.fold.close" || id == "org.fold.open-subtree" {
             next = Presentation.outline(tree).last { $0.start <= caret && (caret < $0.end || $0.end == utf16Length) }
-                .map { Presentation.hideSubtree($0.start, foldState) }
+                .map { id == "org.fold.close" ? Presentation.hideSubtree($0.start, foldState) : Presentation.showSubtree($0.start, in: tree, foldState) }
+        } else if id == "org.fold.open-all" {
+            next = Presentation.showAllHeadings(foldState)
+        } else if id == "org.fold.close-all" {
+            next = Presentation.hideSublevels(1, in: tree, foldState)
+        } else if id == "org.fold.more" || id == "org.fold.less" {
+            let level = Presentation.foldLevel(in: tree, foldState)
+            next = Presentation.hideSublevels(id == "org.fold.more" ? level + 1 : max(1, level - 1), in: tree, foldState)
         } else {
             next = Presentation.heading(containing: caret, in: tree).map {
                 id == "org.fold.open" ? Presentation.openFold($0, in: tree, foldState) : Presentation.toggleFold($0, in: tree, foldState)

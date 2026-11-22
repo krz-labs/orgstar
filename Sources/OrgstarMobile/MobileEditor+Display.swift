@@ -199,6 +199,31 @@ extension MobileEditor {
         setFolds(state)
     }
 
+    /// Doom's `za`, `zo` (on a heading line), `zc` and `zO` (anywhere in a subtree), and `zR`,
+    /// `zM`, `zr` and `zm` for the whole buffer.
+    func foldCommand(_ id: String) {
+        let caret = textView.selectedRange.location
+        let tree = document.tree
+        let length = (document.text as NSString).length
+        let next: FoldState?
+        if id == "org.fold.close" || id == "org.fold.open-subtree" {
+            next = Presentation.outline(tree).last { $0.start <= caret && (caret < $0.end || $0.end == length) }
+                .map { id == "org.fold.close" ? Presentation.hideSubtree($0.start, fold) : Presentation.showSubtree($0.start, in: tree, fold) }
+        } else if id == "org.fold.open-all" {
+            next = Presentation.showAllHeadings(fold)
+        } else if id == "org.fold.close-all" {
+            next = Presentation.hideSublevels(1, in: tree, fold)
+        } else if id == "org.fold.more" || id == "org.fold.less" {
+            let level = Presentation.foldLevel(in: tree, fold)
+            next = Presentation.hideSublevels(id == "org.fold.more" ? level + 1 : max(1, level - 1), in: tree, fold)
+        } else {
+            next = Presentation.heading(containing: caret, in: tree).map {
+                id == "org.fold.open" ? Presentation.openFold($0, in: tree, fold) : Presentation.toggleFold($0, in: tree, fold)
+            }
+        }
+        if let next, next != fold { setFolds(next) }
+    }
+
     /// Opens the folds hiding `offset`.
     func unfold(around offset: Int) {
         var state = fold

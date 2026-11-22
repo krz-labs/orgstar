@@ -441,6 +441,10 @@ public final class OrgEditor: NSObject {
     static var macros: [Character: [KeyChord]] = [:]
     /// What `:`, `/` and `?` read, oldest first, for the command-line window (`q:`).
     static var promptHistory: [String: [String]] = [:]
+    /// The last `:s`, for `&` and `g&`.
+    static var lastSubstitute: (pattern: String, replacement: String, flags: String)?
+    /// The file's path, for the `%` register.
+    public var fileName: String?
     /// Shows `editor`'s buffer with the caret at the offset, for a jump to a file mark set
     /// there.
     public var onJumpToEditor: ((OrgEditor, Int) -> Void)?
@@ -576,7 +580,7 @@ public final class OrgEditor: NSObject {
             switch id {
             case "org.cycle": cycleAtCaret()
             case "org.cycle-global": cycleGlobal()
-            case "org.fold.toggle", "org.fold.open", "org.fold.close": fold(id)
+            case _ where id.hasPrefix("org.fold."): fold(id)
             case "org.narrow.subtree", "org.narrow.block", "org.narrow.toggle", "org.widen": narrow(id)
             case "org.toggle-inline-images": toggleImages()
             case "org.latex-preview": toggleLatex()
@@ -790,6 +794,7 @@ public final class OrgEditor: NSObject {
         mapWrapperFolds(through: edit, near: min(oldMapped.lowerBound, newAffected.lowerBound)..<max(oldMapped.upperBound, newAffected.upperBound))
         if let narrowed { self.narrowed = ViewState(selection: [narrowed]).mapped(through: [edit]).selection[0] }
         mapVimPositions(through: edit)
+        vim.changed(edit)
         if let sparse = sparseHidden { sparseHidden = ViewState(selection: sparse).mapped(through: [edit]).selection.filter { !$0.isEmpty } }
         let oldHighlights = ViewState(selection: highlights).mapped(through: [edit]).selection
         highlights = []

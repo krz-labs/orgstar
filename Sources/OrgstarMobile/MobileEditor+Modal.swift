@@ -61,7 +61,8 @@ extension MobileEditor {
             // Reading the clipboard asks for permission, so only the keys that paste read it.
             let pastes = key.modifiers.isEmpty && (key.key == "p" || key.key == "P")
             let clipboard = pastes ? UIPasteboard.general.string : Self.vimClipboardRecord?.text
-            let actions = vim.feed(key, Vim.Context(text: document.text, caret: caret, clipboard: clipboard, halfPage: halfPage, marks: marks, visible: visibleText, org: true))
+            let actions = vim.feed(key, Vim.Context(text: document.text, caret: caret, clipboard: clipboard, halfPage: halfPage, marks: marks, visible: visibleText, org: true,
+                                                    fileName: fileName, lastEx: Self.promptHistory[":"]?.last))
             Self.vimRegisters = vim.registers
             Self.vimClipboardRecord = vim.clipboardRecord
             apply(actions)
@@ -197,6 +198,10 @@ extension MobileEditor {
                 }
             case .scroll(let place):
                 scrollCaretLine(place)
+            case .scrollLines(let count):
+                scrollLines(count)
+            case .scrollColumns(let count, let halfWidths):
+                scrollColumns(count, halfWidths: halfWidths)
             }
         }
     }
@@ -237,6 +242,32 @@ extension MobileEditor {
         textView.setContentOffset(CGPoint(x: textView.contentOffset.x, y: min(max(-textView.adjustedContentInset.top, y), maxY)), animated: false)
     }
 
+    /// C-e and C-y: the window down or up by lines; the cursor stays in it, as in Emacs.
+    private func scrollLines(_ count: Int) {
+        let inset = textView.adjustedContentInset
+        let maxY = max(-inset.top, textView.contentSize.height - textView.bounds.height + inset.bottom)
+        let y = textView.contentOffset.y + CGFloat(count) * max(1, theme.font.lineHeight)
+        textView.setContentOffset(CGPoint(x: textView.contentOffset.x, y: min(max(-inset.top, y), maxY)), animated: false)
+        guard vim.mode == .normal, let visible = visibleText, !visible.isEmpty else { return }
+        let caret = textView.selectedRange.location
+        let ns = document.text as NSString
+        // Without scrolling back to where the cursor was.
+        if caret < visible.lowerBound {
+            textView.selectedRange = NSRange(location: ns.lineRange(for: NSRange(location: visible.lowerBound, length: 0)).location, length: 0)
+        } else if caret >= visible.upperBound {
+            textView.selectedRange = NSRange(location: ns.lineRange(for: NSRange(location: visible.upperBound - 1, length: 0)).location, length: 0)
+        }
+    }
+
+    /// `zl`, `zh`, `zL` and `zH`: the window right or left by columns or half its width, which
+    /// moves nothing while lines wrap.
+    private func scrollColumns(_ count: Int, halfWidths: Bool) {
+        let step = halfWidths ? textView.bounds.width / 2 : (" " as NSString).size(withAttributes: [.font: theme.font]).width
+        let maxX = max(0, textView.contentSize.width - textView.bounds.width)
+        let x = textView.contentOffset.x + CGFloat(count) * step
+        textView.setContentOffset(CGPoint(x: min(max(0, x), maxX), y: textView.contentOffset.y), animated: false)
+    }
+
     /// `/`, `?` and `:`; with `history` (`q:`), the earlier ones to pick and edit.
     private func prompt(_ kind: String, history: Bool = false) {
         let earlier = Array((Self.promptHistory[kind] ?? []).reversed())
@@ -262,6 +293,10 @@ extension MobileEditor {
         switch trimmed {
         case "w", "write", "wq", "x": onAppCommand?("app.save")
         case "noh", "nohlsearch": break
+        case "s", "&", "&&", "%&&":
+            // The last substitution again; `&&` keeps its flags.
+            guard let last = Self.lastSubstitute else { return }
+            substitute(whole: trimmed.hasPrefix("%"), pattern: last.pattern, replacement: last.replacement, flags: trimmed.hasSuffix("&&") ? last.flags : "")
         default:
             if let line = Int(trimmed) {
                 let ns = document.text as NSString
@@ -275,6 +310,7 @@ extension MobileEditor {
                 return
             }
             if let m = trimmed.firstMatch(of: /^(%?)s\/((?:[^\/\\]|\\.)*)\/((?:[^\/\\]|\\.)*)\/?([gi]*)$/) {
+                Self.lastSubstitute = (String(m.2), String(m.3), String(m.4))
                 substitute(whole: !m.1.isEmpty, pattern: String(m.2), replacement: String(m.3), flags: String(m.4))
                 return
             }

@@ -1,7 +1,8 @@
 import Foundation
 
-// Scrolling the caret's line (`zz`, `zt`, `zb`), numbers (`C-a`, and Doom's evil-numbers keys
-// `g=` and `g-`), replace state (`R`) and the command-line window (`q:`).
+// Scrolling (`zz`, `zt`, `zb`, C-e, C-y, `zh`, `zl`), `gi`, `gJ`, the change list (`g;`, `g,`),
+// numbers (`C-a`, and Doom's evil-numbers keys `g=` and `g-`), replace state (`R`) and the
+// command-line window (`q:`).
 
 extension Vim {
     /// Where `zz`, `zt` and `zb` put the caret's line in the window.
@@ -18,13 +19,21 @@ extension Vim {
         if first == KeyChord("a", .control) {
             return .done(visual ? incrementVisual(buffer, caret, by: n, incremental: false) : increment(buffer, caret, by: n, keys: keys))
         }
+        if first == KeyChord("e", .control) { return .done([.scrollLines(n)]) }
+        if first == KeyChord("y", .control) { return .done([.scrollLines(-n)]) }
         guard first.modifiers.isEmpty else { return nil }
         switch first.key {
+        case "&" where !visual:
+            return .done([.ex("&")])
         case "z" where !visual:
             guard let second else { return .incomplete }
             guard second.modifiers.isEmpty else { return nil }
             let place: ScrollLine
             switch second.key {
+            case "l": return .done([.scrollColumns(n, halfWidths: false)])
+            case "h": return .done([.scrollColumns(-n, halfWidths: false)])
+            case "L": return .done([.scrollColumns(n, halfWidths: true)])
+            case "H": return .done([.scrollColumns(-n, halfWidths: true)])
             case "z", ".": place = .center
             case "t", "RET": place = .top
             case "b", "-": place = .bottom
@@ -48,6 +57,23 @@ extension Vim {
             case ("=", true): return .done(incrementVisual(buffer, caret, by: n, incremental: true))
             case ("-", true): return .done(incrementVisual(buffer, caret, by: -n, incremental: true))
             case ("+", true): return .done(incrementVisual(buffer, caret, by: n, incremental: false))
+            case ("J", false): return .done(join(buffer, at: caret, lines: max(2, n), keys: keys, spaces: false))
+            case ("J", true):
+                let range = visualRange(buffer, caret)
+                lastVisual = (anchor, caret, mode)
+                mode = .normal
+                return .done(join(buffer, at: range.range.lowerBound, lines: max(2, buffer.lineCount(range.range)), keys: keys, spaces: false))
+            case ("i", false):
+                // `evil-insert-resume`: insert state at the `^` mark.
+                let at = min(currentMarks["^"] ?? caret, buffer.length)
+                enterInsert(at: at, keys: keys)
+                return .done((at == caret ? [] : [.jumped(from: caret)]) + [.move(caret: at)])
+            case (";", false), (",", false):
+                steppingChanges = true
+                guard let target = stepChange(older: second.key == ";") else { return .done([]) }
+                let to = buffer.clampNormal(min(target, buffer.length))
+                return .done((to == caret ? [] : [.jumped(from: caret)]) + [.move(caret: to)])
+            case ("&", false): return .done([.ex("%&&")])
             default: return nil
             }
         case "R" where !visual:
@@ -63,6 +89,63 @@ extension Vim {
             return .done([.commandWindow(second.key)])
         default:
             return nil
+        }
+    }
+
+    // MARK: - The change list
+
+    /// An edit as goto-chg reads it from the undo list: text between `lower` and `upper` went,
+    /// or `delta` characters came in at `lower`; `position` is where `g;` goes for it.
+    struct Change {
+        var lower: Int
+        var upper: Int
+        var delta: Int
+        var position: Int
+    }
+
+    /// goto-chg's `glc-default-span`: changes this close to a later one are passed over.
+    static let changeSpan = 8
+
+    /// An edit the editor made to the buffer, by any means, for `g;` to find.
+    public mutating func changed(_ edit: TextEdit) {
+        changeDepth = 0
+        let at = edit.range.lowerBound
+        if !edit.range.isEmpty { changeLog.append(Change(lower: at, upper: edit.range.upperBound, delta: -edit.range.count, position: at)) }
+        let length = edit.replacement.utf16.count
+        if length > 0 {
+            // Text typed on from the last insertion is one change, as in the undo list.
+            if let last = changeLog.last, last.delta > 0, last.position == at {
+                changeLog[changeLog.count - 1] = Change(lower: last.lower, upper: last.lower, delta: last.delta + length, position: at + length)
+            } else {
+                changeLog.append(Change(lower: at, upper: at, delta: length, position: at + length))
+            }
+        }
+        if changeLog.count > 200 { changeLog.removeFirst(changeLog.count - 200) }
+    }
+
+    /// `goto-last-change` and its reverse: the next older (or newer) change's place now, or
+    /// nil when there is none. A change within `changeSpan` of a later one is skipped.
+    mutating func stepChange(older: Bool) -> Int? {
+        var depth = changeDepth
+        while true {
+            depth += older ? 1 : -1
+            guard depth >= 1, depth <= changeLog.count else { return nil }
+            let index = changeLog.count - depth
+            var position: Int? = changeLog[index].position
+            for later in changeLog[(index + 1)...] {
+                guard let p = position else { break }
+                if p <= later.lower - Self.changeSpan {
+                    position = p
+                } else if p > later.upper + Self.changeSpan {
+                    position = p + later.delta
+                } else {
+                    position = nil
+                }
+            }
+            if let position {
+                changeDepth = depth
+                return position
+            }
         }
     }
 

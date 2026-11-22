@@ -56,6 +56,11 @@ public struct Vim: Sendable {
         case visualLines(Int)
         /// `zz`, `zt`, `zb`: scroll the caret's line to the window's middle, top or bottom.
         case scroll(ScrollLine)
+        /// C-e and C-y: scroll the window down (or, negative, up) by lines.
+        case scrollLines(Int)
+        /// `zl`, `zh`: scroll the window right (or, negative, left) by columns; `zL` and `zH`
+        /// with `halfWidths`, by half the window's width.
+        case scrollColumns(Int, halfWidths: Bool)
         /// `q:`, `q/`, `q?`: the command-line window, the earlier commands or searches to pick
         /// from and edit.
         case commandWindow(String)
@@ -73,9 +78,16 @@ public struct Vim: Sendable {
         public var visible: Range<Int>?
         /// An Org buffer, where evil-org's keys apply.
         public var org: Bool
+        /// The file's path, for the `%` register.
+        public var fileName: String?
+        /// The last ex command, for the `:` register.
+        public var lastEx: String?
 
-        public init(text: String, caret: Int, clipboard: String? = nil, halfPage: Int = 15, marks: [Character: Int] = [:], visible: Range<Int>? = nil, org: Bool = false) {
+        public init(text: String, caret: Int, clipboard: String? = nil, halfPage: Int = 15, marks: [Character: Int] = [:], visible: Range<Int>? = nil, org: Bool = false,
+                    fileName: String? = nil, lastEx: String? = nil) {
             self.org = org
+            self.fileName = fileName
+            self.lastEx = lastEx
             self.text = text
             self.caret = caret
             self.clipboard = clipboard
@@ -131,6 +143,13 @@ public struct Vim: Sendable {
     var replaceStack: [(offset: Int, original: String?, length: Int)] = []
     var replaceTyped = ""
     var replaceCount = 1
+    /// What the last insert state typed, for the `.` register.
+    var lastInsertion: String?
+    /// The buffer's edits, oldest first, for `g;` and `g,`.
+    var changeLog: [Change] = []
+    /// How far back `g;` has gone; 0 after any other command.
+    var changeDepth = 0
+    var steppingChanges = false
 
     public init() {}
 
@@ -164,6 +183,8 @@ public struct Vim: Sendable {
                 return []
             case .done(let actions):
                 pending = []
+                if !steppingChanges { changeDepth = 0 }
+                steppingChanges = false
                 return actions
             }
         }
@@ -189,11 +210,14 @@ public struct Vim: Sendable {
             }
             let caret = context.caret
             let lineStart = buffer.lineStart(caret)
+            if !insertedText.isEmpty { lastInsertion = insertedText }
+            // The `^` mark, where `gi` resumes.
+            marks["^"] = caret
             if let block = blockInsert {
                 blockInsert = nil
-                if !insertedText.isEmpty, !insertedText.contains("\n") { return replicateBlockInsert(block, buffer, caret: caret) }
+                if !insertedText.isEmpty, !insertedText.contains("\n") { return [.setMark("^", caret)] + replicateBlockInsert(block, buffer, caret: caret) }
             }
-            return [.move(caret: caret > lineStart ? caret - 1 : caret)]
+            return [.setMark("^", caret), .move(caret: caret > lineStart ? caret - 1 : caret)]
         }
         if key == KeyChord("w", .control) {
             let start = buffer.wordBackward(context.caret, bigWord: false, stopAtLine: true)

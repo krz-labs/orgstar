@@ -126,6 +126,10 @@ struct KeymapTests {
         #expect(doom.keyLabels(for: "app.buffer.kill", modes: ["normal"], limit: 3) == ["C-x k", "SPC b d", "SPC b k"])
         #expect(doom.keyLabels(for: "app.buffer.next", modes: ["normal"]) == ["] b", "C-x <right>"])
         #expect(emacs.keyLabels(for: "app.buffer.switch") == ["C-x C-b", "C-x b"])
+        for (keys, command) in [("z C", "org.fold.close"), ("z O", "org.fold.open-subtree"), ("z R", "org.fold.open-all"), ("z M", "org.fold.close-all"),
+                                ("z r", "org.fold.more"), ("z m", "org.fold.less")] {
+            #expect(doom.candidates(for: KeySequence.parse(keys)!, mode: "normal").first?.command == command)
+        }
         #expect(!emacs.keyLabels(for: "app.quick-open").contains("C-x b"))
     }
 

@@ -75,6 +75,10 @@ final class MobileEditor: NSObject, DocumentBuffer {
     static var macros: [Character: [KeyChord]] = [:]
     /// What `:`, `/` and `?` read, oldest first, for `q:`.
     static var promptHistory: [String: [String]] = [:]
+    /// The last `:s`, for `&` and `g&`.
+    static var lastSubstitute: (pattern: String, replacement: String, flags: String)?
+    /// The file's path, for the `%` register.
+    var fileName: String?
     var onChange: (() -> Void)?
     var onMessage: ((String) -> Void)?
     var onPrompt: ((Prompt, @escaping (String?) -> Void) -> Void)?
@@ -376,6 +380,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
         case "org.cycle":
             if !cycleAtCaret() { onMessage?("Not on a heading, drawer or block") }
         case "org.cycle-global": cycleGlobal()
+        case _ where id.hasPrefix("org.fold."): foldCommand(id)
         case "org.link.open": openLinkAtCaret()
         case "org.toggle-inline-images": toggleImages()
         case "org.latex-preview": toggleLatex()
@@ -411,6 +416,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
         switch id {
         case "org.cycle":
             return Presentation.heading(containing: context.caret, in: context.tree) != nil || Wrappers.toggleable(at: context.caret, in: context.tree) != nil
+        case _ where id.hasPrefix("org.fold."): return true
         case "org.cycle-global", "edit.undo", "edit.redo", "org.toggle-inline-images", "org.latex-preview", "editor.toggle-truncate-lines",
              "editor.toggle-auto-fill", "edit.isearch-forward", "edit.isearch-backward",
              "edit.isearch-forward-regexp", "edit.isearch-backward-regexp": return true
@@ -565,6 +571,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
             load(textView.textStorage.string)
             return
         }
+        vim.changed(edit)
         for table in shrunk.map(through: edit, in: textView.textStorage.string, command: commandEditing) { scheduleRestyle(table) }
         fold = FoldState(
             folds: Self.map(fold.folds, old, delta), bodyFolds: Self.map(fold.bodyFolds, old, delta),

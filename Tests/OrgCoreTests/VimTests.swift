@@ -13,10 +13,24 @@ struct VimDriver {
     var halfPage = 15
     var visible: Range<Int>?
     var org = false
+    var marks: [Character: Int] = [:]
+    var fileName: String?
+    var lastEx: String?
+    var actions: [Vim.Action] = []
 
     init(_ text: String, caret: Int) {
         self.text = text
         self.caret = caret
+    }
+
+    /// An edit as the editor makes it: the change list hears of it and the marks move.
+    mutating func edit(_ edit: TextEdit) {
+        text = edit.apply(to: text)
+        vim.changed(edit)
+        let delta = edit.replacement.utf16.count - edit.range.count
+        for (name, mark) in marks where mark >= edit.range.lowerBound {
+            marks[name] = mark >= edit.range.upperBound ? mark + delta : edit.range.lowerBound
+        }
     }
 
     mutating func type(_ keys: [KeyChord]) {
@@ -24,27 +38,28 @@ struct VimDriver {
             if vim.mode == .insert, vim.passesThrough(key) {
                 if key == KeyChord("DEL") {
                     if caret > 0 {
-                        let ns = text as NSString
-                        text = ns.replacingCharacters(in: NSRange(location: caret - 1, length: 1), with: "")
+                        edit(TextEdit(range: (caret - 1)..<caret, replacement: ""))
                         caret -= 1
                         vim.deletedBackward()
                     }
                 } else {
                     let s = key.key == "SPC" ? " " : key.key == "RET" ? "\n" : key.key == "TAB" ? "\t" : key.key
                     guard key.modifiers.isEmpty, s.count == 1 else { continue }
-                    let ns = text as NSString
-                    text = ns.replacingCharacters(in: NSRange(location: caret, length: 0), with: s)
+                    edit(TextEdit(range: caret..<caret, replacement: s))
                     caret += s.utf16.count
                     vim.inserted(s)
                 }
                 continue
             }
-            let actions = vim.feed(key, Vim.Context(text: text, caret: caret, clipboard: clipboard, halfPage: halfPage, visible: visible, org: org))
+            let actions = vim.feed(key, Vim.Context(text: text, caret: caret, clipboard: clipboard, halfPage: halfPage, marks: marks, visible: visible, org: org,
+                                                    fileName: fileName, lastEx: lastEx))
+            self.actions += actions
             for action in actions {
                 switch action {
                 case .edit(let edits, let to):
-                    for edit in edits.sorted(by: { $0.range.lowerBound > $1.range.lowerBound }) { text = edit.apply(to: text) }
+                    for edit in edits.sorted(by: { $0.range.lowerBound > $1.range.lowerBound }) { self.edit(edit) }
                     caret = to
+                case .setMark(let name, let offset): marks[name] = offset
                 case .move(let to): caret = to
                 case .setClipboard(let s): clipboard = s
                 case .command(let id): commands.append(id)

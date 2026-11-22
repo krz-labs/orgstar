@@ -452,6 +452,7 @@ struct EditorScreen: View {
             showMarkup: model.showMarkup, baseDirectory: URL(fileURLWithPath: path).deletingLastPathComponent()
         )
         let path = path
+        editor.fileName = path
         editor.attachmentPath = { DocumentSession.attachmentPath($0, at: $1, tree: $2, path: path) }
         return editor
     }

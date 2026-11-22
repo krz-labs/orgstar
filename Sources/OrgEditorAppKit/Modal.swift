@@ -106,7 +106,8 @@ extension OrgEditor {
             if jumpIndex > 0, jumpIndex <= jumpList.count { marks["'"] = jumpList[jumpIndex - 1] }
             vim.registers = Self.vimRegisters
             vim.clipboardRecord = Self.vimClipboardRecord
-            let actions = vim.feed(key, Vim.Context(text: document.text, caret: caret, clipboard: clipboard, halfPage: halfPage, marks: marks, visible: visibleText, org: isOrg))
+            let actions = vim.feed(key, Vim.Context(text: document.text, caret: caret, clipboard: clipboard, halfPage: halfPage, marks: marks, visible: visibleText, org: isOrg,
+                                                    fileName: fileName, lastEx: Self.promptHistory[":"]?.last))
             Self.vimRegisters = vim.registers
             Self.vimClipboardRecord = vim.clipboardRecord
             apply(actions)
@@ -289,6 +290,10 @@ extension OrgEditor {
                 textView.setSelectedRanges(ranges.map { NSValue(range: NSRange($0)) }, affinity: .downstream, stillSelecting: false)
             case .scroll(let place):
                 scrollCaretLine(place)
+            case .scrollLines(let count):
+                scrollLines(count)
+            case .scrollColumns(let count, let halfWidths):
+                scrollColumns(count, halfWidths: halfWidths)
             case .commandWindow(let kind):
                 prompt(kind, history: true)
             }
@@ -325,6 +330,34 @@ extension OrgEditor {
         }
         let maxY = max(0, textView.frame.height - height)
         scroll.contentView.scroll(to: NSPoint(x: scroll.contentView.bounds.origin.x, y: min(max(0, y), maxY)))
+        scroll.reflectScrolledClipView(scroll.contentView)
+    }
+
+    /// C-e and C-y: the window down or up by lines; the cursor stays in it, as in Emacs.
+    private func scrollLines(_ count: Int) {
+        guard let scroll = textView.enclosingScrollView, let font = textView.font else { return }
+        let lineHeight = max(1, font.ascender - font.descender + font.leading)
+        let bounds = scroll.contentView.bounds
+        let maxY = max(0, textView.frame.height - bounds.height)
+        scroll.contentView.scroll(to: NSPoint(x: bounds.origin.x, y: min(max(0, bounds.origin.y + CGFloat(count) * lineHeight), maxY)))
+        scroll.reflectScrolledClipView(scroll.contentView)
+        guard vim.mode == .normal, let visible = visibleText, !visible.isEmpty else { return }
+        let caret = textView.selectedRange().location
+        if caret < visible.lowerBound {
+            setCaret(visible.lowerBound)
+        } else if caret >= visible.upperBound {
+            setCaret((document.text as NSString).lineRange(for: NSRange(location: visible.upperBound - 1, length: 0)).location)
+        }
+    }
+
+    /// `zl`, `zh`, `zL` and `zH`: the window right or left by columns or half its width, which
+    /// moves nothing while lines wrap.
+    private func scrollColumns(_ count: Int, halfWidths: Bool) {
+        guard let scroll = textView.enclosingScrollView, let font = textView.font else { return }
+        let bounds = scroll.contentView.bounds
+        let step = halfWidths ? bounds.width / 2 : (" " as NSString).size(withAttributes: [.font: font]).width
+        let maxX = max(0, textView.frame.width - bounds.width)
+        scroll.contentView.scroll(to: NSPoint(x: min(max(0, bounds.origin.x + CGFloat(count) * step), maxX), y: bounds.origin.y))
         scroll.reflectScrolledClipView(scroll.contentView)
     }
 
@@ -372,6 +405,10 @@ extension OrgEditor {
             onAppCommand?("app.save")
             textView.window?.performClose(nil)
         case "noh", "nohlsearch": break
+        case "s", "&", "&&", "%&&":
+            // The last substitution again; `&&` keeps its flags.
+            guard let last = Self.lastSubstitute else { return }
+            substitute(whole: trimmed.hasPrefix("%"), pattern: last.pattern, replacement: last.replacement, flags: trimmed.hasSuffix("&&") ? last.flags : "")
         default:
             if let line = Int(trimmed) {
                 let ns = document.text as NSString
@@ -386,6 +423,7 @@ extension OrgEditor {
                 return
             }
             if let m = trimmed.firstMatch(of: /^(%?)s\/((?:[^\/\\]|\\.)*)\/((?:[^\/\\]|\\.)*)\/?([gi]*)$/) {
+                Self.lastSubstitute = (String(m.2), String(m.3), String(m.4))
                 substitute(whole: !m.1.isEmpty, pattern: String(m.2), replacement: String(m.3), flags: String(m.4))
                 return
             }

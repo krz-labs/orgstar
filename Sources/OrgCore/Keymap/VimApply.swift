@@ -32,11 +32,22 @@ extension Vim {
             return []
         }
         if yank { registers["0"] = (text, linewise) }
+        if !yank, register == nil, !text.contains("\n") { registers["-"] = (text, linewise) }
+        // Evil reads `1` to `9` from the kill ring: `1` is the latest kill.
+        for digit in (2...9).reversed() { registers[Character("\(digit)")] = registers[Character("\(digit - 1)")] }
+        registers["1"] = (text, linewise)
         clipboardRecord = (text, linewise)
         return [.setClipboard(text)]
     }
 
     func paste(_ register: Character?, _ context: Context) -> (String, Bool)? {
+        switch register {
+        case ".": return lastInsertion.map { ($0, false) }
+        case ":": return context.lastEx.map { ($0, false) }
+        case "%": return context.fileName.map { ($0, false) }
+        case "/": return lastSearch.map { ($0.pattern, false) }
+        default: break
+        }
         if let register, register != "\"", register != "+", register != "*" {
             return registers[Character(register.lowercased())]
         }
@@ -170,7 +181,8 @@ extension Vim {
         }
     }
 
-    mutating func join(_ buffer: Buffer, at caret: Int, lines: Int, keys: [KeyChord]) -> [Action] {
+    /// `J`, or without `spaces` `gJ`, which removes the line breaks and nothing else.
+    mutating func join(_ buffer: Buffer, at caret: Int, lines: Int, keys: [KeyChord], spaces: Bool = true) -> [Action] {
         var edits: [TextEdit] = []
         var line = buffer.lineStart(caret)
         var position = caret
@@ -178,11 +190,11 @@ extension Vim {
             let end = buffer.lineEnd(line)
             guard end < buffer.length else { break }
             let nextStart = end + 1
-            let nextText = buffer.firstNonBlankOrEnd(nextStart)
+            let nextText = spaces ? buffer.firstNonBlankOrEnd(nextStart) : nextStart
             let joinsEmpty = buffer.lineEnd(nextStart) == nextText
-            let separator = joinsEmpty || buffer.char(nextText) == 41 ? "" : (end > line && buffer.char(end - 1) == 32 ? "" : " ")
+            let separator = !spaces || joinsEmpty || buffer.char(nextText) == 41 ? "" : (end > line && buffer.char(end - 1) == 32 ? "" : " ")
             var from = end
-            while from > line, let c = buffer.char(from - 1), c == 32 || c == 9 { from -= 1 }
+            while spaces, from > line, let c = buffer.char(from - 1), c == 32 || c == 9 { from -= 1 }
             if !separator.isEmpty || from == end { from = end }
             edits.append(TextEdit(range: from..<nextText, replacement: separator))
             position = from
@@ -192,7 +204,7 @@ extension Vim {
         lastChange = (keys, nil)
         // Positions in edits refer to the original text; apply back to front.
         let shift = edits.dropLast().reduce(0) { $0 + $1.replacement.utf16.count - $1.range.count }
-        return [.edit(edits, caret: position + shift)]
+        return [.edit(edits, caret: spaces ? position + shift : buffer.applying(edits).clampNormal(position + shift))]
     }
 
     mutating func repeatChange(_ count: Int, _ context: Context) -> [Action] {

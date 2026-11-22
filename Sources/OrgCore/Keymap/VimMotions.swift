@@ -142,6 +142,18 @@ extension Vim {
             var p = c
             for _ in 0..<n { p = buffer.paragraph(p, forward: key.key == "}") }
             return .moved(p, .exclusive)
+        case (")", []), ("(", []):
+            goalColumn = nil
+            var p = c
+            for _ in 0..<n { p = buffer.sentence(p, forward: key.key == ")", org: contextOrg) }
+            guard p != c else { return .invalid }
+            // Evil's exclusive motion that ends at a line's start stops at the end of the line
+            // before, and from the line's indentation takes whole lines.
+            if operatorPending, p > c, p == buffer.lineStart(p), p > 0, buffer.char(p - 1) == 10 {
+                if c <= buffer.firstNonBlankOrEnd(buffer.lineStart(c)) { return .moved(p - 1, .linewise) }
+                return .moved(p - 1, .exclusive)
+            }
+            return .moved(p, .exclusive)
         case ("n", []), ("N", []):
             guard let search = lastSearch else { return .invalid }
             let forward = key.key == "n" ? search.forward : !search.forward
@@ -258,6 +270,12 @@ extension Vim {
             return buffer.bracketObject(c, open: 60, close: 62, inner: inner).map { ($0, false) }
         case "p":
             return buffer.paragraphObject(c, inner: inner).map { ($0, true) }
+        case "s":
+            return buffer.sentenceObject(c, inner: inner, count: count, org: contextOrg).map { ($0, false) }
+        case "t":
+            return buffer.tagObject(c, inner: inner, count: count).map { range in
+                !inner && buffer.coversLines(range) ? (range.lowerBound..<min(buffer.length, range.upperBound + 1), true) : (range, false)
+            }
         case "e", "E", "r", "R":
             return Self.orgObject(key.key, inner: inner, buffer, c)
         default:

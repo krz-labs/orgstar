@@ -105,6 +105,44 @@ extension Presentation {
         return next
     }
 
+    /// Doom's `zO` (`outline-show-subtree`): the heading's whole subtree open.
+    public static func showSubtree(_ heading: Int, in tree: OrgTree, _ state: FoldState) -> FoldState {
+        guard let entry = outline(tree).first(where: { $0.start == heading }) else { return state }
+        var next = state
+        next.folds = next.folds.filter { $0 < entry.start || $0 >= entry.end }
+        next.bodyFolds = next.bodyFolds.filter { $0 < entry.start || $0 >= entry.end }
+        return next
+    }
+
+    /// Doom's `zR` (`outline-show-all`): every heading open; drawers and blocks stay as they are.
+    public static func showAllHeadings(_ state: FoldState) -> FoldState {
+        FoldState(wrapperFolds: state.wrapperFolds)
+    }
+
+    /// `outline-hide-sublevels`, behind Doom's `zM`, `zr` and `zm`: headings down to `levels`
+    /// show, without bodies.
+    public static func hideSublevels(_ levels: Int, in tree: OrgTree, _ state: FoldState) -> FoldState {
+        var next = foldState(showingLevels: levels, in: tree)
+        next.wrapperFolds = state.wrapperFolds
+        return next
+    }
+
+    /// Doom's `+org--get-foldlevel`: the deepest level of a visible folded heading, or 1.
+    public static func foldLevel(in tree: OrgTree, _ state: FoldState) -> Int {
+        let outline = outline(tree)
+        var level = 1
+        for entry in outline where isFolded(entry.start, state) {
+            var parent = entry.parent
+            var hidden = false
+            while let index = parent {
+                if state.folds.contains(outline[index].start) { hidden = true }
+                parent = outline[index].parent
+            }
+            if !hidden { level = max(level, entry.level) }
+        }
+        return level
+    }
+
     /// Whether the heading's body is hidden.
     private static func isFolded(_ heading: Int, _ state: FoldState) -> Bool {
         state.folds.contains(heading) || state.bodyFolds.contains(heading)

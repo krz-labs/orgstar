@@ -7615,6 +7615,41 @@
         }
       }
     },
+    "Close All Folds": {
+      "comment": "Command title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alles einklappen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerrar todos los pliegues"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fermer tous les plis"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "すべて折りたたむ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recolher Todas as Dobras"
+          }
+        }
+      }
+    },
     "Close Buffer": {
       "comment": "Command title",
       "localizations": {
@@ -14920,6 +14955,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ocultar Pastas"
+          }
+        }
+      }
+    },
+    "Hide Next Fold Level": {
+      "comment": "Command title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächste Gliederungsebene ausblenden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ocultar el siguiente nivel de pliegue"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masquer le niveau de pli suivant"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "次の階層を隠す"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ocultar Próximo Nível de Dobra"
           }
         }
       }
@@ -22259,6 +22329,41 @@
         }
       }
     },
+    "Open All Folds": {
+      "comment": "Command title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alles aufklappen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir todos los pliegues"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir tous les plis"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "すべて展開"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expandir Todas as Dobras"
+          }
+        }
+      }
+    },
     "Open Attachment…": {
       "comment": "Command title",
       "localizations": {
@@ -22360,6 +22465,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Abrir Link"
+          }
+        }
+      }
+    },
+    "Open Subtree Folds": {
+      "comment": "Command title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Teilbaum aufklappen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir pliegues del subárbol"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir les plis du sous-arbre"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サブツリーを展開"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expandir Dobras da Subárvore"
           }
         }
       }
@@ -28900,6 +29040,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mostrar Marcação"
+          }
+        }
+      }
+    },
+    "Show Next Fold Level": {
+      "comment": "Command title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächste Gliederungsebene einblenden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar el siguiente nivel de pliegue"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher le niveau de pli suivant"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "次の階層を表示"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar Próximo Nível de Dobra"
           }
         }
       }

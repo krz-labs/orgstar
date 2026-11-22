@@ -574,6 +574,30 @@ extension KeymapPreset {
         command = "org.cycle-global"
         mode = "normal"
         [[bind]]
+        keys = "z C"
+        command = "org.fold.close"
+        mode = "normal"
+        [[bind]]
+        keys = "z O"
+        command = "org.fold.open-subtree"
+        mode = "normal"
+        [[bind]]
+        keys = "z R"
+        command = "org.fold.open-all"
+        mode = "normal"
+        [[bind]]
+        keys = "z M"
+        command = "org.fold.close-all"
+        mode = "normal"
+        [[bind]]
+        keys = "z r"
+        command = "org.fold.more"
+        mode = "normal"
+        [[bind]]
+        keys = "z m"
+        command = "org.fold.less"
+        mode = "normal"
+        [[bind]]
         keys = "g h"
         command = "org.heading.up"
         mode = "normal"
