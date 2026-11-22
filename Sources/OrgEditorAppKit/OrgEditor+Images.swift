@@ -31,6 +31,20 @@ extension OrgEditor {
         redrawViews()
     }
 
+    /// The widest an image shows: the text's width, less a margin.
+    private var imageMaxWidth: CGFloat { max(80, (textView.textContainer?.size.width ?? 600) - 40) }
+
+    /// Sizes images again once the view's width has changed, after the layout pass that changed it.
+    func fitImages() {
+        guard showsImages, !fittingImages else { return }
+        fittingImages = true
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.fittingImages = false
+            if self.showsImages, self.imageWidth != self.imageMaxWidth { self.refreshImages() }
+        }
+    }
+
     /// `attachment:` links' files, for inline images.
     private var attachment: ((String, Int) -> String?)? {
         guard let attachmentPath else { return nil }
@@ -68,7 +82,8 @@ extension OrgEditor {
     func applyImages(_ range: Range<Int>, in storage: NSTextStorage, revealed: NSRange) {
         guard showsImages, isOrg else { return }
         let text = storage.string as NSString
-        let maxWidth = max(80, (textView.textContainer?.size.width ?? 600) - 40)
+        let maxWidth = imageMaxWidth
+        imageWidth = maxWidth
         let links = InlineImages.links(document.tree, in: range, includeLinked: imagesIncludeLinked, remote: remote, attachment: attachment)
         for placement in Presentation.imagePlacements(links, in: text) {
             guard let picture = loadImage(placement.link.image.path) else { continue }

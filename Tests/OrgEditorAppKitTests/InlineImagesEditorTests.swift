@@ -9,15 +9,17 @@ struct InlineImagesEditorTests {
     static let text = "* Images\n\(filler)[[file:pic.png]] \(filler)\n[[file:pic.png]]\n| a | [[file:pic.png]] | [[./pic.png]] |\n"
         + "Described [[file:pic.png][a figure]] here\nMissing [[file:missing.png]] here\n"
 
-    /// A folder holding `pic.png`, 100 by 60 points.
+    /// A folder holding `pic.png`, 100 by 60 points, and `wide.png`, 2000 by 100.
     static func folder() throws -> URL {
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent("orgstar-images-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-        let bitmap = try #require(NSBitmapImageRep(
-            bitmapDataPlanes: nil, pixelsWide: 100, pixelsHigh: 60, bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
-            colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0
-        ))
-        try #require(bitmap.representation(using: .png, properties: [:])).write(to: folder.appendingPathComponent("pic.png"))
+        for (name, width, height) in [("pic.png", 100, 60), ("wide.png", 2000, 100)] {
+            let bitmap = try #require(NSBitmapImageRep(
+                bitmapDataPlanes: nil, pixelsWide: width, pixelsHigh: height, bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
+                colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0
+            ))
+            try #require(bitmap.representation(using: .png, properties: [:])).write(to: folder.appendingPathComponent(name))
+        }
         return folder
     }
 
@@ -114,6 +116,24 @@ struct InlineImagesEditorTests {
         let frames = ImageFragment.frames(of: fragment).map(\.frame)
         #expect(frames.count == 2 && frames[1].minX >= frames[0].maxX)
         #expect(fragment.textLineFragments[0].typographicBounds.height >= 59)
+    }
+
+    /// Images wider than the text fit it, and fit it again when the view's width changes.
+    @Test func wideImagesFollowTheViewsWidth() async throws {
+        let folder = try Self.folder()
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let h = Harness("* Wide\n[[file:wide.png]]\nIn text [[file:wide.png]] here\n")
+        h.editor.baseDirectory = folder
+        h.editor.run("org.toggle-inline-images")
+        func widths() -> [CGFloat] { [7, 33].compactMap { Self.box(h, at: $0)?.size.width } }
+        let container = try #require(h.textView.textContainer).size.width
+        #expect(container > 300 && widths() == [container - 40, container - 40])
+
+        h.window.setContentSize(NSSize(width: 420, height: 800))
+        h.window.contentView?.layoutSubtreeIfNeeded()
+        try await Task.sleep(for: .milliseconds(100))
+        let narrower = try #require(h.textView.textContainer).size.width
+        #expect(narrower < container && widths() == [narrower - 40, narrower - 40])
     }
 
     @Test func describedLinksNeedTheirCommandAndMissingFilesStayLinks() throws {

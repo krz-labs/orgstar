@@ -59,10 +59,19 @@ final class OrgTextView: NSTextView {
         didSet { if textWidth != oldValue { updateGutter() } }
     }
 
+    /// The view has another width; during a live resize, called once at its end.
+    var onWidthChange: (() -> Void)?
+
     override func setFrameSize(_ newSize: NSSize) {
         let widthChanged = newSize.width != frame.width
         super.setFrameSize(newSize)
         if widthChanged, textWidth > 0 { updateGutter() }
+        if widthChanged, !inLiveResize { onWidthChange?() }
+    }
+
+    override func viewDidEndLiveResize() {
+        super.viewDidEndLiveResize()
+        onWidthChange?()
     }
     var lineNumbersType = LineNumbersType.absolute {
         didSet { if lineNumbersType != oldValue { needsDisplay = true } }

@@ -184,6 +184,7 @@ public final class OrgEditor: NSObject {
             onImage(data, ext)
             return true
         }
+        view.onWidthChange = { [weak self] in self?.fitImages() }
         view.onMouseDown = { [weak self, unowned view] in
             self?.active = view
             self?.markActive = false
@@ -708,6 +709,9 @@ public final class OrgEditor: NSObject {
     public internal(set) var showsImages = false
     /// Links with a description show their image too.
     var imagesIncludeLinked = false
+    /// The width images were last sized for, and whether sizing them again is waiting.
+    var imageWidth: CGFloat = 0
+    var fittingImages = false
     /// `org-latex-preview`: LaTeX fragments show as typeset math.
     public internal(set) var showsLatex = false
     /// An `attachment:` link's file, from its name, offset and the tree: the app's
