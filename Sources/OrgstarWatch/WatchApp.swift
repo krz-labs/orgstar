@@ -179,13 +179,37 @@ struct EntryRow: View {
             }
             VStack(alignment: .leading, spacing: 1) {
                 if !entry.gutter.isEmpty {
-                    Text(entry.gutter).font(.caption2).foregroundStyle(entry.status == "overdue" ? .red : .secondary)
+                    Text(entry.gutter).font(.caption2).foregroundStyle(statusColor)
                 }
                 Text(entry.title).strikethrough(entry.isDone).lineLimit(3)
-                if let todo = entry.todo { Text(todo).font(.caption2.weight(.semibold)).foregroundStyle(entry.isDone ? .green : .orange) }
+                if let todo = entry.todo { Text(todo).font(.caption2.weight(.semibold)).foregroundStyle(Self.color(keyword: todo, isDone: entry.isDone)) }
             }
         }
     }
+
+    /// The agenda's status colors: `agenda-overdue`, `agenda-due-soon`, `done`.
+    private var statusColor: Color {
+        switch entry.status {
+        case "overdue": .red
+        case "due-soon": .orange
+        case "done": .green
+        default: .secondary
+        }
+    }
+
+    /// The keyword's class color, as the default theme draws it: `todo`, `todo-next`,
+    /// `todo-waiting`, `done`, `todo-cancelled`. The words are `ThemeSpec.TodoClass`'s.
+    static func color(keyword: String, isDone: Bool) -> Color {
+        let word = keyword.uppercased()
+        if isDone { return cancelledWords.contains(word) ? .gray : .green }
+        if nextWords.contains(word) { return .blue }
+        if waitingWords.contains(word) { return .yellow }
+        return .red
+    }
+
+    static let nextWords: Set<String> = ["NEXT", "STRT", "STARTED", "START", "DOING", "ACTIVE", "INPROGRESS", "IN-PROGRESS"]
+    static let waitingWords: Set<String> = ["WAIT", "WAITING", "HOLD", "ONHOLD", "BLOCKED", "DEFERRED", "SOMEDAY", "MAYBE"]
+    static let cancelledWords: Set<String> = ["KILL", "KILLED", "CANCELLED", "CANCELED", "CANCEL", "SKIPPED", "SKIP", "ABORTED", "NO", "WONTFIX"]
 }
 #else
 /// The watch app builds for watchOS only; elsewhere the product does nothing.
