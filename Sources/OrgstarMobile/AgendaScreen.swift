@@ -17,6 +17,7 @@ struct AgendaScreen: View, Equatable {
     @Environment(ClockModel.self) private var clock
     @Environment(MobileModel.self) private var model
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.dynamicTypeSize) private var typeSize
     @Environment(\.openURL) private var openURL
     @State private var tick = 0
     /// The time the now line shows, kept to the minute while the agenda is open.
@@ -653,12 +654,18 @@ struct AgendaScreen: View, Equatable {
             if case .agenda = agenda.mode {
                 HStack(spacing: 2) {
                     barButton("Earlier", "chevron.left") { step(forward: false) }
-                    Button("Today") { goToday() }
-                        .font(.subheadline.weight(.semibold))
-                        .padding(.horizontal, 8)
-                        .frame(minHeight: 44)
-                        .contentShape(Rectangle())
+                    // At accessibility sizes Today goes into the span menu, so the bar fits.
+                    if !typeSize.isAccessibilitySize {
+                        Button("Today") { goToday() }
+                            .font(.subheadline.weight(.semibold))
+                            .padding(.horizontal, 8)
+                            .frame(minHeight: 44)
+                            .contentShape(Rectangle())
+                    }
                     Menu {
+                        if typeSize.isAccessibilitySize {
+                            Button("Today") { goToday() }
+                        }
                         Picker("Span", selection: Binding { range } set: { show($0, around: $0 == nil || todayShown ? agenda.today : firstDay) }) {
                             ForEach(SpanRange.allCases) { Text($0.title).tag(Optional($0)) }
                             Text("\(agenda.span) Days").tag(SpanRange?.none)
@@ -686,7 +693,7 @@ struct AgendaScreen: View, Equatable {
         Button(String(localized: title), systemImage: image, action: action)
             .labelStyle(.iconOnly)
             .font(.body.weight(.medium))
-            .frame(width: 44, height: 44)
+            .frame(minWidth: 44, minHeight: 44)
             .contentShape(Rectangle())
     }
 
@@ -949,50 +956,69 @@ struct AgendaRowView: View {
     let day: Int
     let theme: ThemeSpec
     let dark: Bool
+    @Environment(\.dynamicTypeSize) private var typeSize
+    @ScaledMetric(relativeTo: .subheadline) private var gutterWidth: CGFloat = 82
+    @ScaledMetric(relativeTo: .caption2) private var badgeSize: CGFloat = 18
+
+    /// TODO and match lists have no times or statuses.
+    private var hasGutter: Bool { !row.gutter.isEmpty || row.icon != nil }
 
     var body: some View {
-        HStack(alignment: .top, spacing: 10) {
-            // TODO and match lists have no times or statuses.
-            if !row.gutter.isEmpty || row.icon != nil { gutter.frame(width: 82, alignment: .leading) }
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(alignment: .top, spacing: 5) {
-                    // Wraps instead of truncating the tags.
-                    FlowLayout(spacing: 5, lineSpacing: 3) {
-                        if !row.category.isEmpty {
-                            HStack(spacing: 5) {
-                                Circle().fill(categoryColor).frame(width: 7, height: 7)
-                                Text(row.category).lineLimit(1)
-                            }
-                        }
-                        if let detail = row.prefixDetail { Text(detail).lineLimit(1).truncationMode(.middle) }
-                        ForEach([row.progress, row.detail].compactMap { $0 }, id: \.self) { progress in
-                            Text(progress).monospacedDigit()
-                                .padding(.horizontal, 5)
-                                .background(.quaternary.opacity(0.7), in: Capsule())
-                        }
-                        ForEach(row.tags, id: \.self) { tag in
-                            Text(tag).lineLimit(1)
-                                .padding(.horizontal, 5)
-                                .background(.quaternary.opacity(0.7), in: Capsule())
-                        }
-                    }
-                    Spacer(minLength: 4)
-                    marks
+        Group {
+            // At accessibility sizes the gutter is a line of its own above the rest.
+            if typeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 4) {
+                    if hasGutter { stackedGutter }
+                    content
                 }
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                Text(row.title.isEmpty ? " " : row.title)
-                    .font(.body)
-                    .strikethrough(row.isDone)
-                    .foregroundStyle(row.isDone ? .secondary : .primary)
-                if let habit = row.item?.habit {
-                    HabitStrip(cells: habit.graph(today: day), theme: theme, dark: dark).padding(.top, 3)
+            } else {
+                HStack(alignment: .top, spacing: 10) {
+                    if hasGutter { gutter.frame(width: gutterWidth, alignment: .leading) }
+                    content
                 }
             }
         }
         .padding(.vertical, 2)
         // Blocked entries dim, as `org-agenda-dim-blocked-tasks`.
         .opacity(row.isBlocked ? 0.5 : row.isDone ? 0.75 : 1)
+    }
+
+    private var content: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack(alignment: .top, spacing: 5) {
+                // Wraps instead of truncating the tags.
+                FlowLayout(spacing: 5, lineSpacing: 3) {
+                    if !row.category.isEmpty {
+                        HStack(spacing: 5) {
+                            Circle().fill(categoryColor).frame(width: 7, height: 7)
+                            Text(row.category).lineLimit(1)
+                        }
+                    }
+                    if let detail = row.prefixDetail { Text(detail).lineLimit(1).truncationMode(.middle) }
+                    ForEach([row.progress, row.detail].compactMap { $0 }, id: \.self) { progress in
+                        Text(progress).monospacedDigit()
+                            .padding(.horizontal, 5)
+                            .background(.quaternary.opacity(0.7), in: Capsule())
+                    }
+                    ForEach(row.tags, id: \.self) { tag in
+                        Text(tag).lineLimit(1)
+                            .padding(.horizontal, 5)
+                            .background(.quaternary.opacity(0.7), in: Capsule())
+                    }
+                }
+                Spacer(minLength: 4)
+                marks
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            Text(row.title.isEmpty ? " " : row.title)
+                .font(.body)
+                .strikethrough(row.isDone)
+                .foregroundStyle(row.isDone ? .secondary : .primary)
+            if let habit = row.item?.habit {
+                HabitStrip(cells: habit.graph(today: day), theme: theme, dark: dark).padding(.top, 3)
+            }
+        }
     }
 
     /// The TODO keyword and the priority, on the category's line.
@@ -1011,7 +1037,7 @@ struct AgendaRowView: View {
                 Text(priority)
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(color)
-                    .frame(width: 18, height: 18)
+                    .frame(width: badgeSize, height: badgeSize)
                     .background(color.opacity(0.14), in: Circle())
                     .overlay(Circle().strokeBorder(color, lineWidth: 1.2))
                     .accessibilityLabel("Priority \(priority)")
@@ -1054,6 +1080,21 @@ struct AgendaRowView: View {
                     .imageScale(row.icon == .event ? .small : .medium)
                     .foregroundStyle(iconColor)
             }
+        }
+    }
+
+    /// The gutter as one line, the icon first, for accessibility sizes.
+    private var stackedGutter: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 6) {
+            if let symbol = row.symbol {
+                Image(systemName: symbol)
+                    .font(.caption.weight(.semibold))
+                    .imageScale(row.icon == .event ? .small : .medium)
+                    .foregroundStyle(iconColor)
+            }
+            Text(row.gutter)
+                .font(.subheadline.weight(.semibold).monospacedDigit())
+                .foregroundStyle(row.start != nil && row.status == .normal ? Color.primary : statusColor)
         }
     }
 
