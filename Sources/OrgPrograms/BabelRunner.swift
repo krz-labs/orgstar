@@ -76,10 +76,10 @@ public enum BabelRunner {
             // In the shell, as Org runs it, so `:cmd "node --no-warnings"` or `~/bin/node` works.
             process.arguments = ["/bin/sh", "-c", executable + " \"$@\"", "sh"] + arguments
         case .emacs:
-            guard let emacs = EmacsRunner.executable() else { throw Failure(description: "Emacs isn't installed, so Emacs Lisp blocks can't run.") }
+            // `Programs` runs these natively when Emacs is missing.
             let script = folder.appendingPathComponent("babel.el")
             try input.write(to: script, atomically: true, encoding: .utf8)
-            process.arguments = [emacs.path, "-Q", "--batch", "-l", script.path]
+            process.arguments = [EmacsRunner.executable()?.path ?? "emacs", "-Q", "--batch", "-l", script.path]
         case .session:
             return BabelOutput(stdout: "")
         }
