@@ -49,6 +49,8 @@ public enum WhatsNew {
                   "Radar plots, more of gnuplot's set options, and SVG files without gnuplot."),
             .init("point.3.connected.trianglepath.dotted", "Diagrams",
                   "dot and mermaid blocks draw SVG and PNG pictures without Graphviz or mermaid installed."),
+            .init("circle.hexagongrid", "Node graph",
+                  "Show Node Graph draws your org-roam or Denote notes and the links between them."),
             .init("function", "Math in PDFs",
                   "PDF export typesets math without a network connection."),
         ] + mac),

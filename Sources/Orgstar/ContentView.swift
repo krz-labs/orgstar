@@ -1407,6 +1407,8 @@ struct ContentView: View {
             openWindow(id: "clock-report")
         case "app.board":
             openWindow(id: "board")
+        case "app.node.graph":
+            openWindow(id: "graph")
         case "app.capture":
             NSApp.activate()
             openWindow(id: "capture")

@@ -228,6 +228,10 @@ extension KeymapPreset {
         command = "app.node.insert"
         mode = "normal"
         [[bind]]
+        keys = "SPC n r g"
+        command = "app.node.graph"
+        mode = "normal"
+        [[bind]]
         keys = "SPC n r d t"
         command = "app.dailies.today"
         mode = "normal"

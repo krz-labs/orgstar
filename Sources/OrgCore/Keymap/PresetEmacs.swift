@@ -209,6 +209,9 @@ extension KeymapPreset {
         keys = "C-c n i"
         command = "app.node.insert"
         [[bind]]
+        keys = "C-c n g"
+        command = "app.node.graph"
+        [[bind]]
         keys = "C-c n j"
         command = "app.dailies.capture-today"
         [[bind]]

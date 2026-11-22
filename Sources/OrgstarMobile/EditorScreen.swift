@@ -89,6 +89,7 @@ struct EditorScreen: View {
         case plot(TablePlot.Plot)
         case crypt(CryptRequest)
         case backlinks
+        case graph
         /// The subtree at this offset, to export.
         case exportSubtree(Int)
 
@@ -104,6 +105,7 @@ struct EditorScreen: View {
             case .plot: "plot"
             case .crypt(let request): request.id.uuidString
             case .backlinks: "backlinks"
+            case .graph: "graph"
             case .exportSubtree: "exportSubtree"
             }
         }
@@ -160,6 +162,7 @@ struct EditorScreen: View {
                     }
                     Button("Find Node…", systemImage: "point.3.connected.trianglepath.dotted") { roam("app.node.find") }
                     Button("Insert Node Link…", systemImage: "link") { roam("app.node.insert") }
+                    Button("Node Graph", systemImage: "circle.hexagongrid") { if ProAccess.shared.allows(.roam) { sheet = .graph } }
                     Menu("Attachments", systemImage: "paperclip") {
                         Button("Attach File…", systemImage: "doc.badge.plus") { attaching = .cp }
                         Button("Attach Photo or Video…", systemImage: "photo.badge.plus") { attachingPhotos = true }
@@ -276,6 +279,10 @@ struct EditorScreen: View {
                 if let text = session.document(of: path)?.text { SubtreeExportScreen(path: path, text: text, caret: caret) }
             case .backlinks:
                 BacklinksScreen(workspace: workspace, session: session, path: path, caret: editor?.editContext().caret ?? 0) { location in
+                    if location.path == path { editor?.reveal(location.start) } else { model.openRequest = .heading(location) }
+                }
+            case .graph:
+                RoamGraphScreen(workspace: workspace, session: session, path: path, caret: editor?.editContext().caret ?? 0) { location in
                     if location.path == path { editor?.reveal(location.start) } else { model.openRequest = .heading(location) }
                 }
             }
@@ -497,6 +504,8 @@ struct EditorScreen: View {
                 crypt(id)
             } else if id.hasPrefix("app.attach.") {
                 attachActions.run(id)
+            } else if id == "app.node.graph" {
+                sheet = .graph
             } else if id.hasPrefix("app.dailies.") || id.hasPrefix("app.node.") {
                 roamActions.run(id)
             } else if id == "app.backlinks" {
@@ -1092,7 +1101,7 @@ struct CommandPalette: View {
         ("app.table-import", "Import Table from File…"), ("app.table-export", "Export Table to File…"), ("app.plot", "Plot Table"),
         ("app.crypt.encrypt-entry", "Encrypt Entry…"), ("app.crypt.open-entry", "Decrypt Entry…"), ("app.crypt.decrypt-entry", "Decrypt Entry in File…"),
         ("app.crypt.encrypt-entries", "Encrypt Tagged Entries…"), ("app.crypt.forget-passphrase", "Forget Encryption Passphrase"),
-        ("app.backlinks", "Show Backlinks"), ("app.node.find", "Find Node…"), ("app.node.insert", "Insert Node Link…"),
+        ("app.backlinks", "Show Backlinks"), ("app.node.find", "Find Node…"), ("app.node.insert", "Insert Node Link…"), ("app.node.graph", "Show Node Graph"),
         ("app.node.rename-from-front-matter", "Rename Note from Front Matter"),
         ("app.node.rename", "Rename Note…"),
         ("app.node.rename-folder-from-front-matter", "Rename Notes in Folder from Front Matter…"),

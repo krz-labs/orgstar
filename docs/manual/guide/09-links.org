@@ -327,6 +327,7 @@ the index, without org-roam's database.
 |-+-+-+-|
 | Find Node… | =C-c n f= | =SPC n r f= | Asks for a node by title and opens it (=org-roam-node-find=). |
 | Insert Node Link… | =C-c n i= | =SPC n r i= | Asks for a node and inserts =[[id:…][Title]]=; with a selection, the selection is the description (=org-roam-node-insert=). |
+| Show Node Graph | =C-c n g= | =SPC n r g= | Opens the graph of nodes and their links; see /The graph/ below. |
 | Go to Today's, Yesterday's, Tomorrow's Daily Note | =C-c n d d=, =y=, =t= | =SPC n r d t=, =y=, =m= | Opens the day's note, making it if missing (=org-roam-dailies-goto-today= and the others). |
 | Go to Daily Note for Date… | =C-c n d c= | =SPC n r d d= | Asks for a date, then opens its note. |
 | Capture to Today's Daily Note (and Yesterday's, Tomorrow's, for Date…) | =C-c n j=, =C-c n d n=, =C-c n d v= | =SPC n r d n=, =T=, =Y=, =M=, =D= | Files the entry template at the end of the day's note and opens it at =%?= (=org-roam-dailies-capture-today= and the others). |
@@ -336,6 +337,14 @@ The keys are the ones org-roam's manual suggests for Emacs and Doom's. Titles th
 repeat show their file's name. A file node's title is its =#+TITLE=, or its name.
 
 A title that no node has makes a new node, as org-roam's default capture template does: a file named =%<%Y%m%d%H%M%S>-${slug}.org= in =org-roam-directory= (the first folder unless it is set), starting with an =ID= property drawer and =#+title:= and the title. Find Node… opens it; Insert Node Link… links to it. The slug is the title in lower case, accents dropped, with everything but letters and digits as one =_=, as =org-roam-node-slugify= makes it.
+
+*The graph.* Show Node Graph, or Window ▸ Graph on the Mac and More ▸ Node Graph on iOS, draws every node as a dot and every =id:= link between two nodes as a line. It is part of orgstar+.
+
+- A link belongs to the innermost heading with an ID around it, else to its file's node; a link written where there is no node, or to an ID no node has, isn't drawn. Several links between the same two nodes are one line.
+- A dot is larger the more links its node has. The node the caret is in is orange. Titles are drawn where they have room, the most-linked nodes first; zooming in shows more.
+- Drag to move the picture, pinch or use the buttons to zoom, and click or tap a node to open it.
+- Only the Open Note's Links keeps the node the caret is in and the nodes linked with it.
+- Unsaved text counts, as it does for Find Node….
 
 Daily notes are in =org-roam-dailies-directory= (=daily/=) under =org-roam-directory=,
 which is the first sidebar folder unless set. A new note is named and started as
@@ -359,6 +368,7 @@ what a new note starts with, and what capturing adds; =%<…>= formats the note'
 
 With =notes-package = "denote"= in =config.toml=, the same commands follow Denote:
 
+- The graph draws the notes with a Denote identifier and their =denote:= links to each other.
 - Find Node… and Insert Node Link… list the Org files whose names have a Denote
   identifier, titled by their =#+title:=, and Insert Node Link… inserts
   =[[denote:…][Title]]=.

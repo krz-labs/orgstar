@@ -272,6 +272,7 @@ enum CommandTitles {
         String(localized: "Shift Timer Values in Region…", comment: "Command title"),
         String(localized: "Show Attachment Folder", comment: "Command title"),
         String(localized: "Show Backlinks", comment: "Command title"),
+        String(localized: "Show Node Graph", comment: "Command title"),
         String(localized: "Show Remaining Countdown Time", comment: "Command title"),
         String(localized: "Show or Hide Backlinks", comment: "Command title"),
         String(localized: "Show or Hide Columns and Clock", comment: "Command title"),

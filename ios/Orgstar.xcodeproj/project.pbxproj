@@ -7,35 +7,35 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		EC91295D4306AF0CE88F1D07 /* OrgMathJax in Frameworks */ = {isa = PBXBuildFile; productRef = 70EC41AF804F61B000FC5A1E /* OrgMathJax */; };
-		7080D3827813E58F1F3C6ABC /* OrgMathJax in Frameworks */ = {isa = PBXBuildFile; productRef = FE5434EBA139A800E8727F4B /* OrgMathJax */; };
+		0A61626884F48A1B4963D767 /* OrgWatchData in Frameworks */ = {isa = PBXBuildFile; productRef = 925F6F580D155C1597A5F07B /* OrgWatchData */; };
+		15F20FD7060931A9FA7D5B5A /* OrgstarSpotlight.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AC88ABFF2E0DEC4AD6935E44 /* OrgstarSpotlight.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1B78003BBCE8A4B809333342 /* OrgApp in Frameworks */ = {isa = PBXBuildFile; productRef = A2BE626BBE45EA52880B6169 /* OrgApp */; };
 		1E5861C0EFE1D96CDC21A22F /* OrgApp in Frameworks */ = {isa = PBXBuildFile; productRef = BA239181876756F7732397EB /* OrgApp */; };
 		2BE799BF03ED43EAA6849F53 /* OrgApp in Frameworks */ = {isa = PBXBuildFile; productRef = EDEF22C5B4F393296F1D17BB /* OrgApp */; };
+		34F40D483630871B50619E6F /* OrgApp in Frameworks */ = {isa = PBXBuildFile; productRef = B1EC171400CB989363332D07 /* OrgApp */; };
+		3AA1AFEEC1E57E8A3A1AF804 /* OrgstarWidgets/PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 83EDEDFCE07E278A9F985A17 /* OrgstarWidgets/PrivacyInfo.xcprivacy */; platformFilters = (macos, ); };
+		4392873ADA2B1FC8930BE6C9 /* OrgEditorAppKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0E5F6DB1CD783274FB49FD5E /* OrgEditorAppKit */; };
+		5A205B2638DB5D65DC83501B /* OrgstarWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B54C32C5D364C02EE21DB092 /* OrgstarWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		625E39E946591E6D43200C02 /* OrgstarWatch/Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C908C5209CABA6130FD12641 /* OrgstarWatch/Assets.xcassets */; };
 		67AD8B4FFD1ED43852CFC2CA /* Orgstar/Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0B6845EF9D6D0093A0394C43 /* Orgstar/Assets.xcassets */; };
+		7080D3827813E58F1F3C6ABC /* OrgMathJax in Frameworks */ = {isa = PBXBuildFile; productRef = FE5434EBA139A800E8727F4B /* OrgMathJax */; };
 		76BC65EF4BE629390064AE36 /* OrgstarWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B54C32C5D364C02EE21DB092 /* OrgstarWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		80E85E72A5B727A15D7123D4 /* OrgstarQuickLook.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 54F0339BC26341A6010C1386 /* OrgstarQuickLook.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		8626AEED3928BE739C1DF301 /* IconPreviews in Resources */ = {isa = PBXBuildFile; fileRef = 9B39CA5A070717D948728096 /* IconPreviews */; };
+		9B607A4A9227D06D4F53091C /* OrgstarQuickLook/PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 7B319D00B61E5D44B6F8660B /* OrgstarQuickLook/PrivacyInfo.xcprivacy */; platformFilters = (macos, ); };
 		9BE045FD696469CA8D19F22C /* OrgHighlight in Frameworks */ = {isa = PBXBuildFile; productRef = 47D54A361A74FE9E2B0722BB /* OrgHighlight */; };
 		A05D351FCD8FE36B6A58E035 /* OrgstarShare.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D128CD70D4E88FAA82D23FD9 /* OrgstarShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AB68F3B4EE90C0961355E986 /* OrgCore in Frameworks */ = {isa = PBXBuildFile; productRef = 64DF80C4FBF50B0AF5DC6E33 /* OrgCore */; };
-		FD3273B85979ABA4F4A956A6 /* OrgstarWatchWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 03F7E491D72C8915E6CB2542 /* OrgstarWatchWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		E9F7A5030D53B1C85C74BBCE /* OrgstarWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 8A7A8B14798B54AA57D91D55 /* OrgstarWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		0A61626884F48A1B4963D767 /* OrgWatchData in Frameworks */ = {isa = PBXBuildFile; productRef = 925F6F580D155C1597A5F07B /* OrgWatchData */; };
-		C6824548013D3A2076EAF9C7 /* OrgWatchData in Frameworks */ = {isa = PBXBuildFile; productRef = 2EFA0D9CD8BD435F6283F3AA /* OrgWatchData */; };
-		625E39E946591E6D43200C02 /* OrgstarWatch/Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C908C5209CABA6130FD12641 /* OrgstarWatch/Assets.xcassets */; };
-		34F40D483630871B50619E6F /* OrgApp in Frameworks */ = {isa = PBXBuildFile; productRef = B1EC171400CB989363332D07 /* OrgApp */; };
-		4392873ADA2B1FC8930BE6C9 /* OrgEditorAppKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0E5F6DB1CD783274FB49FD5E /* OrgEditorAppKit */; };
-		CA594F2E6DAFED2D16900872 /* OrgHighlight in Frameworks */ = {isa = PBXBuildFile; productRef = 88F9A423F8C1EBE523B6438B /* OrgHighlight */; };
-		D94278A370A1FB41D7A518DA /* AppIcons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B977A6852EA92ABDAA7C98AA /* AppIcons.xcassets */; };
-		8626AEED3928BE739C1DF301 /* IconPreviews in Resources */ = {isa = PBXBuildFile; fileRef = 9B39CA5A070717D948728096 /* IconPreviews */; };
+		B59088D6FF3E6C60DF909823 /* OrgstarSpotlight/PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 20B42E017B9B06BDBBF0CCDD /* OrgstarSpotlight/PrivacyInfo.xcprivacy */; };
 		BA4DCBEF0B0F66E84D66137B /* OrgstarMac/PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AD93BA820CE0A7E09BB5CB1C /* OrgstarMac/PrivacyInfo.xcprivacy */; };
 		C1D3CBF59C494CF9A95F1B28 /* OrgstarQuickLook.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 54F0339BC26341A6010C1386 /* OrgstarQuickLook.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		5A205B2638DB5D65DC83501B /* OrgstarWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B54C32C5D364C02EE21DB092 /* OrgstarWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		15F20FD7060931A9FA7D5B5A /* OrgstarSpotlight.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AC88ABFF2E0DEC4AD6935E44 /* OrgstarSpotlight.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C4B7AD977A87099C72B5E114 /* OrgCore in Frameworks */ = {isa = PBXBuildFile; productRef = 43689CAB6915EAB97D264A39 /* OrgCore */; };
-		B59088D6FF3E6C60DF909823 /* OrgstarSpotlight/PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 20B42E017B9B06BDBBF0CCDD /* OrgstarSpotlight/PrivacyInfo.xcprivacy */; };
-		9B607A4A9227D06D4F53091C /* OrgstarQuickLook/PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 7B319D00B61E5D44B6F8660B /* OrgstarQuickLook/PrivacyInfo.xcprivacy */; platformFilters = (macos, ); };
-		3AA1AFEEC1E57E8A3A1AF804 /* OrgstarWidgets/PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 83EDEDFCE07E278A9F985A17 /* OrgstarWidgets/PrivacyInfo.xcprivacy */; platformFilters = (macos, ); };
+		C6824548013D3A2076EAF9C7 /* OrgWatchData in Frameworks */ = {isa = PBXBuildFile; productRef = 2EFA0D9CD8BD435F6283F3AA /* OrgWatchData */; };
+		CA594F2E6DAFED2D16900872 /* OrgHighlight in Frameworks */ = {isa = PBXBuildFile; productRef = 88F9A423F8C1EBE523B6438B /* OrgHighlight */; };
+		D94278A370A1FB41D7A518DA /* AppIcons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B977A6852EA92ABDAA7C98AA /* AppIcons.xcassets */; };
+		E9F7A5030D53B1C85C74BBCE /* OrgstarWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 8A7A8B14798B54AA57D91D55 /* OrgstarWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		EC91295D4306AF0CE88F1D07 /* OrgMathJax in Frameworks */ = {isa = PBXBuildFile; productRef = 70EC41AF804F61B000FC5A1E /* OrgMathJax */; };
+		FD3273B85979ABA4F4A956A6 /* OrgstarWatchWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 03F7E491D72C8915E6CB2542 /* OrgstarWatchWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,12 +46,40 @@
 			remoteGlobalIDString = E87BE20AFDC99FD25E1A163F;
 			remoteInfo = OrgstarWidgets;
 		};
+		3CD251D01E4C9C2DC6EA4271 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9571051E69F5D60E9CDFD246;
+			remoteInfo = OrgstarWatch;
+		};
 		5932E50A667F73AEF6E5FB26 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 92364A1473ECC9B162FEAE51;
 			remoteInfo = OrgstarShare;
+		};
+		77FCBFF918E6E58AE9698F1B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BBA37636EB6BBA564493899D;
+			remoteInfo = OrgstarQuickLook;
+		};
+		7C6ACD0E0D599F98671D5D8D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 983BBE813E871966964F6876;
+			remoteInfo = OrgstarSpotlight;
+		};
+		A211EBFC69B345042D422426 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E87BE20AFDC99FD25E1A163F;
+			remoteInfo = OrgstarWidgets;
 		};
 		D0655711FB3B470A356B2D36 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -67,34 +95,6 @@
 			remoteGlobalIDString = A7FEE6F7EC27BB417D26E08E;
 			remoteInfo = OrgstarWatchWidgets;
 		};
-		3CD251D01E4C9C2DC6EA4271 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 9571051E69F5D60E9CDFD246;
-			remoteInfo = OrgstarWatch;
-		};
-		77FCBFF918E6E58AE9698F1B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BBA37636EB6BBA564493899D;
-			remoteInfo = OrgstarQuickLook;
-		};
-		A211EBFC69B345042D422426 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E87BE20AFDC99FD25E1A163F;
-			remoteInfo = OrgstarWidgets;
-		};
-		7C6ACD0E0D599F98671D5D8D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 983BBE813E871966964F6876;
-			remoteInfo = OrgstarSpotlight;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -107,17 +107,6 @@
 				A05D351FCD8FE36B6A58E035 /* OrgstarShare.appex in Embed Foundation Extensions */,
 				80E85E72A5B727A15D7123D4 /* OrgstarQuickLook.appex in Embed Foundation Extensions */,
 				76BC65EF4BE629390064AE36 /* OrgstarWidgets.appex in Embed Foundation Extensions */,
-			);
-			name = "Embed Foundation Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		7BC0D090FB1FD14A791531B5 /* Embed Foundation Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-				FD3273B85979ABA4F4A956A6 /* OrgstarWatchWidgets.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -146,43 +135,54 @@
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7BC0D090FB1FD14A791531B5 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				FD3273B85979ABA4F4A956A6 /* OrgstarWatchWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		E28063B787B853DBF86E0BE8 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = Localizable.xcstrings; path = ../l10n/Localizable.xcstrings; sourceTree = "<group>"; };
 		008B67FA6385670637488313 /* Orgstar/Orgstar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Orgstar/Orgstar.entitlements; sourceTree = "<group>"; };
+		03F7E491D72C8915E6CB2542 /* OrgstarWatchWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OrgstarWatchWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B6845EF9D6D0093A0394C43 /* Orgstar/Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Orgstar/Assets.xcassets; sourceTree = "<group>"; };
 		1025FACEDEC31014F0AFA230 /* OrgstarShare/OrgstarShare.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OrgstarShare/OrgstarShare.entitlements; sourceTree = "<group>"; };
-		48A21BB1AB1E70D4429DCDE4 /* OrgstarQuickLook/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = OrgstarQuickLook/Info.plist; sourceTree = "<group>"; };
-		54F0339BC26341A6010C1386 /* OrgstarQuickLook.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OrgstarQuickLook.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		6C2E41672FBF640AB5554A2B /* OrgstarWidgets/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = OrgstarWidgets/Info.plist; sourceTree = "<group>"; };
-		B54C32C5D364C02EE21DB092 /* OrgstarWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OrgstarWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		C0AFAE84CB7F8B19772BF250 /* OrgstarWidgets/OrgstarWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OrgstarWidgets/OrgstarWidgets.entitlements; sourceTree = "<group>"; };
-		D128CD70D4E88FAA82D23FD9 /* OrgstarShare.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OrgstarShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		D72184D78ACF70837216BCBF /* OrgstarShare/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = OrgstarShare/Info.plist; sourceTree = "<group>"; };
-		ECD4A6B56983444E4E07CE63 /* Orgstar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Orgstar.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		F05C9F05F8A61806F30E9328 /* Orgstar/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Orgstar/Info.plist; sourceTree = "<group>"; };
-		8A7A8B14798B54AA57D91D55 /* OrgstarWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OrgstarWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		03F7E491D72C8915E6CB2542 /* OrgstarWatchWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OrgstarWatchWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		C908C5209CABA6130FD12641 /* OrgstarWatch/Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = OrgstarWatch/Assets.xcassets; sourceTree = "<group>"; };
-		BE8B69F4602C51BD30DCEBE3 /* OrgstarWatch/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = OrgstarWatch/Info.plist; sourceTree = "<group>"; };
-		512F8C0EB67DE2C4AB5051D4 /* OrgstarWatchWidgets/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = OrgstarWatchWidgets/Info.plist; sourceTree = "<group>"; };
-		970E22E052046C63CA01A88F /* OrgstarWatch/OrgstarWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OrgstarWatch/OrgstarWatch.entitlements; sourceTree = "<group>"; };
-		F75B5AA8EBA6F457B6D124AC /* OrgstarWatchWidgets/OrgstarWatchWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OrgstarWatchWidgets/OrgstarWatchWidgets.entitlements; sourceTree = "<group>"; };
-		C51149D0B6EA8A5C84383462 /* orgstar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = orgstar.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		AC88ABFF2E0DEC4AD6935E44 /* OrgstarSpotlight.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OrgstarSpotlight.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		5CAA663B7191AA35B15DE681 /* OrgstarMac/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = OrgstarMac/Info.plist; sourceTree = "<group>"; };
-		465A4F530E1EB892DCA2659D /* OrgstarMac/Orgstar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OrgstarMac/Orgstar.entitlements; sourceTree = "<group>"; };
-		AD93BA820CE0A7E09BB5CB1C /* OrgstarMac/PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = OrgstarMac/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		B977A6852EA92ABDAA7C98AA /* AppIcons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = AppIcons.xcassets; path = ../packaging/AppIcons.xcassets; sourceTree = "<group>"; };
-		9B39CA5A070717D948728096 /* IconPreviews */ = {isa = PBXFileReference; lastKnownFileType = folder; name = IconPreviews; path = ../packaging/IconPreviews; sourceTree = "<group>"; };
-		7B28B0DBC8FEDCBB28FF11E9 /* OrgstarSpotlight/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = OrgstarSpotlight/Info.plist; sourceTree = "<group>"; };
 		108CFDFF570EDFC4035D4DF7 /* OrgstarSpotlight/OrgstarSpotlight.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OrgstarSpotlight/OrgstarSpotlight.entitlements; sourceTree = "<group>"; };
 		20B42E017B9B06BDBBF0CCDD /* OrgstarSpotlight/PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = OrgstarSpotlight/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		D27AFAB2F0523C96E1F9CC93 /* OrgstarQuickLook/OrgstarQuickLook-macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OrgstarQuickLook/OrgstarQuickLook-macOS.entitlements; sourceTree = "<group>"; };
+		465A4F530E1EB892DCA2659D /* OrgstarMac/Orgstar.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OrgstarMac/Orgstar.entitlements; sourceTree = "<group>"; };
+		48A21BB1AB1E70D4429DCDE4 /* OrgstarQuickLook/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = OrgstarQuickLook/Info.plist; sourceTree = "<group>"; };
+		512F8C0EB67DE2C4AB5051D4 /* OrgstarWatchWidgets/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = OrgstarWatchWidgets/Info.plist; sourceTree = "<group>"; };
+		54F0339BC26341A6010C1386 /* OrgstarQuickLook.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OrgstarQuickLook.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		5CAA663B7191AA35B15DE681 /* OrgstarMac/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = OrgstarMac/Info.plist; sourceTree = "<group>"; };
+		6857BB16511F98A95242D558 /* OrgstarWidgets/OrgstarWidgets-macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "OrgstarWidgets/OrgstarWidgets-macOS.entitlements"; sourceTree = "<group>"; };
+		6C2E41672FBF640AB5554A2B /* OrgstarWidgets/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = OrgstarWidgets/Info.plist; sourceTree = "<group>"; };
+		7B28B0DBC8FEDCBB28FF11E9 /* OrgstarSpotlight/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = OrgstarSpotlight/Info.plist; sourceTree = "<group>"; };
 		7B319D00B61E5D44B6F8660B /* OrgstarQuickLook/PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = OrgstarQuickLook/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		6857BB16511F98A95242D558 /* OrgstarWidgets/OrgstarWidgets-macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OrgstarWidgets/OrgstarWidgets-macOS.entitlements; sourceTree = "<group>"; };
 		83EDEDFCE07E278A9F985A17 /* OrgstarWidgets/PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = OrgstarWidgets/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		8A7A8B14798B54AA57D91D55 /* OrgstarWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OrgstarWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		970E22E052046C63CA01A88F /* OrgstarWatch/OrgstarWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OrgstarWatch/OrgstarWatch.entitlements; sourceTree = "<group>"; };
+		9B39CA5A070717D948728096 /* IconPreviews */ = {isa = PBXFileReference; lastKnownFileType = folder; name = IconPreviews; path = ../packaging/IconPreviews; sourceTree = "<group>"; };
+		AC88ABFF2E0DEC4AD6935E44 /* OrgstarSpotlight.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OrgstarSpotlight.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		AD93BA820CE0A7E09BB5CB1C /* OrgstarMac/PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = OrgstarMac/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		B54C32C5D364C02EE21DB092 /* OrgstarWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OrgstarWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B977A6852EA92ABDAA7C98AA /* AppIcons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = AppIcons.xcassets; path = ../packaging/AppIcons.xcassets; sourceTree = "<group>"; };
+		BE8B69F4602C51BD30DCEBE3 /* OrgstarWatch/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = OrgstarWatch/Info.plist; sourceTree = "<group>"; };
+		C0AFAE84CB7F8B19772BF250 /* OrgstarWidgets/OrgstarWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OrgstarWidgets/OrgstarWidgets.entitlements; sourceTree = "<group>"; };
+		C51149D0B6EA8A5C84383462 /* orgstar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = orgstar.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C908C5209CABA6130FD12641 /* OrgstarWatch/Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = OrgstarWatch/Assets.xcassets; sourceTree = "<group>"; };
+		D128CD70D4E88FAA82D23FD9 /* OrgstarShare.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OrgstarShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		D27AFAB2F0523C96E1F9CC93 /* OrgstarQuickLook/OrgstarQuickLook-macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "OrgstarQuickLook/OrgstarQuickLook-macOS.entitlements"; sourceTree = "<group>"; };
+		D72184D78ACF70837216BCBF /* OrgstarShare/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = OrgstarShare/Info.plist; sourceTree = "<group>"; };
+		E28063B787B853DBF86E0BE8 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = Localizable.xcstrings; path = ../l10n/Localizable.xcstrings; sourceTree = "<group>"; };
+		ECD4A6B56983444E4E07CE63 /* Orgstar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Orgstar.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F05C9F05F8A61806F30E9328 /* Orgstar/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Orgstar/Info.plist; sourceTree = "<group>"; };
+		F75B5AA8EBA6F457B6D124AC /* OrgstarWatchWidgets/OrgstarWatchWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OrgstarWatchWidgets/OrgstarWatchWidgets.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -193,13 +193,6 @@
 			);
 			target = BBA37636EB6BBA564493899D /* OrgstarQuickLook */;
 		};
-		921E3E2198CDD080F66DD902 /* Exceptions for "../Sources/OrgstarShare" folder in "OrgstarShare" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				main.swift,
-			);
-			target = 92364A1473ECC9B162FEAE51 /* OrgstarShare */;
-		};
 		4B121E9E27D011F773E768FF /* Exceptions for "../Sources/OrgstarSpotlight" folder in "OrgstarSpotlight" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -207,15 +200,32 @@
 			);
 			target = 983BBE813E871966964F6876 /* OrgstarSpotlight */;
 		};
+		921E3E2198CDD080F66DD902 /* Exceptions for "../Sources/OrgstarShare" folder in "OrgstarShare" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				main.swift,
+			);
+			target = 92364A1473ECC9B162FEAE51 /* OrgstarShare */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		0D702B6721D2BC88F89E3883 /* ../Sources/OrgstarWatch */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ../Sources/OrgstarWatch;
+			sourceTree = "<group>";
+		};
 		2412EC8ED6427B76498FCD18 /* ../Sources/OrgstarQuickLook */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				25D1FFC8C8FE4375AA373DF9 /* Exceptions for "../Sources/OrgstarQuickLook" folder in "OrgstarQuickLook" target */,
 			);
 			path = ../Sources/OrgstarQuickLook;
+			sourceTree = "<group>";
+		};
+		5492CCAC81DA9B3B7C8E53D9 /* ../Sources/Orgstar */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ../Sources/Orgstar;
 			sourceTree = "<group>";
 		};
 		6425CB8F177EDFF8EE2BD447 /* ../Sources/OrgstarShare */ = {
@@ -231,24 +241,9 @@
 			path = ../Sources/OrgstarMobile;
 			sourceTree = "<group>";
 		};
-		DE99BDA1BB90EEDFA8FF4CC2 /* ../Sources/OrgstarWidgets */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ../Sources/OrgstarWidgets;
-			sourceTree = "<group>";
-		};
-		0D702B6721D2BC88F89E3883 /* ../Sources/OrgstarWatch */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ../Sources/OrgstarWatch;
-			sourceTree = "<group>";
-		};
 		C2450FF4F75DA4598ABE47D6 /* ../Sources/OrgstarWatchWidgets */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = ../Sources/OrgstarWatchWidgets;
-			sourceTree = "<group>";
-		};
-		5492CCAC81DA9B3B7C8E53D9 /* ../Sources/Orgstar */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ../Sources/Orgstar;
 			sourceTree = "<group>";
 		};
 		DCA0D699899E2CA4B0F5956F /* ../Sources/OrgstarSpotlight */ = {
@@ -257,6 +252,11 @@
 				4B121E9E27D011F773E768FF /* Exceptions for "../Sources/OrgstarSpotlight" folder in "OrgstarSpotlight" target */,
 			);
 			path = ../Sources/OrgstarSpotlight;
+			sourceTree = "<group>";
+		};
+		DE99BDA1BB90EEDFA8FF4CC2 /* ../Sources/OrgstarWidgets */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ../Sources/OrgstarWidgets;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -270,11 +270,30 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		19E8368F7C3E6B0B873B86D7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0A61626884F48A1B4963D767 /* OrgWatchData in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		2058F3B51F8D10551554307D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				AB68F3B4EE90C0961355E986 /* OrgCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39CC8FCF3B50EC810191AF52 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				34F40D483630871B50619E6F /* OrgApp in Frameworks */,
+				EC91295D4306AF0CE88F1D07 /* OrgMathJax in Frameworks */,
+				4392873ADA2B1FC8930BE6C9 /* OrgEditorAppKit in Frameworks */,
+				CA594F2E6DAFED2D16900872 /* OrgHighlight in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -296,30 +315,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		19E8368F7C3E6B0B873B86D7 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				0A61626884F48A1B4963D767 /* OrgWatchData in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		BCA36593052CBFAC52822B63 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				C6824548013D3A2076EAF9C7 /* OrgWatchData in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		39CC8FCF3B50EC810191AF52 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				34F40D483630871B50619E6F /* OrgApp in Frameworks */,
-				EC91295D4306AF0CE88F1D07 /* OrgMathJax in Frameworks */,
-				4392873ADA2B1FC8930BE6C9 /* OrgEditorAppKit in Frameworks */,
-				CA594F2E6DAFED2D16900872 /* OrgHighlight in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -457,53 +457,6 @@
 			productReference = D128CD70D4E88FAA82D23FD9 /* OrgstarShare.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		BBA37636EB6BBA564493899D /* OrgstarQuickLook */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = FA45BEE00EE2451462D002FF /* Build configuration list for PBXNativeTarget "OrgstarQuickLook" */;
-			buildPhases = (
-				347F295A9254F751A96C2737 /* Sources */,
-				2058F3B51F8D10551554307D /* Frameworks */,
-				D4E4B37C7E22E9760E5FA492 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				2412EC8ED6427B76498FCD18 /* ../Sources/OrgstarQuickLook */,
-			);
-			name = OrgstarQuickLook;
-			packageProductDependencies = (
-				64DF80C4FBF50B0AF5DC6E33 /* OrgCore */,
-			);
-			productName = OrgstarQuickLook;
-			productReference = 54F0339BC26341A6010C1386 /* OrgstarQuickLook.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
-		E87BE20AFDC99FD25E1A163F /* OrgstarWidgets */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 14080276016DB67528B057D6 /* Build configuration list for PBXNativeTarget "OrgstarWidgets" */;
-			buildPhases = (
-				C9A138A7D511613ADA30B0C1 /* Compile string catalog */,
-				296E85448BDDDD3245D3D432 /* Sources */,
-				AE22603FB5DE3C5FFFBBC68E /* Frameworks */,
-				EA6C64E8D42ADCFBC3B131FF /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				DE99BDA1BB90EEDFA8FF4CC2 /* ../Sources/OrgstarWidgets */,
-			);
-			name = OrgstarWidgets;
-			packageProductDependencies = (
-				EDEF22C5B4F393296F1D17BB /* OrgApp */,
-			);
-			productName = OrgstarWidgets;
-			productReference = B54C32C5D364C02EE21DB092 /* OrgstarWidgets.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
 		9571051E69F5D60E9CDFD246 /* OrgstarWatch */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F016DC0514ED09D03670EA41 /* Build configuration list for PBXNativeTarget "OrgstarWatch" */;
@@ -529,6 +482,29 @@
 			productName = OrgstarWatch;
 			productReference = 8A7A8B14798B54AA57D91D55 /* OrgstarWatch.app */;
 			productType = "com.apple.product-type.application";
+		};
+		983BBE813E871966964F6876 /* OrgstarSpotlight */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7B19660ED1008ECEF3FBC821 /* Build configuration list for PBXNativeTarget "OrgstarSpotlight" */;
+			buildPhases = (
+				84D0DC560E0227549E1F5F7E /* Sources */,
+				E2B8E1256CB480BB98CECFCA /* Frameworks */,
+				E0CA3F1B80A8855DAA3B427A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				DCA0D699899E2CA4B0F5956F /* ../Sources/OrgstarSpotlight */,
+			);
+			name = OrgstarSpotlight;
+			packageProductDependencies = (
+				43689CAB6915EAB97D264A39 /* OrgCore */,
+			);
+			productName = OrgstarSpotlight;
+			productReference = AC88ABFF2E0DEC4AD6935E44 /* OrgstarSpotlight.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 		A7FEE6F7EC27BB417D26E08E /* OrgstarWatchWidgets */ = {
 			isa = PBXNativeTarget;
@@ -585,27 +561,51 @@
 			productReference = C51149D0B6EA8A5C84383462 /* orgstar.app */;
 			productType = "com.apple.product-type.application";
 		};
-		983BBE813E871966964F6876 /* OrgstarSpotlight */ = {
+		BBA37636EB6BBA564493899D /* OrgstarQuickLook */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7B19660ED1008ECEF3FBC821 /* Build configuration list for PBXNativeTarget "OrgstarSpotlight" */;
+			buildConfigurationList = FA45BEE00EE2451462D002FF /* Build configuration list for PBXNativeTarget "OrgstarQuickLook" */;
 			buildPhases = (
-				84D0DC560E0227549E1F5F7E /* Sources */,
-				E2B8E1256CB480BB98CECFCA /* Frameworks */,
-				E0CA3F1B80A8855DAA3B427A /* Resources */,
+				347F295A9254F751A96C2737 /* Sources */,
+				2058F3B51F8D10551554307D /* Frameworks */,
+				D4E4B37C7E22E9760E5FA492 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				DCA0D699899E2CA4B0F5956F /* ../Sources/OrgstarSpotlight */,
+				2412EC8ED6427B76498FCD18 /* ../Sources/OrgstarQuickLook */,
 			);
-			name = OrgstarSpotlight;
+			name = OrgstarQuickLook;
 			packageProductDependencies = (
-				43689CAB6915EAB97D264A39 /* OrgCore */,
+				64DF80C4FBF50B0AF5DC6E33 /* OrgCore */,
 			);
-			productName = OrgstarSpotlight;
-			productReference = AC88ABFF2E0DEC4AD6935E44 /* OrgstarSpotlight.appex */;
+			productName = OrgstarQuickLook;
+			productReference = 54F0339BC26341A6010C1386 /* OrgstarQuickLook.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		E87BE20AFDC99FD25E1A163F /* OrgstarWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 14080276016DB67528B057D6 /* Build configuration list for PBXNativeTarget "OrgstarWidgets" */;
+			buildPhases = (
+				C9A138A7D511613ADA30B0C1 /* Compile string catalog */,
+				296E85448BDDDD3245D3D432 /* Sources */,
+				AE22603FB5DE3C5FFFBBC68E /* Frameworks */,
+				EA6C64E8D42ADCFBC3B131FF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				DE99BDA1BB90EEDFA8FF4CC2 /* ../Sources/OrgstarWidgets */,
+			);
+			name = OrgstarWidgets;
+			packageProductDependencies = (
+				EDEF22C5B4F393296F1D17BB /* OrgApp */,
+			);
+			productName = OrgstarWidgets;
+			productReference = B54C32C5D364C02EE21DB092 /* OrgstarWidgets.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -668,19 +668,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A068258849F81C306955A8BE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D4E4B37C7E22E9760E5FA492 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				9B607A4A9227D06D4F53091C /* OrgstarQuickLook/PrivacyInfo.xcprivacy in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		EA6C64E8D42ADCFBC3B131FF /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				3AA1AFEEC1E57E8A3A1AF804 /* OrgstarWidgets/PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -692,10 +691,19 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A068258849F81C306955A8BE /* Resources */ = {
+		E0CA3F1B80A8855DAA3B427A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B59088D6FF3E6C60DF909823 /* OrgstarSpotlight/PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA6C64E8D42ADCFBC3B131FF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3AA1AFEEC1E57E8A3A1AF804 /* OrgstarWidgets/PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -709,18 +717,10 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E0CA3F1B80A8855DAA3B427A /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				B59088D6FF3E6C60DF909823 /* OrgstarSpotlight/PrivacyInfo.xcprivacy in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		B86570FC8656E397B56018C7 /* Compile string catalog */ = {
+		4316AE7E93B32A6A11452968 /* Compile string catalog */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -752,68 +752,6 @@
 			shellScript = "# The catalog is compiled here rather than as a resource, so that Xcode doesn't sync it\n# from this target's sources; scripts/sync-strings.sh keeps it.\nxcrun xcstringstool compile \"$SCRIPT_INPUT_FILE_0\" --output-directory \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\n";
 		};
 		641BAD6CBA4413E3690E3513 /* Compile string catalog */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/../l10n/Localizable.xcstrings",
-			);
-			name = "Compile string catalog";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/en.lproj/Localizable.strings",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/en.lproj/Localizable.stringsdict",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/de.lproj/Localizable.strings",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/de.lproj/Localizable.stringsdict",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/fr.lproj/Localizable.strings",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/fr.lproj/Localizable.stringsdict",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/ja.lproj/Localizable.strings",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/ja.lproj/Localizable.stringsdict",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/es.lproj/Localizable.strings",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/es.lproj/Localizable.stringsdict",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/pt-BR.lproj/Localizable.strings",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/pt-BR.lproj/Localizable.stringsdict",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# The catalog is compiled here rather than as a resource, so that Xcode doesn't sync it\n# from this target's sources; scripts/sync-strings.sh keeps it.\nxcrun xcstringstool compile \"$SCRIPT_INPUT_FILE_0\" --output-directory \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\n";
-		};
-		C9A138A7D511613ADA30B0C1 /* Compile string catalog */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/../l10n/Localizable.xcstrings",
-			);
-			name = "Compile string catalog";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/en.lproj/Localizable.strings",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/en.lproj/Localizable.stringsdict",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/de.lproj/Localizable.strings",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/de.lproj/Localizable.stringsdict",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/fr.lproj/Localizable.strings",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/fr.lproj/Localizable.stringsdict",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/ja.lproj/Localizable.strings",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/ja.lproj/Localizable.stringsdict",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/es.lproj/Localizable.strings",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/es.lproj/Localizable.stringsdict",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/pt-BR.lproj/Localizable.strings",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/pt-BR.lproj/Localizable.stringsdict",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# The catalog is compiled here rather than as a resource, so that Xcode doesn't sync it\n# from this target's sources; scripts/sync-strings.sh keeps it.\nxcrun xcstringstool compile \"$SCRIPT_INPUT_FILE_0\" --output-directory \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\n";
-		};
-		4316AE7E93B32A6A11452968 /* Compile string catalog */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -906,9 +844,78 @@
 			shellPath = /bin/sh;
 			shellScript = "# The catalog is compiled here rather than as a resource, so that Xcode doesn't sync it\n# from this target's sources; scripts/sync-strings.sh keeps it.\nxcrun xcstringstool compile \"$SCRIPT_INPUT_FILE_0\" --output-directory \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\n";
 		};
+		B86570FC8656E397B56018C7 /* Compile string catalog */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/../l10n/Localizable.xcstrings",
+			);
+			name = "Compile string catalog";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/en.lproj/Localizable.strings",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/en.lproj/Localizable.stringsdict",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/de.lproj/Localizable.strings",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/de.lproj/Localizable.stringsdict",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/fr.lproj/Localizable.strings",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/fr.lproj/Localizable.stringsdict",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/ja.lproj/Localizable.strings",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/ja.lproj/Localizable.stringsdict",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/es.lproj/Localizable.strings",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/es.lproj/Localizable.stringsdict",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/pt-BR.lproj/Localizable.strings",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/pt-BR.lproj/Localizable.stringsdict",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# The catalog is compiled here rather than as a resource, so that Xcode doesn't sync it\n# from this target's sources; scripts/sync-strings.sh keeps it.\nxcrun xcstringstool compile \"$SCRIPT_INPUT_FILE_0\" --output-directory \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\n";
+		};
+		C9A138A7D511613ADA30B0C1 /* Compile string catalog */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/../l10n/Localizable.xcstrings",
+			);
+			name = "Compile string catalog";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/en.lproj/Localizable.strings",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/en.lproj/Localizable.stringsdict",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/de.lproj/Localizable.strings",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/de.lproj/Localizable.stringsdict",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/fr.lproj/Localizable.strings",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/fr.lproj/Localizable.stringsdict",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/ja.lproj/Localizable.strings",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/ja.lproj/Localizable.stringsdict",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/es.lproj/Localizable.strings",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/es.lproj/Localizable.stringsdict",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/pt-BR.lproj/Localizable.strings",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/pt-BR.lproj/Localizable.stringsdict",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# The catalog is compiled here rather than as a resource, so that Xcode doesn't sync it\n# from this target's sources; scripts/sync-strings.sh keeps it.\nxcrun xcstringstool compile \"$SCRIPT_INPUT_FILE_0\" --output-directory \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		0EFD7F2537761E968D3FE030 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		296E85448BDDDD3245D3D432 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -917,6 +924,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		347F295A9254F751A96C2737 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		56106460CED1CCEA1C324745 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		84D0DC560E0227549E1F5F7E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CACD414798C1FBC733B9DAEF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -937,84 +965,82 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CACD414798C1FBC733B9DAEF /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		56106460CED1CCEA1C324745 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		0EFD7F2537761E968D3FE030 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		84D0DC560E0227549E1F5F7E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		7F4807D68646366ED2DCA5C2 /* PBXTargetDependency */ = {
+		12D858EB45921C42A853582E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 92364A1473ECC9B162FEAE51 /* OrgstarShare */;
-			targetProxy = 5932E50A667F73AEF6E5FB26 /* PBXContainerItemProxy */;
-		};
-		B35F6E044645C7D88B689DC1 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BBA37636EB6BBA564493899D /* OrgstarQuickLook */;
-			targetProxy = D0655711FB3B470A356B2D36 /* PBXContainerItemProxy */;
-		};
-		D82DF00DA5607ABDDF199065 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E87BE20AFDC99FD25E1A163F /* OrgstarWidgets */;
-			targetProxy = 21312AB4CA947625620BE69C /* PBXContainerItemProxy */;
-		};
-		A7690BEF9D6EBF5AF8DD1750 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = A7FEE6F7EC27BB417D26E08E /* OrgstarWatchWidgets */;
-			targetProxy = FF4EF01204CC241C9F18DFE9 /* PBXContainerItemProxy */;
+			target = 983BBE813E871966964F6876 /* OrgstarSpotlight */;
+			targetProxy = 7C6ACD0E0D599F98671D5D8D /* PBXContainerItemProxy */;
 		};
 		33887935CE813E63D8EA2CE7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 9571051E69F5D60E9CDFD246 /* OrgstarWatch */;
 			targetProxy = 3CD251D01E4C9C2DC6EA4271 /* PBXContainerItemProxy */;
 		};
-		C826A938ED8C4860D583408F /* PBXTargetDependency */ = {
+		7F4807D68646366ED2DCA5C2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 92364A1473ECC9B162FEAE51 /* OrgstarShare */;
+			targetProxy = 5932E50A667F73AEF6E5FB26 /* PBXContainerItemProxy */;
+		};
+		A7690BEF9D6EBF5AF8DD1750 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A7FEE6F7EC27BB417D26E08E /* OrgstarWatchWidgets */;
+			targetProxy = FF4EF01204CC241C9F18DFE9 /* PBXContainerItemProxy */;
+		};
+		B35F6E044645C7D88B689DC1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = BBA37636EB6BBA564493899D /* OrgstarQuickLook */;
-			targetProxy = 77FCBFF918E6E58AE9698F1B /* PBXContainerItemProxy */;
+			targetProxy = D0655711FB3B470A356B2D36 /* PBXContainerItemProxy */;
 		};
 		B8558921DD478BF0929CD181 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = E87BE20AFDC99FD25E1A163F /* OrgstarWidgets */;
 			targetProxy = A211EBFC69B345042D422426 /* PBXContainerItemProxy */;
 		};
-		12D858EB45921C42A853582E /* PBXTargetDependency */ = {
+		C826A938ED8C4860D583408F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 983BBE813E871966964F6876 /* OrgstarSpotlight */;
-			targetProxy = 7C6ACD0E0D599F98671D5D8D /* PBXContainerItemProxy */;
+			target = BBA37636EB6BBA564493899D /* OrgstarQuickLook */;
+			targetProxy = 77FCBFF918E6E58AE9698F1B /* PBXContainerItemProxy */;
+		};
+		D82DF00DA5607ABDDF199065 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E87BE20AFDC99FD25E1A163F /* OrgstarWidgets */;
+			targetProxy = 21312AB4CA947625620BE69C /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		054B9495D84C3E79F2234534 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = OrgstarMac/Orgstar.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 17;
+				DEVELOPMENT_TEAM = ZCNAX3VL9D;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = OrgstarMac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sh.krz.orgstar;
+				PRODUCT_MODULE_NAME = Orgstar;
+				PRODUCT_NAME = orgstar;
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) APPSTORE";
+			};
+			name = Debug;
+		};
 		0BF40655E429259B35B06BEC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = OrgstarQuickLook/OrgstarQuickLook-macOS.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "OrgstarQuickLook/OrgstarQuickLook-macOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_TEAM = ZCNAX3VL9D;
@@ -1087,6 +1113,31 @@
 			};
 			name = Release;
 		};
+		234143503756280C53E4F843 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = OrgstarWatchWidgets/OrgstarWatchWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 17;
+				DEVELOPMENT_TEAM = ZCNAX3VL9D;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = OrgstarWatchWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sh.krz.orgstar.watchkitapp.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Release;
+		};
 		2FA7055951A13CF159CF0B9C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1112,11 +1163,86 @@
 			};
 			name = Release;
 		};
+		68F53E07FC366481771DDDB1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = OrgstarSpotlight/OrgstarSpotlight.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 17;
+				DEVELOPMENT_TEAM = ZCNAX3VL9D;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = OrgstarSpotlight/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sh.krz.orgstar.spotlight;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) APPSTORE";
+			};
+			name = Debug;
+		};
+		6AC21F8B86F031937A6F9E32 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = OrgstarWatch/OrgstarWatch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 17;
+				DEVELOPMENT_TEAM = ZCNAX3VL9D;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = OrgstarWatch/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sh.krz.orgstar.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
+		6CF223EB551BAB4C0891E24F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = OrgstarWatchWidgets/OrgstarWatchWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 17;
+				DEVELOPMENT_TEAM = ZCNAX3VL9D;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = OrgstarWatchWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sh.krz.orgstar.watchkitapp.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
 		7BCEB4BC70BB3B62775CDCFB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = OrgstarWidgets/OrgstarWidgets.entitlements;
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = OrgstarWidgets/OrgstarWidgets-macOS.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "OrgstarWidgets/OrgstarWidgets-macOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_TEAM = ZCNAX3VL9D;
@@ -1146,10 +1272,35 @@
 			};
 			name = Debug;
 		};
+		7F0C08C96E27C66039571111 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = OrgstarSpotlight/OrgstarSpotlight.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 17;
+				DEVELOPMENT_TEAM = ZCNAX3VL9D;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = OrgstarSpotlight/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sh.krz.orgstar.spotlight;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) APPSTORE";
+			};
+			name = Release;
+		};
 		942C95A5D90B164020736D83 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = OrgstarQuickLook/OrgstarQuickLook-macOS.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "OrgstarQuickLook/OrgstarQuickLook-macOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_TEAM = ZCNAX3VL9D;
@@ -1224,7 +1375,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = OrgstarWidgets/OrgstarWidgets.entitlements;
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = OrgstarWidgets/OrgstarWidgets-macOS.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "OrgstarWidgets/OrgstarWidgets-macOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_TEAM = ZCNAX3VL9D;
@@ -1274,31 +1425,6 @@
 			};
 			name = Debug;
 		};
-		6AC21F8B86F031937A6F9E32 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = OrgstarWatch/OrgstarWatch.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 17;
-				DEVELOPMENT_TEAM = ZCNAX3VL9D;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = OrgstarWatch/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = sh.krz.orgstar.watchkitapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "watchos watchsimulator";
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 26.0;
-			};
-			name = Debug;
-		};
 		F6ADDCBD8237C9C35784A7FB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1324,82 +1450,6 @@
 			};
 			name = Release;
 		};
-		6CF223EB551BAB4C0891E24F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				SKIP_INSTALL = YES;
-				CODE_SIGN_ENTITLEMENTS = OrgstarWatchWidgets/OrgstarWatchWidgets.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 17;
-				DEVELOPMENT_TEAM = ZCNAX3VL9D;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = OrgstarWatchWidgets/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = sh.krz.orgstar.watchkitapp.widgets;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SUPPORTED_PLATFORMS = "watchos watchsimulator";
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 26.0;
-			};
-			name = Debug;
-		};
-		234143503756280C53E4F843 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				SKIP_INSTALL = YES;
-				CODE_SIGN_ENTITLEMENTS = OrgstarWatchWidgets/OrgstarWatchWidgets.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 17;
-				DEVELOPMENT_TEAM = ZCNAX3VL9D;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = OrgstarWatchWidgets/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = sh.krz.orgstar.watchkitapp.widgets;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SUPPORTED_PLATFORMS = "watchos watchsimulator";
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 26.0;
-			};
-			name = Release;
-		};
-		054B9495D84C3E79F2234534 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = OrgstarMac/Orgstar.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 17;
-				DEVELOPMENT_TEAM = ZCNAX3VL9D;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = OrgstarMac/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = sh.krz.orgstar;
-				PRODUCT_MODULE_NAME = Orgstar;
-				PRODUCT_NAME = orgstar;
-				SDKROOT = macosx;
-				SUPPORTED_PLATFORMS = macosx;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) APPSTORE";
-			};
-			name = Debug;
-		};
 		FEBB323890D181DA410264E9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1421,56 +1471,6 @@
 				PRODUCT_MODULE_NAME = Orgstar;
 				PRODUCT_NAME = orgstar;
 				SDKROOT = macosx;
-				SUPPORTED_PLATFORMS = macosx;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) APPSTORE";
-			};
-			name = Release;
-		};
-		68F53E07FC366481771DDDB1 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = OrgstarSpotlight/OrgstarSpotlight.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 17;
-				DEVELOPMENT_TEAM = ZCNAX3VL9D;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = OrgstarSpotlight/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@executable_path/../../../../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = sh.krz.orgstar.spotlight;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = macosx;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) APPSTORE";
-			};
-			name = Debug;
-		};
-		7F0C08C96E27C66039571111 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = OrgstarSpotlight/OrgstarSpotlight.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 17;
-				DEVELOPMENT_TEAM = ZCNAX3VL9D;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = OrgstarSpotlight/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@executable_path/../../../../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = sh.krz.orgstar.spotlight;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) APPSTORE";
 			};
@@ -1506,20 +1506,29 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		4B3C4C78C0194125D7118FBE /* Build configuration list for PBXNativeTarget "OrgstarWatchWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6CF223EB551BAB4C0891E24F /* Debug */,
+				234143503756280C53E4F843 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7B19660ED1008ECEF3FBC821 /* Build configuration list for PBXNativeTarget "OrgstarSpotlight" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				68F53E07FC366481771DDDB1 /* Debug */,
+				7F0C08C96E27C66039571111 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		9E5D2D8CAA074680FE17F119 /* Build configuration list for PBXNativeTarget "OrgstarShare" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0D865C988DB7EAA7BA355661 /* Debug */,
 				1339A23112C9EBCAEF5EF7FE /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		FA45BEE00EE2451462D002FF /* Build configuration list for PBXNativeTarget "OrgstarQuickLook" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				942C95A5D90B164020736D83 /* Debug */,
-				0BF40655E429259B35B06BEC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1533,15 +1542,6 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4B3C4C78C0194125D7118FBE /* Build configuration list for PBXNativeTarget "OrgstarWatchWidgets" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				6CF223EB551BAB4C0891E24F /* Debug */,
-				234143503756280C53E4F843 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		F9E8A973377C36C09C37D74B /* Build configuration list for PBXNativeTarget "Orgstar macOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1551,11 +1551,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7B19660ED1008ECEF3FBC821 /* Build configuration list for PBXNativeTarget "OrgstarSpotlight" */ = {
+		FA45BEE00EE2451462D002FF /* Build configuration list for PBXNativeTarget "OrgstarQuickLook" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				68F53E07FC366481771DDDB1 /* Debug */,
-				7F0C08C96E27C66039571111 /* Release */,
+				942C95A5D90B164020736D83 /* Debug */,
+				0BF40655E429259B35B06BEC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1570,6 +1570,21 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		0E5F6DB1CD783274FB49FD5E /* OrgEditorAppKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
+			productName = OrgEditorAppKit;
+		};
+		2EFA0D9CD8BD435F6283F3AA /* OrgWatchData */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
+			productName = OrgWatchData;
+		};
+		43689CAB6915EAB97D264A39 /* OrgCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
+			productName = OrgCore;
+		};
 		47D54A361A74FE9E2B0722BB /* OrgHighlight */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
@@ -1580,7 +1595,27 @@
 			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
 			productName = OrgCore;
 		};
+		70EC41AF804F61B000FC5A1E /* OrgMathJax */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
+			productName = OrgMathJax;
+		};
+		88F9A423F8C1EBE523B6438B /* OrgHighlight */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
+			productName = OrgHighlight;
+		};
+		925F6F580D155C1597A5F07B /* OrgWatchData */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
+			productName = OrgWatchData;
+		};
 		A2BE626BBE45EA52880B6169 /* OrgApp */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
+			productName = OrgApp;
+		};
+		B1EC171400CB989363332D07 /* OrgApp */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
 			productName = OrgApp;
@@ -1595,42 +1630,7 @@
 			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
 			productName = OrgApp;
 		};
-		925F6F580D155C1597A5F07B /* OrgWatchData */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
-			productName = OrgWatchData;
-		};
-		2EFA0D9CD8BD435F6283F3AA /* OrgWatchData */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
-			productName = OrgWatchData;
-		};
-		B1EC171400CB989363332D07 /* OrgApp */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
-			productName = OrgApp;
-		};
-		0E5F6DB1CD783274FB49FD5E /* OrgEditorAppKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
-			productName = OrgEditorAppKit;
-		};
-		88F9A423F8C1EBE523B6438B /* OrgHighlight */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
-			productName = OrgHighlight;
-		};
-		43689CAB6915EAB97D264A39 /* OrgCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
-			productName = OrgCore;
-		};
 		FE5434EBA139A800E8727F4B /* OrgMathJax */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
-			productName = OrgMathJax;
-		};
-		70EC41AF804F61B000FC5A1E /* OrgMathJax */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
 			productName = OrgMathJax;

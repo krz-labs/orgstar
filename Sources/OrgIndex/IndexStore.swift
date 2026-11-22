@@ -455,6 +455,25 @@ public final class IndexStore: Sendable {
         return indexed.filter { overlay[$0.location.path] == nil } + live
     }
 
+    /// Where every heading with an ID starts and ends, subtree included, by file: the text each
+    /// of org-roam's heading nodes covers. Unsaved buffers' in place of their files'.
+    public func nodeSections(overlay: [String: FileRecord] = [:]) throws -> [String: [(id: String, range: Range<Int>)]] {
+        var sections: [String: [(id: String, range: Range<Int>)]] = [:]
+        try database.read { db in
+            let rows = try Row.fetchAll(db, sql: """
+                SELECT f.path, h.org_id, h.start_offset, h.end_offset FROM headings h JOIN files f ON f.id = h.file_id
+                WHERE h.org_id IS NOT NULL AND f.kind = 'org' ORDER BY f.path, h.ordinal
+                """)
+            for row in rows where overlay[row["path"]] == nil {
+                sections[row["path"], default: []].append((row["org_id"], (row["start_offset"] as Int)..<(row["end_offset"] as Int)))
+            }
+        }
+        for record in overlay.values {
+            sections[record.path] = record.headings.compactMap { heading in heading.orgID.map { ($0, heading.start..<heading.end) } }
+        }
+        return sections
+    }
+
     /// Every link and the heading it's in, or the file for links before its first heading,
     /// unsaved buffers' in place of their files'.
     public func links(overlay: [String: FileRecord] = [:]) throws -> [(source: HeadingLocation, target: String)] {

@@ -445,6 +445,13 @@ struct OrgstarApp: App {
             }
         }
         .defaultSize(width: 1100, height: 700)
+        Window("Graph", id: "graph") {
+            if case .success(let model) = workspace {
+                RoamGraphWindow(workspace: model, session: session, commands: commands)
+                    .tint(ConfigSync.shared.theme.color("accent"))
+            }
+        }
+        .defaultSize(width: 900, height: 700)
         Window("Clock Report", id: "clock-report") {
             if case .success(let model) = workspace {
                 ClockReportView(workspace: model, session: session)
@@ -660,6 +667,7 @@ struct AgendaMenuItem: View {
             .keyboardShortcut("a", modifiers: [.command, .shift])
         Button("Board") { openWindow(id: "board") }
             .keyboardShortcut("b", modifiers: [.command, .shift])
+        Button("Graph") { if ProAccess.shared.allows(.roam) { openWindow(id: "graph") } }
     }
 }
 

@@ -153,7 +153,7 @@ Cancel answers nothing, as =C-g= does.
 
 =C-c '= on a block, and =C-c `= on a table field, open the text in a sheet of its own; Save puts it back. A src block's code is colored as its language, as in the editor.
 
-More ▸ Backlinks lists the links to the heading at the caret and to the file; More ▸ Daily Notes, Find Node… and Insert Node Link… work with org-roam-style notes, and the Folders tab's calendar menu opens today's, yesterday's and tomorrow's note. See [[file:09-links.org][Links]].
+More ▸ Backlinks lists the links to the heading at the caret and to the file; More ▸ Daily Notes, Find Node…, Insert Node Link… and Node Graph work with org-roam-style notes, and the Folders tab's calendar menu opens today's, yesterday's and tomorrow's note. See [[file:09-links.org][Links]].
 
 Incremental Search is in Commands, and on =C-s= and =C-r= with a hardware keyboard; see [[file:02-the-editor.org][The editor]]. =auto-fill-mode= works as on the Mac.
 

@@ -1060,6 +1060,7 @@ See [[file:09-links.org][Links]].
 |-+-+-+-+-|
 | Find Node… (=app.node.find=) | =C-c n f= | — | =SPC n r f= (N) | Opens a heading or file with an ID, chosen by title (=org-roam-node-find=). |
 | Insert Node Link… (=app.node.insert=) | =C-c n i= | — | =SPC n r i= (N) | Inserts an =id:= link to a node (=org-roam-node-insert=). |
+| Show Node Graph (=app.node.graph=) | =C-c n g= | — | =SPC n r g= (N) | Opens the graph of nodes and the links between them. |
 | Go to Today's Daily Note (=app.dailies.today=) | =C-c n d d= | — | =SPC n r d t= (N) | =org-roam-dailies-goto-today=. |
 | Go to Yesterday's Daily Note (=app.dailies.yesterday=) | =C-c n d y= | — | =SPC n r d y= (N) | =org-roam-dailies-goto-yesterday=. |
 | Go to Tomorrow's Daily Note (=app.dailies.tomorrow=) | =C-c n d t= | — | =SPC n r d m= (N) | =org-roam-dailies-goto-tomorrow=. |
