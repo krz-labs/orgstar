@@ -142,6 +142,7 @@ struct SidebarBar<Content: View>: View {
     @Binding var showsAgenda: Bool
     @ViewBuilder var content: Content
     @Environment(\.orgTheme) private var theme
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         HStack(spacing: 6) {
@@ -157,6 +158,14 @@ struct SidebarBar<Content: View>: View {
         .foregroundStyle(theme.color("sidebar-foreground") ?? .primary)
         .padding(.horizontal, 10)
         .padding(.vertical, 7)
+        // Solid, so the rows scrolling under the bar don't show through its buttons.
+        .background {
+            if let color = theme.color("sidebar-background", in: colorScheme) {
+                color
+            } else {
+                Rectangle().fill(.ultraThickMaterial)
+            }
+        }
         .overlay(alignment: .top) { Divider() }
     }
 }
