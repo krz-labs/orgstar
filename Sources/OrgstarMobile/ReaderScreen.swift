@@ -35,6 +35,8 @@ struct ReaderScreen: View {
     @State private var loadedPath: String?
     /// The file's display: indentation, leading stars, inline images, truncation.
     @State private var startup: StartupDisplay?
+    /// Headings' padded tags, by the heading's start.
+    @State private var tagGaps: [Int: TagGap] = [:]
     /// The view's width, which images in a line's text are no wider than.
     @State private var width: CGFloat = 0
     @State private var showingOutline = false
@@ -188,7 +190,10 @@ struct ReaderScreen: View {
         let ns = tree.text as NSString
         let line = ns.lineRange(for: NSRange(location: entry.start, length: 0))
         let start = indented ? min(entry.start + entry.level + 1, NSMaxRange(line)) : entry.start
-        let text = attributed(ReadingText.segments(tree, in: start..<NSMaxRange(line), display: display), heading: entry.level, theme)
+        let tags = tagGaps[entry.start].flatMap { $0.tags.upperBound <= NSMaxRange(line) ? $0 : nil }
+        func styled(_ range: Range<Int>) -> AttributedString {
+            attributed(ReadingText.segments(tree, in: range, display: display), heading: entry.level, theme)
+        }
         let hasContent = entry.end > NSMaxRange(line)
         let foldedMark = fold.folds.contains(entry.start) && hasContent
         return HStack(alignment: .firstTextBaseline, spacing: 0) {
@@ -196,7 +201,12 @@ struct ReaderScreen: View {
                 .font(.caption.weight(.semibold)).foregroundStyle(theme.swiftColor("markup") ?? Color(uiColor: .tertiaryLabel))
                 .opacity(hasContent ? 1 : 0)
                 .frame(width: 2 * theme.column, alignment: .leading)
-            lineText(Text(text.trimmingTrailingNewlines()), theme)
+            if let tags, tags.gap.lowerBound >= start {
+                headingWithTags(title: styled(start..<tags.gap.lowerBound), gap: styled(tags.gap),
+                                tags: styled(tags.tags.lowerBound..<NSMaxRange(line)).trimmingTrailingNewlines(), theme)
+            } else {
+                lineText(Text(styled(start..<NSMaxRange(line)).trimmingTrailingNewlines()), theme)
+            }
         }
         .padding(.leading, headingIndent(entry, theme))
         .padding(.top, entry.level == 1 ? 6 : 0)
@@ -204,6 +214,24 @@ struct ReaderScreen: View {
         .onTapGesture { fold = Presentation.cycle(entry.start, in: tree, fold) }
         .accessibilityAddTraits(.isButton)
         .accessibilityHint(foldedMark ? "Unfolds the heading" : "Folds the heading")
+    }
+
+    /// A heading whose tags are padded: as written when the line fits, the tags at the right
+    /// edge when they fit after one space, else the tags on a line of their own at the right.
+    private func headingWithTags(title: AttributedString, gap: AttributedString, tags: AttributedString, _ theme: MobileTheme) -> some View {
+        ViewThatFits(in: .horizontal) {
+            Text(title + gap + tags).fixedSize()
+            HStack(alignment: .firstTextBaseline, spacing: 0) {
+                Text(title).fixedSize()
+                Spacer(minLength: theme.column)
+                Text(tags).fixedSize()
+            }
+            VStack(alignment: .trailing, spacing: 0) {
+                lineText(Text(title), theme)
+                Text(tags).fixedSize()
+            }
+        }
+        .lineSpacing(CGFloat(max(0, theme.spec.lineSpacing)))
     }
 
     private func textView(_ tree: OrgTree, _ range: Range<Int>, _ theme: MobileTheme) -> some View {
@@ -422,6 +450,8 @@ struct ReaderScreen: View {
         guard let tree = document?.tree, showsOwnFile else { return }
         let display = Presentation.startupDisplay(tree, options: session.options)
         startup = display
+        let text = tree.text as NSString
+        tagGaps = Dictionary(Presentation.tagGaps(tree).map { (text.lineRange(for: NSRange(location: $0.gap.lowerBound, length: 0)).location, $0) }) { a, _ in a }
         folded = display.wrappers.map(\.hidden)
         foldable = folded
         guard loadedPath != shownPath else { return }

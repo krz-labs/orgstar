@@ -136,6 +136,9 @@ final class MobileEditor: NSObject, DocumentBuffer {
     var showsLatex = false
     /// The view width images were last sized for.
     var imageWidth: CGFloat = 0
+    /// The text width heading tag gaps were last drawn for, and whether drawing them again is waiting.
+    var tagGapWidth: CGFloat = 0
+    var fittingTagGaps = false
     /// The file's folder, for relative image paths.
     let baseDirectory: URL?
     /// An `attachment:` link's file, from its name, offset and the tree; nil leaves those links

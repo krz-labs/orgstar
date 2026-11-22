@@ -31,10 +31,13 @@ extension OrgEditor {
             document.tree, in: range, highlighter: highlighter, indented: indented, hideStars: hideStars,
             showMarkup: showMarkup, options: options, revealed: revealed.location..<NSMaxRange(revealed)
         )
+        var tags: [Range<Int>] = []
         for change in changes {
             switch change {
             case .indent(let line): storage.addAttribute(.paragraphStyle, value: paragraphStyle(line.firstLine, line.wrapped), range: NSRange(line.range))
-            case .role(let role, let range): theme.apply(role, to: storage, range: NSRange(range))
+            case .role(let role, let range):
+                theme.apply(role, to: storage, range: NSRange(range))
+                if role == .tags { tags.append(range) }
             case .hidden(let range): storage.addAttributes(theme.hidden, range: NSRange(range))
             }
         }
@@ -49,6 +52,62 @@ extension OrgEditor {
         applyHighlights(range, in: storage)
         applyImages(range, in: storage, revealed: revealed)
         applyLatex(range, in: storage, revealed: revealed)
+        fitTagGaps(tags, in: storage)
+    }
+
+    /// The text container's width, for tag gaps: the narrowest view's, as images are sized.
+    var tagGapAvailableWidth: CGFloat {
+        let widths = textViews.compactMap { view in view.textContainer.map { $0.size.width - 2 * $0.lineFragmentPadding } }
+        return widths.filter { $0 > 0 }.min() ?? 0
+    }
+
+    /// Draws the spaces before each heading's tags in `tags` as one gap that fits the view
+    /// (`Presentation.tagGapWidth`): all but the last space hidden, the last widened.
+    func fitTagGaps(_ tags: [Range<Int>], in storage: NSTextStorage) {
+        guard !tags.isEmpty else { return }
+        let available = tagGapAvailableWidth
+        guard available > 0 else { return }
+        // The storage's own string: `string` copies the whole text.
+        let text = storage.mutableString
+        for range in tags where range.upperBound <= text.length {
+            guard let gap = Presentation.tagGap(tags: range, in: text) else { continue }
+            let line = text.lineRange(for: NSRange(location: gap.gap.lowerBound, length: 0))
+            let indent = (storage.attribute(.paragraphStyle, at: line.location, effectiveRange: nil) as? NSParagraphStyle)?.firstLineHeadIndent ?? 0
+            // Without the paragraph style, whose indent is taken from the width apart.
+            func width(_ range: Range<Int>) -> CGFloat {
+                let part = NSMutableAttributedString(attributedString: storage.attributedSubstring(from: NSRange(range)))
+                part.removeAttribute(.paragraphStyle, range: NSRange(location: 0, length: part.length))
+                return part.size().width
+            }
+            // Spaces measured before the tags: trailing spaces may not count.
+            let last = gap.gap.upperBound - 1
+            let title = width(line.location..<gap.gap.lowerBound), tagsWidth = width(gap.tags)
+            let space = width(last..<gap.tags.upperBound) - tagsWidth
+            // A point to spare, so rounding doesn't wrap the tags.
+            guard let shown = Presentation.tagGapWidth(
+                title: title, gap: width(line.location..<gap.tags.upperBound) - title - tagsWidth, space: space, tags: tagsWidth,
+                available: available - indent - 1
+            ) else { continue }
+            storage.addAttributes(theme.hidden, range: NSRange(gap.gap.lowerBound..<last))
+            storage.addAttribute(.kern, value: max(0, shown - space), range: NSRange(location: last, length: 1))
+        }
+    }
+
+    /// Draws tag gaps again once the view's width has changed, after the layout pass that changed it.
+    func refitTagGaps() {
+        guard isOrg, !fittingTagGaps else { return }
+        fittingTagGaps = true
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.fittingTagGaps = false
+            guard self.tagGapWidth != self.tagGapAvailableWidth else { return }
+            let text = self.document.text as NSString
+            for gap in Presentation.tagGaps(self.document.tree) where gap.tags.upperBound <= text.length {
+                let line = text.lineRange(for: NSRange(location: gap.gap.lowerBound, length: 0))
+                self.restyleOutsideEditing(line.location..<NSMaxRange(line))
+            }
+            self.tagGapWidth = self.tagGapAvailableWidth
+        }
     }
 
     /// `org-pretty-entities`: entities drawn as their character over the entity's last

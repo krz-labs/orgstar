@@ -189,7 +189,10 @@ public final class OrgEditor: NSObject {
             onImage(data, ext)
             return true
         }
-        view.onWidthChange = { [weak self] in self?.fitImages() }
+        view.onWidthChange = { [weak self] in
+            self?.fitImages()
+            self?.refitTagGaps()
+        }
         view.onMouseDown = { [weak self, unowned view] in
             self?.active = view
             self?.markActive = false
@@ -714,6 +717,9 @@ public final class OrgEditor: NSObject {
     /// The width images were last sized for, and whether sizing them again is waiting.
     var imageWidth: CGFloat = 0
     var fittingImages = false
+    /// The text width heading tag gaps were last drawn for, and whether drawing them again is waiting.
+    var tagGapWidth: CGFloat = 0
+    var fittingTagGaps = false
     /// `org-latex-preview`: LaTeX fragments show as typeset math.
     public internal(set) var showsLatex = false
     /// An `attachment:` link's file, from its name, offset and the tree: the app's
