@@ -236,7 +236,7 @@ Complete at Point (=completion-at-point=) completes the word before the caret fr
 |--------+----------------------------------------------------------|
 | Emacs  | =C-M-i=                                                  |
 | Doom   | =C-SPC= or =C-@= in insert state; the list also opens by itself after you type two characters and pause for 0.4 seconds, as Doom's corfu does |
-| Mac    | no key; run Complete at Point from the palette, or bind one in =keymap.toml= |
+| Mac    | =⌥⎋= (Option-Escape) while Option is Meta; =⌃Space= stays with macOS, which switches input sources with it |
 
 With one candidate, it is inserted. With several, a list opens under the caret, showing up to 16 rows. Nothing is selected until you pick a row.
 

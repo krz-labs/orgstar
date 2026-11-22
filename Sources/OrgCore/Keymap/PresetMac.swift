@@ -298,6 +298,9 @@ extension KeymapPreset {
         [[bind]]
         keys = "C-M-s-v"
         command = "org.babel.tangle-target"
+        [[bind]]
+        keys = "M-ESC"
+        command = "editor.complete"
 
         """
 }

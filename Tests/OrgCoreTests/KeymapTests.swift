@@ -155,6 +155,8 @@ struct KeymapTests {
         }
         #expect(KeymapPreset.mac.keymap.keys(for: "org.tags.set") == [KeyChord("g", [.control, .command])])
         #expect(KeymapPreset.mac.keymap.keys(for: "org.deadline") == [KeyChord("e", [.control, .command])])
+        // ⌃Space switches input sources, so Complete at Point is ⌥Esc, the system's completion key.
+        #expect(KeymapPreset.mac.keymap.keys(for: "editor.complete") == [KeyChord("ESC", [.meta])])
     }
 
     /// The Mac preset reaches links, clocking, export and act-at-point without the palette.
