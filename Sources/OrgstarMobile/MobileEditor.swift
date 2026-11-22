@@ -193,6 +193,9 @@ final class MobileEditor: NSObject, DocumentBuffer {
             return handleKey(key)
         }
         view.onLayout = { [weak self] in self?.viewResized() }
+        let find = EditorFind(view: view) { [weak self] in self?.unfold(around: $0) }
+        view.find = find
+        view.addInteraction(UIFindInteraction(sessionDelegate: find))
         view.onFiles = { [weak self, weak view] files in
             guard let self, let onFiles else { return false }
             if let view { focus(view) }

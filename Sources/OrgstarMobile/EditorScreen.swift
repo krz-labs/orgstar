@@ -133,6 +133,9 @@ struct EditorScreen: View {
                 if pane?.conflict != nil {
                     Button("Conflict", systemImage: "exclamationmark.triangle") { sheet = .conflict }
                 }
+                Button("Find", systemImage: "magnifyingglass") {
+                    textView?.interactions.lazy.compactMap { $0 as? UIFindInteraction }.first?.presentFindNavigator(showingReplace: false)
+                }
                 // Redo on a long press, as the system's back buttons offer history.
                 Menu {
                     Button("Redo", systemImage: "arrow.uturn.forward") { editor?.run("edit.redo") }

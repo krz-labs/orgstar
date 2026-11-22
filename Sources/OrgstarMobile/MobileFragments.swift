@@ -44,6 +44,8 @@ final class KeyedTextView: UITextView {
     private var handled: Set<UIKeyboardHIDUsage>?
     /// Called after each layout pass, as the view's size settles.
     var onLayout: (() -> Void)?
+    /// The find bar's session, which opens folded text before a result shows.
+    var find: EditorFind?
     /// The text container's width while lines are truncated.
     static let truncatedWidth: CGFloat = 100_000
     /// The widest the text runs, centred in a wider view; 0 for the view's width.
@@ -109,6 +111,81 @@ final class KeyedTextView: UITextView {
         }
         if !rest.isEmpty { super.pressesEnded(rest, with: event) }
     }
+}
+
+/// The editor's find: the file's text searched, folded text opened before a result shows, and that result selected.
+final class EditorFind: NSObject, @preconcurrency UITextSearching, UIFindInteractionDelegate {
+    nonisolated(unsafe) private weak var view: UITextView?
+    private let found: (Int) -> Void
+
+    init(view: UITextView, found: @escaping (Int) -> Void) {
+        self.view = view
+        self.found = found
+    }
+
+    func findInteraction(_ interaction: UIFindInteraction, sessionFor view: UIView) -> UIFindSession? {
+        UITextSearchingFindSession(searchableObject: self)
+    }
+
+    var selectedTextRange: UITextRange? { view?.selectedTextRange }
+
+    func compare(_ foundRange: UITextRange, toRange: UITextRange, document: AnyHashable??) -> ComparisonResult {
+        view?.compare(foundRange, toRange: toRange, document: document) ?? .orderedSame
+    }
+
+    nonisolated func performTextSearch(queryString: String, options: UITextSearchOptions, resultAggregator: UITextSearchAggregator<AnyHashable?>) {
+        // The aggregator takes results from any thread; the view's ranges are made on the main thread.
+        nonisolated(unsafe) let aggregator = resultAggregator
+        let search = {
+            MainActor.assumeIsolated {
+                guard let view = self.view else { return }
+                for found in Self.matches(of: queryString, in: view.textStorage.string as NSString, options: options) {
+                    guard let start = view.position(from: view.beginningOfDocument, offset: found.lowerBound),
+                          let end = view.position(from: start, offset: found.count),
+                          let range = view.textRange(from: start, to: end) else { continue }
+                    aggregator.foundRange(range, searchString: queryString, document: nil)
+                }
+            }
+            aggregator.finishedSearching()
+        }
+        if Thread.isMainThread { search() } else { DispatchQueue.main.sync(execute: search) }
+    }
+
+    /// Where `query` is in `text`, as the find bar's options ask: case, and matching a word's
+    /// start or a whole word.
+    nonisolated static func matches(of query: String, in text: NSString, options: UITextSearchOptions) -> [Range<Int>] {
+        func isWord(_ index: Int) -> Bool {
+            guard index >= 0, index < text.length, let scalar = Unicode.Scalar(text.character(at: index)) else { return false }
+            return CharacterSet.alphanumerics.contains(scalar)
+        }
+        var matches: [Range<Int>] = []
+        var from = 0
+        while from < text.length {
+            let found = text.range(of: query, options: options.stringCompareOptions, range: NSRange(location: from, length: text.length - from))
+            guard found.location != NSNotFound, found.length > 0 else { break }
+            from = NSMaxRange(found)
+            switch options.wordMatchMethod {
+            case .startsWith: if isWord(found.location - 1) { continue }
+            case .fullWord: if isWord(found.location - 1) || isWord(NSMaxRange(found)) { continue }
+            default: break
+            }
+            matches.append(found.location..<NSMaxRange(found))
+        }
+        return matches
+    }
+
+    func decorate(foundTextRange: UITextRange, document: AnyHashable??, usingStyle style: UITextSearchFoundTextStyle) {
+        guard let view else { return }
+        view.decorate(foundTextRange: foundTextRange, document: document, usingStyle: style)
+        guard style == .highlighted else { return }
+        let start = view.offset(from: view.beginningOfDocument, to: foundTextRange.start)
+        found(start)
+        // The result shown is selected, as the Mac's find selects it.
+        view.selectedTextRange = foundTextRange
+        view.scrollRangeToVisible(NSRange(location: start, length: view.offset(from: foundTextRange.start, to: foundTextRange.end)))
+    }
+
+    func clearAllDecoratedFoundText() { view?.clearAllDecoratedFoundText() }
 }
 
 extension NSAttributedString.Key {

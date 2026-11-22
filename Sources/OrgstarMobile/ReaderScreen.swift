@@ -43,6 +43,12 @@ struct ReaderScreen: View {
     @State private var previewed: URL?
     /// The pane the reader shows its file in, closed with the reader.
     @State private var holder = PaneHolder()
+    /// The system find bar over the file's text, shown each time `findRequest` changes.
+    @State private var find = ReaderFind()
+    @State private var findRequest = 0
+    /// Find's results, true for the one shown, and the offset to scroll to.
+    @State private var found: [Range<Int>: Bool] = [:]
+    @State private var findTarget: Int?
     @Environment(\.openURL) private var openURL
     @Environment(MobileModel.self) private var model
 
@@ -103,11 +109,21 @@ struct ReaderScreen: View {
                 guard let offset = pane?.revealRequest?.offset else { return }
                 reveal(offset, proxy)
             }
+            .onChange(of: findTarget) {
+                guard let offset = findTarget else { return }
+                findTarget = nil
+                showFound(offset, proxy)
+            }
         }
         .navigationTitle(((shownPath ?? "") as NSString).lastPathComponent)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
+                Button("Find", systemImage: "magnifyingglass") {
+                    find.text = (document?.tree.text ?? "") as NSString
+                    findRequest += 1
+                }
+                .disabled(document == nil)
                 Button("Outline", systemImage: "list.bullet.indent") { showingOutline = true }.disabled(outline.isEmpty)
                 if let path = shownPath {
                     if let tree = document?.tree { ExportMenu(path: path, tree: tree) { message = $0 } }
@@ -119,6 +135,7 @@ struct ReaderScreen: View {
         .sheet(isPresented: $showingOutline) { outlineSheet }
         .message($message)
         .environment(\.openURL, OpenURLAction { url in follow(url) })
+        .background { FindHost(find: find, request: findRequest) }
         .onAppear(perform: open)
         .onChange(of: pane?.path) { loadFolds() }
         .onChange(of: pane?.editVersion) { loadFolds() }
@@ -325,9 +342,43 @@ struct ReaderScreen: View {
             }
             part.font = Font(font as CTFont)
             part.foregroundColor = Color(uiColor: color)
+            if !found.isEmpty { markFound(&part, segment) }
             result += part
         }
         return result
+    }
+
+    /// Find's results in a segment's text: exactly where the segment shows the file as written,
+    /// otherwise the whole segment.
+    private func markFound(_ part: inout AttributedString, _ segment: ReadingText.Segment) {
+        let length = (segment.text as NSString).length
+        let span = segment.offset..<(segment.offset + length)
+        let source = (document?.tree.text ?? "") as NSString
+        let asWritten = span.upperBound <= source.length && source.substring(with: NSRange(span)) == segment.text
+        for (range, shown) in found where range.overlaps(span) || (span.isEmpty && range.contains(span.lowerBound)) {
+            let color = Color(uiColor: shown ? .systemYellow : .systemYellow.withAlphaComponent(0.35))
+            guard asWritten else {
+                part.backgroundColor = color
+                continue
+            }
+            let text = segment.text
+            func index(_ offset: Int) -> AttributedString.Index {
+                let utf16 = text.utf16.index(text.startIndex, offsetBy: min(max(0, offset - span.lowerBound), length))
+                return part.index(part.startIndex, offsetByCharacters: text.distance(from: text.startIndex, to: utf16))
+            }
+            let lower = index(range.lowerBound), upper = index(range.upperBound)
+            if lower < upper { part[lower..<upper].backgroundColor = color }
+        }
+    }
+
+    /// Unfolds the way to a find result, its heading and a drawer it's in, and scrolls to its heading.
+    private func showFound(_ offset: Int, _ proxy: ScrollViewProxy) {
+        folded.removeAll { $0.contains(offset) }
+        // Before the first heading, the text shows already.
+        guard let index = outline.lastIndex(where: { $0.start <= offset }) else { return }
+        fold.folds.remove(outline[index].start)
+        fold.bodyFolds.remove(outline[index].start)
+        reveal(offset, proxy)
     }
 
     /// How deep a role's text usually nests: elements, then objects, then their parts.
@@ -343,6 +394,8 @@ struct ReaderScreen: View {
     // MARK: - Actions
 
     private func open() {
+        find.onChange = { found = $0 }
+        find.onShow = { findTarget = $0 }
         let pane = holder.pane ?? {
             let made = session.makePane()
             holder.pane = made
@@ -435,6 +488,102 @@ struct ReaderScreen: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { showingOutline = false } } }
         }
+    }
+}
+
+/// The reader's find, for the system find bar: it searches the file as written and tells the
+/// reader which results to mark and which one to show.
+@MainActor
+final class ReaderFind: NSObject, @preconcurrency UITextSearching, UIFindInteractionDelegate {
+    /// The file's text, set when the find bar opens.
+    nonisolated(unsafe) var text: NSString = ""
+    /// Each result marked, true for the one shown.
+    var onChange: ([Range<Int>: Bool]) -> Void = { _ in }
+    /// The result to show, by its offset.
+    var onShow: (Int) -> Void = { _ in }
+    private var marked: [Range<Int>: Bool] = [:]
+
+    final class Position: UITextPosition {
+        let offset: Int
+        init(_ offset: Int) { self.offset = offset }
+    }
+
+    final class TextRange: UITextRange {
+        let range: Range<Int>
+        init(_ range: Range<Int>) { self.range = range }
+        override var start: UITextPosition { Position(range.lowerBound) }
+        override var end: UITextPosition { Position(range.upperBound) }
+        override var isEmpty: Bool { range.isEmpty }
+    }
+
+    func findInteraction(_ interaction: UIFindInteraction, sessionFor view: UIView) -> UIFindSession? {
+        UITextSearchingFindSession(searchableObject: self)
+    }
+
+    var selectedTextRange: UITextRange? { nil }
+
+    func compare(_ foundRange: UITextRange, toRange: UITextRange, document: AnyHashable??) -> ComparisonResult {
+        let a = (foundRange as? TextRange)?.range.lowerBound ?? 0, b = (toRange as? TextRange)?.range.lowerBound ?? 0
+        return a < b ? .orderedAscending : a > b ? .orderedDescending : .orderedSame
+    }
+
+    /// May be called off the main thread; reads only `text`, an immutable string.
+    nonisolated func performTextSearch(queryString: String, options: UITextSearchOptions, resultAggregator: UITextSearchAggregator<AnyHashable?>) {
+        for found in EditorFind.matches(of: queryString, in: text, options: options) {
+            resultAggregator.foundRange(TextRange(found), searchString: queryString, document: nil)
+        }
+        resultAggregator.finishedSearching()
+    }
+
+    func decorate(foundTextRange: UITextRange, document: AnyHashable??, usingStyle style: UITextSearchFoundTextStyle) {
+        guard let range = (foundTextRange as? TextRange)?.range else { return }
+        switch style {
+        case .normal: marked[range] = nil
+        case .highlighted:
+            marked[range] = true
+            onShow(range.lowerBound)
+        default: marked[range] = false
+        }
+        onChange(marked)
+    }
+
+    func clearAllDecoratedFoundText() {
+        marked = [:]
+        onChange(marked)
+    }
+
+    func scrollRangeToVisible(_ range: UITextRange, inDocument: AnyHashable??) {
+        if let range = (range as? TextRange)?.range { onShow(range.lowerBound) }
+    }
+}
+
+/// Holds the find interaction for a SwiftUI screen, and shows its find bar when `request` changes.
+private struct FindHost: UIViewRepresentable {
+    let find: ReaderFind
+    let request: Int
+
+    /// The find bar shows for the first responder's interaction.
+    final class Host: UIView {
+        override var canBecomeFirstResponder: Bool { true }
+    }
+
+    func makeUIView(context: Context) -> Host {
+        let view = Host()
+        view.addInteraction(UIFindInteraction(sessionDelegate: find))
+        return view
+    }
+
+    func updateUIView(_ view: Host, context: Context) {
+        guard request != context.coordinator.shown else { return }
+        context.coordinator.shown = request
+        view.becomeFirstResponder()
+        view.interactions.lazy.compactMap { $0 as? UIFindInteraction }.first?.presentFindNavigator(showingReplace: false)
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator() }
+
+    final class Coordinator {
+        var shown = 0
     }
 }
 
