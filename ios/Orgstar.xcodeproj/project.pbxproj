@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EC91295D4306AF0CE88F1D07 /* OrgMathJax in Frameworks */ = {isa = PBXBuildFile; productRef = 70EC41AF804F61B000FC5A1E /* OrgMathJax */; };
+		7080D3827813E58F1F3C6ABC /* OrgMathJax in Frameworks */ = {isa = PBXBuildFile; productRef = FE5434EBA139A800E8727F4B /* OrgMathJax */; };
 		1B78003BBCE8A4B809333342 /* OrgApp in Frameworks */ = {isa = PBXBuildFile; productRef = A2BE626BBE45EA52880B6169 /* OrgApp */; };
 		1E5861C0EFE1D96CDC21A22F /* OrgApp in Frameworks */ = {isa = PBXBuildFile; productRef = BA239181876756F7732397EB /* OrgApp */; };
 		2BE799BF03ED43EAA6849F53 /* OrgApp in Frameworks */ = {isa = PBXBuildFile; productRef = EDEF22C5B4F393296F1D17BB /* OrgApp */; };
@@ -281,6 +283,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1B78003BBCE8A4B809333342 /* OrgApp in Frameworks */,
+				7080D3827813E58F1F3C6ABC /* OrgMathJax in Frameworks */,
 				9BE045FD696469CA8D19F22C /* OrgHighlight in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -314,6 +317,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				34F40D483630871B50619E6F /* OrgApp in Frameworks */,
+				EC91295D4306AF0CE88F1D07 /* OrgMathJax in Frameworks */,
 				4392873ADA2B1FC8930BE6C9 /* OrgEditorAppKit in Frameworks */,
 				CA594F2E6DAFED2D16900872 /* OrgHighlight in Frameworks */,
 			);
@@ -422,6 +426,7 @@
 			name = "Orgstar iOS";
 			packageProductDependencies = (
 				A2BE626BBE45EA52880B6169 /* OrgApp */,
+				FE5434EBA139A800E8727F4B /* OrgMathJax */,
 				47D54A361A74FE9E2B0722BB /* OrgHighlight */,
 			);
 			productName = Orgstar;
@@ -572,6 +577,7 @@
 			name = "Orgstar macOS";
 			packageProductDependencies = (
 				B1EC171400CB989363332D07 /* OrgApp */,
+				70EC41AF804F61B000FC5A1E /* OrgMathJax */,
 				0E5F6DB1CD783274FB49FD5E /* OrgEditorAppKit */,
 				88F9A423F8C1EBE523B6438B /* OrgHighlight */,
 			);
@@ -1618,6 +1624,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
 			productName = OrgCore;
+		};
+		FE5434EBA139A800E8727F4B /* OrgMathJax */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
+			productName = OrgMathJax;
+		};
+		70EC41AF804F61B000FC5A1E /* OrgMathJax */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A46A1BCE0B67C45BEC8F435B /* XCLocalSwiftPackageReference ".." */;
+			productName = OrgMathJax;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

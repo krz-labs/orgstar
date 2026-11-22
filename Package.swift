@@ -16,6 +16,7 @@ let package = Package(
         .library(name: "OrgEditorAppKit", targets: ["OrgEditorAppKit"]),
         .executable(name: "OrgstarSpike", targets: ["OrgstarSpike"]),
         .library(name: "OrgApp", targets: ["OrgApp"]),
+        .library(name: "OrgMathJax", targets: ["OrgMathJax"]),
         .library(name: "OrgWatchData", targets: ["OrgWatchData"]),
         .library(name: "OrgHighlight", targets: ["OrgHighlight"]),
         .executable(name: "Orgstar", targets: ["Orgstar"]),
@@ -87,8 +88,9 @@ let package = Package(
             ]
         ),
         .executableTarget(name: "OrgstarSpike", dependencies: ["OrgEditorAppKit"]),
-        // MathJax for PDF export, which typesets math without the network.
-        .target(name: "OrgApp", dependencies: ["OrgWorkspace", "OrgDocument", "OrgPresentation", "OrgWatchData"], resources: [.copy("Resources/MathJax")]),
+        .target(name: "OrgApp", dependencies: ["OrgWorkspace", "OrgDocument", "OrgPresentation", "OrgWatchData"]),
+        // MathJax for PDF export, which typesets math without the network; the apps link it, extensions don't.
+        .target(name: "OrgMathJax", resources: [.copy("MathJax")]),
         // What the phone and the watch send each other; Foundation only, so the watch builds it.
         .target(name: "OrgWatchData"),
         // The watch app and its complications, bundled by scripts/build-watch-app.sh.
@@ -96,9 +98,9 @@ let package = Package(
         .executableTarget(name: "OrgstarWatchWidgets", dependencies: ["OrgWatchData"]),
         // Babel, Emacs and gnuplot as processes; the Developer ID app alone links it.
         .target(name: "OrgPrograms", dependencies: ["OrgApp"]),
-        .executableTarget(name: "Orgstar", dependencies: ["OrgApp", "OrgPrograms", "OrgEditorAppKit", "OrgHighlight", .product(name: "Sparkle", package: "Sparkle")]),
+        .executableTarget(name: "Orgstar", dependencies: ["OrgApp", "OrgMathJax", "OrgPrograms", "OrgEditorAppKit", "OrgHighlight", .product(name: "Sparkle", package: "Sparkle")]),
         // The iOS app, bundled by scripts/build-ios-app.sh.
-        .executableTarget(name: "OrgstarMobile", dependencies: ["OrgApp", "OrgHighlight"]),
+        .executableTarget(name: "OrgstarMobile", dependencies: ["OrgApp", "OrgMathJax", "OrgHighlight"]),
         // App extensions, bundled into orgstar.app by scripts/build-app.sh.
         .executableTarget(name: "OrgstarQuickLook", dependencies: ["OrgCore"], linkerSettings: extensionEntry),
         .executableTarget(name: "OrgstarSpotlight", dependencies: ["OrgCore"], linkerSettings: extensionEntry),
@@ -114,7 +116,7 @@ let package = Package(
         .testTarget(name: "OrgWorkspaceTests", dependencies: ["OrgWorkspace"]),
         .testTarget(name: "OrgPresentationTests", dependencies: ["OrgPresentation"]),
         .testTarget(name: "OrgEditorAppKitTests", dependencies: ["OrgEditorAppKit", "OrgApp"]),
-        .testTarget(name: "OrgAppTests", dependencies: ["OrgApp", "OrgDocument"]),
+        .testTarget(name: "OrgAppTests", dependencies: ["OrgApp", "OrgDocument", "OrgMathJax"]),
         .testTarget(name: "OrgProgramsTests", dependencies: ["OrgPrograms", "OrgApp", "OrgDocument"]),
         .testTarget(name: "OrgHighlightTests", dependencies: ["OrgHighlight", "OrgCore", "OrgPresentation"])
     ]

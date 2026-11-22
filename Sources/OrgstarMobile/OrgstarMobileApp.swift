@@ -2,6 +2,7 @@
 import CoreSpotlight
 import OrgApp
 import OrgCore
+import OrgMathJax
 import SwiftUI
 import UserNotifications
 
@@ -14,6 +15,7 @@ struct OrgstarMobileApp: App {
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
+        PDFExport.mathJaxURL = OrgMathJax.script
         // Debug builds, and runs from Xcode, whose scheme sets ORGSTAR_PERF.
         #if DEBUG
         Perf.watchMainThread()

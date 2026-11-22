@@ -45,7 +45,7 @@ otool -l "$app/Contents/MacOS/Orgstar" | grep -q '@executable_path/../Frameworks
 # SwiftMath's math fonts, which it finds in the app's resources.
 cp -R "$(dirname "$binary")/SwiftMath_SwiftMath.bundle" "$app/Contents/Resources/"
 # MathJax, for PDF export.
-cp -R "$(dirname "$binary")/Orgstar_OrgApp.bundle" "$app/Contents/Resources/"
+cp -R "$(dirname "$binary")/Orgstar_OrgMathJax.bundle" "$app/Contents/Resources/"
 
 # Updates: the appcast and its signing key, for signed builds only; a dev build never checks.
 if [ "$sign" != "-" ]; then

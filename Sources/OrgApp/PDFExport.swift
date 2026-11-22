@@ -125,12 +125,12 @@ public enum PDFExport {
         </style>
         """
 
-    /// MathJax 3.2.2's `tex-svg-full.js`: every TeX extension in one file, with SVG output that
-    /// needs no font files, so nothing is fetched.
+    /// MathJax's `tex-svg-full.js`, which the app sets from `OrgMathJax.script`: every TeX
+    /// extension in one file, with SVG output that needs no font files, so nothing is fetched.
+    nonisolated(unsafe) public static var mathJaxURL: URL?
+
     nonisolated static func bundledMathJax() throws -> String {
-        guard let url = Bundle.module.url(forResource: "tex-svg-full", withExtension: "js", subdirectory: "MathJax") else {
-            throw Failure(description: "MathJax is missing from the app.")
-        }
+        guard let url = mathJaxURL else { throw Failure(description: "MathJax is missing from the app.") }
         return try String(contentsOf: url, encoding: .utf8)
     }
 

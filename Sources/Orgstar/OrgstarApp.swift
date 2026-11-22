@@ -2,6 +2,7 @@ import AppKit
 import OrgApp
 import OrgCore
 import OrgEditorAppKit
+import OrgMathJax
 import OrgPresentation
 #if !APPSTORE
 import OrgPrograms
@@ -374,6 +375,7 @@ struct OrgstarApp: App {
     }()
 
     init() {
+        PDFExport.mathJaxURL = OrgMathJax.script
         #if APPSTORE
         AgendaSnapshot.useGroupContainer = true
         EmacsFallback.offered = false

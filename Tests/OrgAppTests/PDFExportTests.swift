@@ -1,5 +1,6 @@
 import Foundation
 import OrgCore
+import OrgMathJax
 import PDFKit
 import Testing
 import WebKit
@@ -7,6 +8,8 @@ import WebKit
 
 @MainActor
 struct PDFExportTests {
+    init() { PDFExport.mathJaxURL = OrgMathJax.script }
+
     /// A long document comes out as several pages with its text, without Emacs.
     @Test func paginatesTheHTMLExport() async throws {
         let sections = (1...40).map { "* Section \($0)\n" + String(repeating: "Some words in a paragraph. ", count: 30) + "\n" }.joined()
