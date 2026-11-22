@@ -805,12 +805,20 @@ struct EditorTextView: UIViewRepresentable {
     let palette: () -> Void
 
     func makeUIView(context: Context) -> UITextView {
-        let bar = UIHostingController(rootView: KeyBar(editor: editor, palette: palette))
-        bar.view.frame = CGRect(x: 0, y: 0, width: 400, height: 48)
+        let bar = UIHostingController(rootView: KeyBar(editor: editor, palette: palette).dynamicTypeSize(...KeyBar.largestSize))
+        bar.view.frame = CGRect(x: 0, y: 0, width: 400, height: 2 * KeyBar.padding + KeyBar.target)
         bar.view.backgroundColor = .clear
-        bar.sizingOptions = []
+        // As tall as its buttons: the input accessory takes the intrinsic height.
+        bar.sizingOptions = .intrinsicContentSize
+        bar.safeAreaRegions = []
+        bar.view.autoresizingMask = .flexibleHeight
         view.inputAccessoryView = bar.view
         context.coordinator.bar = bar
+        // The bar's height follows the text size.
+        view.registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (view: UITextView, _) in
+            view.inputAccessoryView?.invalidateIntrinsicContentSize()
+            view.reloadInputViews()
+        }
         return view
     }
 
@@ -852,6 +860,12 @@ struct KeyBar: View {
         ("Code", "chevron.left.forwardslash.chevron.right", "org.emphasize.code"),
     ]
 
+    /// The bar's buttons are at least 44 points square, scaled with the text size up to here.
+    static let largestSize = DynamicTypeSize.accessibility2
+    static let target: CGFloat = 44
+    static let padding: CGFloat = 4
+    @ScaledMetric(relativeTo: .body) private var size = KeyBar.target
+
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 4) {
@@ -870,11 +884,26 @@ struct KeyBar: View {
                 Button("Hide keyboard", systemImage: "keyboard.chevron.compact.down") { editor.textView.resignFirstResponder() }
             }
             .labelStyle(.iconOnly)
-            .buttonStyle(.bordered)
+            .buttonStyle(KeyStyle(size: size))
             .padding(.horizontal, 8)
-            .padding(.vertical, 6)
+            .padding(.vertical, Self.padding)
         }
         .background(.bar)
+    }
+}
+
+/// A key bar button: a tinted symbol on a capsule, at least `size` square.
+private struct KeyStyle: ButtonStyle {
+    let size: CGFloat
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundStyle(.tint)
+            .padding(.horizontal, 10)
+            .frame(minWidth: size, minHeight: size)
+            .background(.fill.tertiary, in: .capsule)
+            .opacity(configuration.isPressed ? 0.5 : 1)
+            .contentShape(.capsule)
     }
 }
 
