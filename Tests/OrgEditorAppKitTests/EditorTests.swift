@@ -488,6 +488,54 @@ struct InitialStylingTests {
         #expect(h.textView.textStorage!.isEqual(to: Harness(h.string).textView.textStorage!))
     }
 
+    @Test func openingLeavesTextPastTheFirstChunkUnstyled() throws {
+        let text = String(repeating: "** heading *bold*\nbody text\n", count: 4_000)
+        let h = Harness(DocumentState(bytes: Array(text.utf8)), layout: false)
+        let storage = try #require(h.textView.textStorage)
+        var unstyled = NSRange()
+        _ = storage.attributes(at: h.editor.styledUpTo, longestEffectiveRange: &unstyled, in: NSRange(location: 0, length: storage.length))
+        #expect(unstyled == NSRange(location: h.editor.styledUpTo, length: storage.length - h.editor.styledUpTo))
+    }
+
+    /// `#+STARTUP` display options hold in the first chunk before any background pass, and in
+    /// the rest after them.
+    @Test(arguments: [
+        "#+STARTUP: noindent\n", "#+STARTUP: noindent hidestars\n", "#+STARTUP: indent\n", "#+STARTUP: latexpreview\nInline $x^2$ here.\n",
+        "#+STARTUP: shrink\n| <3> | b |\n| long cell | c |\n", "",
+    ]) func startupDisplayAppliesToEveryChunk(head: String) throws {
+        let text = head + String(repeating: "** heading *bold*\nbody text\n", count: 4_000) + "Last $y^2$ line\n"
+        let h = Harness(DocumentState(bytes: Array(text.utf8)), layout: false)
+        let storage = try #require(h.textView.textStorage)
+        let length = storage.length
+        // Without the preview boxes, which are made anew by each styling.
+        func styled() -> NSAttributedString {
+            let copy = NSMutableAttributedString(attributedString: storage.attributedSubstring(from: NSRange(location: 0, length: h.editor.styledUpTo)))
+            copy.removeAttribute(.orgLatex, range: NSRange(location: 0, length: copy.length))
+            return copy
+        }
+        func check() {
+            let before = styled()
+            h.editor.restyleOutsideEditing(0..<h.editor.styledUpTo)
+            #expect(styled().isEqual(to: before))
+        }
+        #expect(h.editor.styledUpTo < length)
+        check()
+        h.drainStyling()
+        #expect(h.editor.styledUpTo == length)
+        check()
+
+        let ns = text as NSString
+        for needle in ["$x^2$", "$y^2$"] where head.contains("latexpreview") {
+            #expect(storage.attribute(.orgLatex, at: ns.range(of: needle).location, effectiveRange: nil) != nil)
+        }
+        for needle in [ns.range(of: "** heading"), ns.range(of: "** heading", options: .backwards)] {
+            let stars = storage.attribute(.foregroundColor, at: needle.location, effectiveRange: nil) as? NSColor
+            #expect((stars == .clear) == !head.contains("noindent\n"))
+            let body = storage.attribute(.paragraphStyle, at: NSMaxRange(ns.lineRange(for: needle)), effectiveRange: nil) as? NSParagraphStyle
+            #expect((body?.firstLineHeadIndent == 0) == head.contains("noindent"))
+        }
+    }
+
     @Test func editsBeforeTheWatermarkShiftIt() {
         let text = String(repeating: "line of text\n", count: 5_000)
         let h = Harness(DocumentState(bytes: Array(text.utf8)), layout: false)

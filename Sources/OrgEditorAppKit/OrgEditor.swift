@@ -110,19 +110,22 @@ public final class OrgEditor: NSObject {
         textContentStorage.delegate = self
 
         if isOrg { shaded.set(Presentation.shadedBlocks(document.tree)) }
+        let startup = isOrg ? Presentation.startupDisplay(document.tree, options: options) : nil
+        if let startup {
+            // What styling reads, set before the text loads: the first chunk and the
+            // background passes style with it.
+            indented = startup.indented
+            hideStars = startup.hideStars
+            shrunk = ShrunkColumns.startup(document.tree)
+            showsImages = startup.inlineImages
+            showsLatex = startup.latexPreview
+        }
         load(document.text)
         // Files open at their start, as in Emacs; replacing the storage leaves it at the end.
         textView.setSelectedRange(NSRange(location: 0, length: 0))
-        if isOrg {
-            let startup = Presentation.startupDisplay(document.tree, options: options)
-            indented = startup.indented
-            hideStars = startup.hideStars
+        if let startup {
             if startup.folds != FoldState() { setFolds(startup.folds, wrappers: startup.wrappers) }
-            shrunk = ShrunkColumns.startup(document.tree)
-            if startup.inlineImages { showsImages = true }
-            if startup.latexPreview { showsLatex = true }
             if startup.alignTables { _ = perform(AlignAllTables()) }
-            if !indented || !hideStars { restyleOutsideEditing(0..<utf16Length) }
         }
         spellChecking = options.spellCheck
         truncatesLines = options.startupTruncated
@@ -263,6 +266,7 @@ public final class OrgEditor: NSObject {
             view.updateGutter()
         }
         styledUpTo = 0
+        revealedLine = caretLine
         styleNextChunk(Self.firstStyleChunk)
         scheduleStyling()
     }
