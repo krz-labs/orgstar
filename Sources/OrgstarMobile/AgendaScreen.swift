@@ -1070,9 +1070,8 @@ struct AgendaRowView: View {
                 Text(row.gutter)
                     .font(.caption.weight(.medium).monospacedDigit())
                     .foregroundStyle(statusColor)
-                    .lineLimit(1)
-                    .allowsTightening(true)
-                    .minimumScaleFactor(0.8)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             if let symbol = row.symbol {
                 Image(systemName: symbol)

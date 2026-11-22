@@ -120,18 +120,21 @@ extension AgendaView {
         return shown.isEmpty ? "No folders" : shown.map { ($0 as NSString).lastPathComponent }.joined(separator: ", ")
     }
 
-    /// The span shown, as the window's title: `Week of 5 Oct 2026`.
+    /// The span shown, as the window's title: `Week of 5 Oct`, with the year when it isn't
+    /// the current one.
     var title: String {
         guard isAgenda else { return viewName.replacingOccurrences(of: "…", with: "") }
         guard let first = agenda.days.first?.day, let last = agenda.days.last?.day else { return "Agenda" }
+        let thisYear = Days.date(agenda.today).year
+        let year = Days.date(first).year == thisYear && Days.date(last).year == thisYear ? "" : " yyyy"
         switch spanKind {
-        case .day: return Self.format(first, "EEEE d MMMM yyyy")
-        case .week: return "Week of " + Self.format(first, "d MMM yyyy")
-        case .month: return Self.format(first, "MMMM yyyy")
+        case .day: return Self.format(first, "EEEE d MMMM" + year)
+        case .week: return "Week of " + Self.format(first, "d MMM" + year)
+        case .month: return Self.format(first, "MMMM" + year)
         case nil:
-            if first == last { return Self.format(first, "EEEE d MMMM yyyy") }
+            if first == last { return Self.format(first, "EEEE d MMMM" + year) }
             let sameYear = Days.date(first).year == Days.date(last).year
-            return Self.format(first, sameYear ? "d MMM" : "d MMM yyyy") + " – " + Self.format(last, "d MMM yyyy")
+            return Self.format(first, sameYear ? "d MMM" : "d MMM yyyy") + " – " + Self.format(last, "d MMM" + year)
         }
     }
 

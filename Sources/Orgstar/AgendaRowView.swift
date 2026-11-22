@@ -71,8 +71,8 @@ struct AgendaRowView: View {
             Text(lines[0])
                 .font(.callout.weight(row.status == .overdue || row.status == .dueSoon ? .semibold : .regular).monospacedDigit())
                 .foregroundStyle(statusColor)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
             if lines.count > 1 {
                 Text(lines[1]).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
             }
