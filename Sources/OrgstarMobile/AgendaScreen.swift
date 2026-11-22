@@ -114,12 +114,7 @@ struct AgendaScreen: View, Equatable {
             } else if case .agenda = agenda.mode {
                 let _ = model.settingsVersion
                 ForEach(Perf.measure("agenda.groups") { agenda.groups(showAllDates: OrgPreferences.agendaShowAllDates(), filter: filter) }) { group in
-                    overdue(group)
-                    Section {
-                        day(group)
-                    } header: {
-                        header(group)
-                    }
+                    dayGroup(group)
                 }
             } else if case .blocks = agenda.mode {
                 // A block's title over its days, or over its entries.
@@ -127,12 +122,7 @@ struct AgendaScreen: View, Equatable {
                     if block.isAgenda {
                         Section { } header: { Text(block.header).font(.headline) }
                         ForEach(agenda.groups(block, showAllDates: OrgPreferences.agendaShowAllDates(), filter: filter)) { group in
-                            overdue(group)
-                            Section {
-                                day(group)
-                            } header: {
-                                header(group)
-                            }
+                            dayGroup(group)
                         }
                     } else {
                         Section {
@@ -446,15 +436,12 @@ struct AgendaScreen: View, Equatable {
 
     // MARK: - Days
 
-    /// Today's entries from earlier days, in a section of their own above today's.
+    /// A day under its header. On today, the entries from earlier days come first, in a group
+    /// of their own headed Overdue.
     @ViewBuilder
-    private func overdue(_ group: AgendaDayGroup) -> some View {
+    private func dayGroup(_ group: AgendaDayGroup) -> some View {
         if group.isToday, !group.overdue.isEmpty {
             Section {
-                if overdueExpanded {
-                    ForEach(group.overdue) { item in Deferred { row(item, day: group.day) } }
-                }
-            } header: {
                 Button {
                     withAnimation { overdueExpanded.toggle() }
                 } label: {
@@ -470,8 +457,23 @@ struct AgendaScreen: View, Equatable {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .textCase(nil)
                 .accessibilityValue(overdueExpanded ? "Expanded" : "Collapsed")
+                if overdueExpanded {
+                    ForEach(group.overdue) { item in Deferred { row(item, day: group.day) } }
+                }
+            } header: {
+                header(group)
+            }
+            if !group.rows.isEmpty {
+                Section {
+                    day(group)
+                }
+            }
+        } else {
+            Section {
+                day(group)
+            } header: {
+                header(group)
             }
         }
     }
@@ -939,8 +941,8 @@ extension RGBA {
     var swiftUI: Color { Color(.sRGB, red: red, green: green, blue: blue, opacity: alpha) }
 }
 
-/// One agenda line: the time or status with an icon in the gutter; the category, title,
-/// progress and tags; the TODO keyword and priority on the right.
+/// One agenda line: the time or status over an icon; above the title the
+/// category, progress and tags, with the TODO keyword and priority at the end; a habit's graph under it.
 struct AgendaRowView: View {
     let row: AgendaRow
     /// The day the row is on, for habit graphs.
@@ -1029,40 +1031,29 @@ struct AgendaRowView: View {
 
     /// The start over the end for timed rows, else the status; the icon under them.
     private var gutter: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 4) {
-            Image(systemName: icon ?? "circle").font(.caption2.weight(.semibold)).foregroundStyle(iconColor)
-                .frame(width: 14)
-                .opacity(icon == nil ? 0 : 1)
-            VStack(alignment: .leading, spacing: 1) {
-                if row.start != nil {
-                    let parts = row.gutter.split(separator: "–", maxSplits: 1)
-                    Text(parts.first.map(String.init) ?? row.gutter)
-                        .font(.subheadline.monospacedDigit().weight(.semibold))
-                        .foregroundStyle(row.status == .normal ? Color.primary : row.status == .done ? Color.secondary : statusColor)
-                    if parts.count > 1 {
-                        Text(parts[1]).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
-                    }
-                } else if !row.gutter.isEmpty {
-                    Text(row.gutter)
-                        .font(.caption.weight(.medium).monospacedDigit())
-                        .foregroundStyle(statusColor)
-                        .lineLimit(1)
-                        .allowsTightening(true)
-                        .minimumScaleFactor(0.8)
+        VStack(alignment: .leading, spacing: 2) {
+            let lines = row.gutterLines
+            if row.start != nil {
+                Text(lines[0])
+                    .font(.subheadline.monospacedDigit().weight(.semibold))
+                    .foregroundStyle(row.status == .normal ? Color.primary : row.status == .done ? Color.secondary : statusColor)
+                if lines.count > 1 {
+                    Text(lines[1]).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
                 }
+            } else if !row.gutter.isEmpty {
+                Text(row.gutter)
+                    .font(.caption.weight(.medium).monospacedDigit())
+                    .foregroundStyle(statusColor)
+                    .lineLimit(1)
+                    .allowsTightening(true)
+                    .minimumScaleFactor(0.8)
             }
-        }
-    }
-
-    private var icon: String? {
-        switch row.icon {
-        case .scheduled: row.status == .overdue ? "exclamationmark.circle.fill" : "calendar"
-        case .deadline: row.status == .overdue ? "exclamationmark.triangle.fill" : "flag.fill"
-        case .habit: "repeat"
-        case .event: "calendar"
-        case .reminder: "circle"
-        case .timestamp: "clock"
-        case nil: nil
+            if let symbol = row.symbol {
+                Image(systemName: symbol)
+                    .font(.caption2.weight(.semibold))
+                    .imageScale(row.icon == .event ? .small : .medium)
+                    .foregroundStyle(iconColor)
+            }
         }
     }
 

@@ -5,8 +5,8 @@ import OrgCore
 import OrgPresentation
 import SwiftUI
 
-/// One agenda line: the time or status over an icon, the category above the title, progress
-/// and tags after it, and the TODO keyword and priority at the end.
+/// One agenda line: the time or status over an icon; above the title the category, progress and
+/// tags, with the TODO keyword and priority at the end; a habit's graph under the title.
 struct AgendaRowView: View {
     let row: AgendaRow
     /// The agenda day the row is on, for habit graphs.
@@ -23,29 +23,24 @@ struct AgendaRowView: View {
     static let gutterWidth: CGFloat = 92
 
     var body: some View {
-        HStack(alignment: .center, spacing: 12) {
+        HStack(alignment: .top, spacing: 12) {
             if showsGutter { gutter }
             VStack(alignment: .leading, spacing: 2) {
-                if !row.category.isEmpty { categoryLine }
-                titleLine
+                HStack(alignment: .top, spacing: 8) {
+                    metaLine
+                    Spacer(minLength: 0)
+                    marks
+                }
+                Text(row.title.isEmpty ? " " : row.title)
+                    .font(.body)
+                    .strikethrough(row.isDone)
+                    .foregroundStyle(row.isDone ? AnyShapeStyle(.secondary) : AnyShapeStyle(theme.color("foreground") ?? .primary))
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                if let habit = row.item?.habit {
+                    HabitGraph(cells: habit.graph(today: day), theme: theme).padding(.top, 2)
+                }
             }
-            .layoutPriority(1)
-            Spacer(minLength: 8)
-            if let habit = row.item?.habit {
-                HabitGraph(cells: habit.graph(today: day), theme: theme)
-            }
-            if let todo = row.todo {
-                let color = theme.dynamic(row.isDone ? .systemGreen : .systemRed) { [theme, row] in theme.todoColor(todo, isDone: row.isDone, dark: $0) }
-                Text(todo)
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(color)
-                    .padding(.horizontal, 7)
-                    .padding(.vertical, 2)
-                    .background(Capsule().fill(color.opacity(0.14)))
-                    .fixedSize()
-            }
-            priorityBadge
-                .frame(width: badgeSize)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 6)
@@ -69,14 +64,19 @@ struct AgendaRowView: View {
         theme.dynamic(.secondaryLabelColor) { [theme, row] in theme.statusColor(row.status, dark: $0) }
     }
 
+    /// The start over the end for timed rows, else the status; the icon under them.
     private var gutter: some View {
-        VStack(alignment: .leading, spacing: 3) {
-            Text(row.gutter)
+        VStack(alignment: .leading, spacing: 2) {
+            let lines = row.gutterLines
+            Text(lines[0])
                 .font(.callout.weight(row.status == .overdue || row.status == .dueSoon ? .semibold : .regular).monospacedDigit())
                 .foregroundStyle(statusColor)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
-            if let symbol {
+            if lines.count > 1 {
+                Text(lines[1]).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+            }
+            if let symbol = row.symbol {
                 Image(systemName: symbol)
                     .font(.caption.weight(.semibold))
                     .imageScale(row.icon == .event ? .small : .medium)
@@ -86,36 +86,26 @@ struct AgendaRowView: View {
         .frame(width: gutterWidth, alignment: .leading)
     }
 
-    /// Overdue entries show a warning, done ones a check, as the status says first.
-    private var symbol: String? {
-        guard let icon = row.icon else { return nil }
-        if row.status == .overdue { return "exclamationmark.circle.fill" }
-        if row.status == .done { return "checkmark.circle.fill" }
-        switch icon {
-        case .scheduled: return "calendar"
-        case .deadline: return "flag.fill"
-        case .habit: return "repeat"
-        case .event: return "circle.fill"
-        case .reminder: return "circle"
-        case .timestamp: return row.start == nil ? "calendar" : "clock"
-        }
-    }
-
     private var iconColor: Color {
         if let event = row.event { return theme.dynamic(.systemPurple) { [theme] in theme.eventColor(event, dark: $0) } }
         return row.status == .normal ? Color.secondary.opacity(0.8) : statusColor
     }
 
-    private var categoryLine: some View {
-        HStack(spacing: 5) {
-            Circle()
-                .fill(row.event.map { event in theme.dynamic(.systemPurple) { [theme] in theme.eventColor(event, dark: $0) } }
-                    ?? theme.dynamic { [theme, row] in theme.categoryColor(row.category, dark: $0) })
-                .frame(width: 6, height: 6)
-            Text(row.category)
-                .font(.subheadline)
-                .foregroundStyle(theme.color("agenda-category") ?? .secondary)
-                .lineLimit(1)
+    /// The category, the prefix's detail, progress and tags, wrapping to more lines as needed.
+    private var metaLine: some View {
+        FlowLayout(spacing: 5, lineSpacing: 3) {
+            if !row.category.isEmpty {
+                HStack(spacing: 5) {
+                    Circle()
+                        .fill(row.event.map { event in theme.dynamic(.systemPurple) { [theme] in theme.eventColor(event, dark: $0) } }
+                            ?? theme.dynamic { [theme, row] in theme.categoryColor(row.category, dark: $0) })
+                        .frame(width: 6, height: 6)
+                    Text(row.category)
+                        .font(.subheadline)
+                        .foregroundStyle(theme.color("agenda-category") ?? .secondary)
+                        .lineLimit(1)
+                }
+            }
             if let detail = row.prefixDetail {
                 Text(detail)
                     .font(.subheadline)
@@ -123,17 +113,6 @@ struct AgendaRowView: View {
                     .lineLimit(1)
                     .truncationMode(.middle)
             }
-        }
-    }
-
-    private var titleLine: some View {
-        HStack(spacing: 6) {
-            Text(row.title.isEmpty ? " " : row.title)
-                .font(.body)
-                .strikethrough(row.isDone)
-                .foregroundStyle(row.isDone ? AnyShapeStyle(.secondary) : AnyShapeStyle(theme.color("foreground") ?? .primary))
-                .lineLimit(1)
-                .truncationMode(.tail)
             ForEach([row.progress, row.detail].compactMap { $0 }, id: \.self) { progress in
                 Text(progress)
                     .font(.caption.weight(.semibold).monospacedDigit())
@@ -141,7 +120,6 @@ struct AgendaRowView: View {
                     .padding(.horizontal, 6)
                     .padding(.vertical, 1)
                     .background(Capsule().fill(Color.secondary.opacity(0.14)))
-                    .fixedSize()
             }
             ForEach(row.tags, id: \.self) { tag in
                 Text(tag)
@@ -150,9 +128,25 @@ struct AgendaRowView: View {
                     .padding(.horizontal, 6)
                     .padding(.vertical, 1)
                     .background(Capsule().strokeBorder((theme.color("tags") ?? .secondary).opacity(0.35), lineWidth: 0.5))
-                    .fixedSize()
             }
         }
+    }
+
+    /// The TODO keyword and the priority, at the end of the category's line.
+    private var marks: some View {
+        HStack(spacing: 6) {
+            if let todo = row.todo {
+                let color = theme.dynamic(row.isDone ? .systemGreen : .systemRed) { [theme, row] in theme.todoColor(todo, isDone: row.isDone, dark: $0) }
+                Text(todo)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(color)
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 2)
+                    .background(Capsule().fill(color.opacity(0.14)))
+            }
+            priorityBadge
+        }
+        .fixedSize()
     }
 
     @ViewBuilder

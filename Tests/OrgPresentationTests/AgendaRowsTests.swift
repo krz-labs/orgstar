@@ -94,6 +94,20 @@ struct AgendaRowsTests {
         #expect(!rent.isEvent && rent.item != nil)
     }
 
+    @Test func gutterLinesAndSymbols() {
+        let rows = Self.rows()
+        #expect(rows["Dentist"]?.gutterLines == ["13:50", "14:30"])
+        #expect(rows["Standup"]?.gutterLines == ["08:00"])
+        #expect(rows["Send forms"]?.gutterLines == ["3d late"])
+        #expect(rows["Send forms"]?.symbol == "exclamationmark.circle.fill")
+        #expect(rows["Pay rent"]?.symbol == "exclamationmark.circle.fill")
+        #expect(rows["Took out bins"]?.symbol == "checkmark.circle.fill")
+        #expect(rows["File taxes"]?.symbol == "flag.fill")
+        #expect(rows["Water plants"]?.symbol == "calendar")
+        #expect(rows["Dentist"]?.symbol == "clock")
+        #expect(rows["Birthday"]?.symbol == "calendar")
+    }
+
     @Test func logRowsKeepTheDurationAndState() {
         let text = """
             * DONE Write report

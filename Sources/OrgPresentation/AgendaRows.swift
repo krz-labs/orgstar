@@ -99,6 +99,27 @@ public struct AgendaRow: Sendable, Equatable, Identifiable {
     /// The calendar's color for an event.
     public var color: RGBA? { event?.color }
 
+    /// The gutter as its lines: a timed row's start over its end, else the status.
+    public var gutterLines: [String] {
+        start == nil ? [gutter] : gutter.split(separator: "–", maxSplits: 1).map(String.init)
+    }
+
+    /// The SF Symbol under the gutter: a warning for overdue entries and a check for done ones,
+    /// as the status says first, else one for the kind of row.
+    public var symbol: String? {
+        guard let icon else { return nil }
+        if status == .overdue { return "exclamationmark.circle.fill" }
+        if status == .done { return "checkmark.circle.fill" }
+        switch icon {
+        case .scheduled: return "calendar"
+        case .deadline: return "flag.fill"
+        case .habit: return "repeat"
+        case .event: return "circle.fill"
+        case .reminder: return "circle"
+        case .timestamp: return start == nil ? "calendar" : "clock"
+        }
+    }
+
     /// Nil for the time grid and the current-time line.
     public init?(item: AgendaItem, day: Int, today: Int) {
         if item.kind == .timeGrid || item.kind == .currentTime { return nil }
