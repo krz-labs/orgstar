@@ -94,7 +94,7 @@ The palette lists every command by title with its keys in the current keymap. Op
 - =M-x= in the Emacs and Doom presets (=execute-extended-command=),
 - =SPC := in Doom normal state.
 
-Type part of a title; matching is fuzzy and the best matches come first. =Return= runs the top match, a click runs any row, and =Esc= closes the palette. Each row shows up to two key sequences; in the Doom preset these are normal-state keys first, then insert-state keys.
+Type part of a title; matching is fuzzy and the best matches come first. =↑= and =↓= (or =C-p= and =C-n=) move the highlight, =Return= runs the highlighted command, a click runs any row, and =Esc= closes the palette. Quick Open (=⌘P=) works the same way. Each row shows up to two key sequences; in the Doom preset these are normal-state keys first, then insert-state keys.
 
 The palette leaves out text-system movement and editing commands (Forward Character, Kill Line, Set Mark and the like), which only make sense from keys. Every other command is in it, including the ones no preset binds, such as Show or Hide Backlinks, Import Table from File…, Recovery Versions… and Delete Property…. The Mac App Store version leaves out the Emacs exports and Attach File as Hard Link… and as Symbolic Link…; a key bound to Export to PDF with Emacs runs Export to PDF. Commands that cannot run at the caret show a message instead.
 
@@ -955,7 +955,7 @@ When a key appears in several rows, it runs the command whose condition holds at
 | Next Table Field (=org.table.next-field=) | =TAB= | =⇥= | =TAB= (I) | In a table, aligns it and moves to the next field, adding a row at the end (=org-table-next-field=). |
 | Previous Table Field (=org.table.previous-field=) | =S-TAB= | =⇧⇥= | =S-TAB= (I) | In a table, moves to the previous field (=org-table-previous-field=). |
 | Next Table Row (=org.table.next-row=) | =RET= | =↩= | =RET= (I) | In a table, moves to the same field in the next row, adding a row at the end (=org-table-next-row=). |
-| Align Table (=org.table.align=) | — | — | =SPC m b a= (N) | In a table, aligns it (=org-table-align=). =C-c C-c= in a table also aligns it; see Act at Point. |
+| Align Table (=org.table.align=) | — | — | =SPC m b a= (N) | In a table, aligns it (=org-table-align=). =C-c C-c= in a table also aligns it; see Update at Point. |
 | Move Table Row Up (=org.table.row-up=) | =M-<up>= | =⌃⌘↑= | =M-k= | In a table, moves the row up (=org-table-move-row-up=). |
 | Move Table Row Down (=org.table.row-down=) | =M-<down>= | =⌃⌘↓= | =M-j= | In a table, moves the row down (=org-table-move-row-down=). |
 | Move Table Column Left (=org.table.column-left=) | =M-<left>= | =⌃⌘←= | =M-h=, =C-d= (I) | In a table, moves the column left (=org-table-move-column-left=). |
@@ -993,7 +993,7 @@ When a key appears in several rows, it runs the command whose condition holds at
 
 | Command | Emacs | Mac | Doom | What it does |
 |-+-+-+-+-|
-| Act at Point (C-c C-c) (=org.ctrl-c-ctrl-c=) | =C-c C-c= | =⌃⌘X= | — | Does what fits the context: sets tags on a heading, toggles an item's checkbox, follows a footnote, offers the property menu in a property drawer, updates a clock line, statistics cookie or timestamp, runs a =#+CALL:= line, inline =call_= or inline =src_= block, and refreshes the setup on a =#+= keyword line (=org-ctrl-c-ctrl-c=). In a table it evaluates a formula typed in the field (starting with ~=~ or ~:=~), then recalculates the row when it is marked =#= and otherwise aligns the table; at the table's first character it recalculates the whole table. After a sparse tree, the first =C-c C-c= only clears the highlights. More specific bindings take =C-c C-c= and =⌃⌘X= in src blocks, =#+TBLFM= lines and dynamic blocks. |
+| Update at Point (=org.ctrl-c-ctrl-c=) | =C-c C-c= | =⌃⌘X= | — | Does what fits the context: sets tags on a heading, toggles an item's checkbox, follows a footnote, offers the property menu in a property drawer, updates a clock line, statistics cookie or timestamp, runs a =#+CALL:= line, inline =call_= or inline =src_= block, and refreshes the setup on a =#+= keyword line (=org-ctrl-c-ctrl-c=). In a table it evaluates a formula typed in the field (starting with ~=~ or ~:=~), then recalculates the row when it is marked =#= and otherwise aligns the table; at the table's first character it recalculates the whole table. After a sparse tree, the first =C-c C-c= only clears the highlights. More specific bindings take =C-c C-c= and =⌃⌘X= in src blocks, =#+TBLFM= lines and dynamic blocks. |
 | Act at Point (=org.dwim=) | — | — | =RET= (N) | Doom's =+org/dwim-at-point=: follows a link, runs a src block, recalculates or aligns a table, toggles a checkbox, or switches a heading between TODO and done. |
 | Run Source Block (=org.babel.execute=) | =C-c C-c= | =⌃⌘X= | — | In a src block, runs it and inserts the results (=org-babel-execute-src-block=). |
 | Tangle File (=org.babel.tangle=) | =C-c C-v t=, =C-c C-v C-t= | =⌃⌘V= | — | Writes the file's src blocks to their tangle targets (=org-babel-tangle=). |

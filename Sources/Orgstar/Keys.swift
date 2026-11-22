@@ -216,6 +216,8 @@ struct PaletteView: View {
     let commands: AppCommands
     let run: (String) -> Void
     @State private var query = ""
+    /// The highlighted match, moved by ↑/↓ or C-p/C-n and run by Return.
+    @State private var selected = 0
     @Environment(\.dismiss) private var dismiss
 
     private var matches: [EditorCommand] {
@@ -228,26 +230,35 @@ struct PaletteView: View {
 
     var body: some View {
         let matches = matches
+        let current = min(selected, matches.count - 1)
         VStack(spacing: 0) {
             TextField("Run command", text: $query)
                 .textFieldStyle(.plain)
                 .font(.title3)
                 .padding(12)
-                .onSubmit { if let first = matches.first { run(first.id) } }
+                .onSubmit { if current >= 0 { run(matches[current].id) } }
+                .movesSelection($selected, current: current, count: matches.count)
+                .onChange(of: query) { selected = 0 }
             Divider()
-            List(matches, id: \.id) { command in
-                Button {
-                    run(command.id)
-                } label: {
-                    HStack {
-                        Text(command.localizedTitle)
-                        Spacer()
-                        if let keys = commands.keyLabel(for: command.id) {
-                            Text(keys).font(.system(.caption, design: .monospaced)).foregroundStyle(.secondary)
+            ScrollViewReader { proxy in
+                List(matches.indices, id: \.self) { index in
+                    let command = matches[index]
+                    Button {
+                        run(command.id)
+                    } label: {
+                        HStack {
+                            Text(command.localizedTitle)
+                            Spacer()
+                            if let keys = commands.keyLabel(for: command.id) {
+                                Text(keys).font(.system(.caption, design: .monospaced)).foregroundStyle(.secondary)
+                            }
                         }
+                        .contentShape(Rectangle())
                     }
+                    .buttonStyle(.plain)
+                    .selectedRow(index == current)
                 }
-                .buttonStyle(.plain)
+                .onChange(of: current) { if current >= 0 { proxy.scrollTo(current) } }
             }
         }
         .frame(width: 520, height: 360)

@@ -6,7 +6,6 @@ import Foundation
 enum CommandTitles {
     static let all: [String] = [
         String(localized: "Act at Point", comment: "Command title"),
-        String(localized: "Act at Point (C-c C-c)", comment: "Command title"),
         String(localized: "Agenda", comment: "Command title"),
         String(localized: "Align Table", comment: "Command title"),
         String(localized: "Align table.el Table", comment: "Command title"),
@@ -327,6 +326,7 @@ enum CommandTitles {
         String(localized: "Unset Attachment Folder", comment: "Command title"),
         String(localized: "Up to Parent Heading", comment: "Command title"),
         String(localized: "Update Dynamic Block", comment: "Command title"),
+        String(localized: "Update at Point", comment: "Command title"),
         String(localized: "Use Selection for Find", comment: "Command title"),
         String(localized: "Verbatim", comment: "Command title"),
         String(localized: "Widen", comment: "Command title"),

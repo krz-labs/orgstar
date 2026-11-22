@@ -2332,41 +2332,6 @@
         }
       }
     },
-    "Act at Point (C-c C-c)": {
-      "comment": "Command title",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "An der Einfügemarke ausführen (C-c C-c)"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Actuar en el punto (C-c C-c)"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Agir au point (C-c C-c)"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ポイントで実行（C-c C-c）"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Agir no Cursor (C-c C-c)"
-          }
-        }
-      }
-    },
     "Actions": {
       "localizations": {
         "de": {
@@ -35203,6 +35168,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Atualizar Bloco Dinâmico"
+          }
+        }
+      }
+    },
+    "Update at Point": {
+      "comment": "Command title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An der Einfügemarke aktualisieren"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actualizar en el punto"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mettre à jour au point"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ポイントで更新"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atualizar no Cursor"
           }
         }
       }

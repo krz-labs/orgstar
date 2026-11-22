@@ -10,7 +10,7 @@ import Foundation
 public struct CtrlCCtrlC: OrgCommand {
     public init() {}
     public var id: String { "org.ctrl-c-ctrl-c" }
-    public var title: String { "Act at Point (C-c C-c)" }
+    public var title: String { "Update at Point" }
     public func applies(in context: EditContext) -> Bool { true }
 
     static let nothing = CommandStep.failed("`C-c C-c' can do nothing useful here")

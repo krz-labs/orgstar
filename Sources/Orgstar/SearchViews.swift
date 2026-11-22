@@ -51,14 +51,7 @@ struct QuickOpenView: View {
                 .font(.title3)
                 .padding(12)
                 .onSubmit { if current >= 0 { open(matches[current]) } }
-                .onKeyPress(phases: .down) { press in
-                    let control = press.modifiers == .control
-                    let step = if press.key == .downArrow || control && press.characters == "n" { 1 }
-                        else if press.key == .upArrow || control && press.characters == "p" { -1 } else { 0 }
-                    guard step != 0 else { return .ignored }
-                    selected = max(0, min(current + step, matches.count - 1))
-                    return .handled
-                }
+                .movesSelection($selected, current: current, count: matches.count)
                 .onChange(of: query) { selected = 0 }
             Divider()
             ScrollViewReader { proxy in
@@ -75,13 +68,34 @@ struct QuickOpenView: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .listRowBackground(index == current ? Color.accentColor.opacity(0.25) : Color.clear)
-                    .accessibilityAddTraits(index == current ? .isSelected : [])
+                    .selectedRow(index == current)
                 }
                 .onChange(of: current) { if current >= 0 { proxy.scrollTo(current) } }
             }
         }
         .frame(width: 520, height: 360)
         .onExitCommand { dismiss() }
+    }
+}
+
+extension View {
+    /// ↑/↓ and C-p/C-n move `selected` through `count` rows; `current` is the row shown as selected.
+    func movesSelection(_ selected: Binding<Int>, current: Int, count: Int) -> some View {
+        onKeyPress(phases: .down) { press in
+            let control = press.modifiers == .control
+            // Shift with an arrow is the date prompt's.
+            let plain = press.modifiers.intersection([.shift, .control, .option, .command]).isEmpty
+            let step = if press.key == .downArrow && plain || control && press.characters == "n" { 1 }
+                else if press.key == .upArrow && plain || control && press.characters == "p" { -1 } else { 0 }
+            guard step != 0, count > 0 else { return .ignored }
+            selected.wrappedValue = max(0, min(current + step, count - 1))
+            return .handled
+        }
+    }
+
+    /// The highlight of the row arrow keys select in a list.
+    func selectedRow(_ selected: Bool) -> some View {
+        listRowBackground(selected ? Color.accentColor.opacity(0.25) : Color.clear)
+            .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }
