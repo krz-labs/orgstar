@@ -66,6 +66,7 @@ struct EditorScreen: View {
     @State private var attaching: Attachments.Method?
     @State private var attachingPhotos = false
     @State private var takingPhoto = false
+    @State private var scanning = false
     @State private var photos: [PhotosPickerItem] = []
     /// A file shown in Quick Look.
     @State private var previewed: URL?
@@ -164,6 +165,9 @@ struct EditorScreen: View {
                         Button("Attach Photo or Video…", systemImage: "photo.badge.plus") { attachingPhotos = true }
                         if CameraPicker.isAvailable {
                             Button("Take Photo…", systemImage: "camera") { takingPhoto = true }
+                        }
+                        if DocumentScanner.isAvailable {
+                            Button("Scan Document…", systemImage: "doc.viewfinder") { scanning = true }
                         }
                         Button("Attach File from URL…", systemImage: "link.badge.plus") { attachActions.run("app.attach.url") }
                         Button("New Attachment…", systemImage: "square.and.pencil") { attachActions.run("app.attach.new") }
@@ -307,6 +311,13 @@ struct EditorScreen: View {
             CameraPicker { data in
                 takingPhoto = false
                 if let data { attachActions.yankImage(data, ext: "jpg", prefix: "photo") }
+            }
+            .ignoresSafeArea()
+        }
+        .fullScreenCover(isPresented: $scanning) {
+            DocumentScanner { data in
+                scanning = false
+                if let data { attachActions.yankImage(data, ext: "pdf", prefix: "scan") }
             }
             .ignoresSafeArea()
         }

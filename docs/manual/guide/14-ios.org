@@ -159,7 +159,7 @@ Incremental Search is in Commands, and on =C-s= and =C-r= with a hardware keyboa
 
 The org-timer commands are in Commands; a running timer shows above the text. See [[file:06-dates-and-clocking.org][Dates and clocking]].
 
-More ▸ Attachments has the org-attach commands, Attach Photo or Video… and Take Photo…, which insert the photo's link at the caret; files shared to orgstar can be attached to an entry. Pasting an image and dropping files on the editor attach them and link them at the caret. Attachments are copied or moved: iOS doesn't let orgstar link a file from another app's storage, so the keys for attaching by hard link or symbolic link say "Attachments can't be linked on iPhone and iPad; Attach File… copies the file." See [[file:04-outlines.org][Outlines]] and [[file:09-links.org][Links]].
+More ▸ Attachments has the org-attach commands, Attach Photo or Video…, Take Photo… and Scan Document…, which insert the link to the photo, or to the scanned pages as one PDF, at the caret; files shared to orgstar can be attached to an entry. Pasting an image and dropping files on the editor attach them and link them at the caret. Attachments are copied or moved: iOS doesn't let orgstar link a file from another app's storage, so the keys for attaching by hard link or symbolic link say "Attachments can't be linked on iPhone and iPad; Attach File… copies the file." See [[file:04-outlines.org][Outlines]] and [[file:09-links.org][Links]].
 
 Archive Subtree in Commands (or =C-c C-x C-s= with a hardware keyboard) archives the entry at the caret where =org-archive-location= says, as on the Mac.
 
