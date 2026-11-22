@@ -43,7 +43,7 @@ With text selected, the command converts the selected lines to a table instead
 
 | Key     | Org command                | Action                                                                     |
 |---------+----------------------------+----------------------------------------------------------------------------|
-| =TAB=   | =org-table-next-field=     | Aligns the table and moves to the next field, skipping rules. In the last field it adds a row. |
+| =TAB=   | =org-table-next-field=     | Aligns the table if the row it leaves changed width, and moves to the next field, skipping rules. In the last field it adds a row. |
 | =S-TAB= | =org-table-previous-field= | Aligns the table and moves to the previous field.                         |
 | =RET=   | =org-table-next-row=       | Aligns the table and moves down a row in the same column. Before a rule or at the end of the table it inserts a row. |
 
@@ -58,7 +58,12 @@ Widths count display columns, so wide characters and hidden link markup are meas
 as they appear.
 
 Alignment happens when you press =TAB=, =S-TAB= or =RET= in a table and after every
-table command, not while you type. To align without moving, use Org ▸ Align Table:
+table command, not while you type. Org's =TAB= aligns only when the buffer changed
+since the last alignment; orgstar's aligns when the row it leaves no longer lines up
+with the row above (below, in the first row), so a row you changed and left some other
+way stays as it is until the next alignment. As in Org, deleting from a field that still
+ends in two spaces doesn't count as a change: =TAB= pads that field back to its width.
+To align without moving, use Org ▸ Align Table:
 
 | Preset | Key                          |
 |--------+------------------------------|

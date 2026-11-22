@@ -53,6 +53,33 @@ struct TableTests {
         try compareWithEmacs(inputs, Self.commands, options: doomOptions)
     }
 
+    /// TAB realigns only after an edit (`org-table-may-need-update`), which here changes the width
+    /// of the field left behind. The last row is out of line, so a realign shows. Emacs starts
+    /// as if just aligned, makes the edit, then TABs; we TAB in the same text after the same edit.
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
+    func nextFieldRealignsOnlyAfterAWidthChange() throws {
+        let table = "| a    | b  |\n|------+----|\n| cc   | dd |\n| eeeeeeee | f |\n"
+        let dd = (table as NSString).range(of: "dd").upperBound
+        func edit(_ range: Range<Int>, _ replacement: String) -> String {
+            (table as NSString).replacingCharacters(in: NSRange(range), with: replacement)
+        }
+        let cases: [(label: String, form: String, caret: Int, text: String, after: Int)] = [
+            ("no edit", "", 3, table, 3),
+            ("typed into spare space", "(let ((last-command-event ?x)) (org-self-insert-command 1))", 3, edit(3..<3, "x"), 4),
+            ("typed past the column's width", "(insert \"xxxxxxxxxx\")", 3, edit(3..<3, "xxxxxxxxxx"), 13),
+            ("deleted with spare space left", "(org-delete-backward-char 1)", 3, edit(2..<3, ""), 2),
+            ("deleted from a full field", "(org-delete-backward-char 1)", dd, edit(dd - 1..<dd, ""), dd - 1),
+        ]
+        let emacs = try EmacsOracle.run(cases.map {
+            EmacsOracle.Case(text: table, point: EmacsOracle.point($0.caret, in: table), form: "(progn (setq org-table-may-need-update nil) \($0.form) (org-table-next-field))")
+        })
+        for (c, theirs) in zip(cases, emacs) {
+            let ours = runCommand(TableCommand(.nextField), c.text, caret: c.after)
+            let caret = EmacsOracle.offset(theirs.point, in: theirs.text)
+            #expect(ours.text == theirs.text && ours.caret == caret, "\(c.label): ours \(ours.text.debugDescription)@\(ours.caret) emacs \(theirs.text.debugDescription)@\(caret)")
+        }
+    }
+
     @Test(.enabled(if: ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil))
     func createTableMatchesEmacs() throws {
         for (text, caret) in [("", 0), ("x\n", 1), ("  \n", 2)] {

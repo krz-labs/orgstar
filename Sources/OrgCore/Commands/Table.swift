@@ -285,12 +285,87 @@ extension EmacsBuffer {
         point = min(lineEnd(point), start + 1)
     }
 
+    /// Display columns of the bars of the table line at `start`, and of the `+` in a rule; nil
+    /// unless the line has the form `org-table-align` gives it: a bar at the end, a space on
+    /// each side of every field, and only dashes between the bars of a rule.
+    func tableSeparatorColumns(_ start: Int) -> [Int]? {
+        let line = substring(start, lineEnd(start))
+        guard line.hasSuffix("|") else { return nil }
+        let rule = line.drop { $0 == " " || $0 == "\t" }.hasPrefix("|-")
+        var columns: [Int] = []
+        var column = 0
+        var segment = ""
+        for c in line {
+            if c == "|" || rule && c == "+" {
+                if !columns.isEmpty {
+                    if rule {
+                        guard !segment.isEmpty, segment.allSatisfy({ $0 == "-" }) else { return nil }
+                    } else {
+                        guard segment.count >= 3, segment.first == " ", segment.last == " " else { return nil }
+                    }
+                }
+                column += cellWidth(segment)
+                columns.append(column)
+                column += 1
+                segment = ""
+            } else {
+                segment.append(c)
+            }
+        }
+        return columns
+    }
+
+    /// Whether the table line at point is aligned and its bars line up with the line above
+    /// (below, on the first line): no field of it changed width since the table was aligned.
+    /// A field at point that lost characters but still ends in two spaces gets its width back
+    /// first, as `org-delete-char` keeps it, leaving `org-table-may-need-update` alone.
+    func tableLineLinesUp() -> Bool {
+        let start = lineStart(point)
+        func isTableLine(_ offset: Int) -> Bool {
+            substring(offset, lineEnd(offset)).drop { $0 == " " || $0 == "\t" }.hasPrefix("|")
+        }
+        let reference: Int
+        if start > 0, isTableLine(lineStart(start - 1)) {
+            reference = lineStart(start - 1)
+        } else if lineEnd(start) < length, isTableLine(lineEnd(start) + 1) {
+            reference = lineEnd(start) + 1
+        } else {
+            return false
+        }
+        guard let mine = tableSeparatorColumns(start), let theirs = tableSeparatorColumns(reference), mine.count == theirs.count else { return false }
+        if mine == theirs { return true }
+        // The field at point lies between bars `column - 1` and `column`.
+        let column = tableCurrentColumn()
+        guard !atTableHline, column > 0, column < mine.count, mine[..<column] == theirs[..<column] else { return false }
+        let shift = mine[column] - theirs[column]
+        guard shift < 0, (column..<mine.count).allSatisfy({ mine[$0] - theirs[$0] == shift }) else { return false }
+        var bar = start
+        var bars = 0
+        while bar < lineEnd(start) {
+            if character(at: bar) == 124 {
+                if bars == column { break }
+                bars += 1
+            }
+            bar += 1
+        }
+        guard character(at: bar - 1) == 32, character(at: bar - 2) == 32 else { return false }
+        saveExcursion {
+            point = bar
+            insert(String(repeating: " ", count: -shift))
+        }
+        return true
+    }
+
     /// `org-table-next-field`.
     func tableNextField() throws {
+        let unchanged = (unchangedPrefix, unchangedSuffix)
         try tableMaybeEvalFormula()
         try tableMaybeRecalculateLine()
         moveIntoField()
-        tableAlign()
+        // `org-table-may-need-update`: Org realigns only after the buffer changed since the last
+        // alignment. Without that history, a line that still lines up stands for no change; a
+        // formula's result is a change.
+        if unchanged != (unchangedPrefix, unchangedSuffix) || !tableLineLinesUp() { tableAlign() }
         let end = tableEnd()
         if atTableHline { endOfLine() }
         func toNextBar() -> Bool { searchForward("\\|", bound: end, caseInsensitive: false) != nil }
