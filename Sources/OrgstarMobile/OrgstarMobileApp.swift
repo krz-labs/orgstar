@@ -120,8 +120,9 @@ struct RootView: View {
     let workspace: WorkspaceModel
     let agenda: AgendaModel
     @State private var capture: CaptureRequest?
-    /// Captures from the share extension after the one showing.
-    @State private var waiting: [CaptureRequest] = []
+    /// The share extension's link whose capture sheet is showing, with its request's id. The link
+    /// stays in the inbox until the sheet is dismissed.
+    @State private var shared: (link: CaptureInbox.Link, request: UUID)?
     /// Files from the share extension, waiting for the entry to attach them to.
     @State private var sharedFiles: SharedFiles?
     @State private var tab = AppTab.agenda
@@ -290,7 +291,11 @@ struct RootView: View {
             capture = request
         }
 
-        .sheet(item: $capture, onDismiss: showWaiting) { request in
+        // Another capture took the sheet from a shared one, which stays in the inbox for later.
+        .onChange(of: capture?.id) { _, id in
+            if let id, id != shared?.request { shared = nil }
+        }
+        .sheet(item: $capture, onDismiss: captureDismissed) { request in
             CaptureScreen(workspace: workspace, session: session, request: request)
         }
         .sheet(item: $sharedFiles) { shared in
@@ -371,13 +376,29 @@ struct RootView: View {
 
     /// What the share extension left, one capture sheet at a time.
     private func takeShared() {
-        waiting += (model.inbox?.take() ?? []).compactMap(CaptureRequest.init(link:))
-        if capture == nil { showWaiting() }
+        showWaiting()
         if sharedFiles == nil, let batch = AttachmentInbox()?.batches().first { sharedFiles = SharedFiles(batch: batch) }
     }
 
+    /// The inbox's oldest capture, unless a capture sheet is showing or being dismissed.
     private func showWaiting() {
-        if !waiting.isEmpty { capture = waiting.removeFirst() }
+        guard capture == nil, shared == nil, let inbox = model.inbox else { return }
+        for link in inbox.links() {
+            guard let request = CaptureRequest(link: link.text) else {
+                inbox.remove(link)
+                continue
+            }
+            shared = (link, request.id)
+            capture = request
+            return
+        }
+    }
+
+    /// The shared capture was saved or discarded, so its link goes; then the next one shows.
+    private func captureDismissed() {
+        if let shared { model.inbox?.remove(shared.link) }
+        shared = nil
+        showWaiting()
     }
 
     /// A widget's or the Live Activity's link.

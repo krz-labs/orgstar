@@ -36,14 +36,24 @@ public struct CaptureInbox: Sendable {
         try Data(link.utf8).write(to: folder.appendingPathComponent(name), options: .atomic)
     }
 
-    /// The waiting links, oldest first, each removed as it's taken.
-    public func take() -> [String] {
+    /// A waiting link and the file that holds it.
+    public struct Link: Sendable, Hashable {
+        public let file: URL
+        public let text: String
+    }
+
+    /// The waiting links, oldest first. Each stays until `remove`; a file that can't be read
+    /// is left out and kept.
+    public func links() -> [Link] {
         let names = ((try? FileManager.default.contentsOfDirectory(atPath: folder.path)) ?? []).filter { $0.hasSuffix(".link") }.sorted()
         return names.compactMap { name in
             let file = folder.appendingPathComponent(name)
-            defer { try? FileManager.default.removeItem(at: file) }
-            return (try? Data(contentsOf: file)).flatMap { String(data: $0, encoding: .utf8) }
+            return (try? Data(contentsOf: file)).flatMap { String(data: $0, encoding: .utf8) }.map { Link(file: file, text: $0) }
         }
+    }
+
+    public func remove(_ link: Link) {
+        try? FileManager.default.removeItem(at: link.file)
     }
 
     public func setTemplates(_ templates: [Template]) throws {

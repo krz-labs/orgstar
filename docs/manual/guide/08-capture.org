@@ -353,7 +353,7 @@ In another app, share a web page or text and choose orgstar. The share form has:
 - for a link, its title (editable) and address;
 - a Text field, filled with shared text.
 
-Capture saves the item in the app group's capture inbox. The next time you open orgstar, it opens the capture sheet with the item as an org-protocol capture: the link becomes =%a= and =%:link=, the title =%:description=, and the text =%i=. Several waiting items open one after another, oldest first. If the extension says orgstar's shared folder isn't available, the app group is missing from the build and nothing can be saved.
+Capture saves the item in the app group's capture inbox. The next time you open orgstar, it opens the capture sheet with the item as an org-protocol capture: the link becomes =%a= and =%:link=, the title =%:description=, and the text =%i=. Several waiting items open one after another, oldest first. An item stays in the inbox until its sheet is saved or cancelled, so items still waiting when orgstar is ended open the next time. If the extension says orgstar's shared folder isn't available, the app group is missing from the build and nothing can be saved.
 
 The share form lists no templates until orgstar has run once with your configuration folder; the capture sheet then starts on the first template.
 

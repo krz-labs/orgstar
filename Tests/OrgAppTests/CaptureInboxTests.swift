@@ -5,14 +5,33 @@ import Testing
 @testable import OrgApp
 
 struct CaptureInboxTests {
-    @Test func takesLinksOldestFirstOnce() throws {
+    @Test func keepsLinksOldestFirstUntilRemoved() throws {
         let folder = try Folder()
         let inbox = CaptureInbox(folder: folder.url.appendingPathComponent("Captures"))
-        #expect(inbox.take() == [])
+        #expect(inbox.links() == [])
         try inbox.add("org-protocol://capture?body=one")
         try inbox.add("org-protocol://capture?body=two")
-        #expect(inbox.take() == ["org-protocol://capture?body=one", "org-protocol://capture?body=two"])
-        #expect(inbox.take() == [])
+        let links = inbox.links()
+        #expect(links.map(\.text) == ["org-protocol://capture?body=one", "org-protocol://capture?body=two"])
+        // Another instance, as after the app was ended with both queued.
+        #expect(CaptureInbox(folder: inbox.folder).links() == links)
+        inbox.remove(links[0])
+        #expect(inbox.links().map(\.text) == ["org-protocol://capture?body=two"])
+        inbox.remove(links[1])
+        #expect(inbox.links() == [])
+    }
+
+    @Test func keepsALinkItCannotRead() throws {
+        let folder = try Folder()
+        let inbox = CaptureInbox(folder: folder.url.appendingPathComponent("Captures"))
+        try inbox.add("org-protocol://capture?body=one")
+        let notText = inbox.folder.appendingPathComponent("0-not-text.link")
+        try Data([0xFF, 0xFE, 0xFD]).write(to: notText)
+        let directory = inbox.folder.appendingPathComponent("1-directory.link")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        #expect(inbox.links().map(\.text) == ["org-protocol://capture?body=one"])
+        #expect(FileManager.default.fileExists(atPath: notText.path))
+        #expect(FileManager.default.fileExists(atPath: directory.path))
     }
 
     @Test func keepsTheTemplateList() throws {
