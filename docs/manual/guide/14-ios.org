@@ -230,7 +230,7 @@ Widgets can't read your folders, so the app writes the next seven days of the ag
 orgstar has two controls for Control Center, the Lock Screen and the Action button. Add them as any control: in Control Center, touch and hold an empty space and tap Add a Control, then choose orgstar.
 
 - Capture :: opens the capture sheet. Touch and hold it while editing Control Center to choose a template; without one it uses the first.
-- Clock :: on while a clock runs, showing its entry. Turning it off clocks out; turning it on clocks in to the entry clocked last (Clock In Last). If a clock was left running elsewhere, orgstar asks in the app how to resolve it.
+- Clock :: on while a clock runs, showing its entry; off, it shows Clock In to /heading/ for the entry clocked last. Turning it off clocks out; turning it on clocks in to the entry clocked last (Clock In Last). If a clock was left running elsewhere, orgstar asks in the app how to resolve it.
 
 ** The clock's Live Activity
 

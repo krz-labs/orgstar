@@ -9,7 +9,7 @@ struct CaptureControl: ControlWidget {
     var body: some ControlWidgetConfiguration {
         AppIntentControlConfiguration(kind: "sh.krz.orgstar.capture-control", intent: CaptureControlConfiguration.self) { configuration in
             ControlWidgetButton(action: OpenCaptureIntent(template: configuration.template)) {
-                Label(configuration.template?.name ?? "Capture", systemImage: "square.and.pencil")
+                Label(configuration.template?.name ?? String(localized: "Capture"), systemImage: "square.and.pencil")
             }
         }
         .displayName("Capture")
@@ -23,7 +23,8 @@ struct ClockControl: ControlWidget {
     var body: some ControlWidgetConfiguration {
         StaticControlConfiguration(kind: "sh.krz.orgstar.clock-control", provider: ClockValueProvider()) { clock in
             ControlWidgetToggle("Clock", isOn: clock.running != nil, action: ClockToggleIntent()) { isOn in
-                Label(isOn ? clock.running ?? "Clocked in" : clock.last.map { "In: \($0)" } ?? "No recent clock",
+                Label(isOn ? clock.running ?? String(localized: "Clocked in")
+                          : clock.last.map { String(localized: "Clock In to \($0)") } ?? String(localized: "No recent clock"),
                       systemImage: isOn ? "stopwatch.fill" : "stopwatch")
             }
             .tint(.orange)
@@ -88,7 +89,7 @@ struct CaptureView: View {
                     Image(systemName: "square.and.pencil").font(.title3)
                     VStack(alignment: .leading, spacing: 0) {
                         Text("Capture").font(.headline)
-                        Text(entry.template?.name ?? "First template").font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                        Text(entry.template?.name ?? String(localized: "First template")).font(.caption).foregroundStyle(.secondary).lineLimit(1)
                     }
                     Spacer(minLength: 0)
                 }
@@ -96,7 +97,7 @@ struct CaptureView: View {
         }
         .widgetURL(AppLink.capture(template: entry.template?.id).url)
         .containerBackground(for: .widget) { Color.clear }
-        .accessibilityLabel("Capture" + (entry.template.map { " with \($0.name)" } ?? ""))
+        .accessibilityLabel(entry.template.map { Text("Capture with \($0.name)") } ?? Text("Capture"))
     }
 }
 #endif

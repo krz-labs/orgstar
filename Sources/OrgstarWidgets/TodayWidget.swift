@@ -85,7 +85,7 @@ struct TodayView: View {
     }
 
     @ViewBuilder
-    private func rows(_ rows: [AgendaSnapshot.Row], _ snapshot: AgendaSnapshot, compact: Bool, empty: String) -> some View {
+    private func rows(_ rows: [AgendaSnapshot.Row], _ snapshot: AgendaSnapshot, compact: Bool, empty: LocalizedStringKey) -> some View {
         if rows.isEmpty {
             Text(empty).font(.caption).foregroundStyle(.secondary)
         }

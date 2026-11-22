@@ -59,7 +59,7 @@ struct NextEntryView: View {
     var body: some View {
         switch family {
         case .accessoryInline:
-            Text(next.map { "\($0.gutter) \($0.title)" } ?? (open == 0 ? "Agenda clear" : "\(open) open today"))
+            Text(next.map { "\($0.gutter) \($0.title)" } ?? (open == 0 ? String(localized: "Agenda clear") : String(localized: "\(open) open today")))
         case .accessoryCircular:
             ZStack {
                 AccessoryWidgetBackground()
@@ -69,11 +69,11 @@ struct NextEntryView: View {
                 }
             }
         case .accessoryCorner:
-            Text("\(open)").font(.title3.weight(.semibold)).widgetLabel { Text(next?.title ?? "Agenda clear") }
+            Text("\(open)").font(.title3.weight(.semibold)).widgetLabel { Text(next?.title ?? String(localized: "Agenda clear")) }
         default:
             VStack(alignment: .leading, spacing: 0) {
-                Text(next?.gutter ?? "Agenda").font(.headline).widgetAccentable().lineLimit(1)
-                Text(next?.title ?? (entry.agenda == nil ? "Open orgstar" : "Nothing left today")).lineLimit(2)
+                Text(next?.gutter ?? String(localized: "Agenda")).font(.headline).widgetAccentable().lineLimit(1)
+                Text(next?.title ?? (entry.agenda == nil ? String(localized: "Open orgstar") : String(localized: "Nothing left today"))).lineLimit(2)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
