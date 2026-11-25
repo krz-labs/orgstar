@@ -63,13 +63,7 @@ struct BoardScreen: View {
                     .background(.bar)
                 if kanban { board } else { list }
             }
-            .safeAreaInset(edge: .bottom) {
-                if let message {
-                    Text(message).font(.footnote).padding(.horizontal, 12).padding(.vertical, 6)
-                        .glassEffect(.regular, in: Capsule())
-                        .onTapGesture { self.message = nil }
-                }
-            }
+            .message($message)
             .navigationTitle(kanban ? "Kanban" : "Entries")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

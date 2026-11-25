@@ -41,13 +41,7 @@ struct ColumnViewScreen: View {
                     .disabled(selected == nil)
                 }
             }
-            .safeAreaInset(edge: .top) {
-                if let message {
-                    Text(message).font(.footnote).padding(.horizontal, 12).padding(.vertical, 6)
-                        .glassEffect(.regular, in: Capsule())
-                        .onTapGesture { self.message = nil }
-                }
-            }
+            .message($message, edge: .top)
             .sheet(item: $prompt) { request in
                 PromptSheet(prompt: request.prompt) { answer in
                     prompt = nil

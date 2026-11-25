@@ -165,6 +165,7 @@ struct AgendaScreen: View, Equatable {
                 ContentUnavailableView("No folders", systemImage: "folder", description: Text("Add a folder of org files under Folders."))
             }
         }
+        .message($message)
         .safeAreaInset(edge: .bottom) {
             if !workspace.rootPaths.isEmpty {
                 if selecting { bulkBar } else { bottomBar }
@@ -610,11 +611,6 @@ struct AgendaScreen: View, Equatable {
     /// The bar while selecting: the count, the bulk actions (`B` in Org's agenda) and Done.
     private var bulkBar: some View {
         VStack(spacing: 8) {
-            if let message {
-                Text(message).font(.footnote).padding(.horizontal, 12).padding(.vertical, 6)
-                    .glassEffect(.regular, in: Capsule())
-                    .onTapGesture { self.message = nil }
-            }
             HStack(spacing: 12) {
                 Text("\(marked.count) selected").font(.footnote.weight(.semibold).monospacedDigit()).padding(.leading, 12)
                 Menu {
@@ -646,10 +642,9 @@ struct AgendaScreen: View, Equatable {
 
     private var bottomBar: some View {
         VStack(spacing: 8) {
-            if let status = message ?? (filter.isEmpty ? nil : "Filter: " + filter.description) {
-                Text(status).font(.footnote).padding(.horizontal, 12).padding(.vertical, 6)
+            if !filter.isEmpty {
+                Text("Filter: " + filter.description).font(.footnote).padding(.horizontal, 12).padding(.vertical, 6)
                     .glassEffect(.regular, in: Capsule())
-                    .onTapGesture { message = nil }
             }
             if case .agenda = agenda.mode {
                 HStack(spacing: 2) {
