@@ -18,6 +18,9 @@ struct BoardView: View {
     @State private var sortOrder = [KeyPathComparator(\BoardRow.todoOrder), KeyPathComparator(\BoardRow.title)]
     @State private var message: String?
     @State private var tick = 0
+    /// The kanban card the arrow keys move from.
+    @State private var current: String?
+    @FocusState private var boardFocused: Bool
     @AppStorage("boardKanban") private var kanban = false
     @AppStorage("boardMatch") private var match = ""
     @AppStorage("boardColumns") private var columnText = "EFFORT"
@@ -131,15 +134,54 @@ struct BoardView: View {
     // MARK: - Kanban
 
     private var board: some View {
-        ScrollView(.horizontal) {
-            HStack(alignment: .top, spacing: 12) {
-                ForEach(keywords, id: \.self) { keyword in
-                    column(keyword)
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal) {
+                HStack(alignment: .top, spacing: 12) {
+                    ForEach(keywords, id: \.self) { keyword in
+                        column(keyword)
+                    }
                 }
+                .padding(12)
             }
-            .padding(12)
+            .onChange(of: current) {
+                if let current { proxy.scrollTo(current) }
+            }
         }
         .background(theme.color("agenda-background", in: colorScheme) ?? .clear)
+        .focusable()
+        .focused($boardFocused)
+        .focusEffectDisabled()
+        .onKeyPress(phases: .down) { press in handle(press) }
+    }
+
+    /// The arrow keys move between cards, Shift-Left and Shift-Right move the card to the
+    /// column before or after, Return opens it.
+    private func handle(_ press: KeyPress) -> KeyPress.Result {
+        let columns = keywords.map { keyword in entries.filter { $0.todo == keyword } }
+        let arrows: [KeyEquivalent] = [.upArrow, .downArrow, .leftArrow, .rightArrow]
+        guard let c = columns.firstIndex(where: { $0.contains { $0.id == current } }),
+              let r = columns[c].firstIndex(where: { $0.id == current }) else {
+            guard arrows.contains(press.key), press.modifiers.isEmpty, let first = columns.lazy.compactMap(\.first).first else { return .ignored }
+            current = first.id
+            return .handled
+        }
+        let entry = columns[c][r]
+        let step = press.key == .leftArrow ? -1 : 1
+        if press.key == .return, press.modifiers.isEmpty {
+            jump(entry)
+        } else if press.modifiers == .shift, press.key == .leftArrow || press.key == .rightArrow {
+            if keywords.indices.contains(c + step) { setTodo(entry, keywords[c + step]) }
+        } else if press.modifiers.isEmpty, press.key == .upArrow || press.key == .downArrow {
+            current = columns[c][min(max(r + (press.key == .upArrow ? -1 : 1), 0), columns[c].count - 1)].id
+        } else if press.modifiers.isEmpty, press.key == .leftArrow || press.key == .rightArrow {
+            // The nearest column with cards, at the same height.
+            var k = c + step
+            while columns.indices.contains(k), columns[k].isEmpty { k += step }
+            if columns.indices.contains(k) { current = columns[k][min(r, columns[k].count - 1)].id }
+        } else {
+            return .ignored
+        }
+        return .handled
     }
 
     private func column(_ keyword: String) -> some View {
@@ -153,10 +195,15 @@ struct BoardView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     ForEach(cards) { entry in
                         card(entry)
+                            .id(entry.id)
                             .draggable(entry.id)
                             .onTapGesture(count: 2) { jump(entry) }
+                            .simultaneousGesture(TapGesture().onEnded {
+                                current = entry.id
+                                boardFocused = true
+                            })
                             .accessibilityElement(children: .combine)
-                            .accessibilityAddTraits(.isButton)
+                            .accessibilityAddTraits(current == entry.id ? [.isButton, .isSelected] : .isButton)
                             .accessibilityAction { jump(entry) }
                             .accessibilityActions {
                                 // Dragging between columns, for VoiceOver.
@@ -181,7 +228,8 @@ struct BoardView: View {
     }
 
     private func card(_ entry: BoardEntry) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        let selected = current == entry.id
+        return VStack(alignment: .leading, spacing: 4) {
             Text((entry.priority.map { "[#\($0)] " } ?? "") + entry.title).lineLimit(3)
             HStack(spacing: 6) {
                 Text(entry.category).font(.caption).foregroundStyle(.secondary)
@@ -198,6 +246,9 @@ struct BoardView: View {
         .padding(8)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(RoundedRectangle(cornerRadius: 6).fill(Color(nsColor: .controlBackgroundColor)))
+        .overlay {
+            if selected { RoundedRectangle(cornerRadius: 6).strokeBorder(theme.color("accent") ?? .accentColor, lineWidth: 2) }
+        }
     }
 
     // MARK: - Editing

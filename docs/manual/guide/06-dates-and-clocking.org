@@ -416,7 +416,7 @@ A line of the form ~CLOCK: => 1:15~, with only a duration, counts towards clock 
 
 ** The inspector
 
-View ▸ Show Columns and Clock opens the inspector beside the editor. Its Clock tab lists the clocked time per heading in the open file for Today, This Week (weeks start on Monday) or All, with a total. Clicking a heading moves to it. Only finished clocks count.
+View ▸ Show Columns and Clock opens the inspector beside the editor. Its Clock tab lists the clocked time per heading in the open file for Today, This Week (weeks start on Monday) or All, with a total. Selecting a heading, by clicking it or with the arrow keys, moves to it. Only finished clocks count.
 
 ** The clock report window
 

@@ -22,7 +22,13 @@ struct PaneDivider: View {
                 start = base
                 width = min(max(base + drag.translation.width, range.lowerBound), range.upperBound)
             }.onEnded { _ in start = nil }))
-            .accessibilityHidden(true)
+            .accessibilityElement()
+            .accessibilityLabel("Outline width")
+            .accessibilityValue("\(Int(width)) points")
+            .accessibilityAdjustableAction { direction in
+                let step = direction == .increment ? 20.0 : -20.0
+                width = min(max(width + step, range.lowerBound), range.upperBound)
+            }
     }
 }
 
@@ -50,25 +56,27 @@ struct BufferTabs: View {
 
     private func tab(_ path: String) -> some View {
         let current = path == pane.path
-        return HStack(spacing: 6) {
-            Text(session.bufferName(path))
+        return HStack(spacing: 2) {
+            Button(session.bufferName(path)) { session.open(path, in: pane) }
+                .buttonStyle(.plain)
                 .lineLimit(1)
                 .foregroundStyle(current ? .primary : .secondary)
-                .accessibilityAddTraits(current ? [.isButton, .isSelected] : .isButton)
-                .accessibilityAction { session.open(path, in: pane) }
+                .accessibilityAddTraits(current ? .isSelected : [])
             Button {
                 close(path)
             } label: {
                 Image(systemName: session.dirtyPaths.contains(path) ? "circle.fill" : "xmark")
                     .font(.system(size: session.dirtyPaths.contains(path) ? 6 : 9, weight: .semibold))
-                    .frame(width: 12, height: 12)
+                    .frame(width: 20, height: 20)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.borderless)
             .help("Close")
             .accessibilityLabel("Close \(session.bufferName(path))" + (session.dirtyPaths.contains(path) ? ", unsaved" : ""))
         }
         .font(.callout)
-        .padding(.horizontal, 12)
+        .padding(.leading, 12)
+        .padding(.trailing, 6)
         .frame(maxHeight: .infinity)
         // A shape, not a color: a color background runs up under the toolbar.
         .background { Rectangle().fill(current ? theme.color("background") ?? Color(nsColor: .textBackgroundColor) : .clear) }

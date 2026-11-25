@@ -14,6 +14,15 @@ struct InspectorPane: View {
     @AppStorage("inspectorClockSpan") private var span = Span.week
     @State private var columns: ColumnView.View?
     @State private var clocked: [(start: Int, heading: String, minutes: Int)] = []
+    /// The selected row's heading start, in each tab.
+    @State private var selectedRow: Int?
+    @State private var selectedClock: Int?
+
+    /// A column view row, identified by its heading.
+    private struct ColumnRow: Identifiable {
+        let row: ColumnView.Row
+        var id: Int { row.start }
+    }
 
     enum Tab: String, CaseIterable {
         case columns = "Columns", clock = "Clock"
@@ -79,33 +88,22 @@ struct InspectorPane: View {
         .padding(.horizontal, 8)
         .padding(.bottom, 6)
         if let columns, !columns.rows.isEmpty {
-            ScrollView([.horizontal, .vertical]) {
-                Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 3) {
-                    GridRow {
-                        ForEach(columns.specs.indices, id: \.self) { i in
-                            Text(columns.specs[i].title).bold().foregroundStyle(.secondary)
-                        }
-                    }
-                    Divider()
-                    ForEach(columns.rows.indices, id: \.self) { r in
-                        let row = columns.rows[r]
-                        GridRow {
-                            ForEach(columns.specs.indices, id: \.self) { i in
-                                Text(columns.specs[i].property == "ITEM" ? String(repeating: "*", count: row.level) + " " + row.values[i] : row.values[i])
-                                    .lineLimit(1)
-                                    .fontWeight(row.start == heading ? .semibold : .regular)
-                            }
-                        }
-                        .contentShape(Rectangle())
-                        .onTapGesture { session.reveal(row.start) }
-                        .accessibilityAddTraits(.isButton)
-                        .accessibilityAction { session.reveal(row.start) }
+            // A table, so the arrow keys move through the rows; selecting one goes to it.
+            Table(columns.rows.map(ColumnRow.init), selection: $selectedRow) {
+                TableColumnForEach(columns.specs.indices, id: \.self) { i in
+                    TableColumn(columns.specs[i].title) { (item: ColumnRow) in
+                        let row = item.row
+                        Text(columns.specs[i].property == "ITEM" ? String(repeating: "*", count: row.level) + " " + row.values[i] : row.values[i])
+                            .lineLimit(1)
+                            .fontWeight(row.start == heading ? .semibold : .regular)
                     }
                 }
-                .font(.system(.callout, design: .monospaced))
-                .padding(8)
             }
-            .defaultScrollAnchor(.topLeading)
+            .font(.system(.callout, design: .monospaced))
+            .onChange(of: selectedRow) { if let selectedRow { session.reveal(selectedRow) } }
+            .contextMenu(forSelectionType: Int.self) { _ in } primaryAction: { starts in
+                if let start = starts.first { session.reveal(start) }
+            }
         } else {
             ContentUnavailableView("No entries", systemImage: "tablecells")
         }
@@ -122,7 +120,8 @@ struct InspectorPane: View {
         if clocked.isEmpty {
             ContentUnavailableView("No clocked time", systemImage: "clock")
         } else {
-            List {
+            // A selectable list, so the arrow keys move through the headings; selecting one goes to it.
+            List(selection: $selectedClock) {
                 ForEach(clocked, id: \.start) { entry in
                     HStack {
                         Text(entry.heading.isEmpty ? String(localized: "(untitled)") : entry.heading).lineLimit(1)
@@ -130,17 +129,18 @@ struct InspectorPane: View {
                         Text(ClockReport.hours(entry.minutes)).monospacedDigit()
                     }
                     .fontWeight(entry.start == heading ? .semibold : .regular)
-                    .contentShape(Rectangle())
-                    .onTapGesture { session.reveal(entry.start) }
                     .accessibilityElement(children: .combine)
-                    .accessibilityAddTraits(.isButton)
-                    .accessibilityAction { session.reveal(entry.start) }
+                    .tag(entry.start)
                 }
                 HStack {
                     Text("Total").bold()
                     Spacer()
                     Text(ClockReport.hours(clocked.reduce(0) { $0 + $1.minutes })).bold().monospacedDigit()
                 }
+            }
+            .onChange(of: selectedClock) { if let selectedClock { session.reveal(selectedClock) } }
+            .contextMenu(forSelectionType: Int.self) { _ in } primaryAction: { starts in
+                if let start = starts.first { session.reveal(start) }
             }
         }
     }

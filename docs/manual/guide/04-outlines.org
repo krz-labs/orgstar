@@ -706,7 +706,8 @@ for the value with the allowed values listed, Previous Value and Next Value (=p=
 View ▸ Show Columns and Clock opens an inspector beside the editor. Its Columns
 tab shows the same table for the open file, kept current as you type. Choose File for
 every entry or Subtree for the entry at the caret. The row of the heading at the caret
-is shown in bold, and clicking a row goes to it. The Clock tab is described in
+is shown in bold. Selecting a row, by clicking it or with the arrow keys, goes to it;
+=Return= or a double-click goes to the selected row again. The Clock tab is described in
 [[file:06-dates-and-clocking.org][Dates and clocking]].
 
 ** Column view tables

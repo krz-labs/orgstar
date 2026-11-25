@@ -395,6 +395,6 @@ To search all your files, use the toolbar's search field; see [[file:01-files-an
 
 The editor works with VoiceOver. VoiceOver reads the text as it is shown rather than as stored: hidden link brackets and targets, hidden emphasis markers and hidden stars are skipped, entities are read as the characters drawn for them, and narrowed table columns are read as drawn. Folded text is still read, so the whole file is available. Lines, the caret position and the selection are reported in terms of the shown text.
 
-Other parts of the window are labelled: tabs in the tab bar are buttons, with the current one marked selected, and each close button names its buffer and says whether it is unsaved; the modeline's unsaved dot reads "Unsaved changes", and the Doom state tag reads, for example, "Normal state".
+Other parts of the window are labelled: tabs in the tab bar are buttons, with the current one marked selected, and each close button names its buffer and says whether it is unsaved; the outline pane's divider is an adjustable Outline width; the modeline's unsaved dot reads "Unsaved changes", and the Doom state tag reads, for example, "Normal state".
 
 The editor keeps the system's keyboard navigation and text editing; the presets only add bindings. See [[file:03-keys.org][Keys and commands]].
