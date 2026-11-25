@@ -501,7 +501,9 @@ struct ContentView: View {
         .fileImporter(isPresented: $commands.showingFolderPicker, allowedContentTypes: [.folder]) { result in
             guard case .success(let url) = result else { return }
             Task {
-                do { try await workspace.addRoot(url) } catch { workspace.lastError = error.localizedDescription }
+                do { try await workspace.addRoot(url) } catch {
+                    workspace.showError(String(localized: "Couldn't Add Folder", comment: "Error alert title"), error.localizedDescription)
+                }
             }
         }
         .sheet(isPresented: $commands.showingQuickOpen) {
@@ -514,7 +516,7 @@ struct ContentView: View {
                 }
             }
         }
-        .alert("orgstar", isPresented: errorShown) {
+        .alert(errorTitle, isPresented: errorShown) {
             Button("OK") {
                 workspace.lastError = nil
                 session.lastError = nil
@@ -1511,6 +1513,11 @@ struct ContentView: View {
     private func report(_ outcome: ClockModel.Outcome) {
         if let jump = outcome.jump { commands.jump(path: jump.path, offset: jump.offset) }
         if let message = outcome.messages.last(where: { !$0.isEmpty }) { commands.show(message) }
+    }
+
+    /// What failed, for the error alert's title.
+    private var errorTitle: String {
+        (workspace.lastError != nil ? workspace.lastErrorTitle : session.lastErrorTitle) ?? "orgstar"
     }
 
     private var errorShown: Binding<Bool> {

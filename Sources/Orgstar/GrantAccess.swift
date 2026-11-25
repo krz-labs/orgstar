@@ -71,7 +71,9 @@ enum GrantAccess {
                                message: String(localized: "Choose \(name) to give orgstar access to it again.", comment: "Open panel for a sidebar folder orgstar can't open"),
                                prompt: String(localized: "Grant Access", comment: "Open panel button that gives orgstar access to a folder")) else { return }
         Task {
-            do { try await workspace.regrant(root, with: url) } catch { workspace.lastError = error.localizedDescription }
+            do { try await workspace.regrant(root, with: url) } catch {
+                workspace.showError(String(localized: "Couldn't Grant Access", comment: "Error alert title"), error.localizedDescription)
+            }
         }
     }
 

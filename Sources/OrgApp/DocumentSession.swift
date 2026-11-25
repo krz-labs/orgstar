@@ -75,7 +75,17 @@ public final class DocumentSession {
     public private(set) var openPaths: [String] = []
     /// Open files with unsaved edits.
     public private(set) var dirtyPaths: Set<String> = []
-    public var lastError: String?
+    public var lastError: String? { didSet { lastErrorTitle = nil } }
+    /// What failed, as the title of the alert that shows `lastError`; nil when `lastError` was
+    /// set without one.
+    public private(set) var lastErrorTitle: String?
+
+    /// Sets `lastError` to `message` under `title`, which says what failed ("Couldn't Save File").
+    public func showError(_ title: String, _ message: String) {
+        lastError = message
+        lastErrorTitle = title
+    }
+
     public var saveMode: SaveMode = .automatic
     public var autosaveDelay: Duration = .seconds(1)
     /// Org options for commands the session runs (refile, archive).
@@ -259,7 +269,7 @@ public final class DocumentSession {
         }
         do {
             guard let bytes = try fileSystem.read(URL(fileURLWithPath: path)) else {
-                lastError = "\((path as NSString).lastPathComponent) no longer exists."
+                showError(String(localized: "Couldn't Open File", comment: "Error alert title"), "\((path as NSString).lastPathComponent) no longer exists.")
                 return
             }
             let entry = Entry(path: path, buffer: StateBuffer(loaded(bytes, path: path)))
@@ -267,7 +277,7 @@ public final class DocumentSession {
             entries.insert(entry, at: index)
             show(entry, in: pane)
         } catch {
-            lastError = "Can't open \(path): \(error.localizedDescription)"
+            showError(String(localized: "Couldn't Open File", comment: "Error alert title"), "Can't open \(path): \(error.localizedDescription)")
         }
     }
 
@@ -461,7 +471,7 @@ public final class DocumentSession {
                 }
             }
         } catch {
-            lastError = "Can't save \(name): \(error.localizedDescription)"
+            showError(String(localized: "Couldn't Save File", comment: "Error alert title"), "Can't save \(name): \(error.localizedDescription)")
         }
         refresh(entry)
         return !entry.buffer.document.isDirty
@@ -474,7 +484,7 @@ public final class DocumentSession {
             try buffer.update { try saver.overwrite(&$0, to: url) }
             current?.conflict = nil
         } catch {
-            lastError = "Can't save \(name): \(error.localizedDescription)"
+            showError(String(localized: "Couldn't Save File", comment: "Error alert title"), "Can't save \(name): \(error.localizedDescription)")
         }
         refresh()
     }
@@ -489,7 +499,7 @@ public final class DocumentSession {
             buffer.update { $0 = loaded(bytes, path: path) }
             current?.conflict = nil
         } catch {
-            lastError = "Can't read \(name): \(error.localizedDescription)"
+            showError(String(localized: "Couldn't Read File", comment: "Error alert title"), "Can't read \(name): \(error.localizedDescription)")
         }
         refresh()
     }
@@ -516,7 +526,7 @@ public final class DocumentSession {
             }
             current?.conflict = nil
         } catch {
-            lastError = "Can't merge \(name): \(error.localizedDescription)"
+            showError(String(localized: "Couldn't Merge", comment: "Error alert title"), "Can't merge \(name): \(error.localizedDescription)")
         }
         refresh()
     }
@@ -1105,7 +1115,7 @@ public final class DocumentSession {
         do {
             read = try fileSystem.read(URL(fileURLWithPath: path))
         } catch {
-            lastError = "Can't read \(name): \(error.localizedDescription)"
+            showError(String(localized: "Couldn't Read File", comment: "Error alert title"), "Can't read \(name): \(error.localizedDescription)")
             return
         }
         guard let bytes = read else { return }

@@ -109,6 +109,7 @@ struct WorkspaceModelTests {
         let reopened = try WorkspaceModel(directory: data)
         let root = try #require(reopened.unresolvedRoots.first)
         #expect(reopened.rootPaths.isEmpty && root.path == gone.path)
+        #expect(reopened.lastErrorTitle == "Couldn't Find Folder")
         let found = try parent.write("found/a.org", "* Plumber\n").deletingLastPathComponent()
         try await reopened.regrant(root, with: found)
         #expect(reopened.unresolvedRoots.isEmpty)
@@ -233,9 +234,12 @@ struct WorkspaceModelTests {
         #expect(throws: WorkspaceModel.FileError.self) { try model.backlinks(to: target) }
         await model.filesChanged([file], rescan: [])
         #expect(model.lastError?.hasPrefix("Indexing ") == true)
+        #expect(model.lastErrorTitle == "Couldn't Index Folder")
         model.lastError = nil
+        #expect(model.lastErrorTitle == nil)
         await model.filesChanged([], rescan: [notes.url])
         #expect(model.lastError?.hasPrefix("Indexing ") == true)
+        #expect(model.lastErrorTitle == "Couldn't Index Folder")
     }
 }
 
@@ -1492,5 +1496,109 @@ struct ICalendarFilesTests {
         #expect(OrgPreferences.icalendarOptions(defaults).useScheduled == ["event-if-todo"])
         defaults.set("unblocked", forKey: "icalendarIncludeTodo")
         #expect(OrgPreferences.icalendarOptions(defaults).includeTodo == .unblocked)
+    }
+}
+
+/// Each error says what failed in a title for its alert.
+@MainActor
+struct ErrorTitleTests {
+    let notes: Folder
+    let file: URL
+    let session: DocumentSession
+
+    init() throws {
+        notes = try Folder()
+        file = try notes.write("a.org", "a\nb\nc\n")
+        session = DocumentSession(recovery: FileRecoveryStore(directory: notes.url.appendingPathComponent(".r")))
+        session.saveMode = .explicit
+        session.open(file.path)
+    }
+
+    /// Types `x` at the start of the buffer.
+    func type(in session: DocumentSession) throws {
+        let buffer = StateBuffer(session.document!)
+        session.attach(buffer)
+        try buffer.update { try $0.apply([TextEdit(range: 0..<0, replacement: "x")], baseRevision: $0.revision) }
+        session.bufferChanged()
+    }
+
+    /// Makes the folder and the file read-only while `body` runs.
+    func readOnly(_ body: () -> Void) {
+        let fm = FileManager.default
+        try? fm.setAttributes([.posixPermissions: 0o444], ofItemAtPath: file.path)
+        try? fm.setAttributes([.posixPermissions: 0o555], ofItemAtPath: notes.url.path)
+        defer {
+            try? fm.setAttributes([.posixPermissions: 0o755], ofItemAtPath: notes.url.path)
+            try? fm.setAttributes([.posixPermissions: 0o644], ofItemAtPath: file.path)
+        }
+        body()
+    }
+
+    /// Edits `session`'s buffer and the file on disk so that they conflict.
+    func conflict(in session: DocumentSession) throws {
+        try type(in: session)
+        try notes.write("a.org", "z\nb\nc\n")
+        #expect(!session.save())
+        #expect(session.conflict != nil)
+    }
+
+    @Test func open() throws {
+        session.open("/nonexistent/a.org")
+        #expect(session.lastErrorTitle == "Couldn't Open File")
+        let locked = try notes.write("b.org", "b\n")
+        try FileManager.default.setAttributes([.posixPermissions: 0], ofItemAtPath: locked.path)
+        session.lastError = nil
+        session.open(locked.path)
+        #expect(session.lastError?.hasPrefix("Can't open ") == true)
+        #expect(session.lastErrorTitle == "Couldn't Open File")
+    }
+
+    @Test func save() throws {
+        try type(in: session)
+        readOnly { #expect(!session.save()) }
+        #expect(session.lastError?.hasPrefix("Can't save a.org: ") == true)
+        #expect(session.lastErrorTitle == "Couldn't Save File")
+    }
+
+    @Test func keepMine() throws {
+        try conflict(in: session)
+        readOnly { session.keepMine() }
+        #expect(session.lastError?.hasPrefix("Can't save a.org: ") == true)
+        #expect(session.lastErrorTitle == "Couldn't Save File")
+    }
+
+    @Test func useDiskVersion() throws {
+        try conflict(in: session)
+        try FileManager.default.setAttributes([.posixPermissions: 0], ofItemAtPath: file.path)
+        session.useDiskVersion()
+        #expect(session.lastError?.hasPrefix("Can't read a.org: ") == true)
+        #expect(session.lastErrorTitle == "Couldn't Read File")
+    }
+
+    /// The buffer can't be kept in recovery, whose folder is now a file.
+    @Test func merge() throws {
+        try conflict(in: session)
+        try? FileManager.default.removeItem(at: notes.url.appendingPathComponent(".r"))
+        try notes.write(".r", "")
+        session.mergeConflictWithMarkers()
+        #expect(session.lastError?.hasPrefix("Can't merge a.org: ") == true)
+        #expect(session.lastErrorTitle == "Couldn't Merge")
+    }
+
+    @Test func changedFile() throws {
+        try notes.write("a.org", "d\n")
+        try FileManager.default.setAttributes([.posixPermissions: 0], ofItemAtPath: file.path)
+        session.fileChanged(file.path)
+        #expect(session.lastErrorTitle == "Couldn't Read File")
+    }
+
+    /// An error set without a title, as the iOS Folders screen sets them, has none.
+    @Test func anErrorWithoutATitle() {
+        session.showError("Couldn't Save File", "Can't save a.org")
+        session.lastError = "Something else"
+        #expect(session.lastErrorTitle == nil)
+        session.showError("Couldn't Save File", "Can't save a.org")
+        session.lastError = nil
+        #expect(session.lastErrorTitle == nil)
     }
 }

@@ -16,7 +16,17 @@ public final class WorkspaceModel {
     public private(set) var downloading: Set<String> = []
     public private(set) var isIndexing = false
     /// The last error worth showing, such as a folder that can no longer be found.
-    public var lastError: String?
+    public var lastError: String? { didSet { lastErrorTitle = nil } }
+    /// What failed, as the title of the alert that shows `lastError`; nil when `lastError` was
+    /// set without one.
+    public private(set) var lastErrorTitle: String?
+
+    /// Sets `lastError` to `message` under `title`, which says what failed ("Couldn't Save File").
+    public func showError(_ title: String, _ message: String) {
+        lastError = message
+        lastErrorTitle = title
+    }
+
     /// Bumped when an indexed file changes on disk, with its path.
     public private(set) var changedFile: (path: String, version: Int)?
     /// Bumped when the index may hold other rows: after a reconcile, or a root's removal.
@@ -140,7 +150,7 @@ public final class WorkspaceModel {
         var refreshed = roots
         for (i, root) in roots.enumerated() {
             guard let (url, isStale) = try? root.resolve() else {
-                lastError = "Can't find the folder \(root.path)."
+                showError(String(localized: "Couldn't Find Folder", comment: "Error alert title"), "Can't find the folder \(root.path).")
                 unresolvedRoots.append(root)
                 continue
             }
@@ -255,7 +265,7 @@ public final class WorkspaceModel {
                 let report = try await Task.detached { try reconciler.reconcile(root: url) }.value
                 pending.formUnion(report.placeholders.map(\.path))
             } catch {
-                lastError = "Indexing \(url.path) failed: \(error.localizedDescription)"
+                showError(String(localized: "Couldn't Index Folder", comment: "Error alert title"), "Indexing \(url.path) failed: \(error.localizedDescription)")
             }
         }
         // Rows of folders that moved or went away (indexed under their old paths).
@@ -293,7 +303,7 @@ public final class WorkspaceModel {
             do {
                 placeholders = try await Task.detached { try reconciler.reconcile(root: rootURL) }.value.placeholders.map(\.path)
             } catch {
-                lastError = "Indexing \(rootURL.path) failed: \(error.localizedDescription)"
+                showError(String(localized: "Couldn't Index Folder", comment: "Error alert title"), "Indexing \(rootURL.path) failed: \(error.localizedDescription)")
             }
             pending = pending.filter { !$0.hasPrefix(rootURL.path + "/") }.union(placeholders)
         }
@@ -304,7 +314,7 @@ public final class WorkspaceModel {
                 let report = try await Task.detached { try reconciler.reconcile(root: rootURL, paths: inRoot) }.value
                 pending.formUnion(report.placeholders.map(\.path))
             } catch {
-                lastError = "Indexing \(rootURL.path) failed: \(error.localizedDescription)"
+                showError(String(localized: "Couldn't Index Folder", comment: "Error alert title"), "Indexing \(rootURL.path) failed: \(error.localizedDescription)")
             }
         }
         try? reloadFiles()

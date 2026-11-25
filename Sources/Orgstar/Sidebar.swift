@@ -83,7 +83,9 @@ struct Sidebar: View {
             guard !folders.isEmpty else { return false }
             Task {
                 for folder in folders {
-                    do { try await workspace.addRoot(folder) } catch { workspace.lastError = error.localizedDescription }
+                    do { try await workspace.addRoot(folder) } catch {
+                        workspace.showError(String(localized: "Couldn't Add Folder", comment: "Error alert title"), error.localizedDescription)
+                    }
                 }
             }
             return true

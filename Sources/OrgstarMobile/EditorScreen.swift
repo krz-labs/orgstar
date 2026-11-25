@@ -346,7 +346,10 @@ struct EditorScreen: View {
             if conflict != nil, isFocused { sheet = .conflict }
         }
         .onChange(of: session.lastError) { _, error in
-            if let error { message = error; session.lastError = nil }
+            guard let error else { return }
+            // The title says what failed.
+            message = session.lastErrorTitle.map { "\($0)\n\(error)" } ?? error
+            session.lastError = nil
         }
         .onReceive(NotificationCenter.default.publisher(for: OrgExport.refused)) { message = $0.object as? String }
         .onAppear(perform: start)
