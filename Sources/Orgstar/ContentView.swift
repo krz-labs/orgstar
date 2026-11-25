@@ -290,7 +290,6 @@ struct ContentView: View {
                                         selectedFile = location.path
                                         session.show(location)
                                     }
-                                    .frame(height: 200)
                                 }
                             }
                         } else {
