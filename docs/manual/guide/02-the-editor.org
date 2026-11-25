@@ -228,6 +228,8 @@ Date prompts also show a date picker, and =S-<left>=, =S-<right>=, =S-<up>= and 
 
 When a prompt closes, the keyboard goes back to the editor.
 
+The Agenda and Board windows and the column view sheet ask their questions in the same prompt, at the bottom of the window or sheet.
+
 * Completion
 
 Complete at Point (=completion-at-point=) completes the word before the caret from what Org knows at that position.

@@ -44,25 +44,15 @@ struct AgendaView: View {
     /// The view picker moved to the agenda for a followed timestamp, which sets its own days.
     @State var keepRequestedDays = false
     @State var message: String?
-    @State var prompt: PendingPrompt?
+    /// A question for an agenda action, at the window's foot.
+    @State var prompt: PromptRequest?
     /// An event being changed, or an entry being added to a calendar.
     @State private var eventRequest: EventRequest?
-    @State var promptText = ""
     @State var prefix: String?
     /// Entries marked for a bulk action.
     @State var marked: [EntryRef] = []
     @State var logMode = false
     @State var filter = AgendaFilter()
-    /// A filter question: its title and which filter it sets.
-    @State var filterPrompt: (title: String, kind: Character)?
-    @State var filterText = ""
-    /// A one-line question for an agenda action, and what to do with the answer.
-    struct TextPrompt {
-        let title: String
-        let apply: (String) -> Void
-    }
-    @State var textPrompt: TextPrompt?
-    @State private var textAnswer = ""
     /// Day, week or month chosen with `v`; nil shows the span the settings or the view give.
     @State var spanKind: AgendaSpan?
     @State var showingDatePicker = false
@@ -124,15 +114,6 @@ struct AgendaView: View {
             self.line = line
             self.offset = offset
         }
-    }
-
-    struct PendingPrompt: Identifiable {
-        let id = UUID()
-        let prompt: Prompt
-        let command: any OrgCommand
-        let atMarker: Bool
-        let answers: [String: String]
-        let itemID: String
     }
 
     private struct RefreshKey: Hashable {
@@ -288,6 +269,14 @@ struct AgendaView: View {
 
     func line(_ id: String) -> Line? { lines(groups).first { $0.id == id } }
 
+    /// Asks `prompt` at the window's foot; `apply` gets the answer unless it is cancelled.
+    func ask(_ prompt: Prompt, apply: @escaping (String) -> Void) {
+        self.prompt = PromptRequest(prompt: prompt) { answer in
+            focused = true
+            if let answer { apply(answer) }
+        }
+    }
+
     var body: some View {
         let groups = self.groups
         _ = tick
@@ -345,7 +334,9 @@ struct AgendaView: View {
         .onAppear { focused = true }
         .onKeyPress(phases: .down) { press in handle(press) }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            if let message = message ?? (filter.isEmpty ? reminderStatus : "Filter: " + filter.description) {
+            if prompt != nil {
+                PromptBar(request: $prompt)
+            } else if let message = message ?? (filter.isEmpty ? reminderStatus : "Filter: " + filter.description) {
                 Text(message)
                     .font(.callout)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -374,51 +365,6 @@ struct AgendaView: View {
                     message = result
                     tick += 1
                 }
-            }
-        }
-        .sheet(item: Binding(get: { prompt?.prompt.fast == nil ? nil : prompt }, set: { if $0 == nil { prompt = nil } })) { pending in
-            if let fast = pending.prompt.fast {
-                FastSelectionView(selection: fast, message: pending.prompt.message) { answer in
-                    prompt = nil
-                    guard let answer else { return }
-                    promptText = answer
-                    prompt = pending
-                    answerPrompt()
-                }
-                .frame(minWidth: 420)
-            }
-        }
-        .alert(prompt?.prompt.message ?? "", isPresented: Binding(get: { prompt != nil && prompt?.prompt.fast == nil }, set: { if !$0 { prompt = nil } })) {
-            TextField("", text: $promptText)
-            Button("OK") { answerPrompt() }
-            Button("Cancel", role: .cancel) { prompt = nil }
-        } message: {
-            if let choices = prompt?.prompt.choices, !choices.isEmpty {
-                Text(choices.prefix(12).joined(separator: "  "))
-            }
-        }
-        .alert(filterPrompt?.title ?? "", isPresented: Binding(get: { filterPrompt != nil }, set: { if !$0 { filterPrompt = nil } })) {
-            TextField("", text: $filterText)
-            Button("Filter") { applyFilter() }
-            Button("Cancel", role: .cancel) { filterPrompt = nil }
-        } message: {
-            if filterPrompt?.kind == "/" || filterPrompt?.kind == "\\" {
-                Text(shown.tags.sorted().prefix(20).joined(separator: "  "))
-            }
-        }
-        .alert(textPrompt?.title ?? "", isPresented: Binding(get: { textPrompt != nil }, set: { if !$0 { textPrompt = nil } })) {
-            TextField("", text: $textAnswer)
-            Button("OK") {
-                let pending = textPrompt
-                let answer = textAnswer
-                textPrompt = nil
-                textAnswer = ""
-                // A follow-up question opens after this alert closes.
-                DispatchQueue.main.async { pending?.apply(answer) }
-            }
-            Button("Cancel", role: .cancel) {
-                textPrompt = nil
-                textAnswer = ""
             }
         }
         .navigationTitle(title)

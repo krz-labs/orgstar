@@ -153,8 +153,8 @@ extension AgendaView {
         tick += 1
     }
 
-    /// Refiles the selected entry, or with `marked` the marked ones, to a target asked for in
-    /// the main window, where the list of targets is searchable.
+    /// Refiles the selected entry, or with `marked` the marked ones, to a target chosen from a
+    /// searchable list.
     private func refile(marked bulk: Bool) {
         let entries = bulk ? marked : selectedEntry.map { [$0] } ?? []
         guard !entries.isEmpty else {
@@ -162,8 +162,8 @@ extension AgendaView {
             return
         }
         let targets = workspace.refileTargets(openPath: session.path, document: session.document)
-        commands.ask(Prompt(key: "refile", message: "Refile to:", choices: targets.map(\.label))) { answer in
-            guard let answer, targets.contains(where: { $0.label == answer }) else { return }
+        ask(Prompt(key: "refile", message: "Refile to:", choices: targets.map(\.label))) { answer in
+            guard targets.contains(where: { $0.label == answer }) else { return }
             message = eachEntry(entries) { entry, offset in
                 // Targets in the entry's own file from its text now, as earlier moves shift them.
                 let document = session.openDocuments.first { $0.path == entry.path }?.document
@@ -176,7 +176,6 @@ extension AgendaView {
             if bulk { marked = [] }
             tick += 1
         }
-        openWindow(id: "main")
     }
 
     /// Runs `action` on each entry, finding it again first: later entries in a file first, so
@@ -213,25 +212,25 @@ extension AgendaView {
             message = "No entries are marked"
             return
         }
-        textPrompt = TextPrompt(title: "Bulk action on \(marked.count): [$] archive [r] refile [t] TODO state [+] tag [-] untag [s] schedule [d] deadline") { answer in
+        ask(Prompt(key: "action", message: "Bulk action on \(marked.count): [$] archive [r] refile [t] TODO state [+] tag [-] untag [s] schedule [d] deadline")) { answer in
             switch answer.trimmingCharacters(in: .whitespaces) {
             case "$": bulk { session.archive(from: ($0.path, $1)) }
             case "r": refile(marked: true)
             case "t":
-                textPrompt = TextPrompt(title: "TODO state (empty for none):") { keyword in
+                ask(Prompt(key: "todo", message: "TODO state (empty for none):")) { keyword in
                     let word = keyword.trimmingCharacters(in: .whitespaces)
                     bulk { performAt($0, $1, SetTodo(keyword: word.isEmpty ? nil : word)) }
                 }
             case "+", "-":
                 let on = answer.trimmingCharacters(in: .whitespaces) == "+"
-                textPrompt = TextPrompt(title: on ? "Tag to add:" : "Tag to remove:") { tag in
+                ask(Prompt(key: "tag", message: on ? "Tag to add:" : "Tag to remove:")) { tag in
                     let tag = tag.trimmingCharacters(in: .whitespaces)
                     guard !tag.isEmpty else { return }
                     bulk { performAt($0, $1, ToggleTag(tag: tag, on: on)) }
                 }
             case "s", "d":
                 let deadline = answer.trimmingCharacters(in: .whitespaces) == "d"
-                textPrompt = TextPrompt(title: deadline ? "Deadline (+2d, fri, 2026-10-12):" : "Schedule (+2d, fri, 2026-10-12):") { date in
+                ask(Prompt(key: "date", message: deadline ? "Deadline (+2d, fri, 2026-10-12):" : "Schedule (+2d, fri, 2026-10-12):")) { date in
                     bulk { performAt($0, $1, SetPlanning(deadline: deadline), answers: ["date": date]) }
                 }
             default:
@@ -270,8 +269,9 @@ extension AgendaView {
         let step = session.perform(command, path: path, at: offset, expect: item.headingLine.map { (start, $0) }, answers: answers)
         switch step {
         case .prompt(let request):
-            promptText = request.initial
-            prompt = PendingPrompt(prompt: request, command: command, atMarker: atMarker, answers: answers, itemID: id)
+            ask(request) { answer in
+                run(command, atMarker: atMarker, answers: answers.merging([request.key: answer]) { $1 }, itemID: id)
+            }
         case .failed(let text):
             message = text
             tick += 1
@@ -281,13 +281,5 @@ extension AgendaView {
             message = nil
             tick += 1
         }
-    }
-
-    func answerPrompt() {
-        guard let pending = prompt else { return }
-        prompt = nil
-        var answers = pending.answers
-        answers[pending.prompt.key] = promptText
-        run(pending.command, atMarker: pending.atMarker, answers: answers, itemID: pending.itemID)
     }
 }

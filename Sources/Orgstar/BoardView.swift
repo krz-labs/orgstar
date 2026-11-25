@@ -17,6 +17,8 @@ struct BoardView: View {
     @State private var selection: Set<String> = []
     @State private var sortOrder = [KeyPathComparator(\BoardRow.todoOrder), KeyPathComparator(\BoardRow.title)]
     @State private var message: String?
+    /// A question an edit asks (a state note, a property).
+    @State private var prompt: PromptRequest?
     @State private var tick = 0
     /// Whether the first load has finished, so an empty board says so.
     @State private var loaded = false
@@ -70,7 +72,9 @@ struct BoardView: View {
             }
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            if let message {
+            if prompt != nil {
+                PromptBar(request: $prompt)
+            } else if let message {
                 Text(message).font(.callout).frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 12).padding(.vertical, 6).background(.bar)
             }
         }
@@ -287,12 +291,11 @@ struct BoardView: View {
         switch session.perform(command, path: entry.path, at: entry.headingOffset, expect: (entry.headingOffset, entry.headingLine), answers: answers) {
         case .failed(let text): message = text
         case .prompt(let prompt):
-            // A state note: asked in the main window's echo area.
-            commands.ask(prompt) { answer in
+            // A state note.
+            self.prompt = PromptRequest(prompt: prompt) { answer in
                 guard let answer else { return }
                 perform(command, on: entry, answers: answers.merging([prompt.key: answer]) { $1 })
             }
-            openWindow(id: "main")
         default: message = nil
         }
         tick += 1
@@ -303,13 +306,12 @@ struct BoardView: View {
     }
 
     private func askProperty(_ entry: BoardEntry) {
-        commands.ask(Prompt(key: "property", message: "Property (NAME value):")) { answer in
+        prompt = PromptRequest(prompt: Prompt(key: "property", message: "Property (NAME value):")) { answer in
             guard let answer, let space = answer.firstIndex(of: " ") else { return }
             let key = String(answer[..<space])
             let value = String(answer[answer.index(after: space)...]).trimmingCharacters(in: .whitespaces)
             perform(SetProperty(key: key, value: value), on: entry)
         }
-        openWindow(id: "main")
     }
 
     private func jump(_ entry: BoardEntry) {

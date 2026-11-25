@@ -17,9 +17,8 @@ struct ColumnViewSheet: View {
     @State private var editing: (row: Int, column: Int)?
     @State private var draft = ""
     @State private var message: String?
-    /// A question the edit asks (a state note), with the command to run again.
-    @State private var pending: (prompt: Prompt, command: any OrgCommand, start: Int, answers: [String: String])?
-    @State private var reply = ""
+    /// A question the edit asks (a state note).
+    @State private var prompt: PromptRequest?
     @FocusState private var focused: Bool
 
     var body: some View {
@@ -43,14 +42,7 @@ struct ColumnViewSheet: View {
                 .padding(10)
             }
             .defaultScrollAnchor(.topLeading)
-            if let pending {
-                HStack {
-                    Text(pending.prompt.message)
-                    TextField("", text: $reply).onSubmit(answerPending)
-                    Button("OK", action: answerPending)
-                }
-                .padding(8)
-            }
+            PromptBar(request: $prompt)
             if let message {
                 Text(message).font(.callout).foregroundStyle(.secondary).padding(8)
             }
@@ -120,7 +112,7 @@ struct ColumnViewSheet: View {
     }
 
     private func key(_ press: KeyPress) -> KeyPress.Result {
-        guard editing == nil, pending == nil else { return .ignored }
+        guard editing == nil, prompt == nil else { return .ignored }
         guard let current = selected else {
             if [.downArrow, .upArrow, .leftArrow, .rightArrow].contains(press.key), !view.rows.isEmpty {
                 selected = (0, 0)
@@ -174,20 +166,18 @@ struct ColumnViewSheet: View {
             refresh()
         case .failed(let text):
             message = text
-        case .prompt(let prompt):
-            reply = prompt.initial ?? ""
-            pending = (prompt, command, start, answers)
+        case .prompt(let question):
+            prompt = PromptRequest(prompt: question) { reply in
+                focused = true
+                guard let reply else { return }
+                let answers = answers.merging([question.key: reply]) { $1 }
+                handle(run(command, start, answers), command: command, start: start, answers: answers)
+            }
+            return
         default:
             message = String(localized: "\(CommandTitle.localized(command.title)) can't run here", comment: "A command that doesn't apply in column view")
         }
         focused = true
-    }
-
-    private func answerPending() {
-        guard let pending else { return }
-        self.pending = nil
-        let answers = pending.answers.merging([pending.prompt.key: reply]) { $1 }
-        handle(run(pending.command, pending.start, answers), command: pending.command, start: pending.start, answers: answers)
     }
 
     /// The view again, over the same entries, keeping the selected cell.

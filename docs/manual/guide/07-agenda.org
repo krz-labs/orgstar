@@ -650,7 +650,7 @@ Right-click a line for Open, Cycle TODO State, Set Priority…, Set Tags…, Sch
 
 =t= follows =org-todo=: with fast-selection keys in your TODO keywords it asks for the state, otherwise it cycles (see [[file:05-todos-and-tags.org][TODOs and tags]]). Questions an action needs, such as a date for =C-c C-s= or a note on a state change, appear in the agenda window. Dates take the same input as in the editor (see [[file:06-dates-and-clocking.org][Dates, scheduling and clocking]]). =S-<right>= and =S-<left>= work only on deadline, scheduled and timestamp lines; they change the timestamp the line comes from.
 
-=C-c C-w= brings the main window forward and asks for the target there, where the target list is searchable.
+=C-c C-w= asks for the target at the bottom of the agenda window, where the target list is searchable.
 
 =I= clocks in as Clock In does, so with no clock running it first asks about open clocks, in the main window's echo area. See [[file:06-dates-and-clocking.org][Dates, scheduling and clocking]].
 
@@ -665,7 +665,7 @@ Each action finds the entry again by its heading line before it changes anything
 | =U= | Unmarks everything                       | =org-agenda-bulk-unmark-all=   |
 | =B= | Asks for an action on every marked entry | =org-agenda-bulk-action=       |
 
-=B= offers =$= archive, =r= refile, =t= set a TODO state (typed; empty for none), =+= add a tag, =-= remove a tag, =s= schedule and =d= set a deadline. Type the letter and press OK. Entries that changed since they were marked are skipped and counted in the status line. An action that needs a further answer per entry, such as a state-change note, is not run in bulk; the status line tells you to run it on the entry.
+=B= offers =$= archive, =r= refile, =t= set a TODO state (typed; empty for none), =+= add a tag, =-= remove a tag, =s= schedule and =d= set a deadline. Type the letter and press =Return=. Entries that changed since they were marked are skipped and counted in the status line. An action that needs a further answer per entry, such as a state-change note, is not run in bulk; the status line tells you to run it on the entry.
 
 On iOS, tap Select in the bar at the bottom, or Select in an entry's menu, then tap entries to mark them. The bar then shows how many are selected, Actions and Done. Actions offers the same actions: TODO State…, Add Tag…, Remove Tag…, Schedule…, Deadline…, Refile… and Archive…, which asks first. After an action, or Done, the selection ends.
 
@@ -698,11 +698,11 @@ These three choices are remembered by the app; they are not in =config.toml=.
 
 ** Table
 
-Columns: TODO, priority, title, tags, scheduled, deadline, your property columns, and the file. Click a column header to sort (the property columns don't sort). The TODO column sorts by the keyword's order in your sequences. The context menu on a row offers Set TODO (a keyword or None), Set Property… (asked in the main window as =NAME value=) and Open. Double-click a row to open the entry.
+Columns: TODO, priority, title, tags, scheduled, deadline, your property columns, and the file. Click a column header to sort (the property columns don't sort). The TODO column sorts by the keyword's order in your sequences. The context menu on a row offers Set TODO (a keyword or None), Set Property… (asked at the bottom of the board as =NAME value=) and Open. Double-click a row to open the entry.
 
 ** Kanban
 
-Each TODO keyword your files use gets a column, in sequence order, done keywords included. Column headings take the keyword colours of the agenda and editor (see [[file:13-configuration.org][Configuration]]). A card shows the priority and title, the category and tags, and the deadline or the scheduled date, in the theme's agenda colours: a past deadline in =agenda-overdue=, one due today or later in =agenda-due-soon=. Drag a card to another column to set that keyword; this is the same edit as changing the state in the editor, so logging and state-change notes apply (a note is asked for in the main window). Double-click a card to open its entry. With VoiceOver, each card has a Move to … action for each other column.
+Each TODO keyword your files use gets a column, in sequence order, done keywords included. Column headings take the keyword colours of the agenda and editor (see [[file:13-configuration.org][Configuration]]). A card shows the priority and title, the category and tags, and the deadline or the scheduled date, in the theme's agenda colours: a past deadline in =agenda-overdue=, one due today or later in =agenda-due-soon=. Drag a card to another column to set that keyword; this is the same edit as changing the state in the editor, so logging and state-change notes apply (a note is asked for at the bottom of the board). Double-click a card to open its entry. With VoiceOver, each card has a Move to … action for each other column.
 
 From the keyboard, click a card or press an arrow key to select one. The arrow keys move between cards, =Return= opens the selected card's entry, and =⇧←= and =⇧→= move it to the column before or after, as dragging does.
 

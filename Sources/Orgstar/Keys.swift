@@ -33,7 +33,7 @@ struct EchoArea: View {
                 .padding(10)
             }
             if let request = commands.prompt {
-                PromptView(commands: commands, request: request)
+                PromptView(request: request, reply: commands.answer)
                     .id(request.id)
             } else if let text = commands.pendingKeys.map({ $0 + "-" }) ?? commands.message {
                 Text(text)
@@ -114,10 +114,12 @@ struct StateTag: View {
 }
 
 /// A question a command asks: fast selection, or a text field with its choices, filtered as
-/// it is typed, and a calendar for dates. Any window with an echo area can show it.
+/// it is typed, and a calendar for dates. The echo area shows it, and `PromptBar` in windows
+/// without one.
 struct PromptView: View {
-    let commands: AppCommands
     let request: PromptRequest
+    /// Ends the prompt with an answer, or nil to cancel.
+    let reply: (String?) -> Void
     @State private var answer = ""
     @FocusState private var answerFocused: Bool
     /// The highlighted choice, moved by ↑/↓ or C-p/C-n.
@@ -130,7 +132,7 @@ struct PromptView: View {
     var body: some View {
         if let fast = prompt.fast {
             Divider()
-            FastSelectionView(selection: fast, message: prompt.message) { commands.answer($0) }
+            FastSelectionView(selection: fast, message: prompt.message) { reply($0) }
         } else {
             let matches = filteredChoices(prompt.choices)
             let current = min(selected, matches.count - 1)
@@ -142,7 +144,7 @@ struct PromptView: View {
                             ForEach(matches.indices, id: \.self) { index in
                                 let choice = matches[index]
                                 Button {
-                                    if prompt.completionSeparator != nil { complete(choice) } else { commands.answer(choice) }
+                                    if prompt.completionSeparator != nil { complete(choice) } else { reply(choice) }
                                 } label: {
                                     Text(choice)
                                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -163,7 +165,7 @@ struct PromptView: View {
             }
             if let read = prompt.date {
                 Divider()
-                DatePickerView(answer: answer, read: read) { commands.answer($0) }
+                DatePickerView(answer: answer, read: read) { reply($0) }
             }
             Divider()
             HStack(spacing: 6) {
@@ -177,9 +179,9 @@ struct PromptView: View {
                     .focused($answerFocused)
                     .onSubmit {
                         if current >= 0, moved || prompt.requireMatch {
-                            commands.answer(matches[current])
+                            reply(matches[current])
                         } else if prompt.choices.isEmpty || !prompt.requireMatch {
-                            commands.answer(answer)
+                            reply(answer)
                         }
                     }
                     .onKeyPress(.tab) {
@@ -194,7 +196,7 @@ struct PromptView: View {
                         answer = DatePickerView.shifted(answer, read, by: days)
                         return .handled
                     }
-                    .onExitCommand { commands.answer(nil) }
+                    .onExitCommand { reply(nil) }
                     .onChange(of: answer) {
                         selected = 0
                         moved = false
@@ -238,6 +240,27 @@ struct PromptView: View {
         return choices.compactMap { choice in FuzzyMatch.score(typed, choice).map { (choice, $0) } }
             .sorted { $0.1 > $1.1 }
             .map(\.0)
+    }
+}
+
+/// A window's own question at its foot, styled as the echo area, for windows without one.
+struct PromptBar: View {
+    @Binding var request: PromptRequest?
+    @Environment(\.orgTheme) private var theme
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        if let current = request {
+            VStack(alignment: .leading, spacing: 0) {
+                PromptView(request: current) { text in
+                    request = nil
+                    current.reply(text)
+                }
+                .id(current.id)
+            }
+            .foregroundStyle(theme.color("modeline-foreground") ?? .primary)
+            .background { if let bg = theme.color("modeline-background", in: colorScheme) { bg } else { Rectangle().fill(.bar) } }
+        }
     }
 }
 

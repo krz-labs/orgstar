@@ -238,7 +238,7 @@ extension AgendaView {
     /// that view.
     func saveView() {
         let mode = agenda.mode
-        textPrompt = TextPrompt(title: String(localized: "Name for this view:")) { name in
+        ask(Prompt(key: "name", message: String(localized: "Name for this view:"))) { name in
             do {
                 try AgendaViewLoader.save(name: name, mode: mode)
                 loadViews()
@@ -298,23 +298,20 @@ extension AgendaView {
     }
 
     func askFilter(_ kind: Character) {
-        switch kind {
-        case "/": filterText = filter.description
-        default: filterText = ""
-        }
         let title = switch kind {
         case "/": "Filter [+cat-tag<0:10-/regexp/]:"
         case "\\": "Tag filter (+tag-tag):"
         case "=": "Regexp filter (-re to drop):"
         default: "Effort filter (<0:30, >1:00, =1:00):"
         }
-        filterPrompt = (title, kind)
+        let tags = kind == "/" || kind == "\\" ? shown.tags.sorted() : []
+        ask(Prompt(key: "filter", message: title, initial: kind == "/" ? filter.description : "", choices: tags, requireMatch: false)) { text in
+            applyFilter(kind, text)
+        }
     }
 
-    func applyFilter() {
-        guard let kind = filterPrompt?.kind else { return }
-        filterPrompt = nil
-        let text = filterText.trimmingCharacters(in: .whitespaces)
+    func applyFilter(_ kind: Character, _ answer: String) {
+        let text = answer.trimmingCharacters(in: .whitespaces)
         var current = filter
         switch kind {
         case "/":
