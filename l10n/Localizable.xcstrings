@@ -5279,6 +5279,40 @@
         }
       }
     },
+    "Body Font": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schrift für Fließtext"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tipo de letra del cuerpo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Police du texte courant"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本文のフォント"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fonte do Corpo"
+          }
+        }
+      }
+    },
     "Body Only": {
       "localizations": {
         "de": {
@@ -36245,6 +36279,40 @@
         }
       }
     },
+    "Text Width": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Textbreite"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ancho del texto"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Largeur du texte"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テキスト幅"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Largura do Texto"
+          }
+        }
+      }
+    },
     "Text width": {
       "localizations": {
         "de": {
@@ -39890,6 +39958,40 @@
         }
       }
     },
+    "Whole Screen": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ganzer Bildschirm"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toda la pantalla"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Écran entier"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画面全体"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tela Inteira"
+          }
+        }
+      }
+    },
     "Whole editor": {
       "localizations": {
         "de": {
@@ -40023,6 +40125,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Os widgets requerem o orgstar+."
+          }
+        }
+      }
+    },
+    "With a Body Font, prose uses it while tables, code, dates, tags and drawers keep the monospaced font. Text Width keeps lines to that many columns, centred, on a screen wider than that.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mit einer Schrift für Fließtext wird Prosa in ihr gesetzt, während Tabellen, Code, Daten, Tags und Schubladen die Festbreitenschrift behalten. Die Textbreite begrenzt Zeilen auf so viele Spalten, zentriert, auf einem breiteren Bildschirm."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Con un tipo de letra del cuerpo, la prosa lo usa mientras las tablas, el código, las fechas, las etiquetas y los cajones mantienen el tipo monoespaciado. El ancho del texto limita las líneas a esas columnas, centradas, en una pantalla más ancha."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avec une police du texte courant, la prose l'utilise tandis que les tableaux, le code, les dates, les étiquettes et les tiroirs gardent la police à chasse fixe. La largeur du texte limite les lignes à ce nombre de colonnes, centrées, sur un écran plus large."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本文のフォントを設定すると、文章にはそのフォントが使われ、表、コード、日付、タグ、ドロワーは等幅フォントのままです。テキスト幅は、それより広い画面で行をその桁数に収めて中央に置きます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Com uma Fonte do Corpo, a prosa a usa enquanto tabelas, código, datas, tags e gavetas mantêm a fonte monoespaçada. A Largura do Texto limita as linhas a essa quantidade de colunas, centralizadas, em uma tela mais larga."
           }
         }
       }

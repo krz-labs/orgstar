@@ -105,7 +105,7 @@ struct SettingsScreen: View {
             } footer: {
                 if badges == false { Text("Turn on Badges in orgstar's notification settings.") }
             }
-            Section("Appearance") {
+            Section {
                 let _ = model.settingsVersion
                 NavigationLink {
                     ThemePickerScreen(model: model, appearance: .light)
@@ -122,6 +122,28 @@ struct SettingsScreen: View {
                 } label: {
                     LabeledContent("App Icon", value: AppIcons.name(appIcon))
                 }
+                Picker("Body Font", selection: Binding {
+                    UserDefaults.standard.string(forKey: "themeBodyFont") ?? ""
+                } set: { model.set("themeBodyFont", to: .string($0)) }) {
+                    let body = UserDefaults.standard.string(forKey: "themeBodyFont") ?? ""
+                    Text("Same as Font").tag("")
+                    Text("System").tag("system")
+                    ForEach(Self.proportionalFamilies, id: \.self) { Text($0).tag($0) }
+                    if !["", "system"].contains(body), !Self.proportionalFamilies.contains(body) { Text(body).tag(body) }
+                }
+                .pickerStyle(.navigationLink)
+                Picker("Text Width", selection: Binding {
+                    UserDefaults.standard.integer(forKey: "themeTextWidth")
+                } set: { model.set("themeTextWidth", to: .integer($0)) }) {
+                    let width = UserDefaults.standard.integer(forKey: "themeTextWidth")
+                    Text("Whole Screen").tag(0)
+                    ForEach([60, 70, 80, 90, 100, 120], id: \.self) { Text("\($0) columns").tag($0) }
+                    if ![0, 60, 70, 80, 90, 100, 120].contains(width) { Text("\(width) columns").tag(width) }
+                }
+            } header: {
+                Text("Appearance")
+            } footer: {
+                Text("With a Body Font, prose uses it while tables, code, dates, tags and drawers keep the monospaced font. Text Width keeps lines to that many columns, centred, on a screen wider than that.")
             }
             calendarSection
             reminderSection
@@ -272,6 +294,12 @@ struct SettingsScreen: View {
         guard !titles.isEmpty else { return }
         let value = Set(titles) == Set(choices.map(\.title)) ? "" : titles.joined(separator: ", ")
         model.set(key, to: .string(value))
+    }
+
+    /// Installed proportional font families, for prose.
+    private static let proportionalFamilies: [String] = UIFont.familyNames.sorted().filter { family in
+        guard let name = UIFont.fontNames(forFamilyName: family).first, let font = UIFont(name: name, size: 13) else { return false }
+        return !font.fontDescriptor.symbolicTraits.contains(.traitMonoSpace)
     }
 
     /// The span and start day, worded as the Mac's Settings word the start.
