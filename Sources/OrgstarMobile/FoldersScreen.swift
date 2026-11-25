@@ -15,17 +15,31 @@ struct FoldersScreen: View {
     @State private var creating: NewItem?
     /// The added folder whose deletion from disk is being confirmed.
     @State private var deletingRoot: String?
+    /// The added folder whose removal from orgstar is being confirmed.
+    @State private var removingRoot: String?
     @Environment(MobileModel.self) private var model
 
     var body: some View {
         List {
             ForEach(workspace.rootPaths, id: \.self) { root in
-                Section((root as NSString).lastPathComponent) {
+                Section {
                     FolderContents(workspace: workspace, root: root, folder: "", deleting: $deleting, changes: changes)
-                    Button("Remove Folder", role: .destructive) { try? workspace.removeRoot(path: root) }
                     if isEmptyFolder(root) {
                         Button("Delete Folder…", role: .destructive) { deletingRoot = root }
                     }
+                } header: {
+                    // A header takes no swipe, so its menu holds the folder's own actions.
+                    HStack {
+                        Text((root as NSString).lastPathComponent)
+                        Spacer()
+                        Menu {
+                            removeButton(root)
+                        } label: {
+                            Label("Folder Actions", systemImage: "ellipsis.circle").labelStyle(.iconOnly)
+                        }
+                        .textCase(nil)
+                    }
+                    .contextMenu { removeButton(root) }
                 }
             }
             if let error = workspace.lastError {
@@ -49,6 +63,16 @@ struct FoldersScreen: View {
             }
         } message: {
             Text("The empty folder is removed from disk and from orgstar.")
+        }
+        .confirmationDialog("Remove “\(removingRoot.map { ($0 as NSString).lastPathComponent } ?? "")” from orgstar?",
+                            isPresented: Binding { removingRoot != nil } set: { if !$0 { removingRoot = nil } }, titleVisibility: .visible) {
+            Button("Remove from orgstar", role: .destructive) {
+                guard let root = removingRoot else { return }
+                removingRoot = nil
+                try? workspace.removeRoot(path: root)
+            }
+        } message: {
+            Text("The folder and its files stay where they are. orgstar stops reading them, and the agenda leaves them out.")
         }
         .navigationDestination(for: FolderRoute.self) { route in
             FolderPage(workspace: workspace, session: session, route: route)
@@ -107,6 +131,10 @@ struct FoldersScreen: View {
     }
 }
 extension FoldersScreen {
+    private func removeButton(_ root: String) -> some View {
+        Button("Remove from orgstar…", systemImage: "folder.badge.minus", role: .destructive) { removingRoot = root }
+    }
+
     /// A daily note, opened in the reader.
     private func dailies(_ id: String) {
         guard ProAccess.shared.allows(.roam) else { return }
@@ -247,6 +275,8 @@ private struct FolderContents: View {
     @Binding var deleting: String?
     /// Changes after each deletion, which the index may not show, so empty folders are read again.
     let changes: Int
+    /// Files not yet downloaded that were tapped, shown with a spinner until they arrive.
+    @State private var requested: Set<String> = []
 
     private var prefix: String { folder.isEmpty ? "" : folder + "/" }
 
@@ -303,7 +333,20 @@ private struct FolderContents: View {
             }
         }
         ForEach(pending.filter { !$0.contains("/") }, id: \.self) { name in
-            Label(name, systemImage: "icloud.and.arrow.down").foregroundStyle(.secondary)
+            let path = root + "/" + prefix + name
+            Button {
+                // iCloud downloads these by itself in time; a tap asks for this one now.
+                try? FileManager.default.startDownloadingUbiquitousItem(at: URL(fileURLWithPath: path))
+                requested.insert(path)
+            } label: {
+                HStack {
+                    Label(name, systemImage: "icloud.and.arrow.down")
+                    Spacer()
+                    if requested.contains(path) { ProgressView() }
+                }
+                .foregroundStyle(.secondary)
+            }
+            .accessibilityHint(requested.contains(path) ? Text("Downloading") : Text("Downloads the file from iCloud"))
         }
     }
 }

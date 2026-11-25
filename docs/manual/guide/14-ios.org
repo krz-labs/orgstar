@@ -21,11 +21,11 @@ orgstar on iOS works on folders you choose, in iCloud Drive or in another app's 
 1. Open the Folders tab and tap Add Folder (the folder icon with a plus).
 2. Choose a folder in the picker.
 
-orgstar keeps access to the folder across launches. Each folder appears as a section listing its =.org= files by their path inside the folder. Remove Folder at the end of a section removes it from orgstar; the files stay where they are. An added folder that is empty also has Delete Folder…, which deletes it from disk too.
+orgstar keeps access to the folder across launches. Each folder appears as a section listing its =.org= files by their path inside the folder. To stop using a folder, tap the ⋯ button beside its name, or touch and hold the name, and choose Remove from orgstar…; orgstar asks first. The folder and its files stay where they are. An added folder that is empty also has Delete Folder…, which deletes it from disk too.
 
 Swipe left on a file, or touch and hold it, to delete it. orgstar asks first. A file in iCloud Drive goes to Recently Deleted in the Files app; elsewhere it is removed. New File… and New Folder… under + at the top right make one in the folder shown, or with several added folders, in the one you pick; a file name without an extension gets =.org=. Empty folders are listed too and delete the same way; a folder with anything in it other than hidden files can't be deleted from orgstar.
 
-Files that iCloud hasn't downloaded to the device yet appear in grey with a cloud icon. orgstar asks iCloud to download them and lists them as files once they arrive.
+Files that iCloud hasn't downloaded to the device yet appear in grey with a cloud icon. orgstar asks iCloud to download them and lists them as files once they arrive; tap one to ask for it at once, and a spinner shows until it arrives.
 
 orgstar sees changes made by iCloud and by apps that use the system's file coordination, and reads every folder again each time you return to the app, since not every sync app reports its changes. An open file takes in changes from disk as described in [[file:15-alongside-emacs.org][Working alongside Emacs and other tools]].
 

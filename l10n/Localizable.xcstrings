@@ -12076,6 +12076,40 @@
         }
       }
     },
+    "Downloading": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird geladen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descargando"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Téléchargement"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ダウンロード中"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Baixando"
+          }
+        }
+      }
+    },
     "Downloading from iCloud": {
       "localizations": {
         "de": {
@@ -12106,6 +12140,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Baixando do iCloud"
+          }
+        }
+      }
+    },
+    "Downloads the file from iCloud": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lädt die Datei aus iCloud"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descarga el archivo de iCloud"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Télécharge le fichier depuis iCloud"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloudからファイルをダウンロードします"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Baixa o arquivo do iCloud"
           }
         }
       }
@@ -15583,6 +15651,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pasta"
+          }
+        }
+      }
+    },
+    "Folder Actions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ordneraktionen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acciones de la carpeta"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actions du dossier"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フォルダの操作"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ações da Pasta"
           }
         }
       }
@@ -29635,6 +29737,108 @@
         }
       }
     },
+    "Remove from orgstar": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aus orgstar entfernen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quitar de orgstar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retirer d'orgstar"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstarから取り除く"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remover do orgstar"
+          }
+        }
+      }
+    },
+    "Remove from orgstar…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aus orgstar entfernen …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quitar de orgstar…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retirer d'orgstar…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstarから取り除く…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remover do orgstar…"
+          }
+        }
+      }
+    },
+    "Remove “%@” from orgstar?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ aus orgstar entfernen?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Quitar “%@” de orgstar?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retirer « %@ » d’orgstar ?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」をorgstarから取り除きますか？"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remover “%@” do orgstar?"
+          }
+        }
+      }
+    },
     "Remove “%@” from the sidebar?": {
       "localizations": {
         "de": {
@@ -36853,6 +37057,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "A pasta e seus arquivos permanecem no disco."
+          }
+        }
+      }
+    },
+    "The folder and its files stay where they are. orgstar stops reading them, and the agenda leaves them out.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Ordner und seine Dateien bleiben, wo sie sind. orgstar liest sie nicht mehr, und die Agenda lässt sie aus."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La carpeta y sus archivos se quedan donde están. orgstar deja de leerlos y la agenda los omite."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le dossier et ses fichiers restent où ils sont. orgstar cesse de les lire et l'agenda les laisse de côté."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フォルダとそのファイルは今の場所に残ります。orgstarはそれらを読まなくなり、アジェンダにも表示されません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A pasta e seus arquivos ficam onde estão. O orgstar deixa de lê-los e a agenda os deixa de fora."
           }
         }
       }
