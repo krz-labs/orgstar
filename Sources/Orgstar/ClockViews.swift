@@ -150,8 +150,9 @@ final class ClockStatusItem: NSObject {
     private func refresh() {
         guard let button = item?.button else { return }
         if let running {
-            button.image = nil
-            button.title = "⏱ " + clockElapsed(running, now: Date())
+            button.image = NSImage(systemSymbolName: "clock", accessibilityDescription: String(localized: "Clocked in"))
+            button.imagePosition = .imageLeading
+            button.title = clockElapsed(running, now: Date())
         } else {
             button.image = NSImage(systemSymbolName: "star", accessibilityDescription: "orgstar")
             button.title = ""
