@@ -16,6 +16,7 @@ struct OnboardingScreen: View {
     @State private var step = Step.welcome
     @State private var importing = false
     @State private var problem: String?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private enum Step: Int, CaseIterable {
         case welcome, folder, notifications, calendar, reminders
@@ -34,7 +35,7 @@ struct OnboardingScreen: View {
             }
             .frame(maxWidth: 500, maxHeight: .infinity)
             .padding(.horizontal, 28)
-            .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)).combined(with: .opacity))
+            .transition(reduceMotion ? .opacity : .asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)).combined(with: .opacity))
             .id(step)
             HStack(spacing: 8) {
                 ForEach(Step.allCases, id: \.self) { s in
@@ -43,6 +44,7 @@ struct OnboardingScreen: View {
             }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("Step \(step.rawValue + 1) of \(Step.allCases.count)")
+            .padding(.top, 12)
             .padding(.bottom, 12)
         }
         .tint(model.theme.accentColor)
@@ -63,7 +65,9 @@ struct OnboardingScreen: View {
     }
 
     private var welcome: some View {
-        page(symbol: "star.fill", title: "Welcome to orgstar", text: "Your org files on iPhone, in the folders where they already are.") {
+        page(symbol: "star.fill", title: "Welcome to orgstar",
+             text: UIDevice.current.userInterfaceIdiom == .pad ? "Your org files on iPad, in the folders where they already are."
+                : "Your org files on iPhone, in the folders where they already are.") {
             VStack(alignment: .leading, spacing: 18) {
                 feature("calendar", "The agenda", "Scheduled entries, deadlines and TODOs from all your files.")
                 feature("hand.tap", "Tap to edit", "Change an entry's state, dates, tags and notes in place. Swipe to finish or reschedule.")
@@ -98,13 +102,17 @@ struct OnboardingScreen: View {
                     next()
                 }
             }
+            secondary("Not Now") {
+                model.set("reminders", to: .bool(false))
+                next()
+            }
         }
     }
 
     private var calendar: some View {
         page(symbol: "calendar.badge.clock", title: "Calendar events",
              text: "Show events from Calendar among your agenda's entries. You can choose which calendars in Settings.") {
-            EmptyView()
+            needsPro
         } actions: {
             primary("Continue") {
                 Task {
@@ -112,13 +120,14 @@ struct OnboardingScreen: View {
                     next()
                 }
             }
+            secondary("Not Now") { next() }
         }
     }
 
     private var reminders: some View {
         page(symbol: "checklist", title: "Reminders app",
              text: "Show incomplete reminders with a due date from the Reminders app in your agenda, read-only.") {
-            EmptyView()
+            needsPro
         } actions: {
             primary("Continue") {
                 Task {
@@ -126,6 +135,16 @@ struct OnboardingScreen: View {
                     next()
                 }
             }
+            secondary("Not Now") { next() }
+        }
+    }
+
+    /// Calendar and Reminders in the agenda are orgstar+ features.
+    @ViewBuilder
+    private var needsPro: some View {
+        if !ProAccess.shared.isUnlocked {
+            Label { Text("Needs orgstar+") } icon: { PlusBadge(size: 22) }
+                .font(.subheadline.weight(.medium))
         }
     }
 
@@ -135,7 +154,7 @@ struct OnboardingScreen: View {
             finish()
             return
         }
-        withAnimation(.snappy) { step = following }
+        withAnimation(reduceMotion ? .easeInOut(duration: 0.2) : .snappy) { step = following }
     }
 
     // MARK: - Layout
@@ -144,18 +163,27 @@ struct OnboardingScreen: View {
         symbol: String, title: LocalizedStringKey, text: LocalizedStringKey,
         @ViewBuilder content: () -> Content, @ViewBuilder actions: () -> Actions
     ) -> some View {
-        VStack(spacing: 20) {
-            Spacer(minLength: 24)
-            Image(systemName: symbol)
-                .font(.system(size: 44, weight: .semibold))
-                .foregroundStyle(Color.accentColor)
-                .frame(width: 96, height: 96)
-                .background(Color.accentColor.opacity(0.12), in: Circle())
-                .accessibilityHidden(true)
-            Text(title).font(.title.bold()).multilineTextAlignment(.center)
-            Text(text).font(.body).foregroundStyle(.secondary).multilineTextAlignment(.center)
-            content()
-            Spacer(minLength: 24)
+        // The text scrolls at large text sizes; the actions stay below it.
+        let content = content()
+        return VStack(spacing: 20) {
+            GeometryReader { geometry in
+                ScrollView {
+                    VStack(spacing: 20) {
+                        Image(systemName: symbol)
+                            .font(.system(size: 44, weight: .semibold))
+                            .foregroundStyle(Color.accentColor)
+                            .frame(width: 96, height: 96)
+                            .background(Color.accentColor.opacity(0.12), in: Circle())
+                            .accessibilityHidden(true)
+                        Text(title).font(.title.bold()).multilineTextAlignment(.center)
+                        Text(text).font(.body).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                        content
+                    }
+                    .padding(.vertical, 24)
+                    .frame(maxWidth: .infinity, minHeight: geometry.size.height)
+                }
+                .scrollBounceBehavior(.basedOnSize)
+            }
             VStack(spacing: 12) { actions() }
         }
     }

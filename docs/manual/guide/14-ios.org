@@ -4,7 +4,7 @@
 
 * Overview
 
-On first launch, a few screens introduce the app, ask for the folder of org files, and offer notifications, Calendar events and Reminders; each permission is asked for only when you choose it, and every one can be changed later in Settings. The app has three tabs, and opens on Folders until a folder has been added:
+On first launch, a few screens introduce the app, ask for the folder of org files, and offer notifications, Calendar events and Reminders. Each permission is asked for only when you tap Continue on its screen; Not Now skips it, and every one can be changed later in Settings. The Calendar and Reminders screens say when the feature needs orgstar+. With Reduce Motion on, the screens fade into each other instead of sliding. The app has three tabs, and opens on Folders until a folder has been added:
 
 - Agenda :: the agenda over your folders, with capture.
 - Folders :: the folders of org files you added. Each shows its subfolders and org files; tap a subfolder to open it.

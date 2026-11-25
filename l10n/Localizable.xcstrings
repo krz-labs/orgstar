@@ -40439,6 +40439,40 @@
         }
       }
     },
+    "Your org files on iPad, in the folders where they already are.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Org-Dateien auf dem iPad, in den Ordnern, in denen sie schon liegen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tus archivos Org en el iPad, en las carpetas donde ya están."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vos fichiers Org sur l'iPad, dans les dossiers où ils se trouvent déjà."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPadでOrgファイルを、今あるフォルダのまま利用できます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seus arquivos Org no iPad, nas pastas onde eles já estão."
+          }
+        }
+      }
+    },
     "Your org files on iPhone, in the folders where they already are.": {
       "localizations": {
         "de": {
