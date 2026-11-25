@@ -469,12 +469,16 @@ struct OrgstarApp: App {
         Window("Clock Report", id: "clock-report") {
             if case .success(let model) = workspace {
                 ClockReportView(workspace: model, session: session)
+                    .environment(\.orgTheme, ConfigSync.shared.theme)
+                    .tint(ConfigSync.shared.theme.color("accent"))
             }
         }
         .defaultSize(width: 860, height: 560)
         Window("Capture", id: "capture") {
             if case .success(let model) = workspace {
                 CaptureView(workspace: model, session: session, commands: commands, clock: clock)
+                    .environment(\.orgTheme, ConfigSync.shared.theme)
+                    .tint(ConfigSync.shared.theme.color("accent"))
             }
         }
         .windowResizability(.contentSize)
