@@ -255,14 +255,16 @@ struct JavaScriptBlocksTests {
     @Test func cancelAndTimeoutEndTheRun() async throws {
         let folder = FileManager.default.temporaryDirectory
         // Spins for seconds, as an endless loop would, but ends so the test leaves no thread busy.
-        let spin = try Self.plan("#+begin_src js\nconst end = Date.now() + 3000; while (Date.now() < end) {}\n#+end_src\n")
+        // Run to its end the two runs take 16 s of wall time whatever the load, so a limit well
+        // under that tells stopping from finishing on a busy machine too.
+        let spin = try Self.plan("#+begin_src js\nconst end = Date.now() + 8000; while (Date.now() < end) {}\n#+end_src\n")
         let start = ContinuousClock.now
         let task = Task { try await JavaScriptBlocks.run(spin, directory: folder) }
         try await Task.sleep(for: .milliseconds(100))
         task.cancel()
         await #expect(throws: CancellationError.self) { try await task.value }
         await #expect(throws: JavaScriptBlocks.Stopped.self) { try await JavaScriptBlocks.run(spin, directory: folder, timeout: .milliseconds(100)) }
-        #expect(ContinuousClock.now - start < .seconds(2))
+        #expect(ContinuousClock.now - start < .seconds(6))
         let interval = try Self.plan("#+begin_src js :results output\nsetInterval(() => {}, 10)\n#+end_src\n")
         await #expect(throws: JavaScriptBlocks.Stopped.self) { try await JavaScriptBlocks.run(interval, directory: folder, timeout: .milliseconds(100)) }
     }
