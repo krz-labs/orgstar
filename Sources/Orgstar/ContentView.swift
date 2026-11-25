@@ -1304,7 +1304,7 @@ struct ContentView: View {
         case "app.split-below": paneWindow?.split(.vertical)
         case "app.split-right": paneWindow?.split(.horizontal)
         case "app.pane-close":
-            guard let window = paneWindow, window.paneCount > 1 else { return commands.show(String(localized: "Attempt to delete the only pane")) }
+            guard let window = paneWindow, window.paneCount > 1 else { return commands.show(String(localized: "This is the only pane.", comment: "Close Pane with one pane")) }
             commands.store.releasePane(window.focused)
             window.close(window.focused)
             focusPane(window)

@@ -4690,41 +4690,6 @@
         }
       }
     },
-    "Attempt to delete the only pane": {
-      "comment": "Echo area: Close Pane with one pane",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Der einzige Bereich kann nicht geschlossen werden"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se puede cerrar el único panel"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Impossible de fermer le seul panneau"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "唯一のペインは閉じられません"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Não é possível fechar o único painel"
-          }
-        }
-      }
-    },
     "Auto Fill": {
       "comment": "View menu toggle (auto-fill-mode)",
       "localizations": {
