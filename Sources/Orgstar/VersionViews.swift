@@ -105,6 +105,31 @@ struct RecoverySheet: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
+        Group {
+            if versions.isEmpty {
+                VStack {
+                    ContentUnavailableView(
+                        "No recovery versions", systemImage: "clock.arrow.circlepath",
+                        description: Text("orgstar keeps a copy of this file here when it replaces a version, and a snapshot before a save at most once an hour.")
+                    )
+                    HStack {
+                        Spacer()
+                        Button("Close") { dismiss() }.keyboardShortcut(.cancelAction)
+                    }
+                }
+                .padding()
+            } else {
+                versionList
+            }
+        }
+        .frame(minWidth: 760, minHeight: 460)
+        .onAppear {
+            versions = session.recoveryVersions()
+            selected = versions.first?.url
+        }
+    }
+
+    private var versionList: some View {
         HSplitView {
             List(versions, id: \.url, selection: $selected) { version in
                 VStack(alignment: .leading) {
@@ -137,11 +162,6 @@ struct RecoverySheet: View {
                 }
             }
             .padding()
-        }
-        .frame(minWidth: 760, minHeight: 460)
-        .onAppear {
-            versions = session.recoveryVersions()
-            selected = versions.first?.url
         }
     }
 

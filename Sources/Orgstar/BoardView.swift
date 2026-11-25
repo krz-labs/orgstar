@@ -18,6 +18,8 @@ struct BoardView: View {
     @State private var sortOrder = [KeyPathComparator(\BoardRow.todoOrder), KeyPathComparator(\BoardRow.title)]
     @State private var message: String?
     @State private var tick = 0
+    /// Whether the first load has finished, so an empty board says so.
+    @State private var loaded = false
     /// The kanban card the arrow keys move from.
     @State private var current: String?
     @FocusState private var boardFocused: Bool
@@ -59,6 +61,14 @@ struct BoardView: View {
         Group {
             if kanban { board } else { table }
         }
+        .overlay {
+            if loaded, entries.isEmpty {
+                ContentUnavailableView(
+                    "No entries", systemImage: "rectangle.split.3x1",
+                    description: Text(match.isEmpty ? "Headings with a TODO keyword in the agenda files show here." : "Nothing in the agenda files matches this.")
+                )
+            }
+        }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if let message {
                 Text(message).font(.callout).frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 12).padding(.vertical, 6).background(.bar)
@@ -89,6 +99,7 @@ struct BoardView: View {
             let result = await agenda.board(open: open, match: match)
             entries = result.entries
             keywords = result.keywords
+            loaded = true
         }
     }
 

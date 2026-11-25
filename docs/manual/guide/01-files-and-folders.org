@@ -294,7 +294,7 @@ Choose File ▸ Recovery Versions… to see the open file's versions, newest fir
 | Disk version, replaced  | The file on disk, before orgstar wrote over it  |
 | Sync conflict copy      | A Syncthing conflict copy you resolved          |
 
-Select a version to see how it differs from the buffer (=-= in the buffer, =+= in the kept version). =Restore= puts the kept version's text in the buffer as one edit, which undo reverses; the buffer as it was goes to recovery first. =Show in Finder= reveals the kept file.
+Select a version to see how it differs from the buffer (=-= in the buffer, =+= in the kept version). =Restore= puts the kept version's text in the buffer as one edit, which undo reverses; the buffer as it was goes to recovery first. =Show in Finder= reveals the kept file. For a file with no kept versions the sheet says so.
 
 ** iCloud
 

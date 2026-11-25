@@ -16512,6 +16512,40 @@
         }
       }
     },
+    "Headings with a TODO keyword in the agenda files show here.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hier erscheinen die Überschriften deiner Agenda-Dateien, die ein TODO-Schlüsselwort haben."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aquí aparecen los encabezados de tus archivos de agenda que tienen una palabra clave TODO."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les titres de vos fichiers d'agenda qui ont un mot-clé TODO s'affichent ici."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アジェンダファイルのうちTODOキーワードのある見出しがここに表示されます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Os cabeçalhos dos seus arquivos da agenda com uma palavra-chave TODO aparecem aqui."
+          }
+        }
+      }
+    },
     "Hidden": {
       "localizations": {
         "de": {
@@ -23684,6 +23718,40 @@
         }
       }
     },
+    "No recovery versions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Wiederherstellungsversionen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay versiones de recuperación"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune version de récupération"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "復元バージョンなし"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhuma versão de recuperação"
+          }
+        }
+      }
+    },
     "No table at point": {
       "localizations": {
         "de": {
@@ -24262,6 +24330,74 @@
         }
       }
     },
+    "Nothing in the agenda files matches this view.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nichts in deinen Agenda-Dateien passt zu dieser Ansicht."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada en tus archivos de agenda coincide con esta vista."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien dans vos fichiers d'agenda ne correspond à cette vue."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このビューに一致する項目はアジェンダファイルにありません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada nos seus arquivos da agenda corresponde a esta visualização."
+          }
+        }
+      }
+    },
+    "Nothing in the agenda files matches this.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nichts in deinen Agenda-Dateien passt dazu."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada en tus archivos de agenda coincide con esto."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien dans vos fichiers d'agenda ne correspond."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アジェンダファイルに一致する項目はありません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada nos seus arquivos da agenda corresponde a isso."
+          }
+        }
+      }
+    },
     "Nothing is running": {
       "localizations": {
         "de": {
@@ -24326,6 +24462,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nada mais hoje"
+          }
+        }
+      }
+    },
+    "Nothing matches the filter.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nichts passt zum Filter."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada coincide con el filtro."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien ne correspond au filtre."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フィルタに一致する項目はありません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada corresponde ao filtro."
           }
         }
       }
@@ -42483,6 +42653,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "orgstar na barra de menus"
+          }
+        }
+      }
+    },
+    "orgstar keeps a copy of this file here when it replaces a version, and a snapshot before a save at most once an hour.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar legt hier eine Kopie dieser Datei ab, wenn es eine Version ersetzt, und höchstens einmal pro Stunde einen Schnappschuss vor dem Sichern."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar guarda aquí una copia de este archivo cuando sustituye una versión, y una instantánea antes de guardar como mucho una vez por hora."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar conserve ici une copie de ce fichier lorsqu'il remplace une version, et un instantané avant un enregistrement au plus une fois par heure."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstarはバージョンを置き換えるときにこのファイルのコピーをここに保存し、保存前のスナップショットも1時間に1回まで保存します。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O orgstar guarda aqui uma cópia deste arquivo quando substitui uma versão, e um instantâneo antes de salvar no máximo uma vez por hora."
           }
         }
       }

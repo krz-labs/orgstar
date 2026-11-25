@@ -345,7 +345,7 @@ The built-in view TODO List is =org-todo-list=: every heading with a TODO keywor
 
 A saved view can list specific keywords instead, done ones included, with =keywords = "WAIT|HOLD"= (see [[*Views][Views]]). This mirrors =C-u M-x org-todo-list= with a keyword argument.
 
-The TODO list and the match views use the same rows as the day view (see [[*Rows][Rows]]), without the left column.
+The TODO list and the match views use the same rows as the day view (see [[*Rows][Rows]]), without the left column. On the Mac, a list with no rows says No entries under its header.
 
 * Tag and property matches
 
@@ -709,6 +709,8 @@ From the keyboard, click a card or press an arrow key to select one. The arrow k
 With Increase Contrast on, cards have an outline, the selected card a heavier one, and the category, tags and dates are drawn in the theme's =foreground=.
 
 With a match that includes entries without a TODO keyword, those entries appear in the table but not on the kanban board, which has no column for them.
+
+When no entry matches, the board says so in place of the table or columns.
 
 ** On iOS
 
