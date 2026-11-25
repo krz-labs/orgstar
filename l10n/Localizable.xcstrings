@@ -9792,6 +9792,146 @@
         }
       }
     },
+    "Couldn't Create File": {
+      "comment": "Error alert title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Datei konnte nicht erstellt werden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha podido crear el archivo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de créer le fichier"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルを作成できませんでした"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não Foi Possível Criar o Arquivo"
+          }
+        }
+      }
+    },
+    "Couldn't Create Folder": {
+      "comment": "Error alert title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ordner konnte nicht erstellt werden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha podido crear la carpeta"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de créer le dossier"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フォルダを作成できませんでした"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não Foi Possível Criar a Pasta"
+          }
+        }
+      }
+    },
+    "Couldn't Delete File": {
+      "comment": "Error alert title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Datei konnte nicht gelöscht werden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha podido eliminar el archivo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de supprimer le fichier"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルを削除できませんでした"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não Foi Possível Apagar o Arquivo"
+          }
+        }
+      }
+    },
+    "Couldn't Delete Folder": {
+      "comment": "Error alert title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ordner konnte nicht gelöscht werden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha podido eliminar la carpeta"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de supprimer le dossier"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フォルダを削除できませんでした"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não Foi Possível Apagar a Pasta"
+          }
+        }
+      }
+    },
     "Couldn't Find Folder": {
       "comment": "Error alert title",
       "localizations": {

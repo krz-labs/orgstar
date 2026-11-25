@@ -43,7 +43,8 @@ struct FoldersScreen: View {
                 }
             }
             if let error = workspace.lastError {
-                Text(error).foregroundStyle(.red)
+                // The title says what failed.
+                Text(workspace.lastErrorTitle.map { "\($0)\n\(error)" } ?? error).foregroundStyle(.red)
             }
         }
         .navigationTitle("Folders")
@@ -57,7 +58,7 @@ struct FoldersScreen: View {
                         try await workspace.trash(root)
                         try workspace.removeRoot(path: root)
                     } catch {
-                        workspace.lastError = "Can't delete \((root as NSString).lastPathComponent): \(error.localizedDescription)"
+                        workspace.showError(String(localized: "Couldn't Delete Folder", comment: "Error alert title"), error.localizedDescription)
                     }
                 }
             }
@@ -124,7 +125,7 @@ struct FoldersScreen: View {
                 do {
                     try await workspace.addRoot(url)
                 } catch {
-                    workspace.lastError = "Can't add \(url.lastPathComponent): \(error.localizedDescription)"
+                    workspace.showError(String(localized: "Couldn't Add Folder", comment: "Error alert title"), error.localizedDescription)
                 }
             }
         }
@@ -198,7 +199,8 @@ private struct NewItemAlert: ViewModifier {
                         if item.isFolder { try Self.makeFolder(typed, in: item.folder) } else { _ = try await workspace.createFile(named: typed, in: item.folder) }
                         created()
                     } catch {
-                        workspace.lastError = error.localizedDescription
+                        workspace.showError(item.isFolder ? String(localized: "Couldn't Create Folder", comment: "Error alert title")
+                                            : String(localized: "Couldn't Create File", comment: "Error alert title"), error.localizedDescription)
                     }
                 }
             }
@@ -236,7 +238,10 @@ private extension View {
                 deleting.wrappedValue = nil
                 session.kill(path)
                 Task {
-                    do { try await workspace.trash(path) } catch { workspace.lastError = "Can't delete \(name): \(error.localizedDescription)" }
+                    do { try await workspace.trash(path) } catch {
+                        workspace.showError(folder ? String(localized: "Couldn't Delete Folder", comment: "Error alert title")
+                                            : String(localized: "Couldn't Delete File", comment: "Error alert title"), error.localizedDescription)
+                    }
                     deleted()
                 }
             }
