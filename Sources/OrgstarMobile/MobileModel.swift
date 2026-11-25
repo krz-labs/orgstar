@@ -101,7 +101,6 @@ final class MobileModel {
             guard let self else { return }
             _ = self.clock.textChanged(path, self.session)
         }
-        clock.remindAtEffort(session)
         // A new Dynamic Type size restyles editors and the reader.
         sizeObserver = NotificationCenter.default.addObserver(forName: UIContentSizeCategory.didChangeNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.settingsVersion += 1 }

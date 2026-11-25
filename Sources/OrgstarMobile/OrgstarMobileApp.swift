@@ -300,6 +300,12 @@ struct RootView: View {
                 takeShared()
             }
         }
+        // After the first frame: removing a pending notification waits on the notification
+        // service, which can take many seconds after the device starts.
+        .task {
+            await Task.yield()
+            model.clock.remindAtEffort(session)
+        }
         .task {
             TimerModel.shared.onDone = { message = $0 }
             takeShared()
