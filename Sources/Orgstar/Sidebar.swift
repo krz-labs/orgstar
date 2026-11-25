@@ -14,6 +14,8 @@ struct Sidebar: View {
     /// Folders shown collapsed, by path, one per line.
     @AppStorage("collapsedFolders") private var collapsedText = ""
     @State private var removing: String?
+    /// A drag with a folder is over the sidebar.
+    @State private var dropTargeted = false
     /// A file operation waiting for a name or a confirmation.
     @Environment(\.orgTheme) private var theme
     @Environment(\.colorScheme) private var colorScheme
@@ -75,6 +77,20 @@ struct Sidebar: View {
         }
         .listStyle(.sidebar)
         .themedListBackground(theme.color("sidebar-background", in: colorScheme))
+        // Folders dropped from the Finder are added as Add Folder… adds them.
+        .dropDestination(for: URL.self) { urls, _ in
+            let folders = urls.filter { (try? $0.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true }
+            guard !folders.isEmpty else { return false }
+            Task {
+                for folder in folders {
+                    do { try await workspace.addRoot(folder) } catch { workspace.lastError = error.localizedDescription }
+                }
+            }
+            return true
+        } isTargeted: { dropTargeted = $0 }
+        .overlay {
+            if dropTargeted { RoundedRectangle(cornerRadius: 6).strokeBorder(Color.accentColor, lineWidth: 2).padding(2) }
+        }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             SidebarBar(showsAgenda: $showsAgenda) {
                 Button("Add Folder…", systemImage: "plus", action: addFolder)
