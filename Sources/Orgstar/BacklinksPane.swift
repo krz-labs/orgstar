@@ -28,17 +28,33 @@ struct BacklinksPane: View {
     }
 
     var body: some View {
-        List {
-            if let failure {
-                Text(failure).foregroundStyle(.secondary)
-            } else {
-                if let heading {
-                    Section("Links to \(heading.title.isEmpty ? "(untitled)" : heading.title)") { rows(toHeading) }
+        Group {
+            if failure == nil, toHeading.isEmpty, toFile.isEmpty {
+                // Nothing links here: a single line, leaving the column to the outline.
+                HStack {
+                    Text("Links to this file").font(.subheadline.weight(.semibold)).foregroundStyle(.secondary)
+                    Spacer()
+                    Text("None").foregroundStyle(.secondary)
                 }
-                Section("Links to this file") { rows(toFile) }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .frame(maxWidth: .infinity)
+                .background(theme.color("sidebar-background", in: colorScheme) ?? .clear)
+            } else {
+                List {
+                    if let failure {
+                        Text(failure).foregroundStyle(.secondary)
+                    } else {
+                        if let heading {
+                            Section("Links to \(heading.title.isEmpty ? "(untitled)" : heading.title)") { rows(toHeading) }
+                        }
+                        Section("Links to this file") { rows(toFile) }
+                    }
+                }
+                .themedListBackground(theme.color("sidebar-background", in: colorScheme))
+                .frame(height: 200)
             }
         }
-        .themedListBackground(theme.color("sidebar-background", in: colorScheme))
         .task(id: Key(path: session.path, heading: heading?.start, title: heading?.title, index: workspace.indexVersion)) { await refresh() }
     }
 

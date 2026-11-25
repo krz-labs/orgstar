@@ -74,8 +74,14 @@ struct CaptureView: View {
                         .keyboardShortcut(.defaultAction)
                 }
             } else {
-                Text((keys.isEmpty ? "Capture" : "Capture: \(keys)") + (day == nil ? "" : ", scheduled " + captureDate(Date()).formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated))))
+                // The window's title says Capture; this line is for the keys typed and the day.
+                if !keys.isEmpty || day != nil {
+                    HStack(spacing: 12) {
+                        if !keys.isEmpty { Text(verbatim: "[\(keys)]").monospaced() }
+                        if day != nil { Text("Scheduled \(captureDate(Date()).formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated)))") }
+                    }
                     .font(.headline)
+                }
                 ForEach(CaptureTemplates.menu(templates, groups: groups, typed: keys)) { item in
                     Button {
                         switch item {

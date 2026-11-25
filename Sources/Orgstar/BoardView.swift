@@ -118,9 +118,9 @@ struct BoardView: View {
             TableColumn("Tags", value: \.tags) { row in Text(row.tags).foregroundStyle(.secondary).lineLimit(1) }
                 .width(min: 60, ideal: 120)
             TableColumn("Scheduled", value: \.scheduled) { row in Text(row.scheduled).monospacedDigit() }
-                .width(min: 80, ideal: 110)
+                .width(min: 80, ideal: 130)
             TableColumn("Deadline", value: \.deadline) { row in Text(row.deadline).monospacedDigit() }
-                .width(min: 80, ideal: 110)
+                .width(min: 80, ideal: 130)
             TableColumnForEach(propertyColumns, id: \.self) { key in
                 TableColumn(key.capitalized) { (row: BoardRow) in Text(row.entry.properties[key] ?? "") }
                     .width(min: 50, ideal: 80)
