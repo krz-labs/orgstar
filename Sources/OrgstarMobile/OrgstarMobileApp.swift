@@ -243,19 +243,8 @@ struct RootView: View {
         .sheet(item: Binding(get: { model.clockPrompts.pending }, set: { if $0 == nil { model.clockPrompts.answer(nil) } })) { pending in
             ClockPromptSheet(prompt: pending.prompt) { model.clockPrompts.answer($0) }
         }
-        // Above the tab bar, clear of every screen's toolbar.
-        .overlay(alignment: .bottom) {
-            if let message {
-                Text(message).font(.callout).padding(.horizontal, 14).padding(.vertical, 8)
-                    .background(.regularMaterial, in: Capsule())
-                    .padding(.bottom, 150)
-                    .onTapGesture { self.message = nil }
-                    .task(id: message) {
-                        try? await Task.sleep(for: .seconds(4))
-                        if self.message == message { self.message = nil }
-                    }
-            }
-        }
+        // At the top, where the keyboard can't hide it.
+        .message($message, edge: .top)
         .sheet(isPresented: $showingClockReport) { ClockReportScreen(workspace: workspace) }
         .onChange(of: model.openRequest) {
             guard let route = model.openRequest else { return }
