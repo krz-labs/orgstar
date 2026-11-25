@@ -124,7 +124,7 @@ struct ProScreen: View {
                 detail(product).font(.subheadline).foregroundStyle(.secondary)
             }
             Spacer()
-            Text(product.displayPrice + period(product))
+            Text(price(product))
                 .font(.headline)
                 .monospacedDigit()
                 .foregroundStyle(Color.accentColor)
@@ -159,11 +159,12 @@ struct ProScreen: View {
         }
     }
 
-    private func period(_ product: Product) -> String {
+    /// The price, and the period a subscription bills for.
+    private func price(_ product: Product) -> String {
         switch product.subscription?.subscriptionPeriod.unit {
-        case .month: " / month"
-        case .year: " / year"
-        default: ""
+        case .month: String(localized: "\(product.displayPrice) / month")
+        case .year: String(localized: "\(product.displayPrice) / year")
+        default: product.displayPrice
         }
     }
 }
