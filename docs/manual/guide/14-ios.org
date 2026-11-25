@@ -385,7 +385,7 @@ See [[file:15-alongside-emacs.org][Working alongside Emacs and other tools]] for
 
 The iOS app reads its settings from a configuration folder: a folder holding =config.toml= and =capture.toml=, such as a copy of the Mac's =~/.config/orgstar= synced through iCloud Drive or another app.
 
-1. Open the Settings tab.
+1. Open the Settings tab. Settings opens on Appearance and the agenda; the Configuration section is near the bottom.
 2. Tap Choose Folder… and choose the folder. If it has no =config.toml=, orgstar writes one with every setting at its default, each with a comment, as the Mac does.
 
 Changes to the files apply as they sync, and again each time you return to the app. Problems in the files show in red under the folder. "No config.toml in /folder/; the defaults apply" means the folder has no =config.toml=, for example because it was removed after you chose the folder.
@@ -410,14 +410,14 @@ The Agenda, TODO Dependencies, Calendar and Reminders sections are the only plac
 - Habits only today :: turns =org-habit-show-habits-only-for-today= on or off.
 - Exclude archived tasks :: turns =agenda-exclude-archives= on or off: the agenda leaves out the files your agenda files archive to.
 - Blocked entries :: Dimmed, Hidden or Shown as usual (=org-agenda-dim-blocked-tasks=).
-- TODO Dependencies :: Not done before TODO children (=org-enforce-todo-dependencies=) and Not done with unchecked boxes (=org-enforce-todo-checkbox-dependencies=).
+- TODO Dependencies :: Entries can't be done before their TODO children (=org-enforce-todo-dependencies=) and Entries can't be done with unchecked boxes (=org-enforce-todo-checkbox-dependencies=).
 - Show Calendar Events :: turns on =calendar-events=, and asks for access to your calendars. iOS asks for full access, as Calendar has no read-only level; orgstar changes a calendar only when you edit an event or add an entry. While access is missing the section shows Allow Access to Calendars…; if you declined, allow it in the Settings app under Privacy & Security ▸ Calendars.
 - The calendars :: tap one to show or hide its events (=calendar-event-calendars=). With every calendar checked the setting is empty, so calendars added later show too.
 - Show Reminders :: turns on =agenda-reminders= and asks for access to your reminders; Allow Access to Reminders… shows while it is missing. Tap a list to show or hide its reminders (=agenda-reminder-lists=).
 
 These write =config.toml= in the configuration folder, as the Mac's Settings window does, so the Mac sees the change too. Without a configuration folder they are kept on the device.
 
-The In use section shows the TODO keywords, the agenda span and start (for example =10 days, starting today=), the reminder lead time, the capture template keys, the light and dark themes, and the theme file's name when there is one, and the font with its size. When =font= names a family that isn't installed on the device, Font shows the system's font with a note, as =System monospaced, 13 pt (JetBrains Mono isn't installed)=.
+The In use section shows the TODO keywords, the agenda span and start (for example =10 days, starting today=), Notifications (how long before a timed entry it notifies you, or Off), the capture template keys, the light and dark themes, and the theme file's name when there is one, and the font with its size. When =font= names a family that isn't installed on the device, Font shows the system's font with a note, as =System monospaced, 13 pt (JetBrains Mono isn't installed)=.
 
 About orgstar, at the bottom, shows the version, What's New (the sheet that opens once after an update with what changed) and links to the manual, the release notes, the website, the issue tracker (which needs a gitbay account), support by email at =help@krz.sh= with the version and device filled in, the App Store review page, the source code, the license, third-party notices and the privacy policy.
 

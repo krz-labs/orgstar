@@ -34,78 +34,6 @@ struct SettingsScreen: View {
             }
             .listRowBackground(ProBanner.rowBackground)
             Section {
-                LabeledContent("Folder", value: model.configFolder?.lastPathComponent ?? String(localized: "none.folder", defaultValue: "None", comment: "No configuration folder chosen"))
-                Button(model.configFolder == nil ? "Choose Folder…" : "Choose Another Folder…") { choosing = true }
-                if model.configFolder != nil {
-                    NavigationLink("Edit config.toml") { ConfigFileEditor(model: model) }
-                }
-                NavigationLink("Import from Emacs") { EmacsImportScreen(model: model) }
-                if model.configFolder != nil {
-                    Button("Stop Using This Folder", role: .destructive) { model.setConfigFolder(nil) }
-                }
-                ForEach(model.configProblems, id: \.self) { Text($0).foregroundStyle(.red) }
-            } header: {
-                Text("Configuration")
-            } footer: {
-                Text("A folder with config.toml and capture.toml, such as a synced copy of ~/.config/orgstar from your Mac. Changes to them apply as they sync.")
-            }
-            Section {
-                let _ = model.settingsVersion
-                Toggle("Show days without entries", isOn: Binding {
-                    OrgPreferences.agendaShowAllDates()
-                } set: { model.set("agendaShowAllDates", to: .bool($0)) })
-                Toggle("Habits only today", isOn: Binding {
-                    OrgPreferences.habitsOnlyForToday()
-                } set: { model.set("habitsOnlyForToday", to: .bool($0)) })
-                Toggle("Exclude archived tasks", isOn: Binding {
-                    OrgPreferences.agendaExcludeArchives()
-                } set: { model.set("agendaExcludeArchives", to: .bool($0)) })
-                Picker("Blocked entries", selection: Binding {
-                    UserDefaults.standard.string(forKey: "agendaDimBlockedTasks") ?? "t"
-                } set: { model.set("agendaDimBlockedTasks", to: .string($0)) }) {
-                    Text("Dimmed").tag("t")
-                    Text("Hidden").tag("invisible")
-                    Text("Shown as usual").tag("nil")
-                }
-            } header: {
-                Text("Agenda")
-            } footer: {
-                Text("Archive files are the ones your agenda files archive to, named by #+ARCHIVE:, an :ARCHIVE: property or org-archive-location.")
-            }
-            Section {
-                let _ = model.settingsVersion
-                Toggle("Not done before TODO children", isOn: Binding {
-                    UserDefaults.standard.bool(forKey: "enforceTodoDependencies")
-                } set: { model.set("enforceTodoDependencies", to: .bool($0)) })
-                Toggle("Not done with unchecked boxes", isOn: Binding {
-                    UserDefaults.standard.bool(forKey: "enforceTodoCheckboxDependencies")
-                } set: { model.set("enforceTodoCheckboxDependencies", to: .bool($0)) })
-            } header: {
-                Text("TODO Dependencies")
-            } footer: {
-                Text("org-enforce-todo-dependencies and org-enforce-todo-checkbox-dependencies.")
-            }
-            Section {
-                if badges == true {
-                    LabeledContent("Overdue Count on Icon", value: "On")
-                } else if badges == false {
-                    Button("Show Overdue Count on Icon…") {
-                        Task {
-                            if await model.badgesEnabled(asking: true) {
-                                badges = true
-                                await model.updateWidgets()
-                            } else if let url = URL(string: UIApplication.openNotificationSettingsURLString) {
-                                openURL(url)
-                            }
-                        }
-                    }
-                }
-            } header: {
-                Text("Badge")
-            } footer: {
-                if badges == false { Text("Turn on Badges in orgstar's notification settings.") }
-            }
-            Section {
                 let _ = model.settingsVersion
                 NavigationLink {
                     ThemePickerScreen(model: model, appearance: .light)
@@ -145,13 +73,91 @@ struct SettingsScreen: View {
             } footer: {
                 Text("With a Body Font, prose uses it while tables, code, dates, tags and drawers keep the monospaced font. Text Width keeps lines to that many columns, centred, on a screen wider than that.")
             }
+            Section {
+                let _ = model.settingsVersion
+                Toggle("Show days without entries", isOn: Binding {
+                    OrgPreferences.agendaShowAllDates()
+                } set: { model.set("agendaShowAllDates", to: .bool($0)) })
+                .help(Text(verbatim: "org-agenda-show-all-dates"))
+                Toggle("Habits only today", isOn: Binding {
+                    OrgPreferences.habitsOnlyForToday()
+                } set: { model.set("habitsOnlyForToday", to: .bool($0)) })
+                .help(Text(verbatim: "org-habit-show-habits-only-for-today"))
+                Toggle("Exclude archived tasks", isOn: Binding {
+                    OrgPreferences.agendaExcludeArchives()
+                } set: { model.set("agendaExcludeArchives", to: .bool($0)) })
+                .help(Text(verbatim: "agenda-exclude-archives"))
+                Picker("Blocked entries", selection: Binding {
+                    UserDefaults.standard.string(forKey: "agendaDimBlockedTasks") ?? "t"
+                } set: { model.set("agendaDimBlockedTasks", to: .string($0)) }) {
+                    Text("Dimmed").tag("t")
+                    Text("Hidden").tag("invisible")
+                    Text("Shown as usual").tag("nil")
+                }
+                .help(Text(verbatim: "org-agenda-dim-blocked-tasks"))
+            } header: {
+                Text("Agenda")
+            } footer: {
+                Text("Archive files are the ones your agenda files archive to, named by #+ARCHIVE:, an :ARCHIVE: property or org-archive-location.")
+            }
+            Section {
+                let _ = model.settingsVersion
+                Toggle("Entries can't be done before their TODO children", isOn: Binding {
+                    UserDefaults.standard.bool(forKey: "enforceTodoDependencies")
+                } set: { model.set("enforceTodoDependencies", to: .bool($0)) })
+                .help(Text(verbatim: "org-enforce-todo-dependencies"))
+                Toggle("Entries can't be done with unchecked boxes", isOn: Binding {
+                    UserDefaults.standard.bool(forKey: "enforceTodoCheckboxDependencies")
+                } set: { model.set("enforceTodoCheckboxDependencies", to: .bool($0)) })
+                .help(Text(verbatim: "org-enforce-todo-checkbox-dependencies"))
+            } header: {
+                Text("TODO Dependencies")
+            } footer: {
+                Text("org-enforce-todo-dependencies and org-enforce-todo-checkbox-dependencies.")
+            }
             calendarSection
             reminderSection
+            Section {
+                if badges == true {
+                    LabeledContent("Overdue Count on Icon", value: "On")
+                } else if badges == false {
+                    Button("Show Overdue Count on Icon…") {
+                        Task {
+                            if await model.badgesEnabled(asking: true) {
+                                badges = true
+                                await model.updateWidgets()
+                            } else if let url = URL(string: UIApplication.openNotificationSettingsURLString) {
+                                openURL(url)
+                            }
+                        }
+                    }
+                }
+            } header: {
+                Text("Badge")
+            } footer: {
+                if badges == false { Text("Turn on Badges in orgstar's notification settings.") }
+            }
+            Section {
+                LabeledContent("Folder", value: model.configFolder?.lastPathComponent ?? String(localized: "none.folder", defaultValue: "None", comment: "No configuration folder chosen"))
+                Button(model.configFolder == nil ? "Choose Folder…" : "Choose Another Folder…") { choosing = true }
+                if model.configFolder != nil {
+                    NavigationLink("Edit config.toml") { ConfigFileEditor(model: model) }
+                }
+                NavigationLink("Import from Emacs") { EmacsImportScreen(model: model) }
+                if model.configFolder != nil {
+                    Button("Stop Using This Folder", role: .destructive) { model.setConfigFolder(nil) }
+                }
+                ForEach(model.configProblems, id: \.self) { Text($0).foregroundStyle(.red) }
+            } header: {
+                Text("Configuration")
+            } footer: {
+                Text("A folder with config.toml and capture.toml, such as a synced copy of ~/.config/orgstar from your Mac. Changes to them apply as they sync.")
+            }
             Section("In use") {
                 let _ = model.settingsVersion
                 LabeledContent("TODO keywords", value: todoKeywords)
                 LabeledContent("Agenda", value: agenda)
-                LabeledContent("Reminders", value: OrgPreferences.reminders() ? "\(OrgPreferences.reminderLead()) min before" : "Off")
+                LabeledContent("Notifications", value: OrgPreferences.reminders() ? "\(OrgPreferences.reminderLead()) min before" : "Off")
                 LabeledContent("Capture templates", value: CaptureTemplates.load().templates.map(\.key).joined(separator: " "))
                 LabeledContent("Theme", value: themeInUse)
                 LabeledContent("Font", value: font)
