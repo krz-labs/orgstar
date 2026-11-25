@@ -5,9 +5,19 @@ import SwiftUI
 public struct DiffView: View {
     let lines: [DiffLine]
     var context = 3
+    let removedColor: Color
+    let addedColor: Color
+    let foreground: Color?
+    let background: Color?
 
-    public init(old: String, new: String) {
+    /// `removed` and `added` tint the changed lines; `foreground` and `background` default to
+    /// the system's text colours.
+    public init(old: String, new: String, removed: Color = .red, added: Color = .green, foreground: Color? = nil, background: Color? = nil) {
         lines = lineDiff(old: old, new: new)
+        removedColor = removed
+        addedColor = added
+        self.foreground = foreground
+        self.background = background
     }
 
     /// Lines to show, nil standing for a run of unchanged lines left out.
@@ -50,14 +60,15 @@ public struct DiffView: View {
             #else
             .font(.system(.footnote, design: .monospaced))
             #endif
+            .foregroundStyle(foreground ?? .primary)
             .textSelection(.enabled)
             .padding(8)
         }
         .defaultScrollAnchor(.topLeading)
         #if os(macOS)
-        .background(Color(nsColor: .textBackgroundColor))
+        .background(background ?? Color(nsColor: .textBackgroundColor))
         #else
-        .background(Color(uiColor: .secondarySystemBackground))
+        .background(background ?? Color(uiColor: .secondarySystemBackground))
         #endif
     }
 
@@ -72,8 +83,8 @@ public struct DiffView: View {
     private func background(_ kind: DiffLine.Kind) -> Color {
         switch kind {
         case .same: .clear
-        case .removed: .red.opacity(0.18)
-        case .added: .green.opacity(0.18)
+        case .removed: removedColor.opacity(0.18)
+        case .added: addedColor.opacity(0.18)
         }
     }
 }

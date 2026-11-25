@@ -752,17 +752,17 @@ The colors stack in this order, each over the one before: the themes chosen with
 
 | Key                     | Colors                                                       |
 |-------------------------+--------------------------------------------------------------|
-| =background=            | the editor's background                                      |
-| =foreground=            | body text                                                    |
+| =background=            | the editor's background; on the Mac, comparisons of versions |
+| =foreground=            | body text; on the Mac, board cards and comparisons           |
 | =cursor=                | the caret                                                    |
 | =selection=             | selected text's background                                   |
 | =accent=                | buttons, toggles and selection in lists; unset: the system's |
 | =heading-1= … =heading-7= | headings of that level                                     |
 | =heading-8=             | level 8 and deeper headings                                  |
-| =todo=                  | TODO keywords not yet done                                   |
+| =todo=                  | TODO keywords not yet done; on the Mac, removed lines in comparisons |
 | =todo-next=             | keywords of work under way: =NEXT=, =STRT= and the others above |
 | =todo-waiting=          | keywords of work on hold: =WAIT=, =HOLD= and the others above |
-| =done=                  | DONE keywords                                                |
+| =done=                  | DONE keywords; on the Mac, added lines in comparisons        |
 | =todo-cancelled=        | done keywords that cancel: =KILL=, =CANCELLED= and the others above |
 | =priority=              | =[#A]= cookies; in the agenda, priorities other than A, B and C |
 | =priority-a=            | agenda: priority A                                           |
@@ -779,7 +779,7 @@ The colors stack in this order, each over the one before: the themes chosen with
 | =keyword=               | =#+KEYWORD= lines                                            |
 | =metadata=              | planning lines, drawers, properties and clocks               |
 | =special=               | footnotes, statistics cookies, targets, macros and LaTeX     |
-| =block-background=      | the band behind blocks                                       |
+| =block-background=      | the band behind blocks; board cards                          |
 | =block-delimiter=       | =#+begin_= and =#+end_= lines                                |
 | =table=                 | tables                                                       |
 | =line-number=           | line numbers                                                 |
@@ -807,8 +807,8 @@ The colors stack in this order, each over the one before: the themes chosen with
 | =agenda-today=          | today's header and the now line                              |
 | =agenda-time=           | times and statuses of agenda rows with the normal status     |
 | =agenda-category=       | categories                                                   |
-| =agenda-overdue=        | agenda: the status of entries past their deadline or scheduled date, and the Overdue group |
-| =agenda-due-soon=       | agenda: the status of deadlines due today or coming up       |
+| =agenda-overdue=        | agenda: the status of entries past their deadline or scheduled date, and the Overdue group; past deadlines on board cards |
+| =agenda-due-soon=       | agenda: the status of deadlines due today or coming up; other deadlines on board cards |
 | =agenda-event=          | agenda: calendar events whose calendar has no color          |
 | =habit-clear=           | habit graph: not due yet                                     |
 | =habit-ready=           | habit graph: due                                             |

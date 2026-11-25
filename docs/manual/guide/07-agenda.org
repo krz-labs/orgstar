@@ -702,7 +702,7 @@ Columns: TODO, priority, title, tags, scheduled, deadline, your property columns
 
 ** Kanban
 
-Each TODO keyword your files use gets a column, in sequence order, done keywords included. A card shows the priority and title, the category and tags, and the deadline (in red) or the scheduled date. Drag a card to another column to set that keyword; this is the same edit as changing the state in the editor, so logging and state-change notes apply (a note is asked for in the main window). Double-click a card to open its entry. With VoiceOver, each card has a Move to … action for each other column.
+Each TODO keyword your files use gets a column, in sequence order, done keywords included. Column headings take the keyword colours of the agenda and editor (see [[file:13-configuration.org][Configuration]]). A card shows the priority and title, the category and tags, and the deadline or the scheduled date, in the theme's agenda colours: a past deadline in =agenda-overdue=, one due today or later in =agenda-due-soon=. Drag a card to another column to set that keyword; this is the same edit as changing the state in the editor, so logging and state-change notes apply (a note is asked for in the main window). Double-click a card to open its entry. With VoiceOver, each card has a Move to … action for each other column.
 
 From the keyboard, click a card or press an arrow key to select one. The arrow keys move between cards, =Return= opens the selected card's entry, and =⇧←= and =⇧→= move it to the column before or after, as dragging does.
 

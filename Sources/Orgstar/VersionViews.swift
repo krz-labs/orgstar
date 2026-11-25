@@ -1,7 +1,22 @@
 import AppKit
 import OrgApp
 import OrgDocument
+import OrgPresentation
 import SwiftUI
+
+/// A diff in the theme's colours: removed lines in its TODO red, added ones in its DONE green.
+struct ThemedDiff: View {
+    let old: String
+    let new: String
+    @Environment(\.orgTheme) private var theme
+
+    var body: some View {
+        DiffView(
+            old: old, new: new, removed: theme.color("todo") ?? .red, added: theme.color("done") ?? .green,
+            foreground: theme.color("foreground"), background: theme.color("background")
+        )
+    }
+}
 
 /// The buffer and the file on disk changed differently: what differs, and how to settle it.
 struct ConflictSheet: View {
@@ -15,7 +30,7 @@ struct ConflictSheet: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             if let versions = session.conflictVersions() {
-                DiffView(old: versions.disk, new: versions.mine)
+                ThemedDiff(old: versions.disk, new: versions.mine)
             }
             HStack {
                 Button("Decide Later") { dismiss() }.keyboardShortcut(.cancelAction)
@@ -51,7 +66,7 @@ struct SyncConflictSheet: View {
                 Text("Lines marked - are in the file, + in the copy. The copy goes to the recovery folder when it's resolved.")
                     .foregroundStyle(.secondary)
                 if let selected, let copy = session.recoveryText(selected), let mine = session.document?.text {
-                    DiffView(old: mine, new: copy)
+                    ThemedDiff(old: mine, new: copy)
                 }
             }
             HStack {
@@ -102,7 +117,7 @@ struct RecoverySheet: View {
             VStack(alignment: .leading, spacing: 10) {
                 Text("Lines marked - are in the buffer, + in the kept version.").foregroundStyle(.secondary)
                 if let selected, let kept = session.recoveryText(selected), let mine = session.document?.text {
-                    DiffView(old: mine, new: kept)
+                    ThemedDiff(old: mine, new: kept)
                 } else {
                     Spacer()
                 }
