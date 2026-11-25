@@ -9791,6 +9791,40 @@
         }
       }
     },
+    "Couldn't save this for orgstar: %@ Open orgstar once, then try again.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konnte das nicht für orgstar sichern: %@ Öffne orgstar einmal und versuche es dann erneut."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo guardar para orgstar: %@ Abre orgstar una vez y vuelve a intentarlo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d'enregistrer ceci pour orgstar : %@ Ouvrez orgstar une fois, puis réessayez."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar用に保存できませんでした: %@ orgstarを一度開いてから、もう一度お試しください。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível salvar para o orgstar: %@ Abra o orgstar uma vez e tente novamente."
+          }
+        }
+      }
+    },
     "Countdown timer": {
       "localizations": {
         "de": {

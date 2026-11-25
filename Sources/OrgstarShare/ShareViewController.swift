@@ -17,11 +17,12 @@ final class ShareViewController: UIViewController {
         Task { @MainActor in
             let shared = await Shared.load(items)
             let inbox = CaptureInbox()
+            // A failed write throws, and the sheet stays open with the error.
             let form = ShareForm(shared: shared, templates: inbox?.templates() ?? [], available: inbox != nil) { link in
-                if let link { try? inbox?.add(link) }
+                if let link { try inbox?.add(link) }
                 context?.completeRequest(returningItems: nil)
             } attach: { files in
-                try? AttachmentInbox()?.add(files)
+                try AttachmentInbox()?.add(files)
                 context?.completeRequest(returningItems: nil)
             }
             let host = UIHostingController(rootView: form)
@@ -96,9 +97,10 @@ struct ShareForm: View {
     let shared: Shared
     let templates: [CaptureInbox.Template]
     let available: Bool
-    let finish: (String?) -> Void
+    let finish: (String?) throws -> Void
     /// Leaves the files for the app to attach.
-    let attach: ([URL]) -> Void
+    let attach: ([URL]) throws -> Void
+    @State private var failure: String?
     @State private var title = ""
     @State private var note = ""
     @State private var template: String?
@@ -108,6 +110,9 @@ struct ShareForm: View {
             Form {
                 if !available {
                     Text("orgstar's shared folder isn't available.").foregroundStyle(.red)
+                }
+                if let failure {
+                    Text(failure).foregroundStyle(.red)
                 }
                 if !shared.files.isEmpty {
                     Section {
@@ -124,15 +129,15 @@ struct ShareForm: View {
             .navigationTitle("orgstar")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { finish(nil) } }
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { save { try finish(nil) } } }
                 ToolbarItem(placement: .confirmationAction) {
                     if shared.files.isEmpty {
                         Button("Capture") {
-                            finish(OrgProtocol.captureURL(template: template, url: shared.url?.absoluteString, title: title, body: note))
+                            save { try finish(OrgProtocol.captureURL(template: template, url: shared.url?.absoluteString, title: title, body: note)) }
                         }
                         .disabled(!available)
                     } else {
-                        Button("Attach") { attach(shared.files) }.disabled(!available)
+                        Button("Attach") { save { try attach(shared.files) } }.disabled(!available)
                     }
                 }
             }
@@ -141,6 +146,14 @@ struct ShareForm: View {
             title = shared.title
             note = shared.text
             template = templates.first?.key
+        }
+    }
+
+    private func save(_ write: () throws -> Void) {
+        do {
+            try write()
+        } catch {
+            failure = String(localized: "Couldn't save this for orgstar: \(error.localizedDescription) Open orgstar once, then try again.")
         }
     }
 

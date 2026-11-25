@@ -290,7 +290,7 @@ orgstar appears in the share sheet of other apps for a web link or text.
 2. Choose a template, edit the link's title, and add text.
 3. Tap Capture.
 
-The share extension doesn't file the entry itself. It leaves it for the app, which opens its capture sheet with the link and text the next time it becomes active. Several shared items open one after another. If the extension shows "orgstar's shared folder isn't available", the app and its extension can't share data, and Capture is disabled.
+The share extension doesn't file the entry itself. It leaves it for the app, which opens its capture sheet with the link and text the next time it becomes active. Several shared items open one after another. If the extension shows "orgstar's shared folder isn't available", the app and its extension can't share data, and Capture is disabled. If saving the shared item fails, the extension stays open with the reason, so you can try again.
 
 ** From Shortcuts
 
