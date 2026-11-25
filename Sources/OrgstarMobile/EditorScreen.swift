@@ -851,26 +851,26 @@ struct KeyBar: View {
     let palette: () -> Void
 
     private static let keys: [(label: String, symbol: String?, keys: String)] = [
-        ("Fold", "arrow.right.to.line", "TAB"),
-        ("Overview", "arrow.left.to.line", "S-TAB"),
-        ("Promote", "decrease.indent", "M-<left>"),
-        ("Demote", "increase.indent", "M-<right>"),
-        ("Move up", "arrow.up.square", "M-<up>"),
-        ("Move down", "arrow.down.square", "M-<down>"),
-        ("New heading or item", "plus", "M-RET"),
+        (String(localized: "Fold", comment: "Key bar button"), "arrow.right.to.line", "TAB"),
+        (String(localized: "Overview", comment: "Key bar button"), "arrow.left.to.line", "S-TAB"),
+        (String(localized: "Promote", comment: "Key bar button"), "decrease.indent", "M-<left>"),
+        (String(localized: "Demote", comment: "Key bar button"), "increase.indent", "M-<right>"),
+        (String(localized: "Move up", comment: "Key bar button"), "arrow.up.square", "M-<up>"),
+        (String(localized: "Move down", comment: "Key bar button"), "arrow.down.square", "M-<down>"),
+        (String(localized: "New heading or item", comment: "Key bar button"), "plus", "M-RET"),
         ("TODO", nil, "C-c C-t"),
-        ("Act at point", "checkmark.square", "C-c C-c"),
-        ("Schedule", "calendar", "C-c C-s"),
-        ("Deadline", "calendar.badge.exclamationmark", "C-c C-d"),
-        ("Tags", "tag", "C-c C-q"),
-        ("Open link", "link", "C-c C-o"),
+        (String(localized: "Act at point", comment: "Key bar button"), "checkmark.square", "C-c C-c"),
+        (String(localized: "Schedule", comment: "Key bar button"), "calendar", "C-c C-s"),
+        (String(localized: "Deadline", comment: "Key bar button"), "calendar.badge.exclamationmark", "C-c C-d"),
+        (String(localized: "Tags", comment: "Key bar button"), "tag", "C-c C-q"),
+        (String(localized: "Open link", comment: "Key bar button"), "link", "C-c C-o"),
     ]
 
     /// Emphasis for the selection, or a pair of markers with the caret between.
     private static let emphasis: [(label: String, symbol: String, command: String)] = [
-        ("Bold", "bold", "org.emphasize.bold"),
-        ("Italic", "italic", "org.emphasize.italic"),
-        ("Code", "chevron.left.forwardslash.chevron.right", "org.emphasize.code"),
+        (String(localized: "Bold", comment: "Key bar button"), "bold", "org.emphasize.bold"),
+        (String(localized: "Italic", comment: "Key bar button"), "italic", "org.emphasize.italic"),
+        (String(localized: "Code", comment: "Key bar button"), "chevron.left.forwardslash.chevron.right", "org.emphasize.code"),
     ]
 
     /// The bar's buttons are at least 44 points square, scaled with the text size up to here.
