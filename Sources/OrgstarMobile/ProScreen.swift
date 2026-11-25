@@ -66,10 +66,13 @@ struct ProScreen: View {
             } footer: {
                 Text("Editing, the agenda, capture, clocking, tables and search stay free.")
             }
-            if access.grant != .grandfathered, store.activeProductID != ProStore.lifetime {
+            if showsPlans {
                 Section {
-                    if store.products.isEmpty {
+                    if store.isLoading && store.products.isEmpty {
                         ProgressView().frame(maxWidth: .infinity)
+                    } else if store.products.count < ProStore.productIDs.count, let message = store.message {
+                        Text(message).foregroundStyle(.secondary)
+                        Button("Try Again") { Task { await store.loadProducts() } }
                     }
                     ForEach(store.products) { product in
                         Button { Task { await store.buy(product) } } label: { plan(product) }
@@ -90,7 +93,8 @@ struct ProScreen: View {
                 Link("Terms of Use", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
                 Link("Privacy Policy", destination: URL(string: "https://krz.sh/privacy/orgstar/")!)
             }
-            if let message = store.message {
+            // A purchase's or restore's message; a failed load shows under the plans.
+            if let message = store.message, !showsPlans || store.products.count == ProStore.productIDs.count {
                 Section { Text(message).foregroundStyle(.secondary) }
             }
         }
@@ -99,6 +103,8 @@ struct ProScreen: View {
         .manageSubscriptionsSheet(isPresented: $managing)
         .task { await store.loadProducts() }
     }
+
+    private var showsPlans: Bool { access.grant != .grandfathered && store.activeProductID != ProStore.lifetime }
 
     /// One plan: its name, an optional savings tag, what it bills, and its price.
     private func plan(_ product: Product) -> some View {
