@@ -9,6 +9,9 @@ public struct DiffView: View {
     let addedColor: Color
     let foreground: Color?
     let background: Color?
+    @Environment(\.colorSchemeContrast) private var contrast
+    @Environment(\.accessibilityDifferentiateWithoutColor) private var withoutColor
+    @ScaledMetric(relativeTo: .caption) private var wordWidth: CGFloat = 64
 
     /// `removed` and `added` tint the changed lines; `foreground` and `background` default to
     /// the system's text colours.
@@ -47,9 +50,7 @@ public struct DiffView: View {
                 if shown.isEmpty { Text("No differences").foregroundStyle(.secondary).padding(8) }
                 ForEach(shown.indices, id: \.self) { i in
                     if let line = shown[i] {
-                        Text(prefix(line.kind) + line.text.trimmingCharacters(in: .newlines))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(background(line.kind))
+                        row(line)
                     } else {
                         Text("⋯").foregroundStyle(.secondary)
                     }
@@ -72,6 +73,29 @@ public struct DiffView: View {
         #endif
     }
 
+    private func row(_ line: DiffLine) -> some View {
+        let text = line.text.trimmingCharacters(in: .newlines)
+        return HStack(spacing: 0) {
+            // Differentiate Without Colour: the change in words before the line.
+            if withoutColor {
+                Text(word(line.kind) ?? "")
+                    .font(.caption.weight(.semibold))
+                    .frame(width: wordWidth, alignment: .leading)
+            }
+            Text(prefix(line.kind) + text)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(tint(line.kind))
+        .overlay(alignment: .leading) {
+            // Increase Contrast: a solid bar at the edge of each changed line.
+            if contrast == .increased, line.kind != .same {
+                Rectangle().fill(line.kind == .removed ? removedColor : addedColor).frame(width: 3)
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(word(line.kind).map { "\($0): \(text)" } ?? text)
+    }
+
     private func prefix(_ kind: DiffLine.Kind) -> String {
         switch kind {
         case .same: "  "
@@ -80,11 +104,20 @@ public struct DiffView: View {
         }
     }
 
-    private func background(_ kind: DiffLine.Kind) -> Color {
+    private func word(_ kind: DiffLine.Kind) -> String? {
         switch kind {
+        case .same: nil
+        case .removed: String(localized: "diff.removed", defaultValue: "Removed", comment: "A line removed, in a comparison of two versions")
+        case .added: String(localized: "diff.added", defaultValue: "Added", comment: "A line added, in a comparison of two versions")
+        }
+    }
+
+    private func tint(_ kind: DiffLine.Kind) -> Color {
+        let strength = contrast == .increased ? 0.35 : 0.18
+        return switch kind {
         case .same: .clear
-        case .removed: removedColor.opacity(0.18)
-        case .added: addedColor.opacity(0.18)
+        case .removed: removedColor.opacity(strength)
+        case .added: addedColor.opacity(strength)
         }
     }
 }

@@ -28,6 +28,7 @@ struct BoardView: View {
     @Environment(\.openWindow) private var openWindow
     @Environment(\.orgTheme) private var theme
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorSchemeContrast) private var contrast
 
     init(workspace: WorkspaceModel, session: DocumentSession, commands: AppCommands) {
         self.workspace = workspace
@@ -233,9 +234,9 @@ struct BoardView: View {
             Text((entry.priority.map { "[#\($0)] " } ?? "") + entry.title).lineLimit(3)
                 .foregroundStyle(theme.color("foreground") ?? .primary)
             HStack(spacing: 6) {
-                Text(entry.category).font(.caption).foregroundStyle(theme.color("agenda-category") ?? .secondary)
+                Text(entry.category).font(.caption).foregroundStyle(secondary("agenda-category"))
                 if !entry.tags.isEmpty {
-                    Text(entry.tags.joined(separator: " ")).font(.caption).foregroundStyle(theme.color("tags") ?? .secondary).lineLimit(1)
+                    Text(entry.tags.joined(separator: " ")).font(.caption).foregroundStyle(secondary("tags")).lineLimit(1)
                 }
             }
             if let deadline = entry.deadline {
@@ -243,15 +244,25 @@ struct BoardView: View {
                 let overdue = deadline.prefix(10) < Date().formatted(Date.ISO8601FormatStyle(timeZone: .current).year().month().day())
                 Text("Deadline \(deadline)").font(.caption).foregroundStyle(theme.color(overdue ? "agenda-overdue" : "agenda-due-soon") ?? .red)
             } else if let scheduled = entry.scheduled {
-                Text("Scheduled \(scheduled)").font(.caption).foregroundStyle(theme.color("agenda-time") ?? .secondary)
+                Text("Scheduled \(scheduled)").font(.caption).foregroundStyle(secondary("agenda-time"))
             }
         }
         .padding(8)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(RoundedRectangle(cornerRadius: 6).fill(theme.color("block-background") ?? Color(nsColor: .controlBackgroundColor)))
         .overlay {
-            if selected { RoundedRectangle(cornerRadius: 6).strokeBorder(theme.color("accent") ?? .accentColor, lineWidth: 2) }
+            // Increase Contrast: a full outline on every card and a heavier one on the selected card.
+            if selected {
+                RoundedRectangle(cornerRadius: 6).strokeBorder(theme.color("accent") ?? .accentColor, lineWidth: contrast == .increased ? 3 : 2)
+            } else if contrast == .increased {
+                RoundedRectangle(cornerRadius: 6).strokeBorder(Color.primary.opacity(0.6), lineWidth: 1)
+            }
         }
+    }
+
+    /// A secondary text colour from the theme; the foreground under Increase Contrast.
+    private func secondary(_ key: String) -> Color {
+        contrast == .increased ? theme.color("foreground") ?? .primary : theme.color(key) ?? .secondary
     }
 
     /// A keyword's colour as the agenda draws it: its own, else its class's (NEXT, WAIT, …).

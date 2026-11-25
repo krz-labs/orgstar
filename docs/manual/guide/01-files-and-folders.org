@@ -247,7 +247,7 @@ To throw away your unsaved edits and load the file as it is on disk, choose File
 
 ** Conflicts
 
-When a buffer conflicts with its file, automatic saving stops for that buffer, the =Conflict= button appears in the toolbar, and the conflict sheet opens. The sheet shows the differences: lines marked =-= are on disk, lines marked =+= are in your version, with three lines of context around each change. Removed lines are tinted in the theme's =todo= color and added lines in its =done= color. Choose:
+When a buffer conflicts with its file, automatic saving stops for that buffer, the =Conflict= button appears in the toolbar, and the conflict sheet opens. The sheet shows the differences: lines marked =-= are on disk, lines marked =+= are in your version, with three lines of context around each change. Removed lines are tinted in the theme's =todo= color and added lines in its =done= color. With Differentiate Without Color on in the system's accessibility settings, each changed line is also labelled Removed or Added; with Increase Contrast on, the tint is stronger and a bar marks each changed line. VoiceOver reads each changed line with Removed or Added before it. Choose:
 
 | Button             | What it does                                                                                                     |
 |--------------------+------------------------------------------------------------------------------------------------------------------|

@@ -706,6 +706,8 @@ Each TODO keyword your files use gets a column, in sequence order, done keywords
 
 From the keyboard, click a card or press an arrow key to select one. The arrow keys move between cards, =Return= opens the selected card's entry, and =⇧←= and =⇧→= move it to the column before or after, as dragging does.
 
+With Increase Contrast on, cards have an outline, the selected card a heavier one, and the category, tags and dates are drawn in the theme's =foreground=.
+
 With a match that includes entries without a TODO keyword, those entries appear in the table but not on the kanban board, which has no column for them.
 
 ** On iOS
