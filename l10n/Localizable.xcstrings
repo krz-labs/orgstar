@@ -20420,6 +20420,41 @@
         }
       }
     },
+    "Low contrast": {
+      "comment": "A theme whose colours are below 4.5:1 in places",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geringer Kontrast"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contraste bajo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contraste faible"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "低コントラスト"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Baixo contraste"
+          }
+        }
+      }
+    },
     "Lower Priority": {
       "comment": "Command title",
       "localizations": {

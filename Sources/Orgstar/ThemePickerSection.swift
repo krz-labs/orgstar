@@ -33,7 +33,10 @@ struct ThemePickerSection: View {
     private func picker(_ title: LocalizedStringKey, _ appearance: Palette.Appearance, _ selection: Binding<String>) -> some View {
         Picker(title, selection: selection) {
             ForEach(ThemeSpec.palettes(appearance), id: \.id) { palette in
-                Label { Text(palette.displayName) } icon: { Image(nsImage: Self.swatch(palette)) }.tag(palette.id)
+                Label {
+                    // Below 4.5:1 for body text or coloured roles in places.
+                    palette.lowContrast ? Text(palette.displayName) + Text(verbatim: " – ") + Text("Low contrast") : Text(palette.displayName)
+                } icon: { Image(nsImage: Self.swatch(palette)) }.tag(palette.id)
             }
             if ThemeSpec.palette(selection.wrappedValue, appearance) == nil {
                 Text(selection.wrappedValue).tag(selection.wrappedValue)

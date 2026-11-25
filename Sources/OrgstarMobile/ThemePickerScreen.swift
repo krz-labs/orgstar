@@ -17,7 +17,11 @@ struct ThemePickerScreen: View {
             } label: {
                 HStack {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text(palette.displayName).foregroundStyle(.primary)
+                        HStack(alignment: .firstTextBaseline) {
+                            Text(palette.displayName).foregroundStyle(.primary)
+                            // Below 4.5:1 for body text or coloured roles in places.
+                            if palette.lowContrast { Text("Low contrast").font(.caption).foregroundStyle(.secondary) }
+                        }
                         Self.sample(palette)
                     }
                     Spacer()
