@@ -112,9 +112,9 @@ struct RecoverySheet: View {
                 }
             }
             .overlay {
-                if versions.isEmpty { ContentUnavailableView("No Kept Versions", systemImage: "clock.arrow.circlepath") }
+                if versions.isEmpty { ContentUnavailableView("No Recovery Versions", systemImage: "clock.arrow.circlepath") }
             }
-            .navigationTitle("Recovered Versions")
+            .navigationTitle("Recovery Versions")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } } }
         }

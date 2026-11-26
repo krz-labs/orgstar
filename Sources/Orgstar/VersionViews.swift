@@ -109,7 +109,7 @@ struct RecoverySheet: View {
             if versions.isEmpty {
                 VStack {
                     ContentUnavailableView(
-                        "No recovery versions", systemImage: "clock.arrow.circlepath",
+                        "No Recovery Versions", systemImage: "clock.arrow.circlepath",
                         description: Text("orgstar keeps a copy of this file here when it replaces a version, and a snapshot before a save at most once an hour.")
                     )
                     HStack {

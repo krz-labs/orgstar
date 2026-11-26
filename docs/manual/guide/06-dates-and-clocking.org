@@ -1,5 +1,5 @@
 #+TITLE: Dates, scheduling and clocking
-#+DESCRIPTION: Timestamps, the date prompt, SCHEDULED and DEADLINE, repeating tasks, effort, clocking, clock tables, habits and reminders in orgstar.
+#+DESCRIPTION: Timestamps, the date prompt, SCHEDULED and DEADLINE, repeating tasks, effort, clocking, clock tables, habits and notifications in orgstar.
 #+LEDE: Put dates on entries, plan work with scheduled dates and deadlines, and record the time you spend.
 
 * Timestamps
@@ -416,7 +416,7 @@ A line of the form ~CLOCK: => 1:15~, with only a duration, counts towards clock 
 
 ** The inspector
 
-View ▸ Show Columns and Clock opens the inspector beside the editor. Its Clock tab lists the clocked time per heading in the open file for Today, This Week (weeks start on Monday) or All, with a total. Selecting a heading, by clicking it or with the arrow keys, moves to it. Only finished clocks count.
+View ▸ Show Inspector opens the inspector beside the editor. Its Clock tab lists the clocked time per heading in the open file for Today, This Week (weeks start on Monday) or All, with a total. Selecting a heading, by clicking it or with the arrow keys, moves to it. Only finished clocks count.
 
 ** The clock report window
 
@@ -555,16 +555,16 @@ SCHEDULED: <2026-10-07 Wed .+2d/4d>
 
 How habits appear in the agenda, with the graph covering 21 days back and 7 ahead, is described in [[file:07-agenda.org][The agenda]].
 
-* Reminders
+* Notifications
 
 orgstar can post a macOS notification before entries that have a time of day, as Emacs's =appt= does with =org-agenda-to-appt=.
 
 - It covers the agenda's files and the next 7 days: scheduled items, deadlines, plain active timestamps and date ranges with a time, that are not done.
-- Each reminder comes the lead time before the entry's time: 12 minutes by default (=appt-message-warning-time=). An =APPT_WARNTIME= property on the entry, in minutes, overrides it.
-- If the warning time has already passed when orgstar sets a reminder but the entry has not started, the notification comes at once.
-- At most 64 reminders are pending at a time, the earliest first.
+- Each notification comes the lead time before the entry's time: 12 minutes by default (=appt-message-warning-time=). An =APPT_WARNTIME= property on the entry, in minutes, overrides it.
+- If the warning time has already passed when orgstar sets a notification but the entry has not started, the notification comes at once.
+- At most 64 notifications are pending at a time, the earliest first.
 - The notification shows the entry's text, its time, and its category. Clicking it opens the entry. Notifications also show while orgstar is the active app.
 
-orgstar updates the reminders a couple of seconds after you stop editing, when files change, and every hour. The agenda window shows how far ahead reminders are set. Reminders already set still arrive after you quit orgstar; changes to your files are taken into account the next time it runs.
+orgstar updates the notifications a couple of seconds after you stop editing, when files change, and every hour. The agenda window shows how far ahead notifications are set. Notifications already set still arrive after you quit orgstar; changes to your files are taken into account the next time it runs.
 
-Turn reminders on or off, and set the lead time from 0 to 120 minutes, in Settings ▸ Agenda; in =config.toml= the keys are =reminders= under =[orgstar]= (default =true=) and =appt-message-warning-time=. The first time, macOS asks whether orgstar may post notifications; if you decline, the agenda says so, and you can change it in System Settings ▸ Notifications. The iOS app's reminders are described in [[file:14-ios.org][iOS]].
+Turn notifications on or off, and set the lead time from 0 to 120 minutes, in Settings ▸ Agenda; in =config.toml= the keys are =reminders= under =[orgstar]= (default =true=) and =appt-message-warning-time=. The first time, macOS asks whether orgstar may post notifications; if you decline, the agenda says so, and you can change it in System Settings ▸ Notifications. The iOS app's notifications are described in [[file:14-ios.org][iOS]].

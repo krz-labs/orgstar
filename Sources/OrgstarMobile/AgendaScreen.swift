@@ -432,7 +432,7 @@ struct AgendaScreen: View, Equatable {
         guard OrgPreferences.reminders() else { return nil }
         if !scheduler.isAuthorized { return "Notifications are off for orgstar in Settings." }
         guard let through = scheduler.scheduledThrough else { return nil }
-        return "Reminders are set through " + through.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated).hour().minute())
+        return "Notifications are set through " + through.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated).hour().minute())
             + ". Open orgstar to set later ones."
     }
 

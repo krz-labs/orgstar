@@ -113,7 +113,7 @@ orgstar's menus, settings and agenda are in English, German, French, Japanese, S
 | Theme: Copy to Config Folder    | Writes =my-theme.toml= and makes it =theme-file= |                 |                     |
 | App Icon                        | One of 13 icons, shown in the Dock while orgstar runs | Default    | (this Mac only)     |
 | Font                            | System monospaced, or any installed monospaced family | System monospaced | =font=        |
-| Body text                       | Same as Font, System, or any installed proportional family | Same as Font | =body-font=   |
+| Body font                       | Same as Font, System, or any installed proportional family | Same as Font | =body-font=   |
 | Size                            | 8 to 36 pt                                    | 13 pt              | =font-size=         |
 | Line spacing                    | 0 to 16 pt                                    | 2 pt               | =line-spacing=      |
 | Text width                      | Whole editor, or 60 to 120 columns            | Whole editor       | =text-width=        |
@@ -828,7 +828,7 @@ orgstar follows the system's light or dark appearance (System Settings ▸ Appea
 By default the editor uses one font for everything: body text, headings, code and tables. Choose it in Settings ▸ Appearance or with =font= under =[theme]=.
 
 - The Font menu lists installed monospaced families. =config.toml= accepts any family name; a family that isn't installed falls back to the system's monospaced font. Tags and tables line up in columns, so a proportional font there misaligns them.
-- Body text (=body-font=) sets a second font for prose, as Emacs's =mixed-pitch-mode= does. Paragraphs, list text and headings use it. Tables, source and example blocks, verbatim and code, keyword lines, planning lines, drawers, timestamps and tags keep =font=, and so do a heading's stars and a line's leading blanks, bullet and checkbox, so text still starts under the indentation. Tags after a heading in the body font no longer line up at =org-tags-column=; the file is unchanged. A family that isn't installed falls back to =font=.
+- Body font (=body-font=) sets a second font for prose, as Emacs's =mixed-pitch-mode= does. Paragraphs, list text and headings use it. Tables, source and example blocks, verbatim and code, keyword lines, planning lines, drawers, timestamps and tags keep =font=, and so do a heading's stars and a line's leading blanks, bullet and checkbox, so text still starts under the indentation. Tags after a heading in the body font no longer line up at =org-tags-column=; the file is unchanged. A family that isn't installed falls back to =font=.
 - =font-size= is the body size, at least 6 points.
 - Headings are bold. Level 1 is =font-size= plus three times =heading-size-step=, level 2 plus two times, level 3 plus one time; level 4 and deeper are body size. Set =heading-size-step = 0= for one size throughout.
 - =line-spacing= adds space between lines, in points.

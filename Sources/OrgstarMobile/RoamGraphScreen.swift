@@ -24,7 +24,7 @@ struct RoamGraphScreen: View {
                 dismiss()
                 open(location)
             }
-            .navigationTitle("Graph")
+            .navigationTitle("Node Graph")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
         }

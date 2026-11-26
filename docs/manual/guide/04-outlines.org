@@ -701,9 +701,9 @@ scrolls both ways; tap a cell to select it. The bar at the bottom has Edit, whic
 for the value with the allowed values listed, Previous Value and Next Value (=p= and
 =n=), and Go to Entry. Done closes it.
 
-** The Columns inspector
+** The inspector's Columns tab
 
-View ▸ Show Columns and Clock opens an inspector beside the editor. Its Columns
+View ▸ Show Inspector opens the inspector beside the editor. Its Columns
 tab shows the same table for the open file, kept current as you type. Choose File for
 every entry or Subtree for the entry at the caret. The row of the heading at the caret
 is shown in bold. Selecting a row, by clicking it or with the arrow keys, goes to it;

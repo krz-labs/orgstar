@@ -96,7 +96,7 @@ struct CaptureScreen: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     if editing {
-                        Button("File") { file() }.disabled(template == nil)
+                        Button("Capture") { file() }.disabled(template == nil)
                     } else {
                         Button("Continue", action: fill)
                     }

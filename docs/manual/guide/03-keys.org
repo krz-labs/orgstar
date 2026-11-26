@@ -131,7 +131,7 @@ These come from the menu bar and work in every preset. In the Doom preset, keys 
 | View | Close Other Panes | =⌃⌘1= |
 | View | Next Pane | =⌥⌘`= |
 | View | Show Outline | =⌥⌘O= |
-| View | Show Columns and Clock | =⌥⌘I= |
+| View | Show Inspector | =⌥⌘I= |
 | Window | Agenda | =⇧⌘A= |
 | Window | Board | =⇧⌘B= |
 | Window | Next Buffer | =⇧⌘]= |
@@ -1154,7 +1154,7 @@ No preset binds these. Run them from the palette or a menu, or bind them in =key
 | Forget Encryption Passphrase (=app.crypt.forget-passphrase=) | Removes the file's passphrase from the Keychain. |
 | Show or Hide Outline (=app.toggle-outline=) | Shows or hides the outline pane. View ▸ Show Outline, =⌥⌘O=. |
 | Show or Hide Backlinks (=app.toggle-backlinks=) | Shows or hides the backlinks pane. View ▸ Show Backlinks. |
-| Show or Hide Columns and Clock (=app.toggle-inspector=) | Shows or hides the columns and clock inspector. View ▸ Show Columns and Clock, =⌥⌘I=. |
+| Show or Hide Inspector (=app.toggle-inspector=) | Shows or hides the inspector, with column view and clocked time. View ▸ Show Inspector, =⌥⌘I=. |
 | Show or Hide Markup (=app.toggle-markup=) | Shows or hides link brackets and emphasis markers. View ▸ Show Markup, =⇧⌘M=. |
 | Show or Hide Line Numbers (=app.toggle-line-numbers=) | Shows or hides line numbers. View ▸ Show Line Numbers, =⇧⌘L=. |
 | Show or Hide Tab Bar (=app.toggle-tab-bar=) | Shows or hides the tab bar. View ▸ Show Tab Bar. |

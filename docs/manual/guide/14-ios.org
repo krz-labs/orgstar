@@ -1,5 +1,5 @@
 #+TITLE: iPhone and iPad
-#+DESCRIPTION: The iOS app: folders, reading and editing, search, the agenda, widgets, capture, clocking, reminders, export and settings.
+#+DESCRIPTION: The iOS app: folders, reading and editing, search, the agenda, widgets, capture, clocking, notifications, export and settings.
 #+LEDE: orgstar for iPhone and iPad reads and edits the same org files as the Mac, with the agenda, capture and search.
 
 * Overview
@@ -57,7 +57,7 @@ The toolbar has:
 - Conflict :: shown while the file and your edits conflict; opens the conflict sheet.
 - Find :: the system find bar. The result shown is selected, and opened when it is in folded text.
 - Undo :: touch and hold it for Redo.
-- More :: Commands, Clock In, Show Markup, Recent Entries, Export, Sync Conflict Copies, and Recovered Versions.
+- More :: Commands, Clock In, Show Markup, Recent Entries, Export, Resolve Sync Conflicts…, and Recovery Versions….
 
 Messages from commands show at the top of the editor and the column view, and at the bottom of the reader, the agenda and the board, for a few seconds; tap one to dismiss it. VoiceOver reads each message as it appears. An error opening, saving or reading a file shows what failed on its first line, such as =Couldn't Save File=.
 
@@ -342,11 +342,11 @@ Clock Report shows the time per day and heading for the files you choose. It sta
 
 See [[file:06-dates-and-clocking.org][Dates and clocking]].
 
-* Reminders
+* Notifications
 
 With =reminders= on, orgstar schedules a notification before each timed agenda entry in the next week, =appt-message-warning-time= minutes ahead (or the entry's =APPT_WARNTIME=). Tap a notification to open its entry. Notifications show while the app is open too.
 
-iOS lets an app schedule at most 64 notifications, and orgstar schedules more only while it runs. It updates them when files or settings change, when you return to the app, and every hour while it is open. The agenda's status line says how far ahead reminders are set ("Reminders are set through …"), or that notifications are off for orgstar in the system Settings app.
+iOS lets an app schedule at most 64 notifications, and orgstar schedules more only while it runs. It updates them when files or settings change, when you return to the app, and every hour while it is open. The agenda's status line says how far ahead notifications are set ("Notifications are set through …"), or that notifications are off for orgstar in the system Settings app.
 
 The app icon's badge counts the entries in the agenda's Overdue section that aren't done: past their scheduled day or their deadline, habits left out. An entry past both counts once. orgstar sets each of the next six midnights' counts ahead, so the badge stays right while the app is closed. If notifications were allowed before orgstar asked for badges, tap Show Overdue Count on Icon under Badge in orgstar's Settings; it adds Badges to orgstar's notification settings and opens them when they're still off. Turn the badge off there, under Badges.
 
@@ -391,9 +391,9 @@ When a file changes on disk while you have unsaved edits, orgstar merges the cha
 
 The version you don't keep goes to the recovery folder.
 
-More ▸ Sync Conflict Copies lists Syncthing's conflict copies of the file (=name.sync-conflict-…=), each compared with the file, with Keep File, Merge and Use Copy. The copy goes to the recovery folder and is removed. When a file with conflict copies opens in the editor, a message says how many there are.
+More ▸ Resolve Sync Conflicts… lists Syncthing's conflict copies of the file (=name.sync-conflict-…=), each compared with the file, with Keep File, Merge and Use Copy. The copy goes to the recovery folder and is removed. When a file with conflict copies opens in the editor, a message says how many there are.
 
-More ▸ Recovered Versions lists the versions of the file kept in the recovery folder, newest first, each compared with the editor's text. Restore puts a version's text in the editor as an edit you can undo.
+More ▸ Recovery Versions… lists the versions of the file kept in the recovery folder, newest first, each compared with the editor's text. Restore puts a version's text in the editor as an edit you can undo.
 
 See [[file:15-alongside-emacs.org][Working alongside Emacs and other tools]] for how merging and recovery work.
 
@@ -427,9 +427,9 @@ The Agenda, TODO Dependencies, Calendar and Reminders sections are the only plac
 - Exclude archived tasks :: turns =agenda-exclude-archives= on or off: the agenda leaves out the files your agenda files archive to.
 - Blocked entries :: Dimmed, Hidden or Shown as usual (=org-agenda-dim-blocked-tasks=).
 - TODO Dependencies :: Entries can't be done before their TODO children (=org-enforce-todo-dependencies=) and Entries can't be done with unchecked boxes (=org-enforce-todo-checkbox-dependencies=).
-- Show Calendar Events :: turns on =calendar-events=, and asks for access to your calendars. iOS asks for full access, as Calendar has no read-only level; orgstar changes a calendar only when you edit an event or add an entry. While access is missing the section shows Allow Access to Calendars…; if you declined, allow it in the Settings app under Privacy & Security ▸ Calendars.
+- Show events from Calendar :: turns on =calendar-events=, and asks for access to your calendars. iOS asks for full access, as Calendar has no read-only level; orgstar changes a calendar only when you edit an event or add an entry. While access is missing the section shows Allow Access to Calendars…; if you declined, allow it in the Settings app under Privacy & Security ▸ Calendars.
 - The calendars :: tap one to show or hide its events (=calendar-event-calendars=). With every calendar checked the setting is empty, so calendars added later show too.
-- Show Reminders :: turns on =agenda-reminders= and asks for access to your reminders; Allow Access to Reminders… shows while it is missing. Tap a list to show or hide its reminders (=agenda-reminder-lists=).
+- Show reminders from Reminders :: turns on =agenda-reminders= and asks for access to your reminders; Allow Access to Reminders… shows while it is missing. Tap a list to show or hide its reminders (=agenda-reminder-lists=).
 
 These write =config.toml= in the configuration folder, as the Mac's Settings window does, so the Mac sees the change too. Without a configuration folder they are kept on the device.
 
@@ -473,7 +473,7 @@ Quick Look in the Files app shows org files as the HTML export renders them.
 - In the download version, LaTeX-made PDF export.
 - Idle detection from keyboard and mouse input; iOS uses the time away from the app instead.
 - In the download version, attaching by hard link or symbolic link.
-- The Columns inspector, and the buffer list and tab bar. The board and column view are there (see [[file:07-agenda.org][The agenda]] and [[file:04-outlines.org][Outlines]]).
+- The inspector, and the buffer list and tab bar. The board and column view are there (see [[file:07-agenda.org][The agenda]] and [[file:04-outlines.org][Outlines]]).
 - The global capture hotkey and the Settings window.
 - Explicit saving.
 

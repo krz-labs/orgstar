@@ -94,7 +94,7 @@ struct BoardView: View {
                 }
             }
         }
-        .navigationTitle(kanban ? "Kanban" : "Entries")
+        .navigationTitle("Board")
         .task(id: RefreshKey(match: match, subfolders: includeSubfolders, files: workspace.files.count, changed: workspace.changedFile?.version, edits: session.editVersion, path: session.path, tick: tick)) {
             agenda.includeSubfolders = includeSubfolders
             agenda.excludeArchives = OrgPreferences.agendaExcludeArchives()

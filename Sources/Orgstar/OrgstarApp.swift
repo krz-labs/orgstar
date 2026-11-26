@@ -459,7 +459,7 @@ struct OrgstarApp: App {
             }
         }
         .defaultSize(width: 1100, height: 700)
-        Window("Graph", id: "graph") {
+        Window("Node Graph", id: "graph") {
             if case .success(let model) = workspace {
                 RoamGraphWindow(workspace: model, session: session, commands: commands)
                     .tint(ConfigSync.shared.theme.color("accent"))
@@ -685,7 +685,7 @@ struct ViewMenuToggles: View {
         Toggle("Show Outline", isOn: Binding(get: { outline }, set: { _ in commands.run("app.toggle-outline") }))
             .keyboardShortcut("o", modifiers: [.command, .option])
         Toggle("Show Backlinks", isOn: $backlinksShown)
-        Toggle("Show Columns and Clock", isOn: $inspectorShown)
+        Toggle("Show Inspector", isOn: $inspectorShown)
             .keyboardShortcut("i", modifiers: [.command, .option])
         MarkupToggle()
         editorToggle("Truncate Long Lines", "editor.toggle-truncate-lines", editor?.truncatesLines)
@@ -1034,7 +1034,7 @@ struct SettingsView: View {
                     ForEach(Self.monospacedFamilies, id: \.self) { Text($0).tag($0) }
                     if !themeFont.isEmpty, !Self.monospacedFamilies.contains(themeFont) { Text(themeFont).tag(themeFont) }
                 }
-                Picker("Body text", selection: $themeBodyFont) {
+                Picker("Body font", selection: $themeBodyFont) {
                     Text("Same as Font").tag("")
                     Text("System").tag("system")
                     Divider()
@@ -1050,7 +1050,7 @@ struct SettingsView: View {
                 }
                 Stepper("Headings grow by \(themeHeadingStep) pt a level", value: $themeHeadingStep, in: 0...8)
             } footer: {
-                Text("Tags and tables line up in columns, so Font should be monospaced. With a Body text font, prose uses it while tables, code, dates, tags and drawers keep Font.")
+                Text("Tags and tables line up in columns, so Font should be monospaced. With a body font, prose uses it while tables, code, dates, tags and drawers keep Font.")
                     .settingsFooter()
             }
             Section {

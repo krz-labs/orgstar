@@ -102,7 +102,7 @@ struct Sidebar: View {
                         Button((root as NSString).lastPathComponent) { removing = root }
                     }
                 } label: {
-                    Label("Remove Folder", systemImage: "minus")
+                    Label("Remove from Sidebar", systemImage: "minus")
                 }
                 .menuIndicator(.hidden)
                 .fixedSize()

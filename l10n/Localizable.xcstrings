@@ -5347,6 +5347,40 @@
         }
       }
     },
+    "Body font": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schrift für Fließtext"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tipo de letra del cuerpo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Police du texte courant"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本文のフォント"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fonte do corpo"
+          }
+        }
+      }
+    },
     "Body only": {
       "localizations": {
         "de": {
@@ -5377,40 +5411,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Só o corpo"
-          }
-        }
-      }
-    },
-    "Body text": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fließtext"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Texto del cuerpo"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Texte courant"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "本文"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Texto do corpo"
           }
         }
       }
@@ -17275,41 +17275,6 @@
         }
       }
     },
-    "Hide Columns and Clock": {
-      "comment": "Toolbar button for the inspector",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Spalten und Zeiterfassung ausblenden"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ocultar columnas y registro de tiempo"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Masquer les colonnes et le chronométrage"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "列とクロックを非表示"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ocultar Colunas e Registro de Tempo"
-          }
-        }
-      }
-    },
     "Hide Folders": {
       "localizations": {
         "de": {
@@ -17340,6 +17305,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ocultar Pastas"
+          }
+        }
+      }
+    },
+    "Hide Inspector": {
+      "comment": "Toolbar button for the inspector",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inspektor ausblenden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ocultar inspector"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masquer l'inspecteur"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "インスペクタを非表示"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ocultar Inspetor"
           }
         }
       }
@@ -23633,6 +23633,40 @@
         }
       }
     },
+    "No Recovery Versions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Wiederherstellungsversionen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay versiones de recuperación"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune version de récupération"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "復元バージョンなし"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhuma Versão de Recuperação"
+          }
+        }
+      }
+    },
     "No State": {
       "localizations": {
         "de": {
@@ -24515,40 +24549,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nenhum registro recente"
-          }
-        }
-      }
-    },
-    "No recovery versions": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keine Wiederherstellungsversionen"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No hay versiones de recuperación"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucune version de récupération"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "復元バージョンなし"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nenhuma versão de recuperação"
           }
         }
       }
@@ -29226,6 +29226,40 @@
         }
       }
     },
+    "Recovery Versions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wiederherstellungsversionen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versiones de recuperación"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versions de récupération"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "復元バージョン"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versões de Recuperação"
+          }
+        }
+      }
+    },
     "Recovery Versions…": {
       "comment": "Command title",
       "localizations": {
@@ -29944,6 +29978,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Remover uma pasta da barra lateral"
+          }
+        }
+      }
+    },
+    "Remove from Sidebar": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aus der Seitenleiste entfernen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quitar de la barra lateral"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retirer de la barre latérale"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サイドバーから取り除く"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remover da Barra Lateral"
           }
         }
       }
@@ -33148,41 +33216,6 @@
         }
       }
     },
-    "Show Columns and Clock": {
-      "comment": "Toolbar button for the inspector",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Spalten und Zeiterfassung einblenden"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mostrar columnas y registro de tiempo"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Afficher les colonnes et le chronométrage"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "列とクロックを表示"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mostrar Colunas e Registro de Tempo"
-          }
-        }
-      }
-    },
     "Show Default Theme": {
       "localizations": {
         "de": {
@@ -33247,6 +33280,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mostrar Arquivos"
+          }
+        }
+      }
+    },
+    "Show Inspector": {
+      "comment": "Toolbar button for the inspector",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inspektor einblenden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar inspector"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher l'inspecteur"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "インスペクタを表示"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar Inspetor"
           }
         }
       }
@@ -34036,41 +34104,6 @@
         }
       }
     },
-    "Show or Hide Columns and Clock": {
-      "comment": "Command title",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Spalten und Zeiterfassung ein- oder ausblenden"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mostrar u ocultar columnas y registro de tiempo"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Afficher ou masquer les colonnes et le chronométrage"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "列とクロックを表示/非表示"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mostrar ou Ocultar Colunas e Registro de Tempo"
-          }
-        }
-      }
-    },
     "Show or Hide Inline Images": {
       "comment": "Command title",
       "localizations": {
@@ -34137,6 +34170,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mostrar ou Ocultar Imagens Embutidas, Incluindo Links com Descrição"
+          }
+        }
+      }
+    },
+    "Show or Hide Inspector": {
+      "comment": "Command title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inspektor ein- oder ausblenden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar u ocultar inspector"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher ou masquer l'inspecteur"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "インスペクタを表示/非表示"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar ou Ocultar Inspetor"
           }
         }
       }
@@ -36248,36 +36316,36 @@
         }
       }
     },
-    "Tags and tables line up in columns, so Font should be monospaced. With a Body text font, prose uses it while tables, code, dates, tags and drawers keep Font.": {
+    "Tags and tables line up in columns, so Font should be monospaced. With a body font, prose uses it while tables, code, dates, tags and drawers keep Font.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tags und Tabellen stehen in Spalten, daher sollte die Schrift eine feste Breite haben. Mit einer Fließtextschrift verwendet Fließtext diese, Tabellen, Code, Daten, Tags und Fächer behalten die Schrift."
+            "value": "Tags und Tabellen stehen in Spalten, daher sollte die Schrift eine feste Breite haben. Mit einer Schrift für Fließtext verwendet Fließtext diese, Tabellen, Code, Daten, Tags und Fächer behalten die Schrift."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Las etiquetas y las tablas se alinean en columnas, así que el tipo de letra debería ser monoespaciado. Con un tipo de letra para el texto del cuerpo, la prosa lo usa, mientras que las tablas, el código, las fechas, las etiquetas y los cajones conservan el tipo de letra."
+            "value": "Las etiquetas y las tablas se alinean en columnas, así que el tipo de letra debería ser monoespaciado. Con un tipo de letra del cuerpo, la prosa lo usa, mientras que las tablas, el código, las fechas, las etiquetas y los cajones conservan el tipo de letra."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Les tags et les tableaux s'alignent en colonnes, la police devrait donc être à chasse fixe. Avec une police Texte courant, la prose utilise celle-ci, tandis que les tableaux, le code, les dates, les tags et les tiroirs gardent Police."
+            "value": "Les tags et les tableaux s'alignent en colonnes, la police devrait donc être à chasse fixe. Avec une police du texte courant, la prose utilise celle-ci, tandis que les tableaux, le code, les dates, les tags et les tiroirs gardent Police."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "タグと表は列で揃えるため、「フォント」には等幅フォントを使用してください。「本文」フォントを指定すると文章にはそれが使われ、表、コード、日付、タグ、ドロワーには「フォント」が使われます。"
+            "value": "タグと表は列で揃えるため、「フォント」には等幅フォントを使用してください。本文のフォントを指定すると文章にはそれが使われ、表、コード、日付、タグ、ドロワーには「フォント」が使われます。"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Etiquetas e tabelas se alinham em colunas, portanto a Fonte deve ser monoespaçada. Com uma fonte de Texto do corpo, a prosa a utiliza, enquanto tabelas, código, datas, etiquetas e gavetas mantêm a Fonte."
+            "value": "Etiquetas e tabelas se alinham em colunas, portanto a Fonte deve ser monoespaçada. Com uma fonte do corpo, a prosa a utiliza, enquanto tabelas, código, datas, etiquetas e gavetas mantêm a Fonte."
           }
         }
       }

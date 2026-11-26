@@ -52,7 +52,7 @@ struct CaptureView: View {
                     if template.kind == .entry {
                         Button("Refile…") { finish(refile: true) }
                     }
-                    Button("File It") { finish() }
+                    Button("Capture") { finish() }
                         .keyboardShortcut(.return, modifiers: .command)
                 }
             } else if let template, !questions.isEmpty {

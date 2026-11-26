@@ -1,5 +1,5 @@
 #+TITLE: The agenda
-#+DESCRIPTION: The agenda window, its rows, calendar events, the TODO list, tag and property matches, saved views, filters, reminders and the board.
+#+DESCRIPTION: The agenda window, its rows, calendar events, the TODO list, tag and property matches, saved views, filters, notifications and the board.
 #+LEDE: The agenda collects dated entries and TODO items from your agenda files into one list you can act on.
 
 * Opening the agenda
@@ -207,7 +207,7 @@ With =org-enforce-todo-dependencies= or =org-enforce-todo-checkbox-dependencies=
 The agenda can show events from the system Calendar app (EventKit) among your entries. orgstar changes your calendars only when you edit an event or add an entry, as below. It is off by default. To turn it on:
 
 - On the Mac, turn on Settings ▸ Agenda ▸ Show events from Calendar, and check the calendars to show.
-- On iOS, turn on Settings ▸ Calendar ▸ Show Calendar Events, and tap the calendars to show.
+- On iOS, turn on Settings ▸ Calendar ▸ Show events from Calendar, and tap the calendars to show.
 - Or set the keys in =config.toml=:
 
 #+BEGIN_SRC toml
@@ -242,7 +242,7 @@ Both use the access granted for showing events. Read-only calendars, such as sub
 The agenda can also show reminders from the Reminders app (EventKit), read-only. It is off by default. To turn it on:
 
 - On the Mac, turn on Settings ▸ Agenda ▸ Show reminders from Reminders, and check the lists to show.
-- On iOS, turn on Settings ▸ Reminders ▸ Show Reminders, and tap the lists to show.
+- On iOS, turn on Settings ▸ Reminders ▸ Show reminders from Reminders, and tap the lists to show.
 - Or set the keys in =config.toml=:
 
 #+BEGIN_SRC toml
@@ -669,20 +669,20 @@ Each action finds the entry again by its heading line before it changes anything
 
 On iOS, tap Select in the bar at the bottom, or Select in an entry's menu, then tap entries to mark them. The bar then shows how many are selected, Actions and Done. Actions offers the same actions: TODO State…, Add Tag…, Remove Tag…, Schedule…, Deadline…, Refile… and Archive…, which asks first. After an action, or Done, the selection ends.
 
-* Reminders
+* Notifications
 
-orgstar can post a notification before each timed entry, as =org-agenda-to-appt= hands entries to =appt=. Reminders cover the next 7 days and include deadline, scheduled, plain timestamp and range lines that have a time of day and are not done. Overdue items and upcoming-deadline warnings don't get reminders.
+orgstar can post a notification before each timed entry, as =org-agenda-to-appt= hands entries to =appt=. Notifications cover the next 7 days and include deadline, scheduled, plain timestamp and range lines that have a time of day and are not done. Overdue items and upcoming-deadline warnings don't get notifications.
 
 | Setting                       | Default | =config.toml=                      |
 |-------------------------------+---------+------------------------------------|
 | Notify before timed entries   | on      | =reminders = true= under =[orgstar]= |
 | Minutes of warning            | 12      | =appt-message-warning-time = 12=   |
 
-Both are in Settings ▸ Agenda. An entry's =APPT_WARNTIME= property, in minutes, overrides the warning time for that entry. If the warning time has already passed but the entry hasn't started, the reminder fires at once.
+Both are in Settings ▸ Agenda. An entry's =APPT_WARNTIME= property, in minutes, overrides the warning time for that entry. If the warning time has already passed but the entry hasn't started, the notification comes at once.
 
 The notification's title is the heading; its body is the time, Org's leader text (=Scheduled:=, =Deadline:=) if any, and the category, such as =14:00 · Scheduled: · work=. Clicking it shows the entry in the main window.
 
-On the Mac, reminders are updated two seconds after edits stop, when files change, and every hour. At most 64 are set, the earliest first. The agenda's status line says how far ahead they are set, or that notifications are off for orgstar in System Settings. Turning reminders off removes the pending ones.
+On the Mac, notifications are updated two seconds after edits stop, when files change, and every hour. At most 64 are set, the earliest first. The agenda's status line says how far ahead they are set, or that notifications are off for orgstar in System Settings. Turning notifications off removes the pending ones.
 
 * The board
 
@@ -746,6 +746,6 @@ The Agenda tab shows the same views from the same files, using the settings in t
 - Marking an entry done and rescheduling one give haptic feedback.
 - Log Mode, in the span menu, turns log mode on and off. The widgets never show log mode's entries.
 - There are no keyboard commands; bulk actions use Select instead of marks (see [[*Bulk actions][Bulk actions]]).
-- Reminders are set while the app is open. iOS allows at most 64 pending notifications and the app can't add more while it isn't running, so the agenda's footer says how far ahead they go and asks you to open orgstar to set later ones.
+- Notifications are set while the app is open. iOS allows at most 64 pending notifications and the app can't add more while it isn't running, so the agenda's footer says how far ahead they go and asks you to open orgstar to set later ones.
 
 The Today and Up Next widgets show the agenda on the Home Screen and the Lock Screen; see [[file:14-ios.org][iPhone and iPad]].

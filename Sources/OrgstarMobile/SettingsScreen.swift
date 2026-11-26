@@ -191,7 +191,7 @@ struct SettingsScreen: View {
         let on = OrgPreferences.calendarEvents()
         let chosen = OrgPreferences.calendarEventCalendars()
         return Section {
-            Toggle("Show Calendar Events", isOn: Binding {
+            Toggle("Show events from Calendar", isOn: Binding {
                 on
             } set: { value in
                 guard !value || ProAccess.shared.allows(.calendar) else { return }
@@ -231,7 +231,7 @@ struct SettingsScreen: View {
         let on = OrgPreferences.agendaReminders()
         let chosen = OrgPreferences.agendaReminderLists()
         return Section {
-            Toggle("Show Reminders", isOn: Binding {
+            Toggle("Show reminders from Reminders", isOn: Binding {
                 on
             } set: { value in
                 guard !value || ProAccess.shared.allows(.calendar) else { return }

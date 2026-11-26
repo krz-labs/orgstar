@@ -270,7 +270,7 @@ struct ClockReportScreen: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } }
                 ToolbarItem(placement: .primaryAction) {
-                    ShareLink(item: report, preview: SharePreview("Time report")).disabled(report.isEmpty)
+                    ShareLink(item: report, preview: SharePreview("Clock Report")).disabled(report.isEmpty)
                 }
             }
         }

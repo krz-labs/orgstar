@@ -202,8 +202,8 @@ struct EditorScreen: View {
                     if let tree = session.document(of: path)?.tree {
                         ExportMenu(path: path, tree: tree, report: { message = $0 }, exportSubtree: exportSubtree)
                     }
-                    Button("Sync Conflict Copies", systemImage: "doc.on.doc") { sheet = .syncCopies }
-                    Button("Recovered Versions", systemImage: "clock.arrow.circlepath") { sheet = .recovery }
+                    Button("Resolve Sync Conflicts…", systemImage: "doc.on.doc") { sheet = .syncCopies }
+                    Button("Recovery Versions…", systemImage: "clock.arrow.circlepath") { sheet = .recovery }
                     if onPaneCommand != nil, sizeClass == .regular {
                         Menu("Panes", systemImage: "rectangle.split.2x1") {
                             Button("Split Pane Right", systemImage: "rectangle.split.2x1") { _ = onPaneCommand?("app.split-right") }

@@ -64,7 +64,7 @@ struct BoardScreen: View {
                 if kanban { board } else { list }
             }
             .message($message)
-            .navigationTitle(kanban ? "Kanban" : "Entries")
+            .navigationTitle("Board")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Done", action: done) }

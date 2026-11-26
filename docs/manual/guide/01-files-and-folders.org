@@ -35,7 +35,7 @@ Several commands in this chapter are only in the palette, not in a menu: Close O
 |------------------------------------------+----------+----------------------------------|
 | View ▸ Show Outline                      | =⌥⌘O=    | Show or Hide Outline             |
 | View ▸ Show Backlinks                    |          | Show or Hide Backlinks           |
-| View ▸ Show Columns and Clock            | =⌥⌘I=    | Show or Hide Columns and Clock   |
+| View ▸ Show Inspector                    | =⌥⌘I=    | Show or Hide Inspector           |
 | View ▸ Show Tab Bar                      |          | Show or Hide Tab Bar             |
 
 The toolbar's outline button does the same as View ▸ Show Outline. The sidebar is shown and hidden with the standard View menu command. The button at the right of the bar under it switches it between the files and an agenda; see [[file:07-agenda.org][The agenda]].
@@ -201,7 +201,7 @@ Under the outline, the backlinks pane lists headings in your folders that link t
 
 ** Inspector
 
-View ▸ Show Columns and Clock (=⌥⌘I=) opens a pane on the right with column view and clocked time for the file or the current subtree. See [[file:04-outlines.org][Outlines]] and [[file:06-dates-and-clocking.org][Dates and clocking]].
+View ▸ Show Inspector (=⌥⌘I=) opens the inspector, a pane on the right with column view and clocked time for the file or the current subtree. See [[file:04-outlines.org][Outlines]] and [[file:06-dates-and-clocking.org][Dates and clocking]].
 
 * Saving
 

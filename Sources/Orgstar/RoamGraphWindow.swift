@@ -25,6 +25,6 @@ struct RoamGraphWindow: View {
             commands.jump(path: location.path, offset: location.start)
         }
         .frame(minWidth: 420, minHeight: 320)
-        .navigationTitle("Graph")
+        .navigationTitle("Node Graph")
     }
 }

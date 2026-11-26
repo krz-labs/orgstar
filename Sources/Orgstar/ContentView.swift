@@ -228,7 +228,7 @@ struct ContentView: View {
                 .help("Find a command by name (⇧⌘P)")
         }
         ToolbarItem(id: "inspector") {
-            Button(inspectorShown ? "Hide Columns and Clock" : "Show Columns and Clock", systemImage: "sidebar.trailing") { inspectorShown.toggle() }
+            Button(inspectorShown ? "Hide Inspector" : "Show Inspector", systemImage: "sidebar.trailing") { inspectorShown.toggle() }
                 .help(inspectorShown ? "Hide the columns and clocked time (⌥⌘I)" : "Show the columns and clocked time (⌥⌘I)")
         }
         if workspace.isIndexing {
