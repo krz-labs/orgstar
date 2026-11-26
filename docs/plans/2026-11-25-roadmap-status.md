@@ -36,7 +36,7 @@ gitbay mr list --state open --json
 gitbay milestone list
 ```
 
-- A worktree under `.claude/worktrees/` or a local branch with commits not on `origin/main` is unfinished work. `git log origin/main..<branch>` shows it; the commit subjects name the issue. Continue it in that worktree rather than starting over.
+- A worktree other than the main checkout, or a local branch with commits not on `origin/main` is unfinished work. `git log origin/main..<branch>` shows it; the commit subjects name the issue. Continue it in that worktree rather than starting over.
 - An open merge request is waiting for review and merge (procedure step 2.4 in the handoff).
 - A worktree with no commits beyond `origin/main` and no changes can be removed.
 - Remove a worktree with `git worktree remove -f -f <path>` if it is locked, then `git worktree prune`; delete its branch locally and on gitbay after the merge request shows `merged`.
