@@ -92,6 +92,8 @@ struct EditorScreen: View {
         case crypt(CryptRequest)
         case backlinks
         case graph
+        /// Rename Tag or Rename TODO Keyword, starting from this name.
+        case rename(ReplaceKind, String)
         /// The subtree at this offset, to export.
         case exportSubtree(Int)
 
@@ -109,6 +111,7 @@ struct EditorScreen: View {
             case .crypt(let request): request.id.uuidString
             case .backlinks: "backlinks"
             case .graph: "graph"
+            case .rename(let kind, _): kind.rawValue
             case .exportSubtree: "exportSubtree"
             }
         }
@@ -238,6 +241,8 @@ struct EditorScreen: View {
                 RoamGraphScreen(workspace: workspace, session: session, path: path, caret: editor?.editContext().caret ?? 0) { location in
                     if location.path == path { editor?.reveal(location.start) } else { model.openRequest = .heading(location) }
                 }
+            case .rename(let kind, let initial):
+                RenameScreen(kind: kind, workspace: workspace, session: session, initial: initial) { message = $0 }
             }
         }
         .fileImporter(isPresented: $importingTable, allowedContentTypes: [.commaSeparatedText, .tabSeparatedText, .plainText]) { result in
@@ -503,6 +508,9 @@ struct EditorScreen: View {
                 roamActions.run(id)
             } else if id == "app.backlinks" {
                 sheet = .backlinks
+            } else if let kind = ReplaceKind(command: id), kind != .replace {
+                let context = self.editor?.editContext()
+                sheet = .rename(kind, context.map { kind.initial(text: $0.text, caret: $0.caret, keywords: $0.tree.settings.todoKeywordNames) } ?? "")
             } else if id == "app.toggle-markup" {
                 model.showMarkup.toggle()
             } else if MobileEditor.linkCommands.contains(id) {
@@ -1050,6 +1058,7 @@ struct CommandPalette: View {
         ("app.table-export.tsv", "Export Table as TSV…"), ("app.plot", "Plot Table"),
         ("app.crypt.encrypt-entry", "Encrypt Entry…"), ("app.crypt.open-entry", "Decrypt Entry…"), ("app.crypt.decrypt-entry", "Decrypt Entry in File…"),
         ("app.crypt.encrypt-entries", "Encrypt Tagged Entries…"), ("app.crypt.forget-passphrase", "Forget Encryption Passphrase"),
+        ("app.rename-tag", "Rename Tag…"), ("app.rename-todo-keyword", "Rename TODO Keyword…"),
         ("app.backlinks", "Show Backlinks"), ("app.node.find", "Find Node…"), ("app.node.insert", "Insert Node Link…"), ("app.node.graph", "Show Node Graph"),
         ("app.node.rename-from-front-matter", "Rename Note from Front Matter"),
         ("app.node.rename", "Rename Note…"),

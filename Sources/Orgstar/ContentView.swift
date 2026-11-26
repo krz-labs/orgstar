@@ -124,6 +124,8 @@ struct ContentView: View {
     @State private var plainOutlineShown = false
     @State private var showingImport = false
     @State private var showingTemplate = false
+    /// Replace in Files, Rename Tag or Rename TODO Keyword, with the text to start from.
+    @State private var replacing: (kind: ReplaceKind, initial: String)?
     @AppStorage("showTabBar") private var showTabBar = false
     /// This window's panes.
     @State private var window: WindowModel?
@@ -399,6 +401,9 @@ struct ContentView: View {
         .sheet(isPresented: $showingImport) { EmacsImportView(workspace: workspace) }
         .sheet(isPresented: $showingTemplate) {
             TemplateSheet(workspace: workspace, folder: session.path.map { ($0 as NSString).deletingLastPathComponent }) { selectedFile = $0 }
+        }
+        .sheet(item: Binding(get: { replacing?.kind }, set: { if $0 == nil { replacing = nil } })) { kind in
+            ReplaceInFilesSheet(kind: kind, workspace: workspace, session: session, initial: replacing?.initial ?? "") { commands.show($0) }
         }
         .sheet(item: $panel) { panel in panelView(panel) }
         .sheet(item: Bindable(ProAccess.shared).paywall) { feature in
@@ -986,6 +991,18 @@ struct ContentView: View {
         }
     }
 
+    /// What Replace in Files starts with (the selection on one line) or a rename (the tag or
+    /// keyword at the caret).
+    private func replaceInitial(for kind: ReplaceKind) -> String {
+        guard let editor = commands.editor else { return "" }
+        let context = editor.context()
+        if kind == .replace {
+            let selected = context.selection.first.map { (context.text as NSString).substring(with: NSRange($0)) } ?? ""
+            return selected.contains("\n") ? "" : selected
+        }
+        return kind.initial(text: context.text, caret: context.caret, keywords: context.tree.settings.todoKeywordNames)
+    }
+
     /// `new` in place of the buffer's text, as one edit, with the caret at `caret` or where it was.
     private func applyText(_ new: String, caret: Int? = nil) {
         guard let editor = commands.editor else { return }
@@ -1340,6 +1357,8 @@ struct ContentView: View {
         case "app.toggle-line-numbers": showLineNumbers.toggle()
         case "app.import-emacs": showingImport = true
         case "app.new-file-from-template": showingTemplate = true
+        case "app.replace-in-files", "app.rename-tag", "app.rename-todo-keyword":
+            replacing = ReplaceKind(command: id).map { ($0, replaceInitial(for: $0)) }
         case "app.edit-config": commands.jump(path: UserConfig.configFile.path, offset: 0)
         case "app.quick-open": commands.showingQuickOpen = true
         case "app.palette": commands.showingPalette = true

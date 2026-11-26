@@ -202,6 +202,8 @@ Archive Subtree in Commands (or =C-c C-x C-s= with a hardware keyboard) archives
 
 Commands has the org-crypt commands; see [[file:04-outlines.org][Outlines]]. A remembered passphrase is used after Face ID, Touch ID or the device passcode.
 
+Rename Tag… and Rename TODO Keyword… in the editor's Commands, under TODO and Tags, rename a tag or a keyword in every org file of one folder or all folders, as on the Mac: a sheet asks for the old and new name (the menu beside the first field lists the tags of your folders, or the keywords), the folder, and whether to change =config.toml= too; Find lists each line that changes, with a switch to leave it out, and Rename applies them. A change to =config.toml= goes into the synced folder's file. See [[file:05-todos-and-tags.org][TODOs and tags]].
+
 ** The menu bar on iPad
 
 The iPad's menu bar, and the list of keys shown while =⌘= is held on a hardware keyboard, have these menus, after the Mac's and with the Mac's keys:
@@ -522,6 +524,7 @@ Quick Look in the Files app shows org files as the HTML export renders them.
 - In the download version, attaching by hard link or symbolic link.
 - The inspector, and the buffer list and tab bar. The board and column view are there (see [[file:07-agenda.org][The agenda]] and [[file:04-outlines.org][Outlines]]).
 - The global capture hotkey and the Settings window.
+- Replace in Files; the rename commands are on iOS.
 - Explicit saving.
 
 Commands the iOS app can't carry out show a message instead: "/Command/ isn't available on iPhone and iPad. It runs on the Mac." Only tables that need Emacs say that Emacs is needed. Commands that only appear on the Mac aren't listed in Commands. Refile… in Commands (or =C-c C-w= with a hardware keyboard) refiles the entry at the caret, choosing the target as the agenda's Refile… does.

@@ -643,7 +643,7 @@ struct OrgMenuItems: View {
     static let groups: [(title: LocalizedStringKey, prefixes: [String])] = [
         ("Visibility", ["org.cycle", "org.fold.", "org.narrow.", "org.widen", "org.sparse-tree", "org.toggle-inline-images", "org.latex-preview"]),
         ("Headings", ["org.heading.", "org.subtree.", "org.element.", "org.goto", "org.sort", "org.archive.", "app.refile", "app.archive"]),
-        ("TODO and Tags", ["org.todo.", "org.priority.", "org.tags.", "org.effort."]),
+        ("TODO and Tags", ["org.todo.", "org.priority.", "org.tags.", "org.effort.", "app.rename-"]),
         ("Properties and Columns", ["org.property.", "org.columns", "org.drawer."]),
         ("Dates and Timers", ["org.schedule", "org.deadline", "org.timestamp.", "org.timer."]),
         ("Lists", ["org.item.", "org.checkbox."]),
@@ -751,6 +751,9 @@ struct FindMenu: View {
             item("Find Next", "edit.find-next", "g")
             item("Find Previous", "edit.find-previous", "g", [.command, .shift])
             item("Use Selection for Find", "edit.use-selection-for-find", "e")
+            Divider()
+            Button("Replace in Files…") { commands.run("app.replace-in-files") }
+                .keyboardShortcut("f", modifiers: [.command, .option, .shift])
         }
     }
 

@@ -899,6 +899,45 @@ public final class DocumentSession {
         }
     }
 
+    /// Applies `edits`, computed against `expected`, to `path` as one change, as Replace in
+    /// Files and the renames do. An open buffer takes them as an edit its editor can undo; a
+    /// buffer with no editor yet, and a file that isn't open, first has its text kept in
+    /// recovery (labelled `replace`), and the file is written through the save path. Nil when
+    /// done, else why not; nothing changes when the text is no longer `expected`.
+    public func applyChanges(_ edits: [TextEdit], to path: String, expecting expected: String, now: Date = Date()) -> String? {
+        let url = URL(fileURLWithPath: path)
+        let name = url.lastPathComponent
+        let stale = "\(name) changed after the search; nothing was changed in it."
+        if let entry = entry(path) {
+            let state = entry.buffer.document
+            guard state.isEditable else { return "\(name) isn't UTF-8, so it can't be changed." }
+            guard state.text == expected else { return stale }
+            if entry.buffer is StateBuffer {
+                do { try recovery.keep(try state.encodedText(), for: url, label: "replace") } catch {
+                    return "Can't keep a copy of \(name): \(error.localizedDescription)"
+                }
+            }
+            if case .failed(let message) = entry.buffer.perform(PrecomputedEdit(EditResult(baseRevision: state.revision, edits: edits)), now: now, answers: [:]) {
+                return message
+            }
+            changed(entry)
+            return nil
+        }
+        do {
+            guard let bytes = try fileSystem.read(url) else { return "\(name) no longer exists." }
+            var state = loaded(bytes, path: path)
+            guard state.isEditable else { return "\(name) isn't UTF-8, so it can't be changed." }
+            guard state.text == expected else { return stale }
+            try recovery.keep(bytes, for: url, label: "replace")
+            try state.apply(edits, baseRevision: state.revision)
+            if case .conflict = try saver.save(&state, to: url) { return "\(name) changed on disk; nothing was changed." }
+            textChanged?(path)
+            return nil
+        } catch {
+            return "Can't change \(name): \(error.localizedDescription)"
+        }
+    }
+
     // MARK: - External work
 
     /// Recalculates a table in Emacs from a snapshot of the buffer, then replaces the table

@@ -315,6 +315,20 @@ orgstar aligns tags whenever it changes a heading line: setting tags, changing t
 
 The Settings window offers =-77= and =0=; other values go in =config.toml=. Columns are counted as Emacs displays the line, so links count as their description and, when =org-hide-emphasis-markers= is on, emphasis markers do not count. A heading always keeps at least one space before its tags.
 
+* Renaming a tag or keyword everywhere
+
+Org ▸ TODO and Tags ▸ Rename Tag… and Rename TODO Keyword… (also in the command palette, and in Commands on iPhone and iPad) rename a tag or a keyword in every org file of one folder or of all your folders. They start with the tag under the caret, or the heading's keyword. Give the new name, choose the folder, and press Find: the list shows each line that changes, as Replace in Files does (see [[file:02-the-editor.org][The editor]]), and you can untick a line or a file before pressing Rename. Each file changes in one step, an open one as an edit you can undo in its buffer, one that isn't open after its text is kept in recovery.
+
+Only structural places change, never words in the text:
+
+- *Rename Tag* changes the tag in heading tag lists, in =#+TAGS= lines (keeping a fast-selection key such as =work(w)=, and inside ={ }= and =[ ]= groups) and in =#+FILETAGS= lines. A heading whose tags changed is realigned as Set Tags aligns it (=org-set-tags=).
+- *Rename TODO Keyword* changes the keyword where it is a heading's keyword and in =#+TODO=, =#+SEQ_TODO= and =#+TYP_TODO= lines, keeping its key and logging flags (=NEXT(n!)= becomes =WAIT(n!)=). A heading with tags is realigned, as changing the state realigns it.
+- With Also rename it in config.toml on, =org-tag-alist= or =org-todo-keywords= in =config.toml= changes too, and the list shows the new value first. A keyword change in =config.toml= takes effect after you restart the app, as any change to =org-todo-keywords= does.
+- A heading's keyword changes only where the new name will be a keyword: in a file whose own =#+TODO= lines name it, in one whose =#+SETUPFILE= is among the files renamed, or, for a file that uses the default keywords, when =config.toml= changes too. Otherwise the heading would no longer have a keyword, so it is left as it is.
+- Lines inside blocks don't count as keyword lines, and the encrypted text of =crypt= entries and =.gpg= files is left alone.
+
+Renaming to a name that is already there merges the two: a heading with both tags keeps one, and in a =#+TAGS=, =#+FILETAGS= or =#+TODO= line that names both, the old name is removed rather than doubled (so =#+TODO: TODO NEXT | DONE= with =NEXT= renamed to =TODO= becomes =#+TODO: TODO | DONE=). A keyword can't be renamed to one on the other side of the =|=, a done state to a not-done one or the other way round: the search stops and says in which file, or in =config.toml=, the two states differ. A tag name must be letters, digits, =_=, =@=, =#= and =%=, and a keyword can't contain a space, a =|= or parentheses.
+
 * Progress on child tasks
 
 A =[/]= or =[%]= cookie in a heading shows how many of its children are done:

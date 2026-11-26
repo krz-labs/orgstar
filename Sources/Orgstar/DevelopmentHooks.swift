@@ -9,7 +9,8 @@ import OrgEditorAppKit
 /// - `ORGSTAR_WINDOW`: a window to open at launch (`agenda`, `settings`); the snapshot renders it.
 /// - `ORGSTAR_COMMAND`: commands to run at launch, separated by commas (`app.import-emacs`); a
 ///   sheet or prompt they open is what the snapshot renders.
-/// - `ORGSTAR_ANSWERS`: answers to the prompts those commands ask, in order, separated by commas.
+/// - `ORGSTAR_ANSWERS`: answers to the prompts those commands ask, in order, separated by commas;
+///   for Replace in Files and the renames, the two names, then the search runs.
 /// - `ORGSTAR_URL`: an `org-protocol://` link to handle at launch, as if opened from a browser.
 /// - `ORGSTAR_PASTEBOARD`: the name of a pasteboard to paste images and files from, instead of
 ///   the clipboard.

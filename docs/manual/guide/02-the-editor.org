@@ -477,6 +477,28 @@ In Doom, =:s/PATTERN/REPLACEMENT/= and =:%s/…/…/= with the =g= and =i= flags
 
 To search all your files, use the toolbar's search field; see [[file:01-files-and-folders.org][Files, folders and buffers]].
 
+* Replacing in many files
+
+Edit ▸ Find ▸ Replace in Files… (=⌥⇧⌘F=, or Replace in Files… in the command palette) replaces text in every file of one folder or of all your folders. Fill in Find and Replace with, choose the folder under In, and press Find. Selected text on one line starts as the search.
+
+- *Plain text or regular expression.* With Regular expression on, the pattern is an ICU regular expression, as in the find bar and Doom's =:s=; =^= and =$= match at the start and end of each line. In the replacement, =\1= or =$1= is the first group, =\&= or =$0= the whole match, =\\= a backslash and =\$= a dollar sign. Plain text replaces literally.
+- *Case.* As Emacs's defaults have it: with Ignore case when the search is lower case on (=case-fold-search=), a search with no upper-case letters matches any case, and one with an upper-case letter matches case exactly (a letter after a backslash in a regular expression doesn't count). With Keep each match's case on as well (=case-replace=), the replacement follows each match: =foo= replaced with =bar= turns =Foo= into =Bar= and =FOO= into =BAR=, as =query-replace= does.
+
+The list shows every match by file and line, the matched text struck through and the replacement after it. Untick a match, or a file's box to leave out the whole file, then press Replace. While the search runs, a bar shows how many files are done; Stop ends it and keeps what it found.
+
+What is searched:
+
+- Org files (=.org=, =.org_archive=) and plain text (=.txt=, =.md=, =.markdown=) in the folder. Encrypted files (=.gpg=) are left out, and so are the encrypted entries in org files: the =-----BEGIN PGP MESSAGE-----= to =-----END PGP MESSAGE-----= text under a heading with the =crypt= tag (=org-crypt-tag-matcher=), its own or inherited. The tagged heading's own line is searched.
+- An open file as it is in its buffer, unsaved changes included.
+
+How each file changes:
+
+- An open file changes in its buffer, as one edit: Edit ▸ Undo in that buffer takes back the whole replacement in that file. It is saved as any edit is, at once with automatic saving, else when you save.
+- A file that isn't open is written at once through the same save path as a buffer, so a file changed on disk meanwhile is merged or reported as a conflict. Before it is written, its text is kept in recovery, as =Before a change across files=; there is no undo for it, but File ▸ Recovery Versions… on that file shows the old text and restores it (the restore can be undone).
+- A file that changed after the search is left alone, and the echo area says so; search again.
+
+The echo area then says how many files changed. Org ▸ TODO and Tags has Rename Tag… and Rename TODO Keyword…, which work the same way but change only tags or keywords; see [[file:05-todos-and-tags.org][TODOs and tags]].
+
 * Accessibility
 
 The editor works with VoiceOver. VoiceOver reads the text as it is shown rather than as stored: hidden link brackets and targets, hidden emphasis markers and hidden stars are skipped, entities are read as the characters drawn for them, and narrowed table columns are read as drawn. Folded text is still read, so the whole file is available. Lines, the caret position and the selection are reported in terms of the shown text.

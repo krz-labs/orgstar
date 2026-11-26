@@ -145,6 +145,7 @@ struct RecoverySheet: View {
         case "external": "Disk version, replaced"
         case "sync-conflict": "Sync conflict copy"
         case "snapshot": "Snapshot, before a save"
+        case "replace": String(localized: "Before a change across files", comment: "Recovery version kept before Replace in Files or a rename changed the file")
         default: label
         }
     }

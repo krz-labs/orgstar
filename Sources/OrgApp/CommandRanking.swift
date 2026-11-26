@@ -77,7 +77,7 @@ public enum CommandGroups {
     public static let orgMenu: [Group] = [
         Group(title: String(localized: "Visibility", comment: "Org menu submenu"), prefixes: ["org.cycle", "org.fold.", "org.narrow.", "org.widen", "org.sparse-tree", "org.toggle-inline-images", "org.latex-preview"]),
         Group(title: String(localized: "Headings", comment: "Org menu submenu"), prefixes: ["org.heading.", "org.subtree.", "org.element.", "org.goto", "org.sort", "org.archive.", "app.refile", "app.archive"]),
-        Group(title: String(localized: "TODO and Tags", comment: "Org menu submenu"), prefixes: ["org.todo.", "org.priority.", "org.tags.", "org.effort."]),
+        Group(title: String(localized: "TODO and Tags", comment: "Org menu submenu"), prefixes: ["org.todo.", "org.priority.", "org.tags.", "org.effort.", "app.rename-"]),
         Group(title: String(localized: "Properties and Columns", comment: "Org menu submenu"), prefixes: ["org.property.", "org.columns", "org.drawer."]),
         Group(title: String(localized: "Dates and Timers", comment: "Org menu submenu"), prefixes: ["org.schedule", "org.deadline", "org.timestamp.", "org.timer."]),
         Group(title: String(localized: "Lists", comment: "Org menu submenu"), prefixes: ["org.item.", "org.checkbox."]),
