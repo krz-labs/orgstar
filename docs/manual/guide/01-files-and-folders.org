@@ -358,4 +358,4 @@ orgstar does not convert between encodings or line endings.
 
 * On iOS
 
-The iOS app adds folders from its Folders screen and lists only org files there. Conflicts, Syncthing copies and recovery versions are in the editor's menu; the iOS app doesn't list git commits or commit to git. Files are watched through file presenters rather than FSEvents. See [[file:14-ios.org][iOS]].
+The iOS app adds folders from its Folders screen and lists only org files there. Conflicts, Syncthing copies and recovery versions are in the editor's menu; the iOS app doesn't list git commits, and commits, pulls and pushes a git folder through the Working Copy app. Files are watched through file presenters rather than FSEvents. See [[file:14-ios.org][iOS]].

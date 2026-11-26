@@ -886,6 +886,181 @@
         }
       }
     },
+    "%@ wasn't synced: %@": {
+      "comment": "Working Copy sync; Working Copy's error follows",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ wurde nicht synchronisiert: %2$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ no se sincronizó: %2$@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ n’a pas été synchronisé : %2$@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@は同期されませんでした：%2$@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ não foi sincronizado: %2$@"
+          }
+        }
+      }
+    },
+    "%@ wasn't synced: %@ couldn't be saved.": {
+      "comment": "Working Copy sync",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ wurde nicht synchronisiert: %2$@ konnte nicht gesichert werden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ no se sincronizó: no se pudo guardar %2$@."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ n’a pas été synchronisé : %2$@ n’a pas pu être enregistré."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@は同期されませんでした：%2$@を保存できませんでした。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ não foi sincronizado: não foi possível salvar %2$@."
+          }
+        }
+      }
+    },
+    "%@ wasn't synced: Working Copy isn't installed or couldn't be opened.": {
+      "comment": "Working Copy sync",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ wurde nicht synchronisiert: Working Copy ist nicht installiert oder konnte nicht geöffnet werden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ no se sincronizó: Working Copy no está instalada o no se pudo abrir."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ n’a pas été synchronisé : Working Copy n’est pas installée ou n’a pas pu être ouverte."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@は同期されませんでした：Working Copyがインストールされていないか、開けませんでした。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ não foi sincronizado: o Working Copy não está instalado ou não pôde ser aberto."
+          }
+        }
+      }
+    },
+    "%@ wasn't synced: Working Copy reported an error.": {
+      "comment": "Working Copy sync",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ wurde nicht synchronisiert: Working Copy hat einen Fehler gemeldet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ no se sincronizó: Working Copy informó de un error."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ n’a pas été synchronisé : Working Copy a signalé une erreur."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@は同期されませんでした：Working Copyがエラーを報告しました。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ não foi sincronizado: o Working Copy relatou um erro."
+          }
+        }
+      }
+    },
+    "%@ wasn't synced: set Working Copy's URL key in Settings ▸ Working Copy.": {
+      "comment": "Working Copy sync",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ wurde nicht synchronisiert: Lege den URL-Schlüssel von Working Copy unter Einstellungen ▸ Working Copy fest."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ no se sincronizó: introduce la clave URL de Working Copy en Ajustes ▸ Working Copy."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ n’a pas été synchronisé : saisissez la clé URL de Working Copy dans Réglages ▸ Working Copy."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@は同期されませんでした：設定 ▸ Working CopyでWorking CopyのURLキーを設定してください。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ não foi sincronizado: defina a chave de URL do Working Copy em Ajustes ▸ Working Copy."
+          }
+        }
+      }
+    },
     "%@ with %@": {
       "localizations": {
         "de": {
@@ -34063,6 +34238,40 @@
         }
       }
     },
+    "Remove Key": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schlüssel entfernen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eliminar clave"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer la clé"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キーを削除"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remover Chave"
+          }
+        }
+      }
+    },
     "Remove Priority": {
       "comment": "Command title",
       "localizations": {
@@ -34892,6 +35101,40 @@
         }
       }
     },
+    "Replace Key": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schlüssel ersetzen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sustituir clave"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remplacer la clé"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キーを置き換え"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Substituir Chave"
+          }
+        }
+      }
+    },
     "Replace in Files": {
       "comment": "Window title",
       "localizations": {
@@ -35095,6 +35338,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Para relatar um problema, é preciso uma conta no gitbay. Sem uma, envie um e-mail para %@."
+          }
+        }
+      }
+    },
+    "Repository": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Repository"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Repositorio"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dépôt"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リポジトリ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Repositório"
           }
         }
       }
@@ -35990,6 +36267,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Salvar Campo"
+          }
+        }
+      }
+    },
+    "Save Key": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schlüssel sichern"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardar clave"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer la clé"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キーを保存"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salvar Chave"
           }
         }
       }
@@ -40923,6 +41234,178 @@
         }
       }
     },
+    "Sync folders that are git repositories in Working Copy.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ordner synchronisieren, die Git-Repositorys in Working Copy sind."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincroniza carpetas que son repositorios git en Working Copy."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchroniser les dossiers qui sont des dépôts git dans Working Copy."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Working Copyのgitリポジトリであるフォルダを同期します。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronize pastas que são repositórios git no Working Copy."
+          }
+        }
+      }
+    },
+    "Sync saves every file, then Working Copy commits every changed file in the repository, pulls and pushes. The repository is its name in Working Copy's list.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beim Synchronisieren werden alle Dateien gesichert; dann committet Working Copy jede geänderte Datei im Repository, führt Pull und dann Push aus. Als Repository gilt sein Name in der Liste von Working Copy."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Al sincronizar se guardan todos los archivos; luego Working Copy hace commit de cada archivo cambiado del repositorio, pull y push. El repositorio es su nombre en la lista de Working Copy."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La synchronisation enregistre tous les fichiers, puis Working Copy fait un commit de chaque fichier modifié du dépôt, un pull et un push. Le dépôt est son nom dans la liste de Working Copy."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同期するとすべてのファイルが保存され、Working Copyがリポジトリ内の変更されたファイルをすべてコミットし、プルしてからプッシュします。リポジトリにはWorking Copyの一覧に表示される名前を指定します。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizar salva todos os arquivos; depois o Working Copy faz commit de cada arquivo alterado no repositório, pull e push. O repositório é o nome dele na lista do Working Copy."
+          }
+        }
+      }
+    },
+    "Sync when orgstar opens": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beim Öffnen von orgstar synchronisieren"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizar al abrir orgstar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchroniser à l’ouverture d’orgstar"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstarを開いたときに同期"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizar ao abrir o orgstar"
+          }
+        }
+      }
+    },
+    "Sync with Working Copy": {
+      "comment": "Command title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mit Working Copy synchronisieren"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizar con Working Copy"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchroniser avec Working Copy"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Working Copyと同期"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizar com Working Copy"
+          }
+        }
+      }
+    },
+    "Synced %@ with Working Copy": {
+      "comment": "Working Copy sync",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ mit Working Copy synchronisiert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ sincronizada con Working Copy"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ synchronisé avec Working Copy"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@をWorking Copyと同期しました"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ sincronizado com o Working Copy"
+          }
+        }
+      }
+    },
     "System": {
       "localizations": {
         "de": {
@@ -43286,6 +43769,75 @@
         }
       }
     },
+    "This folder doesn't sync with Working Copy; turn it on in Settings ▸ Working Copy.": {
+      "comment": "Sync with Working Copy in a folder that isn't set up",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Ordner wird nicht mit Working Copy synchronisiert; schalte es unter Einstellungen ▸ Working Copy ein."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta carpeta no se sincroniza con Working Copy; actívalo en Ajustes ▸ Working Copy."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce dossier ne se synchronise pas avec Working Copy ; activez-le dans Réglages ▸ Working Copy."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このフォルダはWorking Copyと同期していません。設定 ▸ Working Copyでオンにしてください。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta pasta não sincroniza com o Working Copy; ative em Ajustes ▸ Working Copy."
+          }
+        }
+      }
+    },
+    "This folder is a git repository.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Ordner ist ein Git-Repository."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta carpeta es un repositorio git."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce dossier est un dépôt git."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このフォルダはgitリポジトリです。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta pasta é um repositório git."
+          }
+        }
+      }
+    },
     "This is the only pane.": {
       "comment": "Close Pane with one pane",
       "localizations": {
@@ -44427,6 +44979,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ative os Indicadores nos ajustes de notificação do orgstar."
+          }
+        }
+      }
+    },
+    "URL key": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL-Schlüssel"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clave URL"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clé URL"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URLキー"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chave de URL"
           }
         }
       }
@@ -46145,6 +46731,108 @@
           "stringUnit": {
             "state": "translated",
             "value": "Palavras no arquivo (count-words); clique para ver caracteres e tempo de leitura"
+          }
+        }
+      }
+    },
+    "Working Copy": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Working Copy"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Working Copy"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Working Copy"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Working Copy"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Working Copy"
+          }
+        }
+      }
+    },
+    "Working Copy runs orgstar's sync only with the URL key from Working Copy's settings. orgstar keeps it in the Keychain on this device.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Working Copy führt die Synchronisierung von orgstar nur mit dem URL-Schlüssel aus den Einstellungen von Working Copy aus. orgstar bewahrt ihn im Schlüsselbund auf diesem Gerät auf."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Working Copy solo ejecuta la sincronización de orgstar con la clave URL de los ajustes de Working Copy. orgstar la guarda en el llavero de este dispositivo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Working Copy n’exécute la synchronisation d’orgstar qu’avec la clé URL des réglages de Working Copy. orgstar la conserve dans le trousseau de cet appareil."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Working CopyはWorking Copyの設定にあるURLキーがある場合にのみorgstarの同期を実行します。orgstarはこのキーをこのデバイスのキーチェーンに保管します。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Working Copy só executa a sincronização do orgstar com a chave de URL dos ajustes do Working Copy. O orgstar a guarda nas Chaves deste dispositivo."
+          }
+        }
+      }
+    },
+    "Working Copy…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Working Copy …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Working Copy…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Working Copy…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Working Copy…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Working Copy…"
           }
         }
       }

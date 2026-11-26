@@ -17,6 +17,8 @@ struct FoldersScreen: View {
     @State private var deletingRoot: String?
     /// The added folder whose removal from orgstar is being confirmed.
     @State private var removingRoot: String?
+    /// The added folder whose Working Copy settings are showing.
+    @State private var workingCopyRoot: String?
     @Environment(MobileModel.self) private var model
 
     var body: some View {
@@ -33,13 +35,17 @@ struct FoldersScreen: View {
                         Text((root as NSString).lastPathComponent)
                         Spacer()
                         Menu {
+                            workingCopyButtons(root)
                             removeButton(root)
                         } label: {
                             Label("Folder Actions", systemImage: "ellipsis.circle").labelStyle(.iconOnly)
                         }
                         .textCase(nil)
                     }
-                    .contextMenu { removeButton(root) }
+                    .contextMenu {
+                        workingCopyButtons(root)
+                        removeButton(root)
+                    }
                 }
             }
             if let error = workspace.lastError {
@@ -77,6 +83,9 @@ struct FoldersScreen: View {
         }
         .navigationDestination(for: FolderRoute.self) { route in
             FolderPage(workspace: workspace, session: session, route: route)
+        }
+        .sheet(isPresented: Binding { workingCopyRoot != nil } set: { if !$0 { workingCopyRoot = nil } }) {
+            if let root = workingCopyRoot { WorkingCopyFolderScreen(root: root) }
         }
         .confirmDeletion($deleting, workspace: workspace, session: session) { changes += 1 }
         .createItem($creating, workspace: workspace) { changes += 1 }
@@ -133,6 +142,19 @@ struct FoldersScreen: View {
     }
 }
 extension FoldersScreen {
+    /// Sync for a folder set up with Working Copy, and its settings for one that is set up or
+    /// a git repository; others are set up in Settings ▸ Working Copy.
+    @ViewBuilder
+    private func workingCopyButtons(_ root: String) -> some View {
+        let setUp = model.workingCopy.folders.folder(root) != nil
+        if setUp {
+            Button("Sync with Working Copy", systemImage: "arrow.triangle.2.circlepath") { model.workingCopy.sync(root, session: session) }
+        }
+        if setUp || WorkingCopy.isRepository(root) {
+            Button("Working Copy…", systemImage: "arrow.triangle.branch") { workingCopyRoot = root }
+        }
+    }
+
     private func removeButton(_ root: String) -> some View {
         Button("Remove from orgstar…", systemImage: "folder.badge.minus", role: .destructive) { removingRoot = root }
     }

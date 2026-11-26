@@ -200,6 +200,8 @@ Commands has the org-attach commands, and Attach Photo or Video…, Take Photo�
 
 Lint File, under File in Commands, lists the problems in the open file with their lines, as the Mac's Lint File panel does; tap one to close the list and move the caret to its line. The checks are the Mac's; see [[file:02-the-editor.org][The editor]]. Run it again after editing to check again.
 
+Sync with Working Copy, under File in Commands, syncs the folder of the open file through Working Copy; see Git folders through Working Copy below.
+
 Archive Subtree in Commands (or =C-c C-x C-s= with a hardware keyboard) archives the entry at the caret where =org-archive-location= says, as on the Mac.
 
 Commands has the org-crypt commands; see [[file:04-outlines.org][Outlines]]. A remembered passphrase is used after Face ID, Touch ID or the device passcode.
@@ -447,6 +449,28 @@ Resolve Sync Conflicts… (in the editor's toolbar while there are copies, and i
 Recovery Versions… (in Commands, and in the editor's toolbar on iPad while there are versions) lists the versions of the file kept in the recovery folder, newest first, each compared with the editor's text. Restore puts a version's text in the editor as an edit you can undo.
 
 See [[file:15-alongside-emacs.org][Working alongside Emacs and other tools]] for how merging and recovery work.
+
+* Git folders through Working Copy
+
+A folder that is a git repository in [[https://workingcopyapp.com][Working Copy]], added to orgstar from Working Copy's place in the folder picker, works like any other folder. orgstar can also ask Working Copy to commit, pull and push it, so you don't have to switch to Working Copy to sync.
+
+Setting it up, once:
+
+1. In Working Copy's settings, find the URL key it uses for x-callback-url commands. Working Copy runs a command from another app only with this key.
+2. In orgstar, open Settings ▸ Working Copy, enter the key in URL key and tap Save Key. orgstar keeps it in the Keychain on this device only, never in =config.toml= or the app's settings.
+3. In the same screen, turn on Sync with Working Copy for the folder. Repository is the repository's name in Working Copy's list; it starts as the folder's name. Sync when orgstar opens is off; turn it on to sync each time you open orgstar.
+
+For a folder with a =.git= folder at its top, the ⋯ button beside its name in Folders also has Working Copy…, with the same settings. Working Copy's own folders may not show =.git=, so set those up in Settings ▸ Working Copy.
+
+To sync, choose Sync with Working Copy from the folder's ⋯ menu in Folders, or from Commands in the editor of a file in the folder. orgstar saves every open file, then opens Working Copy, which commits every changed file in the repository with the message =Update from orgstar=, pulls, pushes and comes back to orgstar. orgstar says =Synced notes with Working Copy= and reads the folder again, or says why the sync didn't happen: a file couldn't be saved, there is no URL key, Working Copy isn't installed, or Working Copy's error, such as a merge conflict. Conflicts are resolved in Working Copy. Pushing needs Working Copy's push feature.
+
+With Sync when orgstar opens, the folders that have it sync, one after another, when you open orgstar or come back to it, except when you come back from Working Copy within two minutes of a sync.
+
+orgstar doesn't sync when you leave it: iOS doesn't let an app open another app as it goes to the background. Use a Shortcuts automation for that, or in place of orgstar's own sync:
+
+1. In Shortcuts, open Automation and add a personal automation with the App trigger. Choose orgstar, and Is Closed (or Is Opened, to pull when you start).
+2. Choose Run Immediately.
+3. Add Working Copy's actions for the repository: commit (with a message), then pull, then push; or only pull for Is Opened.
 
 * Settings
 

@@ -328,6 +328,7 @@ enum CommandTitles {
         String(localized: "Strike-Through", comment: "Command title"),
         String(localized: "Switch to Buffer…", comment: "Command title"),
         String(localized: "Sync Attachments", comment: "Command title"),
+        String(localized: "Sync with Working Copy", comment: "Command title"),
         String(localized: "Take Photo…", comment: "Command title"),
         String(localized: "Tangle Block", comment: "Command title"),
         String(localized: "Tangle Block's Target", comment: "Command title"),

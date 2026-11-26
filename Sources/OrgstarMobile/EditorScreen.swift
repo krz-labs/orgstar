@@ -521,6 +521,12 @@ struct EditorScreen: View {
                 sheet = .rename(kind, context.map { kind.initial(text: $0.text, caret: $0.caret, keywords: $0.tree.settings.todoKeywordNames) } ?? "")
             } else if id == "app.lint" {
                 if FileLint.applies(to: path) { sheet = .lint } else { message = String(localized: "Lint File works on Org files", comment: "Lint File in a file that isn't Org") }
+            } else if id == "app.working-copy.sync" {
+                if let root = model.workingCopy.root(containing: path, roots: workspace.rootPaths) {
+                    model.workingCopy.sync(root, session: session)
+                } else {
+                    message = String(localized: "This folder doesn't sync with Working Copy; turn it on in Settings ▸ Working Copy.", comment: "Sync with Working Copy in a folder that isn't set up")
+                }
             } else if id == "app.toggle-markup" {
                 model.showMarkup.toggle()
             } else if MobileEditor.linkCommands.contains(id) {
@@ -1059,6 +1065,7 @@ struct CommandPalette: View {
         ("app.toggle-markup", "Show or Hide Markup"), ("app.word-count", "Word Count"),
         ("org.snippet.next-field", "Next Snippet Field"), ("org.snippet.previous-field", "Previous Snippet Field"),
         ("app.recovery", "Recovery Versions…"), ("app.sync-conflicts", "Resolve Sync Conflicts…"), ("app.lint", "Lint File"),
+        ("app.working-copy.sync", "Sync with Working Copy"),
         ("org.toggle-inline-images", "Show or Hide Inline Images"), ("org.toggle-inline-images-linked", "Show or Hide Inline Images, Including Described Links"), ("org.latex-preview", "Show or Hide LaTeX Previews"), ("editor.toggle-truncate-lines", "Truncate or Wrap Long Lines"), ("editor.toggle-auto-fill", "Turn Auto Fill On or Off"),
         ("editor.complete", "Complete at Point"), ("editor.dabbrev-expand", "Expand Word"), ("editor.dabbrev-completion", "Complete Word"),
         ("edit.isearch-forward", "Incremental Search"), ("edit.isearch-backward", "Incremental Search Backward"),

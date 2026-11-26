@@ -49,6 +49,8 @@ final class MobileModel {
     let reminderLists = ReminderLists()
     /// The file and caret of the editor on screen, advertised for Handoff.
     @ObservationIgnored let handoff = HandoffAdvertiser()
+    /// Folders synced through Working Copy.
+    let workingCopy = WorkingCopySync()
     /// The file of the editor on screen; nil when none is.
     @ObservationIgnored var handoffPath: String? {
         didSet { if handoffPath != oldValue { handoff.changed() } }

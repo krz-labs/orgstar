@@ -513,6 +513,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
         case "app.refile", "app.refile.copy", "app.archive": return onAppCommand != nil && Presentation.heading(containing: context.caret, in: context.tree) != nil
         case "app.export-dialog", "app.export-subtree-dialog", "app.copy-rich-text", "app.export.html-open", "app.export-body-only", "app.export.icalendar-agenda", "app.export.icalendar-combined": return onAppCommand != nil
         case _ where id.hasPrefix("app.publish"): return onAppCommand != nil
+        case "app.working-copy.sync": return onAppCommand != nil
         case _ where Self.linkCommands.contains(id): return onAppCommand != nil
         case "org.link.open": return OpenLinkAtPoint().applies(in: context)
         case "org.table.toggle-column-width", "org.table.shrink", "org.table.expand":

@@ -73,6 +73,25 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
     }
 }
 
+/// Files continued from another device, and what Working Copy's syncs come to.
+private struct HandoffAndSync: ViewModifier {
+    let model: MobileModel
+    let open: (HandoffPlace) -> Void
+    @Binding var message: String?
+
+    func body(content: Content) -> some View {
+        content
+            .onContinueUserActivity(HandoffPlace.activityType) { activity in
+                if let place = HandoffPlace(userInfo: activity.userInfo) { open(place) }
+            }
+            .onChange(of: model.workingCopy.message) {
+                guard let text = model.workingCopy.message else { return }
+                model.workingCopy.message = nil
+                message = text
+            }
+    }
+}
+
 /// A tab on iPhone, or a row of the sidebar on a regular-width iPad, which also lists search
 /// and each added folder.
 enum AppTab: Hashable { case agenda, search, folders, folder(String), settings }
@@ -398,6 +417,7 @@ struct RootView: View {
             }
             workspace.startWatching()
             await workspace.refresh()
+            model.workingCopy.appOpened(roots: workspace.rootPaths, session: session)
         }
         .task {
             while !Task.isCancelled {
@@ -408,9 +428,6 @@ struct RootView: View {
         .background { BackgroundWork(model: model, workspace: workspace, agenda: agenda, active: scenePhase == .active, onboarded: onboarded, hour: hour) }
         .onContinueUserActivity(CSSearchableItemActionType) { activity in
             if let path = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String { model.openRequest = .file(path) }
-        }
-        .onContinueUserActivity(HandoffPlace.activityType) { activity in
-            if let place = HandoffPlace(userInfo: activity.userInfo) { continueHandoff(place) }
         }
         .onChange(of: scenePhase) { _, phase in
             // Unsaved edits are written before the app may be stopped.
@@ -426,9 +443,11 @@ struct RootView: View {
             takeShared()
             model.reloadConfig()
             model.handoff.update()
+            model.workingCopy.appOpened(roots: workspace.rootPaths, session: session)
             Task { await workspace.refresh() }
         }
         .onOpenURL(perform: handle)
+        .modifier(HandoffAndSync(model: model, open: continueHandoff, message: $message))
         // The Live Activity follows the clock, wherever it starts or stops.
         .task {
             LiveClock.publish(model.clock)
@@ -472,7 +491,9 @@ struct RootView: View {
 
     /// A widget's or the Live Activity's link, or an org-protocol URL.
     private func handle(_ url: URL) {
-        if let link = AppLink(url: url) {
+        if let callback = WorkingCopy.callback(url) {
+            model.workingCopy.finished(callback, workspace: workspace, session: session)
+        } else if let link = AppLink(url: url) {
             open(link)
         } else if let request = CaptureRequest(link: url.absoluteString) {
             capture = request

@@ -176,6 +176,17 @@ Download version only. One row for each folder in the sidebar; a folder that isn
 
 The choice is kept on this Mac for the folder's path, not in =config.toml=, since another Mac has other folders. Removing a folder from the sidebar and adding it again keeps it. See [[file:01-files-and-folders.org::*Committing to git][Committing to git]].
 
+On iPhone and iPad, Settings ▸ Working Copy syncs folders through the Working Copy app instead:
+
+| Control                  | Choices               | Default            |
+|--------------------------+-----------------------+--------------------|
+| URL key                  | Working Copy's key    | None               |
+| Sync with Working Copy   | On or off, per folder | Off                |
+| Repository               | A name, per folder    | The folder's name  |
+| Sync when orgstar opens  | On or off, per folder | Off                |
+
+These are kept on the device, not in =config.toml=: the folders are at other paths on each device, and the key is kept in the Keychain. See [[file:14-ios.org::*Git folders through Working Copy][Git folders through Working Copy]].
+
 ** Settings only in config.toml
 
 These settings have no control in the Settings window. Some are in the View menu.

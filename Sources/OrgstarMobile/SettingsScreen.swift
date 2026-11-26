@@ -78,6 +78,13 @@ struct SettingsScreen: View {
             } footer: {
                 Text("The buttons above the on-screen keyboard.")
             }
+            if let workspace = model.workspace {
+                Section {
+                    NavigationLink("Working Copy") { WorkingCopyScreen(workspace: workspace) }
+                } footer: {
+                    Text("Sync folders that are git repositories in Working Copy.")
+                }
+            }
             Section {
                 let _ = model.settingsVersion
                 Toggle("Show days without entries", isOn: Binding {
