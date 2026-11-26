@@ -32,7 +32,6 @@ public final class CryptVault: @unchecked Sendable {
     private var revealed: [String: [String: String]] = [:]
     /// By file: whether the encrypted file was armored when read.
     private var armored: [String: Bool] = [:]
-    private var onWrite: ((String) -> Void)?
 
     public init() {}
 
@@ -57,12 +56,6 @@ public final class CryptVault: @unchecked Sendable {
     public var tag: String {
         get { locked { entryTag } }
         set { locked { entryTag = newValue } }
-    }
-
-    /// Called with a file's path each time it was written.
-    public var written: ((String) -> Void)? {
-        get { locked { onWrite } }
-        set { locked { onWrite = newValue } }
     }
 
     public func passphrase(for path: String) -> String? {
@@ -175,11 +168,9 @@ public final class CryptVault: @unchecked Sendable {
     /// The messages in a file `cipher` gave were written: reading it back gives their text.
     public func didWrite(_ messages: [(message: String, plaintext: String)], to path: String) {
         let key = Self.key(path)
-        let callback = locked {
+        locked {
             for (message, plaintext) in messages { revealed[key, default: [:]][message] = plaintext }
-            return onWrite
         }
-        callback?(path)
     }
 
     /// Whether `passphrase` opens the encrypted file `bytes`; an empty file takes any.

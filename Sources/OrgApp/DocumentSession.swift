@@ -163,21 +163,9 @@ public final class DocumentSession {
         let pane = EditorPane()
         panes = [pane]
         focused = pane
-        crypt.written = { [weak self] path in
-            if Thread.isMainThread {
-                MainActor.assumeIsolated { self?.fileSaved?(path) }
-            } else {
-                Task { @MainActor in self?.fileSaved?(path) }
-            }
-        }
     }
 
     // MARK: - Encryption
-
-    /// Called with a file's path each time the session wrote it to disk: a buffer saved (by
-    /// hand or on its own), Keep Mine, and refile, archive or agenda changes to files that
-    /// aren't open. Not called for a save that was held, failed or conflicted.
-    @ObservationIgnored public var fileSaved: ((String) -> Void)?
 
     /// `org-crypt-use-before-save-magic`: entries with `cryptTag` are encrypted on every save.
     public var encryptsTaggedEntries: Bool {

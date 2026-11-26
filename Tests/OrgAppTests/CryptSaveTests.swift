@@ -64,7 +64,7 @@ struct CryptSaveTests {
         var asked = 0
         session.storedPassphrase = { _ in asked += 1; return "pw" }
         var written: [String] = []
-        session.fileSaved = { written.append($0) }
+        session.fileWritten = { written.append($0) }
         session.open(file.path)
         try replace(with: Self.file)
         #expect(!session.save())
@@ -98,10 +98,13 @@ struct CryptSaveTests {
 
     @Test func holdsTheWholeFileWithoutThePassphrase() throws {
         try notes.write("a.org", "* Plain\nOpen text.\n")
+        var written: [String] = []
+        session.fileWritten = { written.append($0) }
         session.open(file.path)
         try replace(with: Self.file)
         #expect(!session.save())
         #expect(session.held[file.path] == .entries(1))
+        #expect(written.isEmpty)
         #expect(disk == "* Plain\nOpen text.\n")
         #expect(recoveryFiles.isEmpty)
         #expect(session.isDirty)
@@ -112,12 +115,25 @@ struct CryptSaveTests {
         #expect(disk == "* Plain\nOpen text.\n")
         #expect(recoveryFiles.isEmpty)
         // The passphrase, when given, encrypts and saves.
+        #expect(written.isEmpty)
         #expect(session.unlock("pw", for: file.path) == nil)
         #expect(session.held.isEmpty)
         #expect(!session.isDirty)
+        #expect(written == [file.path])
         #expect(!disk.contains(Self.secret))
         #expect(recoveryFiles.allSatisfy { !$0.contains(Self.secret) })
         #expect(session.openTexts[file.path] == nil)
+    }
+
+    @Test func restoringAVersionOfAHeldFileKeepsNoPlaintext() throws {
+        try notes.write("a.org", "* Plain\nOpen text.\n")
+        session.open(file.path)
+        try replace(with: Self.file)
+        #expect(!session.save())
+        #expect(session.restore(text: "* Plain\nOpen text.\n* Other\n") == nil)
+        #expect(recoveryFiles.isEmpty)
+        #expect(session.save())
+        #expect(recoveryFiles.allSatisfy { !$0.contains(Self.secret) })
     }
 
     @Test func aHeldFileIsReleasedWhenTheEntryGoes() throws {
@@ -222,7 +238,7 @@ struct CryptSaveTests {
         let path = notes.url.appendingPathComponent("diary.org.gpg")
         try message.write(to: path)
         var written: [String] = []
-        session.fileSaved = { written.append($0) }
+        session.fileWritten = { written.append($0) }
         session.open(path.path)
         #expect(session.unlockRequest == path.path)
         #expect(!session.isOpen(path.path))
