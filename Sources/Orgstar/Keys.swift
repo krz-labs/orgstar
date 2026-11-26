@@ -303,7 +303,8 @@ let hiddenCommandIDs = AppStoreCommands.hidden
 let hiddenCommandIDs: Set<String> = []
 #endif
 
-/// M-x and ⇧⌘P: every command by title, with its keys.
+/// M-x and ⇧⌘P: every command by title, with its keys. An empty query lists the commands run
+/// from here most recently, then the rest; matches rank commands used often a little higher.
 struct PaletteView: View {
     let commands: AppCommands
     let run: (String) -> Void
@@ -312,48 +313,62 @@ struct PaletteView: View {
     @State private var selected = 0
     @Environment(\.dismiss) private var dismiss
 
-    private var matches: [EditorCommand] {
-        let scored: [(command: EditorCommand, score: Int)] = EditorCommands.all.filter { $0.inPalette && !hiddenCommandIDs.contains($0.id) }.compactMap { command in
-            guard let score = FuzzyMatch.score(query, command.localizedTitle) ?? FuzzyMatch.score(query, command.title) else { return nil }
-            return (command, score)
-        }
-        return scored.sorted { $0.score != $1.score ? $0.score > $1.score : $0.command.localizedTitle < $1.command.localizedTitle }.map(\.command)
+    private var matches: (recent: [EditorCommand], rest: [EditorCommand]) {
+        CommandRanking.rank(EditorCommands.all.filter { $0.inPalette && !hiddenCommandIDs.contains($0.id) }, query: query,
+                            id: \.id, titles: { [$0.localizedTitle, $0.title] })
     }
 
     var body: some View {
-        let matches = matches
+        let ranked = matches
+        let matches = ranked.recent + ranked.rest
         let current = min(selected, matches.count - 1)
         VStack(spacing: 0) {
             TextField("Run command", text: $query)
                 .textFieldStyle(.plain)
                 .font(.title3)
                 .padding(12)
-                .onSubmit { if current >= 0 { run(matches[current].id) } }
+                .onSubmit { if current >= 0 { choose(matches[current].id) } }
                 .movesSelection($selected, current: current, count: matches.count)
                 .onChange(of: query) { selected = 0 }
             Divider()
             ScrollViewReader { proxy in
-                List(matches.indices, id: \.self) { index in
-                    let command = matches[index]
-                    Button {
-                        run(command.id)
-                    } label: {
-                        HStack {
-                            Text(command.localizedTitle)
-                            Spacer()
-                            if let keys = commands.keyLabel(for: command.id) {
-                                Text(keys).font(.system(.caption, design: .monospaced)).foregroundStyle(.secondary)
-                            }
-                        }
-                        .contentShape(Rectangle())
+                List {
+                    if !ranked.recent.isEmpty {
+                        Section("Recent") { rows(matches, 0..<ranked.recent.count, current) }
+                        Section("All Commands") { rows(matches, ranked.recent.count..<matches.count, current) }
+                    } else {
+                        rows(matches, matches.indices, current)
                     }
-                    .buttonStyle(.plain)
-                    .selectedRow(index == current)
                 }
                 .onChange(of: current) { if current >= 0 { proxy.scrollTo(current) } }
             }
         }
         .frame(width: 520, height: 360)
         .onExitCommand { dismiss() }
+    }
+
+    private func rows(_ matches: [EditorCommand], _ indices: Range<Int>, _ current: Int) -> some View {
+        ForEach(indices, id: \.self) { index in
+            let command = matches[index]
+            Button {
+                choose(command.id)
+            } label: {
+                HStack {
+                    Text(command.localizedTitle)
+                    Spacer()
+                    if let keys = commands.keyLabel(for: command.id) {
+                        Text(keys).font(.system(.caption, design: .monospaced)).foregroundStyle(.secondary)
+                    }
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .selectedRow(index == current)
+        }
+    }
+
+    private func choose(_ id: String) {
+        CommandUsage.shared.record(id)
+        run(id)
     }
 }
