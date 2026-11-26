@@ -44511,6 +44511,40 @@
         }
       }
     },
+    "The file changed on disk; nothing was changed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Datei wurde auf dem Datenträger geändert; nichts wurde geändert."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El archivo cambió en el disco; no se cambió nada."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le fichier a changé sur le disque ; rien n'a été modifié."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルがディスク上で変更されたため、何も変更されませんでした。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O arquivo mudou no disco; nada foi alterado."
+          }
+        }
+      }
+    },
     "The file has no passphrase yet": {
       "localizations": {
         "de": {
@@ -44575,6 +44609,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "O arquivo está criptografado e sua senha não é conhecida"
+          }
+        }
+      }
+    },
+    "The file keeps changing on disk; nothing was saved.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Datei ändert sich laufend auf dem Datenträger; nichts wurde gesichert."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El archivo sigue cambiando en el disco; no se guardó nada."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le fichier change sans cesse sur le disque ; rien n'a été enregistré."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルがディスク上で変更され続けているため、何も保存されませんでした。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O arquivo continua mudando no disco; nada foi salvo."
           }
         }
       }

@@ -72,6 +72,8 @@ public final class ClockModel {
 
     private func save() {
         try? FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+        // Hidden tasks that can be found only in this run aren't kept past it.
+        let history = history.filter { !$0.isSessionOnly }
         if running != nil || !history.isEmpty, let data = try? JSONEncoder().encode(Saved(running: running, history: history)) {
             try? data.write(to: file, options: .atomic)
         } else {

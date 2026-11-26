@@ -611,6 +611,19 @@ public final class DocumentSession {
         Saver(fileSystem: WriteReporting(base: fileSystem) { [weak self] url in MainActor.assumeIsolated { self?.fileWritten?(url.path) } }, recovery: recovery)
     }
 
+    /// The saver for a file that isn't open, whose state is thrown away after the save: a
+    /// version another writer put on disk just before ours, which recovery can't keep, is put
+    /// back as it was, and the change fails.
+    private var closedFileSaver: Saver {
+        var saver = saver
+        let crypt = crypt, disk = diskFileSystem
+        saver.restoreOverwritten = { url in
+            guard let theirs = crypt.takeReplaced(for: url.path) else { return }
+            _ = try disk.replace(url, with: theirs)
+        }
+        return saver
+    }
+
     private func scheduleAutosave(_ entry: Entry) {
         entry.autosave?.cancel()
         // A held file whose edits were undone, or whose tagged entries went, isn't held.
@@ -876,7 +889,7 @@ public final class DocumentSession {
     @discardableResult
     public func refile(to target: RefileTarget, from: (path: String, offset: Int)? = nil, keep: Bool = false, now: Date = Date()) -> String? {
         guard var (path, context) = source(from, now: now) else { return from == nil ? nil : "Can't read the entry's file." }
-        if target.path != path {
+        do {
             switch prepareMove(path, context: context, to: target.path) {
             case .refused(let message): return message
             case .sealed(let heading):
@@ -916,7 +929,7 @@ public final class DocumentSession {
             guard let start = target.locate(in: state) else { return "Can't find \(target.label) any more." }
             guard let result = Refile.toOtherFile(source: context, target: state.text, under: start, keep: keep) else { return "Can't refile from here." }
             try state.apply([result.target], baseRevision: state.revision)
-            if case .conflict = try saver.save(&state, to: url) { return "\(targetName) changed on disk; nothing was refiled." }
+            if case .conflict = try closedFileSaver.save(&state, to: url) { return "\(targetName) changed on disk; nothing was refiled." }
             if !keep, let message = applySource(result.source, path: path, now: now) { return message }
             return done
         } catch {
@@ -953,7 +966,7 @@ public final class DocumentSession {
             guard state.isEditable else { return .failure(.message("\(name) isn't UTF-8, so it can't be changed.")) }
             guard let (edit, start, level) = insert(into: state) else { return .failure(.message("Can't find \(parent.label) any more.")) }
             try state.apply([edit], baseRevision: state.revision)
-            if case .conflict = try saver.save(&state, to: url) { return .failure(.message("\(name) changed on disk; nothing was added.")) }
+            if case .conflict = try closedFileSaver.save(&state, to: url) { return .failure(.message("\(name) changed on disk; nothing was added.")) }
             return .success(target(start, level, FileRecord.hash(state.mergeBase)))
         } catch {
             return .failure(.message("Can't add \(title): \(error.localizedDescription)"))
@@ -1016,6 +1029,12 @@ public final class DocumentSession {
     /// passphrase; tagged entries with text in the subtree are encrypted where they are first,
     /// since the tag they inherit doesn't go with them.
     private func prepareMove(_ path: String, context: EditContext, to target: String) -> MovePreparation {
+        // Within the file, an entry keeps its own tag; one inside an encrypted entry would leave it.
+        if target == path {
+            guard crypt.sealsEntries(for: path), let heading = OrgCrypt.heading(context.text, at: context.selection.first?.lowerBound ?? 0),
+                  OrgCrypt.isInTaggedText(context.text, at: heading, tag: cryptTag) else { return .ready }
+            return .refused(String(localized: "This heading is inside an encrypted entry, so it isn't moved on its own; move the encrypted entry."))
+        }
         // The target's passphrase, lent by the source for the move, isn't kept after it.
         if Self.isEncryptedFile(target), !isOpen(target) {
             DispatchQueue.main.async { [weak self] in
@@ -1063,7 +1082,7 @@ public final class DocumentSession {
                 guard let bytes = try fileSystem.read(URL(fileURLWithPath: path)) else { return .refused("\(from) no longer exists.") }
                 var state = loaded(bytes, path: path)
                 try state.apply(edit.edits, baseRevision: state.revision)
-                if case .conflict = try saver.save(&state, to: URL(fileURLWithPath: path)) { return .refused("\(from) changed on disk; nothing was moved.") }
+                if case .conflict = try closedFileSaver.save(&state, to: URL(fileURLWithPath: path)) { return .refused("\(from) changed on disk; nothing was moved.") }
             } catch {
                 return .refused("Can't encrypt the entry: \(error.localizedDescription)")
             }
@@ -1087,8 +1106,8 @@ public final class DocumentSession {
         case .success(let value): destination = value
         case .failure(.message(let message)): return message
         }
-        if !destination.isSameFile {
-            switch prepareMove(path, context: context, to: destination.path) {
+        do {
+            switch prepareMove(path, context: context, to: destination.isSameFile ? path : destination.path) {
             case .refused(let message): return message
             case .sealed(let heading):
                 guard let again = source((path, heading), now: now) else { return "Can't read the entry's file." }
@@ -1126,7 +1145,7 @@ public final class DocumentSession {
             }
             if let archiveEdit = edits.archive {
                 try state.apply([archiveEdit], baseRevision: state.revision)
-                if case .conflict = try saver.save(&state, to: url) { return "\(url.lastPathComponent) changed on disk; nothing was archived." }
+                if case .conflict = try closedFileSaver.save(&state, to: url) { return "\(url.lastPathComponent) changed on disk; nothing was archived." }
             }
             if let message = applySource(edits.source, path: path, now: now) { return message }
             return destination.isSameFile ? "Archived under \(destination.heading ?? "the end of the file")" : "Archived to \(url.lastPathComponent)"
@@ -1196,7 +1215,7 @@ public final class DocumentSession {
             guard state.isEditable else { return .failed("\(name) isn't UTF-8, so it can't be changed.") }
             guard matches(state.text) else { return stale }
             let step = try state.run(command, selection: [offset..<offset], now: now, answers: answers, options: options)
-            if case .commit = step, state.isDirty, case .conflict = try saver.save(&state, to: url) {
+            if case .commit = step, state.isDirty, case .conflict = try closedFileSaver.save(&state, to: url) {
                 return .failed("\(name) changed on disk; nothing was changed.")
             }
             if case .commit = step { textChanged?(path) }
@@ -1239,7 +1258,7 @@ public final class DocumentSession {
             guard state.text == expected else { return stale }
             try recovery.keep(bytes, for: url, label: "replace")
             try state.apply(edits, baseRevision: state.revision)
-            if case .conflict = try saver.save(&state, to: url) { return "\(name) changed on disk; nothing was changed." }
+            if case .conflict = try closedFileSaver.save(&state, to: url) { return "\(name) changed on disk; nothing was changed." }
             textChanged?(path)
             return nil
         } catch {

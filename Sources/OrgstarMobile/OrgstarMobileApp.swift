@@ -26,6 +26,7 @@ struct OrgstarMobileApp: App {
         #endif
         LiveClock.install()
         ProStore.shared.start()
+        ClockTask.titleKey = ClockTitleKey.loadOrCreate()
         // Read before the app becomes active and clears it.
         _ = UnsavedHeldFiles.atLaunch
         // Early, so that the watch's actions are taken when iOS wakes the app for them.

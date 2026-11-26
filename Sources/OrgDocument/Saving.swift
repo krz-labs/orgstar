@@ -37,6 +37,8 @@ public enum SaveOutcome: Sendable, Equatable {
 
 public enum SaveError: Error, Equatable {
     case fileKeepsChanging
+    /// Another writer's version, replaced by ours and not kept, was put back; ours isn't on disk.
+    case otherVersionRestored
 }
 
 /// The save sequence from the design: read, merge if the file moved, check again, replace,
@@ -46,6 +48,11 @@ public struct Saver: Sendable {
     public let fileSystem: FileSystem
     public let recovery: RecoveryStore
     public var maxAttempts = 3
+    /// For a state that's thrown away after the save (a file that isn't open): puts back, as it
+    /// was, the version another writer had on disk just before ours replaced it. Set, a version
+    /// that recovery can't keep is restored and the save throws `otherVersionRestored`, rather
+    /// than merged into the state.
+    public var restoreOverwritten: (@Sendable (URL) throws -> Void)?
 
     public init(fileSystem: FileSystem, recovery: RecoveryStore) {
         self.fileSystem = fileSystem
@@ -74,7 +81,7 @@ public struct Saver: Sendable {
             let replaced = try fileSystem.replace(url, with: bytes)
             state.didWrite(bytes)
             if replaced != disk, let replaced {
-                return .overwroteExternalChange(keepOverwritten(replaced, base: disk ?? [], in: &state, url: url))
+                return .overwroteExternalChange(try keepOverwritten(replaced, base: disk ?? [], in: &state, url: url))
             }
 
             if let after = try fileSystem.read(url), after != bytes {
@@ -98,7 +105,7 @@ public struct Saver: Sendable {
         let replaced = try fileSystem.replace(url, with: bytes)
         state.didWrite(bytes)
         if let replaced, replaced != disk, replaced != base {
-            _ = keepOverwritten(replaced, base: base, in: &state, url: url, merge: false)
+            _ = try keepOverwritten(replaced, base: base, in: &state, url: url, merge: false)
         }
     }
 
@@ -106,7 +113,16 @@ public struct Saver: Sendable {
     /// recovery and, when `merge`, merged into the buffer. When recovery can't keep it (it holds
     /// text that can only be kept encrypted, without a passphrase) and it isn't merged, it goes
     /// into the buffer beside ours between conflict markers, so it's never lost.
-    func keepOverwritten(_ replaced: [UInt8], base: [UInt8], in state: inout DocumentState, url: URL, merge: Bool = true) -> DocumentState.ExternalChange {
+    func keepOverwritten(_ replaced: [UInt8], base: [UInt8], in state: inout DocumentState, url: URL, merge: Bool = true) throws -> DocumentState.ExternalChange {
+        if let restoreOverwritten {
+            do {
+                try recovery.keep(replaced, for: url, label: "external")
+                return merge ? state.mergeOverwritten(replaced, base: base) : .unchanged
+            } catch {
+                try restoreOverwritten(url)
+                throw SaveError.otherVersionRestored
+            }
+        }
         let change: DocumentState.ExternalChange = merge ? state.mergeOverwritten(replaced, base: base) : .conflict([])
         do {
             try recovery.keep(replaced, for: url, label: "external")

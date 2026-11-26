@@ -477,6 +477,7 @@ struct OrgstarApp: App {
     @State private var clock = ClockModel()
     @State private var scheduler = SystemReminderCenter.isAvailable ? ReminderScheduler(center: SystemReminderCenter()) : nil
     @State private var session: DocumentSession = {
+        ClockTask.titleKey = ClockTitleKey.loadOrCreate()
         let session = DocumentSession()
         session.defaults = Preferences.orgSettings
         // Before any window: capture and agenda edits can save before the main window opens.

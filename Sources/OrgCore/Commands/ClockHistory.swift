@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 
 // Clock history and task selection (`org-clock-history`, `org-clock-history-push`,
@@ -13,8 +14,26 @@ public struct ClockTask: Codable, Equatable, Hashable, Sendable {
     public let ordinal: Int
     public let id: String?
     /// For a task whose title is a placeholder for one that isn't kept (an encrypted
-    /// heading's): a checksum of the real title, which finds it with its ID or position.
+    /// heading's): an HMAC of the real title, which finds it with its ID or position.
     public let titleHash: String?
+
+    /// The key titles are hashed with, kept by the app; without one, a key of this run's
+    /// only, and such tasks (`isSessionOnly`) aren't kept past it.
+    nonisolated(unsafe) public static var titleKey: SymmetricKey?
+    static let sessionKey = SymmetricKey(size: .bits256)
+
+    /// `title`'s HMAC-SHA256, hex, prefixed `s:` when made with this run's key.
+    public static func titleDigest(_ title: String) -> String {
+        func hex(_ key: SymmetricKey) -> String {
+            HMAC<SHA256>.authenticationCode(for: Data(title.utf8), using: key).map { String(format: "%02x", $0) }.joined()
+        }
+        if let titleKey { return hex(titleKey) }
+        return "s:" + hex(sessionKey)
+    }
+
+    /// Whether the task can be found only in this run: hidden, without an ID, hashed with this
+    /// run's key.
+    public var isSessionOnly: Bool { id == nil && titleHash?.hasPrefix("s:") == true }
 
     public init(path: String, title: String, ordinal: Int, id: String?, titleHash: String? = nil) {
         self.path = path
@@ -37,7 +56,7 @@ public struct ClockTask: Codable, Equatable, Hashable, Sendable {
     public func index(in model: DocumentModel) -> Int? {
         if let id, let index = model.headings.firstIndex(where: { $0.id == id }) { return index }
         if let titleHash {
-            func matches(_ index: Int) -> Bool { OrgCrypt.checksum(model.headings[index].title) == titleHash }
+            func matches(_ index: Int) -> Bool { Self.titleDigest(model.headings[index].title) == titleHash }
             if ordinal < model.headings.count, matches(ordinal) { return ordinal }
             return model.headings.indices.first(where: matches)
         }
@@ -62,7 +81,7 @@ public struct ClockTask: Codable, Equatable, Hashable, Sendable {
     /// The task with `placeholder` for its title, or as it is with nil.
     public func hiding(_ placeholder: String?) -> ClockTask {
         guard let placeholder else { return self }
-        return ClockTask(path: path, title: placeholder, ordinal: ordinal, id: id, titleHash: titleHash ?? OrgCrypt.checksum(title))
+        return ClockTask(path: path, title: placeholder, ordinal: ordinal, id: id, titleHash: titleHash ?? Self.titleDigest(title))
     }
 }
 

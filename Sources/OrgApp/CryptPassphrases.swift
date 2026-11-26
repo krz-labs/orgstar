@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 import LocalAuthentication
 import OrgDocument
@@ -147,6 +148,38 @@ public enum CryptPassphrases {
     }
 }
 
+/// The key clock history hashes encrypted headings' titles with, made once and kept in the
+/// Keychain, on this device only, without asking for authentication.
+public enum ClockTitleKey {
+    static let service = "sh.krz.orgstar.clock-title-key"
+
+    static func query(dataProtection: Bool) -> [String: Any] {
+        var query: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service, kSecAttrAccount as String: "key"]
+        if dataProtection { query[kSecUseDataProtectionKeychain as String] = true }
+        return query
+    }
+
+    /// The key, made and kept the first time; nil when the Keychain keeps none.
+    public static func loadOrCreate() -> SymmetricKey? {
+        for dataProtection in [true, false] {
+            var q = query(dataProtection: dataProtection)
+            q[kSecReturnData as String] = true
+            var result: AnyObject?
+            if SecItemCopyMatching(q as CFDictionary, &result) == errSecSuccess, let data = result as? Data, data.count == 32 { return SymmetricKey(data: data) }
+        }
+        let key = SymmetricKey(size: .bits256)
+        let data = key.withUnsafeBytes { Data($0) }
+        for dataProtection in [true, false] {
+            var item = query(dataProtection: dataProtection)
+            item[kSecValueData as String] = data
+            item[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+            item[kSecAttrLabel as String] = "orgstar: clock history key"
+            if SecItemAdd(item as CFDictionary, nil) == errSecSuccess { return key }
+        }
+        return nil
+    }
+}
+
 extension CryptHold {
     /// Whether giving the passphrase lets the file be saved.
     public var takesPassphrase: Bool {
@@ -162,6 +195,15 @@ extension CryptHold {
         case .entries(let count): String(localized: "\(count) tagged entries aren't encrypted. Changes to \(name) aren't saved until they are.")
         case .file: String(localized: "\(name) isn't saved until it has a passphrase.")
         case .blocked(let reason): reason + ". " + String(localized: "Changes to \(name) aren't saved until that's fixed.")
+        }
+    }
+}
+
+extension SaveError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .fileKeepsChanging: String(localized: "The file keeps changing on disk; nothing was saved.")
+        case .otherVersionRestored: String(localized: "The file changed on disk; nothing was changed.")
         }
     }
 }

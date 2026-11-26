@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 import OrgCore
 import OrgDocument
@@ -134,6 +135,96 @@ struct CryptReviewTests {
         let b = offset(of: "* B")
         #expect(session.refusesSubtreeShare(file.path, at: b)?.contains("public key") == true)
         #expect(session.subtreeShare(file.path, at: b) == nil)
+    }
+
+    // Final check, 1
+    @Test func closedFilesPutBackAVersionTheyCantKeep() throws {
+        let files = InjectingFileSystem()
+        let session = DocumentSession(fileSystem: files, recovery: FileRecoveryStore(directory: recoveryFolder))
+        session.encryptsTaggedEntries = true
+        session.hasStoredPassphrase = { _ in false }
+        let theirs = "* B\nb\n* Emacs :crypt:\nemacs secret\n* Work\nEMACSWORK\n"
+        let b = try notes.write("b.org", "* B\nb\n")
+        func check(_ message: String?, _ what: String) {
+            #expect(message?.contains("changed on disk") == true, "\(what): \(String(describing: message))")
+            #expect(read(b) == theirs, "\(what)")
+            #expect(recoveryFiles.allSatisfy { !$0.contains("emacs secret") }, "\(what)")
+            try? notes.write("b.org", "* B\nb\n")
+        }
+        // Replace in Files.
+        files.inject[b.path] = theirs
+        check(session.applyChanges([TextEdit(range: 4..<5, replacement: "c")], to: b.path, expecting: "* B\nb\n"), "replace")
+        // Agenda actions, the clock and capture run commands on the file.
+        files.inject[b.path] = theirs
+        if case .failed(let message) = session.perform(PrecomputedEdit(EditResult(baseRevision: 0, edits: [TextEdit(range: 4..<5, replacement: "c")])), path: b.path, at: 0, expect: nil) {
+            check(message, "perform")
+        } else {
+            Issue.record("perform succeeded")
+        }
+        // Refile into it, and a new heading under its heading.
+        try notes.write("a.org", "* Moved\nmoved text\n")
+        session.open(file.path)
+        files.inject[b.path] = theirs
+        let target = RefileTarget(label: "b.org", path: b.path, start: nil, title: "", level: 0, contentHash: "")
+        check(session.refile(to: target, from: (file.path, 0)), "refile")
+        #expect(disk == "* Moved\nmoved text\n")
+        files.inject[b.path] = theirs
+        if case .failure(.message(let message)) = session.createRefileChild(under: target, title: "New") { check(message, "child") } else { Issue.record("child added") }
+        // Archive into it.
+        try notes.write("a.org", "#+ARCHIVE: b.org::\n* Old\nold text\n")
+        session.kill(file.path)
+        session.open(file.path)
+        files.inject[b.path] = theirs
+        check(session.archive(from: (file.path, 19)), "archive")
+        // An open file merges it as before.
+        session.open(b.path)
+        let buffer = StateBuffer(session.document(of: b.path)!)
+        session.attach(buffer, for: b.path)
+        try buffer.update { try $0.apply([TextEdit(range: 0..<0, replacement: "x")], baseRevision: $0.revision) }
+        session.bufferChanged(b.path)
+        files.inject[b.path] = theirs
+        _ = session.save(b.path)
+        #expect(session.document(of: b.path)?.text.contains("EMACSWORK") == true)
+    }
+
+    // Final check, 2
+    @Test func sameFileMovesDontTakeAHeadingOutOfItsEntry() throws {
+        let text = "#+ARCHIVE: ::* Archive\n* Parent :crypt:\nparent text\n** SECRETTITLE child\nchild secret\n* Last\n"
+        try notes.write("a.org", text)
+        session.open(file.path)
+        session.cryptUsed("pw", for: file.path)
+        let child = (text as NSString).range(of: "** SECRETTITLE").location
+        let target = RefileTarget(label: "a.org", path: file.path, start: nil, title: "", level: 0, contentHash: "")
+        #expect(session.refile(to: target, from: (file.path, child))?.contains("inside an encrypted entry") == true)
+        #expect(session.archive(from: (file.path, child))?.contains("inside an encrypted entry") == true)
+        #expect(session.document?.text == text)
+        // An entry not inside one moves as before.
+        #expect(session.refile(to: target, from: (file.path, (text as NSString).range(of: "* Last").location)) != nil)
+    }
+
+    // Final check, 3
+    @Test func hiddenTitlesAreHashedWithAKey() throws {
+        ClockTask.titleKey = nil
+        let session = ClockTask(path: "/x", title: "Real", ordinal: 0, id: nil).hiding("Encrypted entry")
+        #expect(session.isSessionOnly && session.titleHash != OrgCrypt.checksum("Real"))
+        #expect(session.locate(in: "* Real\n") == 0)
+        let key = SymmetricKey(size: .bits256)
+        ClockTask.titleKey = key
+        defer { ClockTask.titleKey = nil }
+        let kept = ClockTask(path: "/x", title: "Real", ordinal: 0, id: nil).hiding("Encrypted entry")
+        #expect(!kept.isSessionOnly && kept.titleHash != OrgCrypt.checksum("Real") && kept.locate(in: "* Real\n") == 0)
+        // Hidden tasks that can be found only in this run aren't written to the clock's file.
+        ClockTask.titleKey = nil
+        let text = "* Bank :crypt:\nintro\n** Secret task\nbody\n"
+        try notes.write("a.org", text)
+        self.session.open(file.path)
+        self.session.cryptUsed("pw", for: file.path)
+        let clockFile = notes.url.appendingPathComponent("clock.json")
+        let clock = ClockModel(file: clockFile)
+        _ = clock.clockIn(self.session, path: file.path, at: (text as NSString).range(of: "** Secret").location)
+        _ = clock.clockOut(self.session)
+        #expect(clock.history.count == 1)
+        #expect(!read(clockFile).contains("s:"))
     }
 
     // Third review, C
@@ -378,5 +469,18 @@ struct CryptReviewTests {
         #expect(item[kSecUseDataProtectionKeychain as String] as? Bool == true)
         #expect(item[kSecAttrService as String] as? String == "sh.krz.orgstar.crypt.v2")
         #expect(item[kSecAttrAccessible as String] == nil)
+    }
+}
+
+/// The disk, with another writer that puts `inject[path]` in place just before a replace.
+final class InjectingFileSystem: FileSystem, @unchecked Sendable {
+    let base = CoordinatedFileSystem(writesInPlaceWhenDenied: false)
+    var inject: [String: String] = [:]
+
+    func read(_ url: URL) throws -> [UInt8]? { try base.read(url) }
+
+    func replace(_ url: URL, with bytes: [UInt8]) throws -> [UInt8]? {
+        if let text = inject.removeValue(forKey: url.path) { try Data(text.utf8).write(to: url) }
+        return try base.replace(url, with: bytes)
     }
 }
