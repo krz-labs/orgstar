@@ -74,6 +74,9 @@ To hide folders with a Focus, add orgstar's Hide Folders filter to the Focus in 
 
 The default view is =org-agenda-list=: a run of days, each under a header with its date, such as =Monday 5 October= (with the year when it isn't the current year). Today, tomorrow and yesterday are named before the date: =Today · Thursday 8 October=. Today's header is in the =agenda-today= color and days before today are grey. Each header stays at the top of the window while you scroll through its day.
 
+#+CAPTION: The agenda window on the Mac: today's timed entries on the time grid, then scheduled entries and upcoming deadlines.
+[[file:../images/mac-agenda.png]]
+
 | Setting                      | Default | =config.toml=                     | Range in Settings |
 |------------------------------+---------+-----------------------------------+-------------------|
 | Days shown                   | 10      | =org-agenda-span = 10=            | 1 to 366          |

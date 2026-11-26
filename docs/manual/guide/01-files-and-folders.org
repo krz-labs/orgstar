@@ -11,6 +11,9 @@ orgstar has one main window, titled with the name of the buffer it shows. From l
 - the *editor*, with the optional tab bar above it and the modeline and echo area below it;
 - the *inspector*, hidden by default, showing column view and clocked time.
 
+#+CAPTION: The main window: the sidebar, the outline pane with the backlinks pane under it, and the editor with the modeline.
+[[file:../images/mac-window.png]]
+
 The toolbar holds a button that shows or hides the outline pane; Capture, Agenda and Commands (the command palette) buttons; a button that shows or hides the inspector; a progress indicator while orgstar indexes your folders, the running clock (see [[file:06-dates-and-clocking.org][Dates and clocking]]), a =Conflict= button when the open file has a conflict (see /Conflicts/ below), and the search field. View ▸ Customize Toolbar… adds, removes and moves the buttons.
 
 Help ▸ orgstar Manual opens this manual on the web, and Help ▸ Keys its key reference.

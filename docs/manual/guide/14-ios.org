@@ -125,6 +125,10 @@ Table columns with width cookies narrow as on the Mac: =#+STARTUP: shrink= narro
 
 A bar above the on-screen keyboard has buttons for Org's keys. Each does what its Emacs key does at the caret, so the arrows promote and demote headings, indent list items, or move table columns, depending on where the caret is. Scroll the bar sideways for more. Its buttons are at least 44 points high and grow with the text size up to the second accessibility size.
 
+#+CAPTION: The iPhone editor with the key bar above the keyboard.
+#+ATTR_HTML: :width 368
+[[file:../images/ios-editor.png]]
+
 | Button               | Key         |
 |----------------------+-------------|
 | Commands             | the command list |
