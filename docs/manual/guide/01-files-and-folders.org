@@ -356,6 +356,75 @@ When the entry or an entry under it has attachments, Include attachments sends e
 
 An encrypted entry (=:crypt:=) is shared as the file holds it, still encrypted.
 
+* Importing Markdown and Obsidian
+
+File ▸ Import ▸ Markdown Files… and File ▸ Import ▸ Obsidian Vault… (also in the command palette) convert Markdown to new org files in one of your folders. The source is only read.
+
+1. Choose the source: Markdown files or folders of them (=.md=, =.markdown=), or a vault's folder.
+2. Choose the folder to import into from the folders in the sidebar and the folders inside them.
+3. The preview counts the files, headings, links and attachments, lists names that were already taken, and lists what couldn't be converted or was converted with a loss. Import writes the files; Cancel writes nothing.
+
+Where files go:
+
+- A chosen file becomes =name.org= in the folder.
+- A chosen folder or vault becomes a new folder of the same name, with each note at the same path inside it. Hidden files and folders (=.obsidian=, =.trash=) are skipped.
+- An existing file or folder is never replaced. A name already taken gets a number: =note 2.org=, =Vault 2=. The preview lists these; if a name is taken between the preview and Import, the message after the import lists it too.
+- Files a note links to or embeds (images, PDFs) are copied: a folder's at the same path inside the new folder, so a vault's attachment folder is kept; a chosen file's into =attachments= in the folder. Files nothing links to are not copied.
+- Each file is written to a temporary name and renamed into place, so a file is there whole or not at all.
+
+The conversion reads files in the background; a vault of 1,000 notes takes a few seconds.
+
+** What is converted
+
+| Markdown                                     | Org                                                       |
+|----------------------------------------------+-----------------------------------------------------------|
+| =#= headings and underlined headings         | =*= headings, the same level                              |
+| =**bold**=, =*italic*=, =~~strike~~=, =`code`= | =*bold*=, =/italic/=, =+strike+=, =~code~= (verbatim when the code holds a tilde) |
+| =[text](url)=, reference links, =<url>=      | =[[url][text]]=                                           |
+| =![alt](image.png)=                          | =[[file:image.png]]=; on its own line, with =#+attr_html: :alt alt= |
+| lists, nested, numbered, =- [ ]= tasks       | org lists; a list starting at 3 gets =[@3]=; =[x]= is =[X]=, =[/]= is =[-]= |
+| =>= quotes                                   | =#+begin_quote= blocks                                    |
+| fenced code with a language                  | =#+begin_src lang=; without one, and indented code, =#+begin_example= |
+| tables                                       | org tables; an escaped pipe in a cell becomes =\vert{}=    |
+| =[^1]= footnotes                             | =[fn:1]=, the definitions at the end of the file          |
+| =$$…$$= and =$…$=                            | =\[…\]= and =\(…\)=                                       |
+| HTML blocks, =<!-- -->=                      | =#+begin_export html=, =#+begin_comment=                  |
+| two trailing spaces or =\= at a line's end   | =\\=                                                      |
+
+YAML front matter becomes the top of the file:
+
+- =title= → =#+title:=; =date= → =#+date:=; =tags= → =#+filetags:=.
+- =aliases= → =ROAM_ALIASES= in a property drawer at the top of the file.
+- Every other key → a property in that drawer, under its own name. A list becomes space-separated values, quoted when they contain spaces, as org's multivalued properties are.
+
+Tag characters org doesn't allow, such as =/= and =-=, become =_=: =work/meetings= is =work_meetings=.
+
+Obsidian vaults also get:
+
+- =[[Note]]= and =[[Note|text]]= → =file:= links to the converted file, relative to the file holding the link. A note is found by name anywhere in the vault, as Obsidian does; the shortest path wins. =file:= links rather than =id:= links, so no =ID= properties are added and the links work in Emacs without an ID database.
+- =[[Note#Heading]]= → =file:Note.org::*Heading=; =[[Note#^id]]= → =file:Note.org::id=, with the block's =^id= written as the target =<<id>>=; =[[#Heading]]= → =[[*Heading]]=.
+- =![[image.png]]= → =[[file:…/image.png]]=, shown as an image; =![[image.png|300]]= on its own line adds =#+attr_org: :width 300=. Other embedded files and embedded notes → links.
+- =#tags= in the text stay as text and are added as tags: to the heading whose section they are in, or to =#+filetags:= before the first heading. Tags at the end of a heading line move to its tags.
+- => [!note] Title= callouts → =#+begin_note= special blocks with the title as a bold first line. =example= and other names org reserves get =callout-= in front: =#+begin_callout-example=.
+- The Tasks plugin's =📅 date=, =⏳ date= and =✅ date= → =DEADLINE: <date>=, =SCHEDULED: <date>= and =CLOSED: [date]= in the item's text; =🛫= and =➕= dates → timestamps. The agenda shows them as timestamps on that day, not as deadlines, since only headings have planning lines in org.
+- Highlights (two equals signs on each side) → bold; =%% comments %%= on their own lines → =#+begin_comment=.
+- A note without a =title= gets the file name as =#+title:=.
+
+** Not supported
+
+- Wikilinks to notes that don't exist are written as links to where the note would be (=file:Missing.org=) and listed in the preview.
+- Links to Markdown files not among those imported keep their =.md= path and are listed.
+- Canvas (=.canvas=) and base (=.base=) files are skipped and listed.
+- Front matter keys holding a nested map are left out and listed.
+- Tasks plugin recurrences (=🔁=) stay as text; custom task statuses other than =x= and =/= become open checkboxes; both are listed.
+- Headings inside a list or quote become bold lines.
+- Table column alignment, link titles and image alt text inside paragraphs are dropped.
+- Emphasis inside a word (=foo**bar**baz=) is converted, but org shows it as emphasis only next to spaces or punctuation.
+- Text that org reads as markup, such as a word between slashes, may show as emphasis.
+- Inline HTML is kept as =@@html:…@@=; Obsidian's inline =%%comments%%= stay as text.
+- Files that aren't UTF-8 are skipped and listed.
+- Importing is on the Mac only.
+
 * Encodings and line endings
 
 orgstar edits UTF-8 files, with or without a byte order mark.

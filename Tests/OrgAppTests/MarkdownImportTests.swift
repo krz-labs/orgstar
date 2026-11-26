@@ -128,8 +128,8 @@ struct MarkdownImportTests {
 
         let plan = try MarkdownImport.plan(.markdown, sources: [source.appendingPathComponent("Vault"), source.appendingPathComponent("a.md"),
                                                                  source.appendingPathComponent("b.markdown")], into: destination)
-        #expect(plan.renamed.map(\.to) == ["Vault 2", "a 2.org"])
-        #expect(plan.renamed.map(\.from) == ["Vault", "a.md"])
+        #expect(plan.renamed.map(\.to) == ["Vault 2", "a 2.org", "attachments/pic 2.png"])
+        #expect(plan.renamed.map(\.from) == ["Vault", "a.md", "pic.png"])
         let written = try MarkdownImport.write(plan)
         #expect(written.renamed.isEmpty)
         #expect(try read("Vault 2/Note.org") == "* Hi\n")

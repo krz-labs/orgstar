@@ -39,8 +39,6 @@ public enum MarkdownImportIssue: Hashable, Sendable {
     case taskStatus(String)
     /// A heading inside a list or quote, written as a bold line.
     case nestedHeading(String)
-    /// An attachment that couldn't be read.
-    case attachment(String)
 }
 
 /// Converts a Markdown file (CommonMark with GFM tables, task lists, strikethrough and

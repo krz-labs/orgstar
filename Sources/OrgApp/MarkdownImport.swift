@@ -182,6 +182,7 @@ public enum MarkdownImport {
                 plan.outputs.append(Plan.Output(top: top, inner: relative, content: .copy(source)))
             case .loose(let name):
                 takenAttachments.insert(name.lowercased())
+                if name != source.lastPathComponent { plan.renamed.append((source.lastPathComponent, "attachments/" + name)) }
                 plan.outputs.append(Plan.Output(top: attachmentsTop, inner: name, content: .copy(source)))
             }
             plan.attachments += 1

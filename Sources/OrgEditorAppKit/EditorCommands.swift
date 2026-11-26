@@ -106,6 +106,8 @@ public enum EditorCommands {
         EditorCommand(id: "app.toggle-markup", title: "Show or Hide Markup", action: .app),
         EditorCommand(id: "app.edit-config", title: "Edit Config File", action: .app),
         EditorCommand(id: "app.import-emacs", title: "Import from Emacs…", action: .app),
+        EditorCommand(id: "app.import-markdown", title: "Import Markdown Files…", action: .app),
+        EditorCommand(id: "app.import-obsidian", title: "Import Obsidian Vault…", action: .app),
         EditorCommand(id: "app.toggle-line-numbers", title: "Show or Hide Line Numbers", action: .app),
         EditorCommand(id: "app.quick-open", title: "Quick Open…", action: .app),
         EditorCommand(id: "app.palette", title: "Command Palette…", action: .app),

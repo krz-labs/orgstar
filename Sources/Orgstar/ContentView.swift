@@ -128,6 +128,7 @@ struct ContentView: View {
     /// The outline for a file that isn't org, off until asked for.
     @State private var plainOutlineShown = false
     @State private var showingImport = false
+    @State private var markdownImport: MarkdownImportKind?
     @State private var showingTemplate = false
     /// Replace in Files, Rename Tag or Rename TODO Keyword, with the text to start from.
     @State private var replacing: (kind: ReplaceKind, initial: String)?
@@ -418,6 +419,9 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)) { _ in defaultsChanges += 1 }
         .onChange(of: preset, initial: true) { loadKeymap() }
         .sheet(isPresented: $showingImport) { EmacsImportView(workspace: workspace) }
+        .sheet(item: $markdownImport) { kind in
+            MarkdownImportSheet(kind: kind.kind, workspace: workspace, folder: session.path.map { ($0 as NSString).deletingLastPathComponent }) { commands.show($0) }
+        }
         .sheet(isPresented: $showingTemplate) {
             TemplateSheet(workspace: workspace, folder: session.path.map { ($0 as NSString).deletingLastPathComponent }) { selectedFile = $0 }
         }
@@ -1447,6 +1451,8 @@ struct ContentView: View {
         case "app.toggle-markup": showMarkup.toggle()
         case "app.toggle-line-numbers": showLineNumbers.toggle()
         case "app.import-emacs": showingImport = true
+        case "app.import-markdown": markdownImport = .markdown
+        case "app.import-obsidian": markdownImport = .obsidian
         case "app.new-file-from-template": showingTemplate = true
         case "app.replace-in-files", "app.rename-tag", "app.rename-todo-keyword":
             replacing = ReplaceKind(command: id).map { ($0, replaceInitial(for: $0)) }

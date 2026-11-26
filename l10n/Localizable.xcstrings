@@ -4065,6 +4065,41 @@
         }
       }
     },
+    "A task's 🔁 recurrence is kept as text.": {
+      "comment": "Markdown import problem",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die 🔁-Wiederholung einer Aufgabe bleibt als Text erhalten."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La repetición 🔁 de una tarea se conserva como texto."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La récurrence 🔁 d’une tâche est conservée comme texte."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "タスクの🔁繰り返しはテキストのまま残ります。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A recorrência 🔁 de uma tarefa é mantida como texto."
+          }
+        }
+      }
+    },
     "A template's key in capture.toml; the first template when empty.": {
       "localizations": {
         "de": {
@@ -5797,6 +5832,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Permita que o orgstar leia seus lembretes em Ajustes do Sistema ▸ Privacidade e Segurança ▸ Lembretes."
+          }
+        }
+      }
+    },
+    "Already in the folder, so imported under another name:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schon im Ordner vorhanden, daher unter anderem Namen importiert:"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ya están en la carpeta, así que se importan con otro nombre:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Déjà présents dans le dossier, donc importés sous un autre nom :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フォルダにすでにあるため、別の名前で読み込みます:"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Já estão na pasta, então são importados com outro nome:"
           }
         }
       }
@@ -8836,6 +8905,41 @@
         }
       }
     },
+    "Canvas and base files have no org equivalent; not imported.": {
+      "comment": "Markdown import problem",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canvas- und Base-Dateien haben keine Entsprechung in Org; nicht importiert."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los archivos canvas y base no tienen equivalente en org; no se importaron."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les fichiers canvas et base n’ont pas d’équivalent org ; non importés."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "canvasとbaseファイルにはorgの対応物がないため、読み込みませんでした。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arquivos canvas e base não têm equivalente em org; não importados."
+          }
+        }
+      }
+    },
     "Capture": {
       "localizations": {
         "de": {
@@ -10072,6 +10176,41 @@
         }
       }
     },
+    "Choose Markdown files, or folders of them.": {
+      "comment": "Open panel for importing Markdown files",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle Markdown-Dateien oder Ordner mit Markdown-Dateien."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige archivos Markdown o carpetas que los contengan."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez des fichiers Markdown ou des dossiers qui en contiennent."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdownファイル、またはそれを含むフォルダを選択してください。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escolha arquivos Markdown ou pastas que os contenham."
+          }
+        }
+      }
+    },
     "Choose a Plan": {
       "localizations": {
         "de": {
@@ -10309,6 +10448,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Escolha a pasta neste dispositivo para cada uma. As pastas não escolhidas não são adicionadas."
+          }
+        }
+      }
+    },
+    "Choose the vault's folder.": {
+      "comment": "Open panel for importing an Obsidian vault",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle den Ordner des Vaults."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige la carpeta de la bóveda."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez le dossier du coffre."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保管庫のフォルダを選択してください。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escolha a pasta do cofre."
           }
         }
       }
@@ -17279,6 +17453,40 @@
         }
       }
     },
+    "Everything can be converted.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alles kann umgewandelt werden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todo se puede convertir."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout peut être converti."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "すべて変換できます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tudo pode ser convertido."
+          }
+        }
+      }
+    },
     "Exclude archived tasks": {
       "localizations": {
         "de": {
@@ -20273,6 +20481,41 @@
         }
       }
     },
+    "Front matter %@ holds a nested map and was left out.": {
+      "comment": "Markdown import problem",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Front Matter %@ enthält eine verschachtelte Zuordnung und wurde ausgelassen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El front matter %@ contiene un mapa anidado y se omitió."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le front matter %@ contient une table imbriquée et a été omis."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フロントマターの %@ は入れ子のマップのため省きました。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O front matter %@ contém um mapa aninhado e foi omitido."
+          }
+        }
+      }
+    },
     "General": {
       "localizations": {
         "de": {
@@ -21204,6 +21447,41 @@
         }
       }
     },
+    "Heading %@ inside a list or quote became a bold line.": {
+      "comment": "Markdown import problem",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Überschrift %@ in einer Liste oder einem Zitat wurde zu einer fetten Zeile."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El encabezado %@ dentro de una lista o cita pasó a ser una línea en negrita."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le titre %@ dans une liste ou une citation est devenu une ligne en gras."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リストまたは引用内の見出し %@ は太字の行になりました。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O título %@ dentro de uma lista ou citação virou uma linha em negrito."
+          }
+        }
+      }
+    },
     "Headings": {
       "localizations": {
         "de": {
@@ -21855,6 +22133,144 @@
         }
       }
     },
+    "Import Markdown Files": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown-Dateien importieren"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importar archivos Markdown"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importer des fichiers Markdown"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdownファイルを読み込む"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importar arquivos Markdown"
+          }
+        }
+      }
+    },
+    "Import Markdown Files…": {
+      "comment": "Command title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown-Dateien importieren …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importar archivos Markdown…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importer des fichiers Markdown…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdownファイルを読み込む…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importar arquivos Markdown…"
+          }
+        }
+      }
+    },
+    "Import Obsidian Vault": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obsidian-Vault importieren"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importar bóveda de Obsidian"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importer un coffre Obsidian"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obsidian保管庫を読み込む"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importar cofre do Obsidian"
+          }
+        }
+      }
+    },
+    "Import Obsidian Vault…": {
+      "comment": "Command title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obsidian-Vault importieren …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importar bóveda de Obsidian…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importer un coffre Obsidian…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obsidian保管庫を読み込む…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importar cofre do Obsidian…"
+          }
+        }
+      }
+    },
     "Import Table from File…": {
       "comment": "Command title",
       "localizations": {
@@ -21955,6 +22371,75 @@
           "stringUnit": {
             "state": "translated",
             "value": "Importar do Emacs…"
+          }
+        }
+      }
+    },
+    "Import into": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importieren in"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importar en"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importer dans"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "読み込み先"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importar em"
+          }
+        }
+      }
+    },
+    "Imported %lld files and %lld attachments.": {
+      "comment": "Message after a Markdown import",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Dateien und %lld Anhänge importiert."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se importaron %lld archivos y %lld adjuntos."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld fichiers et %lld pièces jointes importés."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 個のファイルと %lld 個の添付ファイルを読み込みました。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld arquivos e %lld anexos importados."
           }
         }
       }
@@ -25214,6 +25699,110 @@
         }
       }
     },
+    "Link to %@, which isn't among the files imported.": {
+      "comment": "Markdown import problem",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Link auf %@, das nicht unter den importierten Dateien ist."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enlace a %@, que no está entre los archivos importados."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lien vers %@, qui ne fait pas partie des fichiers importés."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ へのリンク。読み込むファイルに含まれていません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Link para %@, que não está entre os arquivos importados."
+          }
+        }
+      }
+    },
+    "Link to %@: no such heading or block, so the link goes to the file.": {
+      "comment": "Markdown import problem",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Link auf %@: Diese Überschrift oder diesen Block gibt es nicht, daher führt der Link zur Datei."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enlace a %@: no existe ese encabezado o bloque, así que el enlace lleva al archivo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lien vers %@ : ce titre ou ce bloc n’existe pas, le lien mène donc au fichier."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ へのリンク：その見出しまたはブロックがないため、リンク先はファイルになります。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Link para %@: esse título ou bloco não existe, então o link leva ao arquivo."
+          }
+        }
+      }
+    },
+    "Links": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Links"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enlaces"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Liens"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リンク"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Links"
+          }
+        }
+      }
+    },
     "Links and Footnotes": {
       "comment": "Org menu submenu",
       "localizations": {
@@ -26138,6 +26727,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Marcar como Tarefa Padrão de Registro de Tempo"
+          }
+        }
+      }
+    },
+    "Markdown Files…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown-Dateien …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archivos Markdown…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fichiers Markdown…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdownファイル…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arquivos Markdown…"
           }
         }
       }
@@ -28033,6 +28656,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nova Janela"
+          }
+        }
+      }
+    },
+    "New files only: nothing in the folder or the source is changed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur neue Dateien: Im Ordner und in der Quelle wird nichts geändert."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solo archivos nuevos: no se cambia nada en la carpeta ni en el origen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nouveaux fichiers uniquement : rien n’est modifié dans le dossier ni dans la source."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新しいファイルのみ：フォルダと読み込み元は変更されません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apenas arquivos novos: nada na pasta ou na origem é alterado."
           }
         }
       }
@@ -30480,6 +31137,41 @@
         }
       }
     },
+    "Not UTF-8 text; not imported.": {
+      "comment": "Markdown import problem",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kein UTF-8-Text; nicht importiert."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No es texto UTF-8; no se importó."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Texte non UTF-8 ; non importé."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "UTF-8のテキストではないため、読み込みませんでした。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é texto UTF-8; não importado."
+          }
+        }
+      }
+    },
     "Not a command here; the key bar skips it.": {
       "localizations": {
         "de": {
@@ -30647,6 +31339,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sem registro de tempo"
+          }
+        }
+      }
+    },
+    "Not converted, or converted with a loss (%lld):": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht oder mit Verlust umgewandelt (%lld):"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sin convertir o convertido con pérdidas (%lld):"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non converti ou converti avec une perte (%lld) :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "変換できなかったもの、または一部失われたもの（%lld）:"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não convertido ou convertido com perda (%lld):"
           }
         }
       }
@@ -31027,6 +31753,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Notas"
+          }
+        }
+      }
+    },
+    "Nothing chosen yet.": {
+      "comment": "Markdown import with no source chosen",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch nichts ausgewählt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aún no se ha elegido nada."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien n’a encore été choisi."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "まだ何も選択されていません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada escolhido ainda."
           }
         }
       }
@@ -31573,6 +32334,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "OK"
+          }
+        }
+      }
+    },
+    "Obsidian Vault…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obsidian-Vault …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bóveda de Obsidian…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coffre Obsidian…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obsidian保管庫…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cofre do Obsidian…"
           }
         }
       }
@@ -35784,6 +36579,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Somente leitura: não é UTF-8"
+          }
+        }
+      }
+    },
+    "Reading…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lesen …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leyendo…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lecture…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "読み込み中…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lendo…"
           }
         }
       }
@@ -45563,6 +46392,41 @@
         }
       }
     },
+    "Taken since the preview, so renamed: %@.": {
+      "comment": "Message after a Markdown import",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seit der Vorschau belegt, daher umbenannt: %@."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ocupados desde la vista previa, así que se renombraron: %@."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pris depuis l’aperçu, donc renommés : %@."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プレビュー後に使用されたため名前を変更しました: %@。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ocupados desde a pré-visualização, então renomeados: %@."
+          }
+        }
+      }
+    },
     "Tangle Block": {
       "comment": "Command title",
       "localizations": {
@@ -45698,6 +46562,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Toque para editar"
+          }
+        }
+      }
+    },
+    "Task status [%@] became an open checkbox.": {
+      "comment": "Markdown import problem",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aufgabenstatus [%@] wurde zu einem offenen Kontrollkästchen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El estado de tarea [%@] pasó a ser una casilla abierta."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le statut de tâche [%@] est devenu une case à cocher ouverte."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "タスクの状態 [%@] は未完了のチェックボックスになりました。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O status de tarefa [%@] virou uma caixa de seleção aberta."
           }
         }
       }

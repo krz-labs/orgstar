@@ -643,6 +643,10 @@ struct OrgstarApp: App {
                         Button(command.localizedTitle) { commands.run(command.id) }
                     }
                 }
+                Menu("Import") {
+                    Button("Markdown Files…") { commands.run("app.import-markdown") }
+                    Button("Obsidian Vault…") { commands.run("app.import-obsidian") }
+                }
                 Divider()
                 Button("Revert to File on Disk") { commands.run("app.revert") }
                     .disabled(session.path == nil)
