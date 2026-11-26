@@ -164,6 +164,12 @@ When the buttons don't fit the width, the bar shows as many as fit, in order, an
 
 While a snippet's fields are filled in, Previous Snippet Field and Next Snippet Field take the places of Promote and Demote, so the fields work without a hardware keyboard; Promote and Demote come back when the snippet ends. A bar without Promote or Demote shows the field buttons first.
 
+*** Suggestions
+
+While completion has candidates at the caret, the bar shows them in place of its buttons, as the system's QuickType bar does: the candidates the completion list would show, in its order, each with what the list adds after it, such as a snippet's name (with a snippet symbol) or a template's block. Tap one to insert it as choosing it from the list does; a snippet expands. The suggestions scroll sideways when they don't fit; the × at the end stays in place and puts them away, bringing the buttons back until the word is finished or Complete at Point is run again. The row is as tall as the buttons and follows the text size the same way.
+
+Suggestions appear when the list would open by itself (Settings ▸ Completion, with its pause and minimum length) and on Complete at Point in Commands. They take the list's place while the on-screen keyboard is used, on iPhone and iPad; with a hardware keyboard the list opens at the caret instead, so its keys move through it, and the bar keeps its buttons.
+
 ** Commands
 
 Commands, in the key bar and in the toolbar of the editor, the reader and the agenda, lists the commands of the screen. With nothing typed, the ten you ran from Commands most recently come first under Recent, then every command by subject, in the Org menu's groups (Visibility, Headings, TODO and Tags, and so on) followed by Clock, Export, File, Edit and View. Type to search: the letters you type must appear in the title in order, as in the Mac's command palette, and commands you run often rank a little higher. The command runs once the list closes.
@@ -222,7 +228,7 @@ See [[file:03-keys.org][Keys and commands]] for the Emacs bindings.
 
 ** Completion
 
-With a hardware keyboard, Complete at Point (=C-M-i=, or =C-SPC= in Doom's insert state), Expand Word (=M-/=, or =F5= with the Mac keys) and Complete Word (=C-M-/=, or =C-n= and =C-p= in Doom's insert state) work as on the Mac; see [[file:02-the-editor.org][The editor]]. The list shows up to 8 rows under the caret; the keys move through it as on the Mac, and tapping a row inserts it. The settings in Settings ▸ Completion are the Mac's: whether the list opens by itself, after which pause and how many characters, prefix or fuzzy matching, and words in the list. With them on, the list also opens as you type on the on-screen keyboard, where tapping a row is the way to choose.
+With a hardware keyboard, Complete at Point (=C-M-i=, or =C-SPC= in Doom's insert state), Expand Word (=M-/=, or =F5= with the Mac keys) and Complete Word (=C-M-/=, or =C-n= and =C-p= in Doom's insert state) work as on the Mac; see [[file:02-the-editor.org][The editor]]. The list shows up to 8 rows under the caret; the keys move through it as on the Mac, and tapping a row inserts it. The settings in Settings ▸ Completion are the Mac's: whether the list opens by itself, after which pause and how many characters, prefix or fuzzy matching, and words in the list. With them on, candidates also show as you type on the on-screen keyboard, in the key bar's place; see Suggestions under The key bar.
 
 ** Snippets
 

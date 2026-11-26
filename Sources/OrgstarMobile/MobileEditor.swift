@@ -130,6 +130,8 @@ final class MobileEditor: NSObject, DocumentBuffer {
     var completionTimer: Timer?
     var completionFetched: CompletionFlow.Fetched?
     var completionTask: Task<Void, Never>?
+    /// The candidates the key bar shows in its place while the on-screen keyboard is used.
+    let suggestions = Suggestions()
     /// `dabbrev-expand` being repeated, and the revision its last expansion left.
     var dabbrev: DabbrevExpansion?
     var dabbrevRevision: Int?
@@ -847,6 +849,13 @@ extension MobileEditor: NSTextLayoutManagerDelegate {
         }
         return fragment
     }
+}
+
+/// The completion the suggestion row shows, and whether it was put away for it.
+@Observable
+final class Suggestions {
+    var completion: Completion?
+    var dismissed = false
 }
 
 /// Whether a snippet's fields are being filled in.

@@ -7,7 +7,8 @@ import UIKit
 /// Org's keys for a touch keyboard: each button does what its key does at the caret, as the
 /// Emacs keymap binds it (M-→ demotes a heading, indents an item, moves a table column), or
 /// runs a command. The buttons are `[key-bar]` in config.toml, or the default; they share the
-/// width without scrolling, and those that don't fit go under More.
+/// width without scrolling, and those that don't fit go under More. While completion has
+/// candidates at the caret, they show in the bar's place.
 struct KeyBar: View {
     let editor: MobileEditor
     let palette: () -> Void
@@ -109,6 +110,22 @@ struct KeyBar: View {
     @ScaledMetric(relativeTo: .body) private var size = KeyBar.target
 
     var body: some View {
+        Group {
+            if SuggestionRow.shows(editor.suggestions.completion, dismissed: editor.suggestions.dismissed), let completion = editor.suggestions.completion {
+                suggestionRow(completion)
+            } else {
+                keys
+            }
+        }
+        .labelStyle(.iconOnly)
+        .padding(.horizontal, 6)
+        .padding(.vertical, Self.padding)
+        .frame(maxWidth: .infinity)
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
+        .background(.bar)
+    }
+
+    private var keys: some View {
         let layout = sizeClass == .regular ? KeyBarLayout.Width.ipad : .iphone
         var ids = ((layout == .ipad ? ipad : iphone).map(KeyBarLayout.ids) ?? layout.defaultIDs).filter { Self.item($0) != nil }
         if editor.fields.active { ids = KeyBarLayout.withSnippetFields(ids) }
@@ -120,12 +137,52 @@ struct KeyBar: View {
             }
             if !more.isEmpty { moreButton(more) }
         }
-        .labelStyle(.iconOnly)
-        .padding(.horizontal, 6)
-        .padding(.vertical, Self.padding)
-        .frame(maxWidth: .infinity)
-        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
-        .background(.bar)
+    }
+
+    /// The candidates at the caret in the bar's place, scrolling on their own, and at the end
+    /// the button that puts them away and brings the keys back.
+    private func suggestionRow(_ completion: Completion) -> some View {
+        HStack(spacing: 4) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 4) {
+                    ForEach(SuggestionRow.items(completion), id: \.candidate) { item in
+                        Button {
+                            editor.chooseSuggestion(item.candidate)
+                        } label: {
+                            suggestionLabel(item)
+                        }
+                        .buttonStyle(SuggestionStyle(size: size))
+                        .accessibilityLabel([item.candidate, item.detail, item.snippet ? String(localized: "snippet", comment: "Marks a snippet in the completion list") : nil]
+                            .compactMap { $0 }.joined(separator: ", "))
+                    }
+                }
+                .padding(.horizontal, 2)
+            }
+            // Back at the start for each new completion.
+            .id(completion.range.lowerBound)
+            Button {
+                editor.suggestions.dismissed = true
+            } label: {
+                Label(String(localized: "Hide Suggestions"), systemImage: "xmark")
+            }
+            .buttonStyle(KeyStyle(size: size, slots: 1))
+            .frame(width: KeyBar.widest)
+            .accessibilityLabel(String(localized: "Hide Suggestions"))
+        }
+        .dynamicTypeSize(...Self.largestSymbolSize)
+        .accessibilityIdentifier("suggestions")
+    }
+
+    private func suggestionLabel(_ item: SuggestionRow.Item) -> some View {
+        CappedWidth(width: 240) {
+            HStack(spacing: 4) {
+                if item.snippet { Image(systemName: "text.badge.plus").foregroundStyle(.tint) }
+                Text(item.candidate).foregroundStyle(.primary)
+                if let detail = item.detail { Text(detail).foregroundStyle(.secondary) }
+            }
+            .font(.body)
+            .lineLimit(1)
+        }
     }
 
     @ViewBuilder
@@ -262,6 +319,35 @@ private struct KeyShape: ViewModifier {
             .opacity(pressed ? 0.5 : 1)
             .padding(.horizontal, 2)
             .frame(maxWidth: .infinity)
+            .contentShape(.rect)
+    }
+}
+
+/// As wide as its content wants up to `width`, where a long suggestion is cut short.
+private struct CappedWidth: Layout {
+    let width: CGFloat
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        guard let view = subviews.first else { return .zero }
+        let ideal = view.sizeThatFits(.unspecified)
+        return view.sizeThatFits(ProposedViewSize(width: min(ideal.width, width), height: proposal.height))
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        subviews.first?.place(at: bounds.origin, proposal: ProposedViewSize(bounds.size))
+    }
+}
+
+/// A suggestion: its text on a tile as tall as the keys, as wide as the text needs.
+private struct SuggestionStyle: ButtonStyle {
+    let size: CGFloat
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(.horizontal, 12)
+            .frame(minHeight: size)
+            .background(.fill.tertiary, in: .rect(cornerRadius: 10))
+            .opacity(configuration.isPressed ? 0.5 : 1)
             .contentShape(.rect)
     }
 }

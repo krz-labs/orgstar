@@ -18970,6 +18970,41 @@
         }
       }
     },
+    "Hide Suggestions": {
+      "comment": "Key bar: puts the completion suggestions away and shows the keys again",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorschläge ausblenden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ocultar sugerencias"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masquer les suggestions"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "候補を隠す"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ocultar Sugestões"
+          }
+        }
+      }
+    },
     "Hide entries from earlier days": {
       "localizations": {
         "de": {

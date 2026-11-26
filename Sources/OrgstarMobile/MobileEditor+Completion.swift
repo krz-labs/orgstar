@@ -1,5 +1,6 @@
 #if os(iOS)
 import OrgApp
+import GameController
 import OrgCore
 import UIKit
 
@@ -100,6 +101,7 @@ extension MobileEditor {
 
     func openCompletion(_ completion: Completion, select: Int? = nil) {
         completionFetched = nil
+        suggestions.dismissed = false
         if !completion.candidates.isEmpty { showCompletion(completion, select: select) }
         guard let query = completion.query, let source = completionSource else {
             if completion.candidates.isEmpty { closeCompletion() }
@@ -140,7 +142,10 @@ extension MobileEditor {
             completionList = view
             textView.addSubview(view)
         }
-        guard let position = textView.position(from: textView.beginningOfDocument, offset: completion.range.lowerBound) else { return }
+        let row = SuggestionRow.usesRow(hardwareKeyboard: GCKeyboard.coalesced != nil)
+        view.isHidden = row
+        suggestions.completion = row ? view.completion : nil
+        guard !row, let position = textView.position(from: textView.beginningOfDocument, offset: completion.range.lowerBound) else { return }
         let caret = textView.caretRect(for: position)
         let insets = textView.adjustedContentInset
         let visible = CGRect(x: textView.contentOffset.x, y: textView.contentOffset.y + insets.top,
@@ -154,6 +159,15 @@ extension MobileEditor {
         completionTask?.cancel()
         completionList?.removeFromSuperview()
         completionList = nil
+        suggestions.completion = nil
+        suggestions.dismissed = false
+    }
+
+    /// A candidate tapped in the suggestion row, inserted as one chosen from the list.
+    func chooseSuggestion(_ candidate: String) {
+        guard let completion = completionList?.completion else { return }
+        closeCompletion()
+        insertCompletion(completion, candidate)
     }
 
     /// After typing: the open list follows the text; otherwise, as the settings say, a list
