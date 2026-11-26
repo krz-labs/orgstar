@@ -84,7 +84,8 @@ public struct CryptSheet: View {
         self.done = done
     }
 
-    public var body: some View {
+    #if os(macOS)
+    private var layout: some View {
         VStack(alignment: .leading, spacing: 12) {
             if editing != nil {
                 Text("Encrypted Entry").font(.headline)
@@ -114,11 +115,62 @@ public struct CryptSheet: View {
             }
         }
         .padding(20)
-        #if os(macOS)
         .frame(minWidth: 460)
-        #else
-        .frame(maxHeight: .infinity, alignment: .top)
-        #endif
+    }
+    #else
+    @FocusState private var fieldFocused: Bool
+
+    /// The editor's sheet: a navigation bar with Cancel and the action, the fields in a form.
+    private var layout: some View {
+        Form {
+            if editing != nil {
+                Section {
+                    TextEditor(text: $plaintext)
+                        .font(.body.monospaced())
+                        .frame(minHeight: 220)
+                } footer: {
+                    if let problem { Text(problem).foregroundStyle(.red) }
+                }
+                Section {
+                    Button("Decrypt in File") { decryptEdited() }
+                }
+            } else {
+                Section {
+                    SecureField("Passphrase", text: $passphrase)
+                        .focused($fieldFocused)
+                        .submitLabel(.go)
+                        .onSubmit(submit)
+                    if asksTwice { SecureField("Repeat passphrase", text: $repeated).submitLabel(.go).onSubmit(submit) }
+                } footer: {
+                    VStack(alignment: .leading, spacing: 6) {
+                        if let explanation { Text(explanation) }
+                        if let problem { Text(problem).foregroundStyle(.red) }
+                    }
+                }
+            }
+        }
+        .navigationTitle(editing != nil ? String(localized: "Encrypted Entry") : title)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel", role: .cancel) { if editing != nil { done(nil) } else { cancel() } }
+            }
+            ToolbarItem(placement: .confirmationAction) {
+                if editing != nil {
+                    Button("Save") { save() }
+                } else {
+                    Button(request.encrypting ? "Encrypt" : "Decrypt") { submit() }.disabled(passphrase.isEmpty)
+                }
+            }
+        }
+        .presentationDetents(editing != nil ? [.large] : [.medium, .large])
+        .onAppear { fieldFocused = true }
+        // A wrong passphrase: the field again, to type it over.
+        .onChange(of: problem) { if problem != nil, editing == nil { fieldFocused = true } }
+    }
+    #endif
+
+    public var body: some View {
+        layout
         .task {
             if let stored = await passphrases.stored(for: request.path) { run(stored, remembered: true) }
         }
