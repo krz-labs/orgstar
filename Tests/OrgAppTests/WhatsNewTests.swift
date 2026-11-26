@@ -31,6 +31,13 @@ struct WhatsNewTests {
         #expect(WhatsNew.pending(version: "2.0.1", firstLaunch: false, defaults: defaults, releases: releases) == nil)
     }
 
+    @Test func aSkippedVersionsNotesShowAfterTheNextUpdate() throws {
+        let defaults = try defaults()
+        defaults.set("1.9.0", forKey: WhatsNew.seenKey)
+        #expect(WhatsNew.pending(version: "2.0.1", firstLaunch: false, defaults: defaults, releases: releases)?.version == "2.0.0")
+        #expect(WhatsNew.pending(version: "2.0.2", firstLaunch: false, defaults: defaults, releases: releases) == nil)
+    }
+
     @Test func itemsHaveDistinctTitles() {
         for release in WhatsNew.releases {
             #expect(Set(release.items.map(\.id)).count == release.items.count)

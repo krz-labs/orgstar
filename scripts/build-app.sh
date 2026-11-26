@@ -10,7 +10,7 @@
 set -eu
 
 cd "$(dirname "$0")/.."
-version="${1:-1.3.0}"
+version="${1:-1.3.1}"
 build="${2:-$version}"
 sign="${ORGSTAR_SIGN:--}"
 app=".build/app/orgstar.app"

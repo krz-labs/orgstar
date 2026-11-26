@@ -106,15 +106,18 @@ public enum WhatsNew {
     ]
     #endif
 
-    /// The notes to show at launch: those for `version`, the first time it runs after another
-    /// version did. Records `version` as seen. `firstLaunch` is a new install, which shows none.
+    /// The notes to show at launch, the first time `version` runs after another version did: the
+    /// newest notes for a version after the one seen last, up to `version`, so an update that
+    /// skips a version still shows its notes. Records `version` as seen. `firstLaunch` is a new
+    /// install, which shows none.
     public static func pending(
         version: String = appVersion, firstLaunch: Bool, defaults: UserDefaults = .standard, releases: [ReleaseNotes] = releases
     ) -> ReleaseNotes? {
         let seen = defaults.string(forKey: seenKey)
         defaults.set(version, forKey: seenKey)
         guard seen != version, !firstLaunch else { return nil }
-        return releases.first { $0.version == version }
+        func newer(_ a: String, than b: String) -> Bool { a.compare(b, options: .numeric) == .orderedDescending }
+        return releases.first { notes in !newer(notes.version, than: version) && seen.map { newer(notes.version, than: $0) } ?? true }
     }
 }
 

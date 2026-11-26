@@ -63,6 +63,7 @@ Everyone who downloaded orgstar before orgstar+ keeps all of it.
 - Handoff of the open file between iPhone, iPad and Mac; Share Subtree by AirDrop, Mail or Messages.
 - Sync a git folder through Working Copy.
 - Faster opening and styling of large files, and many fixes to layout, wording and accessibility.
+- Fixes: an encrypted entry you didn't change keeps its encrypted text when the file is saved, and the passphrase sheet on iPhone and iPad has larger fields and buttons.
 
 ## Keywords
 
@@ -143,6 +144,7 @@ org-mode,emacs,outline,todo,agenda,plain text,notes,tasks,gtd,planner,kanban,org
 - Handoff of the open file between Mac, iPhone and iPad; Share Subtree by AirDrop, Mail or Messages.
 - A customisable toolbar, a grouped Org menu and Help ▸ Manual.
 - Faster opening and styling of large files, and many fixes to layout, wording and accessibility.
+- Fixes: an encrypted entry you didn't change keeps its encrypted text when the file is saved.
 
 ### App Review notes
 
