@@ -1,15 +1,15 @@
-# Roadmap status, 2026-11-25
+# Roadmap status, 2026-11-26
 
 Where the milestone work stands, so a session can pick it up at any point. Read `docs/plans/2026-11-21-roadmap-handoff.md` first: its repository rules, decisions and procedure still apply. This document adds what milestone 1 taught, what it left open, and what comes next.
 
 ## State
 
-- `main` is at `3aea06b`, in sync with gitbay. No worktrees, work branches or open merge requests.
+- `main` is in sync with gitbay. No worktrees, work branches or open merge requests.
 - Milestone 1 (Reviews and cleanup) is closed: 32 issues, 30 merge requests (447–476).
 - Milestone 4 (Commands and editing speed) is closed: 12 issues (#236 added during it; #156 closed with #142), 6 merge requests (479–484), about one day.
-- Milestone 5 (Sync and files) is done apart from #87, which waits on a device test: 10 issues closed (#238 added during it), 8 merge requests (486–492), about one and a half days, most of it on #153's four review rounds.
+- Milestone 5 (Sync and files) is closed: 11 issues (#238 and #239 added during it), 10 merge requests (486–492, 494, 495), about two days, most of it on #153's four review rounds. #87 (OneDrive greyed out in the iOS folder picker) moved to the Backlog: still greyed out on 2026-11-26; re-test later, Graph API app-folder sync is the fallback.
 - On `main` with everything merged: `swift test` (about 1,475 tests), both Xcode builds and every performance gate pass (three gate runs on 2026-11-27: 1 MB open 83–89 ms, typing p95 unchanged; new gates for Lint File and Lint All Folders).
-- Not released. The code is past 1.2.0; the plan pencils milestone 1 as 1.3.0. Releasing is the owner's call.
+- `v1.3.0` is tagged on the "Version 1.3.0" commit and covers milestones 1, 4 and 5. Nothing is uploaded: the App Store builds, the notarised download, the appcast and the cask are the owner's call. `scripts/release-mac.sh` tags and pushes `v<version>` itself, so for 1.3.0 skip or delete that step.
 - Simulators: "iPhone 17", "iPad Air 11-inch (M4)" (iOS 27.0) and "Apple Watch Series 11 (46mm)" (watchOS 27.0). Reuse them; do not create others.
 
 | Milestone | Open | Closed |
@@ -18,11 +18,11 @@ Where the milestone work stands, so a session can pick it up at any point. Read 
 | 2 Capture | 6 | 0 |
 | 3 Agenda and planning | 9 | 0 |
 | 4 Commands and editing speed | 0 | 12 |
-| 5 Sync and files | 1 | 10 |
+| 5 Sync and files | 0 | 11 |
 | 6 Formats, import and export | 6 | 0 |
 | 7 Notes and knowledge | 3 | 0 |
 | 8 Automation and extension | 3 | 0 |
-| Backlog | 40 | 0 |
+| Backlog | 42 | 0 |
 
 #109 (code scanning) has no milestone and stays out of scope.
 
@@ -117,19 +117,20 @@ gitbay milestone list
 
 ## Decisions taken in milestone 5, for the owner to confirm or overrule
 
-1. #153: encrypt-on-save and `.org.gpg` are not behind orgstar+ (the existing Encrypt commands still are). Once a file is unlocked it keeps sealing until closed, whatever the setting. A heading inside an encrypted entry can't be archived or refiled on its own; Share Subtree shares it as an "Encrypted entry" placeholder. Exports and Emacs copies leave encrypted content out (Emacs copies are refused rather than asked). The Developer ID build keeps remembered passphrases in the login keychain (no data-protection entitlement), with the caveat shown beside the Remember toggle; a Developer ID provisioning profile with `keychain-access-groups` would let it use the protected item. age is not supported.
+1. #153: encrypt-on-save and `.org.gpg` are not behind orgstar+ (the existing Encrypt commands still are). Once a file is unlocked it keeps sealing until closed, whatever the setting. A heading inside an encrypted entry can't be archived or refiled on its own; Share Subtree shares it as an "Encrypted entry" placeholder. Exports and Emacs copies leave encrypted content out (Emacs copies are refused rather than asked). age is not supported.
 2. #95: auto-commit per folder in Settings ▸ Git (download version), off by default; only files orgstar wrote; pull (`--ff-only`), then commit, then push.
 3. #155: File ▸ History… replaces Recovery Versions… on the Mac.
 4. #151: Replace in Files keeps a recovery version, not undo, for files that weren't open; renames change `config.toml` too while the dialog's checkbox is on (the default).
 5. #148: no sync on leaving the app (iOS can't open another app while going to the background); a Shortcuts automation is documented instead.
 6. #93: Handoff matches folders by iCloud path, then by folder name; nothing is advertised for encrypted files or buffers with decrypted entries.
+7. #239: one app-wide "Use Face ID to Decrypt" (Touch ID on the Mac) in UserDefaults, undecided until the first typed passphrase or a launch with passphrases saved by an earlier version asks; Not Now records off and leaves earlier items unread but listed with Forget; only a passphrase that opens every encrypted message in the file is saved; turning off deletes every saved passphrase. The Mac quit prompt saves only while on and never asks.
+8. The download version embeds the Developer ID provisioning profile (`~/Library/MobileDevice/Provisioning Profiles/orgstar_dev_id.provisionprofile`, valid to 2044, tied to the Developer ID Application certificate created 2026-10-10) and uses the protected Keychain like the App Store build. A new certificate means a new profile; `release-mac.sh` stops without one.
 
 ## Device checks owed
 
 ### From milestone 5
 
-- #87: whether OneDrive's new File Provider lets an iPhone pick a folder; close the issue if it does.
-- Encryption: App Store and iOS builds use the protected Keychain and ask once per file; the Developer ID build's caveat beside Remember; quit and close alerts on the Mac; the iOS notice and unlock screens; the clock title key across launches.
+- Encryption: every build uses the protected Keychain; with Use Face ID to Decrypt on, Face ID or Touch ID is asked once per file (the simulator doesn't show the prompt); the question at the first typed passphrase and at the first launch after 1.2.0 with saved passphrases; the notarised download launches with the embedded profile; quit and close alerts on the Mac; the iOS notice and unlock screens; the clock title key across launches.
 - Git: auto-commit against a real remote over SSH or the Keychain.
 - Handoff between real devices in each direction; Working Copy installed with a real repository (its key, the sync chain, a commit with nothing changed); AirDrop, Mail and Messages from Share Subtree.
 - iOS: the rename screen, the lint lists, Lint All Folders on a large real workspace.
