@@ -1,5 +1,6 @@
 #if os(iOS)
 import OrgApp
+import OrgCore
 import OrgIndex
 import SwiftUI
 

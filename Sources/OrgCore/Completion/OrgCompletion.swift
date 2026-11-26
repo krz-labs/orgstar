@@ -3,18 +3,33 @@ import Foundation
 // Completion at point (Org 9.8.7's org-pcomplete): `org-thing-at-point` picks what the caret
 // is on, and each context offers what its `pcomplete/org-mode/…` function does. Link types
 // after `[[`, workspace tags and org-tempo's `<` templates are added, and snippet triggers
-// where no org context offers anything.
+// where no org context offers anything. Headings after `[[id:`, notes after `[[denote:` and
+// property values come from the buffer at once and from the index when it answers
+// `Completion.query`.
 
 public struct Completion: Sendable, Equatable {
     public enum Kind: String, Sendable {
         case keyword, keywordValue, link, entity, tag, todo, heading, drawer, property, srcLanguage, srcHeader, clocktable, template, snippet
+        case idLink, denoteLink, propertyValue, word
     }
 
     public var kind: Kind
     /// The text the chosen candidate replaces: from the start of what's typed to the caret.
     public var range: Range<Int>
-    /// Candidates starting with what's typed, sorted.
+    /// Candidates matching what's typed: starting with it, sorted, or with fuzzy matching,
+    /// best first.
     public var candidates: [String]
+    /// What's typed: the text of `range`.
+    public var typed = ""
+    /// More candidates to ask the index for; nil when there are none.
+    public var query: CompletionQuery?
+    /// For links, the item behind each candidate, and every item found.
+    public var items: [CompletionItem] = []
+    public var targets: [CompletionItem] = []
+    /// Candidates before matching, for words and property values.
+    public var pool: [String] = []
+    /// For links, the text inserting a candidate replaces: the link typed so far.
+    public var link: Range<Int>?
     /// The block templates `<` completes, for `.template`.
     public var templates: [StructureTemplate] = []
     /// The snippets whose triggers are the candidates, for `.snippet`; choosing one expands it.
@@ -22,6 +37,9 @@ public struct Completion: Sendable, Equatable {
 
     /// How the list shows `candidate`: a template with the block it makes.
     public func label(_ candidate: String) -> String {
+        if kind == .idLink || kind == .denoteLink, let item = item(candidate), candidate == item.title, !item.path.isEmpty {
+            return candidate + "  " + (item.path as NSString).lastPathComponent
+        }
         if kind == .snippet, let snippet = snippets.first(where: { $0.trigger == candidate }), snippet.name != candidate {
             return candidate + "  " + snippet.name
         }
@@ -39,8 +57,35 @@ public struct Completion: Sendable, Equatable {
 public enum OrgCompletion {
     public static func at(_ context: EditContext) -> Completion? {
         let org = orgAt(context)
-        if let org, !org.candidates.isEmpty { return org }
+        if let org, !org.candidates.isEmpty || org.query != nil { return org }
         return snippets(context) ?? org
+    }
+
+    /// `candidates` matching `typed`, each once: those starting with it, or with `fuzzy`,
+    /// those with its characters in order, best first, preferring matches in its case.
+    /// `sorted` puts the prefix matches, and fuzzy matches scoring the same, in order.
+    public static func matching(_ candidates: [String], _ typed: String, fuzzy: Bool, ignoringCase: Bool = false, sorted: Bool = true) -> [String] {
+        var seen = Set<String>()
+        let unique = candidates.filter { seen.insert($0).inserted }
+        let byName: (String, String) -> Bool = { $0.localizedStandardCompare($1) == .orderedAscending }
+        guard fuzzy, !typed.isEmpty else {
+            let lowered = typed.lowercased()
+            let prefixed = unique.filter { ignoringCase ? $0.lowercased().hasPrefix(lowered) : $0.hasPrefix(typed) }
+            return sorted ? prefixed.sorted(by: byName) : prefixed
+        }
+        let sameCase = unique.filter { isSubsequence(typed, of: $0) }
+        let pool = sameCase.isEmpty ? unique : sameCase
+        let scored = pool.enumerated().compactMap { index, candidate in FuzzyMatch.score(typed, candidate).map { (candidate, $0, index) } }
+        return scored.sorted { a, b in
+            if a.1 != b.1 { return a.1 > b.1 }
+            return sorted ? byName(a.0, b.0) : a.2 < b.2
+        }.map(\.0)
+    }
+
+    static func isSubsequence(_ typed: String, of candidate: String) -> Bool {
+        var rest = typed[...]
+        for c in candidate where rest.first == c { rest = rest.dropFirst() }
+        return rest.isEmpty
     }
 
     /// Snippet triggers starting with the text from the last blank to the caret.
@@ -53,9 +98,11 @@ public enum OrgCompletion {
         while start > 0, let scalar = UnicodeScalar(ns.character(at: start - 1)), !CharacterSet.whitespacesAndNewlines.contains(scalar) { start -= 1 }
         guard start < caret else { return nil }
         let typed = ns.substring(with: NSRange(location: start, length: caret - start))
-        let matching = snippets.filter { $0.trigger.hasPrefix(typed) }
-        guard !matching.isEmpty else { return nil }
-        return Completion(kind: .snippet, range: start..<caret, candidates: matching.map(\.trigger).sorted { $0.localizedStandardCompare($1) == .orderedAscending }, snippets: matching)
+        let triggers = matching(snippets.map(\.trigger), typed, fuzzy: context.options.completion.fuzzy)
+        guard !triggers.isEmpty else { return nil }
+        var completion = Completion(kind: .snippet, range: start..<caret, candidates: triggers, snippets: snippets.filter { triggers.contains($0.trigger) })
+        completion.typed = typed
+        return completion
     }
 
     static func orgAt(_ context: EditContext) -> Completion? {
@@ -76,9 +123,9 @@ public enum OrgCompletion {
         }()
         func make(_ kind: Completion.Kind, from: Int, _ candidates: [String]) -> Completion {
             let typed = ns.substring(with: NSRange(location: from, length: caret - from))
-            var seen = Set<String>()
-            let matching = candidates.filter { $0.hasPrefix(typed) && seen.insert($0).inserted }
-            return Completion(kind: kind, range: from..<caret, candidates: matching.sorted { $0.localizedStandardCompare($1) == .orderedAscending })
+            var completion = Completion(kind: kind, range: from..<caret, candidates: matching(candidates, typed, fuzzy: context.options.completion.fuzzy))
+            completion.typed = typed
+            return completion
         }
         func matches(_ pattern: String, _ s: String, caseInsensitive: Bool = true) -> NSTextCheckingResult? {
             let regex = try! NSRegularExpression(pattern: pattern, options: caseInsensitive ? [.caseInsensitive] : [])
@@ -139,6 +186,15 @@ public enum OrgCompletion {
             let from = start + NSMaxRange((line as NSString).range(of: "#+"))
             return make(.keyword, from: from, caseDouble(fileOptions))
         }
+        // Headings after `[[id:`, Denote's notes after `[[denote:`.
+        if let target = linkTarget(context, lineStart: start, toHere: toHere) {
+            var completion = Completion(kind: target.type == "id" ? .idLink : .denoteLink, range: target.typed, candidates: [])
+            completion.typed = ns.substring(with: NSRange(target.typed))
+            completion.link = target.link
+            completion.setItems(target.type == "id" ? bufferTargets(context) : [], fuzzy: context.options.completion.fuzzy)
+            completion.query = target.type == "id" ? .linkTargets : .denoteNotes
+            return completion
+        }
         // Link abbreviations and types after `[[`.
         do {
             var p = caret
@@ -185,6 +241,23 @@ public enum OrgCompletion {
            (toHere as NSString).substring(with: NSRange(location: star.location - 2, length: 2)) == "[[" {
             let titles = DocumentModel(tree: context.tree).headings.map { Links.normalizedTitle($0.title) }
             return make(.heading, from: start + star.location + 1, titles)
+        }
+        // Values of a property in a property drawer.
+        if let m = toHere.firstMatch(of: /^[ \t]*:([^\s:]+):[ \t]+(\S*)$/),
+           context.tree.root.descendants().contains(where: { $0.kind == .propertyDrawer && $0.range.contains(start) }) {
+            let name = String(m.1).hasSuffix("+") ? String(m.1.dropLast()) : String(m.1)
+            guard name.uppercased() != "END", !name.uppercased().hasSuffix("_ALL") else { return nil }
+            let from = caret - String(m.2).utf16.count
+            var completion = Completion(kind: .propertyValue, range: from..<caret, candidates: [])
+            completion.typed = String(m.2)
+            // The value on this line is what's being typed, not a candidate.
+            var values = bufferValues(name, context)
+            let own = ns.substring(with: NSRange(location: from, length: contentsEnd - from)).trimmingCharacters(in: .whitespaces)
+            if let index = values.lastIndex(of: own) { values.remove(at: index) }
+            completion.pool = values
+            completion.candidates = matching(completion.pool, completion.typed, fuzzy: context.options.completion.fuzzy, ignoringCase: true, sorted: false)
+            completion.query = .propertyValues(name)
+            return completion
         }
         // Property or drawer names.
         if matches("^[ \\t]*:\\S*$", toHere, caseInsensitive: false) != nil, afterBlank {
