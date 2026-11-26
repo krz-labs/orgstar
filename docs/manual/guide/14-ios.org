@@ -57,10 +57,12 @@ The toolbar has:
 - Conflict :: shown while the file and your edits conflict; opens the conflict sheet.
 - Find :: the system find bar. The result shown is selected, and opened when it is in folded text.
 - Resolve Sync Conflicts… :: shown while the file has Syncthing conflict copies; see Conflicts below.
-- Recovery Versions… :: shown while the recovery folder holds versions of the file; see Conflicts below.
+- Recovery Versions… :: on iPad, shown while the recovery folder holds versions of the file; see Conflicts below.
 - Undo :: touch and hold it for Redo.
-- Export :: the export formats, as in the reader; see Export below.
+- Export :: on iPad, the export formats; see Export below.
 - Commands :: every command; see Commands below.
+
+On iPhone, Recovery Versions…, Export… and Export Subtree… are in Commands, so the file name has room at every text size.
 
 The key bar holds what you repeat at the caret while typing, the toolbar what acts on the whole file, and Commands everything else.
 
@@ -176,7 +178,7 @@ Commands, in the key bar and in the toolbar of the editor, the reader and the ag
 
 Named keyboard macros are listed by name under Edit, and Next Snippet Field and Previous Snippet Field under Text with the other snippet commands. In the editor, a command that doesn't apply at the caret is listed greyed, with the reason, such as =Not in a list= or =No table at point=, so a search finds everything the editor can do. With a hardware keyboard attached, each command shows its Emacs key.
 
-The reader's list has Find, Outline, Export…, Show or Hide Markup, Capture… and the clock commands that need no caret. The agenda's has its views, Tags and Properties…, Search…, Save as View…, Today, Earlier, Later, Go to Date…, Log Mode, Filter…, Select, Board, Capture… and the same clock commands.
+The editor's list has Export… and Export Subtree… under Export. The reader's list has Find, Outline, Export…, Show or Hide Markup, Capture… and the clock commands that need no caret. The agenda's has its views, Tags and Properties…, Search…, Save as View…, Today, Earlier, Later, Go to Date…, Log Mode, Filter…, Select, Board, Capture… and the same clock commands.
 
 When a command asks a question, a sheet opens:
 
@@ -397,11 +399,11 @@ The app icon's badge counts the entries in the agenda's Overdue section that are
 
 * Export
 
-Export (in the editor's toolbar, and Export… in the reader's Commands) offers HTML, Markdown, PDF, Word, Rich Text (RTF), Plain Text, ODT, iCalendar, LaTeX and Plain Text (ASCII), and Copy as Rich Text. Each opens the share sheet with a file named after the org file, which you can send to another app or keep with Save to Files. The export reads the file's setup files and follows its export keywords, as the Mac's export does. For a file the LaTeX or ASCII export can't write as Emacs would, the share sheet stops and "Can't export to LaTeX: " or "Can't export to plain text: " and the reason show at the bottom of the screen.
+Export (in the editor's toolbar on iPad, and Export… in the Commands of the editor and the reader) offers HTML, Markdown, PDF, Word, Rich Text (RTF), Plain Text, ODT, iCalendar, LaTeX and Plain Text (ASCII), and Copy as Rich Text. Each opens the share sheet with a file named after the org file, which you can send to another app or keep with Save to Files. The export reads the file's setup files and follows its export keywords, as the Mac's export does. For a file the LaTeX or ASCII export can't write as Emacs would, the share sheet stops and "Can't export to LaTeX: " or "Can't export to plain text: " and the reason show at the bottom of the screen.
 
 PDF export follows =pdf-margin=, =pdf-font= and =pdf-page-numbers= in =config.toml=, and Word files get heading styles and the file's images, as on the Mac. PDF through LaTeX isn't available on iOS.
 
-Body Only in the Export menu leaves out the title and the page around the text in HTML, Markdown, LaTeX and Plain Text (ASCII), and is kept for each file; the other formats say they have no body-only export while it is on. Export Subtree…, in the editor's Export menu, shares the subtree at the caret in any of the formats.
+Body Only in the Export menu leaves out the title and the page around the text in HTML, Markdown, LaTeX and Plain Text (ASCII), and is kept for each file; the other formats say they have no body-only export while it is on. Export Subtree…, in the editor's Commands and its Export menu on iPad, shares the subtree at the caret in any of the formats.
 
 The Export menu also has Export Agenda Files to iCalendar, which writes an =.ics= beside each agenda file, and Combine Agenda Files into iCalendar, which shares one calendar of them all. Commands has these, Copy as Rich Text, and Export to HTML and Open, which shows the HTML export in Quick Look. Without orgstar+, the Export menu's items that need it end in "(orgstar+)" and open the orgstar+ screen.
 
@@ -438,7 +440,7 @@ The version you don't keep goes to the recovery folder.
 
 Resolve Sync Conflicts… (in the editor's toolbar while there are copies, and in Commands) lists Syncthing's conflict copies of the file (=name.sync-conflict-…=), each compared with the file, with Keep File, Merge and Use Copy. The copy goes to the recovery folder and is removed. When a file with conflict copies opens in the editor, a message says how many there are.
 
-Recovery Versions… (in the editor's toolbar while there are versions, and in Commands) lists the versions of the file kept in the recovery folder, newest first, each compared with the editor's text. Restore puts a version's text in the editor as an edit you can undo.
+Recovery Versions… (in Commands, and in the editor's toolbar on iPad while there are versions) lists the versions of the file kept in the recovery folder, newest first, each compared with the editor's text. Restore puts a version's text in the editor as an edit you can undo.
 
 See [[file:15-alongside-emacs.org][Working alongside Emacs and other tools]] for how merging and recovery work.
 

@@ -90,6 +90,7 @@ enum CommandTitles {
         String(localized: "Expand Table Columns", comment: "Command title"),
         String(localized: "Expand Word", comment: "Command title"),
         String(localized: "Export Agenda Files to iCalendar", comment: "Command title"),
+        String(localized: "Export Subtree…", comment: "Command title"),
         String(localized: "Export Table as TSV…", comment: "Command title"),
         String(localized: "Export Table to File…", comment: "Command title"),
         String(localized: "Export to HTML", comment: "Command title"),

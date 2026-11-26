@@ -83,7 +83,7 @@ struct EditorScreen: View {
     }
 
     enum Sheet: Identifiable {
-        case palette, conflict, syncCopies, recovery
+        case palette, conflict, syncCopies, recovery, export
         /// `app.refile`, `app.refile.copy` or `app.refile.goto`.
         case refile(String)
         case block(BlockEdit)
@@ -102,6 +102,7 @@ struct EditorScreen: View {
             case .conflict: "conflict"
             case .syncCopies: "syncCopies"
             case .recovery: "recovery"
+            case .export: "export"
             case .block(let edit): "block \(edit.range)"
             case .columns: "columns"
             case .plot: "plot"
@@ -114,6 +115,9 @@ struct EditorScreen: View {
     }
 
     private var pane: EditorPane? { givenPane ?? holder.pane }
+
+    /// Export Subtree…, which shows the export formats for the subtree at the caret.
+    static let exportSubtreeCommand = "app.export-subtree-dialog"
 
     /// The pane commands, as the Mac's View menu has them.
     static let paneCommands = ["app.split-right", "app.split-below", "app.pane-next", "app.pane-close", "app.pane-only"]
@@ -138,7 +142,8 @@ struct EditorScreen: View {
                 if syncCopies > 0 {
                     Button("Resolve Sync Conflicts…", systemImage: "doc.on.doc") { sheet = .syncCopies }
                 }
-                if recoveries > 0 {
+                // On iPhone, in Commands, so the file name has room at the largest text sizes.
+                if recoveries > 0, sizeClass == .regular {
                     Button("Recovery Versions…", systemImage: "clock.arrow.circlepath") { sheet = .recovery }
                 }
                 Button("Find", systemImage: "magnifyingglass") {
@@ -152,7 +157,8 @@ struct EditorScreen: View {
                 } primaryAction: {
                     editor?.run("edit.undo")
                 }
-                if let tree = session.document(of: path)?.tree {
+                // On iPhone, Export is in Commands, so the file name has room.
+                if sizeClass == .regular, let tree = session.document(of: path)?.tree {
                     ExportMenu(path: path, tree: tree, report: { message = $0 }, exportSubtree: exportSubtree)
                 }
                 Button("Commands", systemImage: "command") { sheet = .palette }
@@ -220,6 +226,8 @@ struct EditorScreen: View {
                 PlotScreen(plot: plot)
             case .crypt(let request):
                 CryptScreen(request: request, session: session, editor: editor) { message = $0 }
+            case .export:
+                if let tree = session.document(of: path)?.tree { ExportScreen(path: path, tree: tree) { message = $0 } }
             case .exportSubtree(let caret):
                 if let tree = session.document(of: path)?.tree { SubtreeExportScreen(path: path, tree: tree, caret: caret) }
             case .backlinks:
@@ -449,6 +457,10 @@ struct EditorScreen: View {
                 if let caret = self.editor?.editContext().caret { message = session.archive(from: (path, caret)) }
             } else if id == "app.copy-rich-text" {
                 if let text = session.document(of: path)?.text { message = ExportItems.copy(path: path, text: text, theme: model.theme) }
+            } else if id == "app.export-dialog" {
+                sheet = .export
+            } else if id == EditorScreen.exportSubtreeCommand {
+                exportSubtree()
             } else if id == "app.export.html-open" {
                 exportHTMLAndOpen()
             } else if id == "app.export-body-only" {
@@ -1020,7 +1032,8 @@ struct CommandPalette: View {
         ("app.clock.in-last", "Clock In to Last Entry"), ("app.clock.goto-recent", "Go to Recent Clocked Entry…"),
         ("app.clock.default", "Mark as Default Clock Task"), ("app.clock.resolve", "Resolve Open Clocks…"),
         ("app.refile", "Refile…"), ("app.refile.copy", "Copy to Refile Target…"), ("app.refile.goto", "Go to Refile Target…"),
-        ("app.archive", "Archive Subtree"), ("app.copy-rich-text", "Copy as Rich Text"), ("app.export.html-open", "Export to HTML and Open"),
+        ("app.archive", "Archive Subtree"), ("app.export-dialog", "Export…"), ("app.export-subtree-dialog", "Export Subtree…"),
+        ("app.copy-rich-text", "Copy as Rich Text"), ("app.export.html-open", "Export to HTML and Open"),
         ("app.export-body-only", "Turn Body-Only Export On or Off"),
         ("app.export.icalendar-agenda", "Export Agenda Files to iCalendar"), ("app.export.icalendar-combined", "Combine Agenda Files into iCalendar"),
         ("app.publish", "Publish Project…"), ("app.publish.all", "Publish All Projects"), ("app.publish.current-file", "Publish Current File"),
@@ -1112,6 +1125,8 @@ struct CommandPalette: View {
         switch id {
         case "app.recovery": return recoveries > 0 ? nil : String(localized: "No Recovery Versions")
         case "app.sync-conflicts": return syncCopies > 0 ? nil : String(localized: "No sync conflict copies", comment: "Why Resolve Sync Conflicts… is greyed in the Commands list")
+        case EditorScreen.exportSubtreeCommand:
+            return ExportScope.subtree(context.text, at: context.caret) != nil ? nil : String(localized: "Not in a subtree", comment: "Why Export Subtree… is greyed in the Commands list")
         default: return editor.applies(id, in: context) ? nil : CommandReason.reason(for: id, in: context)
         }
     }
