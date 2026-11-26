@@ -497,7 +497,12 @@ struct OrgstarApp: App {
     @State private var clock = ClockModel()
     @State private var scheduler = SystemReminderCenter.isAvailable ? ReminderScheduler(center: SystemReminderCenter()) : nil
     @State private var session: DocumentSession = {
+        #if APPSTORE
         ClockTask.titleKey = ClockTitleKey.loadOrCreate()
+        #else
+        // A snapshot run is a renamed, ad hoc signed copy, which the Keychain would stop at a prompt.
+        ClockTask.titleKey = DevelopmentHooks.snapshotting ? nil : ClockTitleKey.loadOrCreate()
+        #endif
         let session = DocumentSession()
         session.defaults = Preferences.orgSettings
         // Before any window: capture and agenda edits can save before the main window opens.

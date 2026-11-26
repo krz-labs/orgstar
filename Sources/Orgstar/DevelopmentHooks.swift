@@ -18,12 +18,15 @@ import OrgEditorAppKit
 /// - `ORGSTAR_SNAPSHOT`: after `ORGSTAR_SNAPSHOT_DELAY` seconds (default 3), render the main
 ///   window to this PNG path and quit. Rendering from inside the app needs no screen-recording
 ///   permission.
+///   The clock title key isn't read from the Keychain in such a run.
 enum DevelopmentHooks {
     static var fileToOpen: String? { ProcessInfo.processInfo.environment["ORGSTAR_OPEN"] }
     static var rootToAdd: String? { ProcessInfo.processInfo.environment["ORGSTAR_ROOT"] }
     static var windowToOpen: String? { ProcessInfo.processInfo.environment["ORGSTAR_WINDOW"] }
     static var commandToRun: String? { ProcessInfo.processInfo.environment["ORGSTAR_COMMAND"] }
     static var urlToOpen: String? { ProcessInfo.processInfo.environment["ORGSTAR_URL"] }
+    /// `ORGSTAR_SNAPSHOT` is set: the run renders a window and quits.
+    static var snapshotting: Bool { ProcessInfo.processInfo.environment["ORGSTAR_SNAPSHOT"] != nil }
     static var answers: [String] { ProcessInfo.processInfo.environment["ORGSTAR_ANSWERS"]?.split(separator: ",").map(String.init) ?? [] }
 
     @MainActor
