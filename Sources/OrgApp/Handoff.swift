@@ -246,6 +246,8 @@ extension DocumentSession {
     /// in none of `roots` or an encrypted one.
     public func handoffPlace(_ path: String? = nil, roots: [String]) -> HandoffPlace? {
         guard let path = path ?? self.path, let text = document(of: path)?.text else { return nil }
+        // The outline and ID could name decrypted headings.
+        guard !crypt.isPrivate(text, for: path) else { return nil }
         return HandoffPlace.make(path: path, text: text, caret: caret(of: path) ?? 0, roots: roots, settings: defaults)
     }
 }

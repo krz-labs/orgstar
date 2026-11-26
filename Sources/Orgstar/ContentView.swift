@@ -1538,6 +1538,7 @@ struct ContentView: View {
             copyRichText()
         case "app.share-subtree":
             guard let path = session.path else { return commands.show(String(localized: "No file is open")) }
+            if let refusal = session.refusesSubtreeShare(path, at: session.caret) { return commands.show(refusal) }
             guard let share = session.subtreeShare(path, at: session.caret) else { return commands.show(String(localized: "Not in a subtree")) }
             panel = .shareSubtree(UUID(), share)
         case "app.export-dialog":

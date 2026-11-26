@@ -709,6 +709,40 @@
         }
       }
     },
+    "%@ is encrypted; its entries aren't shared.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ ist verschlüsselt; seine Einträge werden nicht geteilt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» está cifrado; sus entradas no se comparten."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« %@ » est chiffré ; ses entrées ne sont pas partagées."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”は暗号化されているため、エントリは共有されません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"%@\" está criptografado; suas entradas não são compartilhadas."
+          }
+        }
+      }
+    },
     "%@ is saved encrypted with this passphrase.": {
       "localizations": {
         "de": {

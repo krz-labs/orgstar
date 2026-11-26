@@ -245,6 +245,34 @@ struct CryptReviewTests {
         #expect(try OpenPGP.decryptFile(Data(contentsOf: path), passphrase: "pw") == Data("210x* D\nbody\n".utf8))
     }
 
+    // MR 490 hooks
+    @Test func handoffAndShareSubtreeKeepWhatIsEncrypted() throws {
+        let text = "* Bank :crypt:\nintro\n** Secret child\nbody\n* Open\n"
+        try notes.write("a.org", text)
+        session.open(file.path)
+        let child = (text as NSString).range(of: "** Secret").location
+        // Without the passphrase, the subtree isn't shared.
+        #expect(session.handoffPlace(file.path, roots: [notes.url.path]) == nil)
+        #expect(session.refusesSubtreeShare(file.path, at: child)?.contains("Encrypt…") == true)
+        #expect(session.subtreeShare(file.path, at: child) == nil)
+        session.cryptUsed("pw", for: file.path)
+        let share = try #require(session.subtreeShare(file.path, at: child))
+        #expect(!share.text.contains("body") && share.text.contains("-----BEGIN PGP MESSAGE-----"))
+        #expect(session.document?.text == text)
+        let bank = try #require(session.subtreeShare(file.path, at: 0))
+        #expect(!bank.text.contains("intro") && !bank.text.contains("Secret child"))
+        // An open file without tagged entries is advertised as before.
+        let plain = try notes.write("b.org", "* Plain\n")
+        session.open(plain.path)
+        #expect(session.handoffPlace(plain.path, roots: [notes.url.path]) != nil)
+        // An encrypted file's entries aren't shared.
+        let gpg = notes.url.appendingPathComponent("d.org.gpg")
+        try OpenPGP.encryptedMessage(Data("* D\nsecret\n".utf8), passphrase: "pw").write(to: gpg)
+        session.open(gpg.path)
+        #expect(session.unlock("pw", for: gpg.path) == nil)
+        #expect(session.refusesSubtreeShare(gpg.path, at: 0) != nil && session.subtreeShare(gpg.path, at: 0) == nil)
+    }
+
     // 9
     @Test func unchangedEntriesKeepTheirMessageAcrossSaves() throws {
         session.open(file.path)

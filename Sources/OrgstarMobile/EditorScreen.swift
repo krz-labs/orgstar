@@ -509,7 +509,9 @@ struct EditorScreen: View {
             } else if id == EditorScreen.exportSubtreeCommand {
                 exportSubtree()
             } else if id == "app.share-subtree" {
-                if let caret = self.editor?.editContext().caret, let share = session.subtreeShare(path, at: caret) {
+                if let caret = self.editor?.editContext().caret, let refusal = session.refusesSubtreeShare(path, at: caret) {
+                    message = refusal
+                } else if let caret = self.editor?.editContext().caret, let share = session.subtreeShare(path, at: caret) {
                     sheet = .shareSubtree(share)
                 } else {
                     message = String(localized: "Not in a subtree")
