@@ -40,6 +40,9 @@ struct ReaderScreen: View {
     /// The view's width, which images in a line's text are no wider than.
     @State private var width: CGFloat = 0
     @State private var showingOutline = false
+    @State private var showingCommands = false
+    /// The command chosen in Commands, run once the list is gone.
+    @State private var chosenCommand: String?
     @State private var message: String?
     /// A file a link opened, shown in Quick Look.
     @State private var previewed: URL?
@@ -131,7 +134,17 @@ struct ReaderScreen: View {
                     if let tree = document?.tree { ExportMenu(path: path, tree: tree) { message = $0 } }
                     NavigationLink(value: EditorRoute(path: path, offset: nil)) { Label("Edit", systemImage: "pencil") }
                 }
+                Button("Commands", systemImage: "command") { showingCommands = true }
             }
+        }
+        .sheet(isPresented: $showingCommands, onDismiss: {
+            // After the list has gone, so the command's own sheet can show.
+            if let id = chosenCommand {
+                chosenCommand = nil
+                runCommand(id)
+            }
+        }) {
+            CommandList(rows: commandRows) { chosenCommand = $0 }
         }
         .quickLookPreview($previewed)
         .sheet(isPresented: $showingOutline) { outlineSheet }
@@ -143,6 +156,30 @@ struct ReaderScreen: View {
         .onChange(of: pane?.editVersion) { loadFolds() }
         .onChange(of: model.settingsVersion) { loadFolds() }
         .onReceive(NotificationCenter.default.publisher(for: OrgExport.refused)) { message = $0.object as? String }
+    }
+
+    // MARK: - Commands
+
+    /// The reader's commands: its own, capture, and the clock's that need no caret.
+    private var commandRows: [CommandRow] {
+        [
+            CommandRow(id: "reader.find", title: String(localized: "Find"), reason: document == nil ? String(localized: "Nothing to do here") : nil),
+            CommandRow(id: "reader.outline", title: String(localized: "Outline"), reason: outline.isEmpty ? String(localized: "Nothing to do here") : nil),
+            CommandRow(id: "app.toggle-markup", title: CommandTitle.localized("Show or Hide Markup")),
+            CommandRow(id: "app.capture", title: CommandTitle.localized("Capture…")),
+        ] + MobileClock.screenCommands.map { CommandRow(id: $0.id, title: CommandTitle.localized($0.title)) }
+    }
+
+    private func runCommand(_ id: String) {
+        switch id {
+        case "reader.find":
+            find.text = (document?.tree.text ?? "") as NSString
+            findRequest += 1
+        case "reader.outline": showingOutline = true
+        case "app.toggle-markup": model.showMarkup.toggle()
+        case "app.capture": model.captureRequest = CaptureRequest()
+        default: _ = MobileClock.run(id, model: model, workspace: workspace) { message = $0 }
+        }
     }
 
     // MARK: - Content

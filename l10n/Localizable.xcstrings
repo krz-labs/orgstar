@@ -2332,106 +2332,6 @@
         }
       }
     },
-    "%lld sync conflict copies of this file; More › Resolve Sync Conflicts… compares them.": {
-      "localizations": {
-        "de": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld Synchronisierungskonflikt-Kopie dieser Datei; Mehr › Synchronisierungskonflikte auflösen … vergleicht sie."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld Synchronisierungskonflikt-Kopien dieser Datei; Mehr › Synchronisierungskonflikte auflösen … vergleicht sie."
-                }
-              }
-            }
-          }
-        },
-        "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld sync conflict copy of this file; More › Resolve Sync Conflicts… compares them."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld sync conflict copies of this file; More › Resolve Sync Conflicts… compares them."
-                }
-              }
-            }
-          }
-        },
-        "es": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld copia de conflicto de sincronización de este archivo; Más › Resolver conflictos de sincronización… las compara."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld copias de conflicto de sincronización de este archivo; Más › Resolver conflictos de sincronización… las compara."
-                }
-              }
-            }
-          }
-        },
-        "fr": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld copie de conflit de synchronisation de ce fichier ; Plus › Résoudre les conflits de synchronisation… les compare."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld copies de conflit de synchronisation de ce fichier ; Plus › Résoudre les conflits de synchronisation… les compare."
-                }
-              }
-            }
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "このファイルの同期競合コピーが%lld個あります。「その他」›「同期の競合を解決…」で比較できます。"
-          }
-        },
-        "pt-BR": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld cópia de conflito de sincronização deste arquivo; Mais › Resolver Conflitos de Sincronização… as compara."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld cópias de conflito de sincronização deste arquivo; Mais › Resolver Conflitos de Sincronização… as compara."
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "%lld sync conflict copies of this file; Resolve Sync Conflicts compares them.": {
       "comment": "Echo area when a file with Syncthing conflict copies opens",
       "localizations": {
@@ -2526,6 +2426,106 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "%lld cópias de conflito de sincronização deste arquivo; Resolver Conflitos de Sincronização as compara."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld sync conflict copies of this file; Resolve Sync Conflicts… in the toolbar compares them.": {
+      "localizations": {
+        "de": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Synchronisierungskonflikt-Kopie dieser Datei; Synchronisierungskonflikte auflösen … in der Symbolleiste vergleicht sie."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Synchronisierungskonflikt-Kopien dieser Datei; Synchronisierungskonflikte auflösen … in der Symbolleiste vergleicht sie."
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld sync conflict copy of this file; Resolve Sync Conflicts… in the toolbar compares them."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld sync conflict copies of this file; Resolve Sync Conflicts… in the toolbar compares them."
+                }
+              }
+            }
+          }
+        },
+        "es": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld copia de conflicto de sincronización de este archivo; Resolver conflictos de sincronización… en la barra de herramientas las compara."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld copias de conflicto de sincronización de este archivo; Resolver conflictos de sincronización… en la barra de herramientas las compara."
+                }
+              }
+            }
+          }
+        },
+        "fr": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld copie de conflit de synchronisation de ce fichier ; Résoudre les conflits de synchronisation… dans la barre d’outils les compare."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld copies de conflit de synchronisation de ce fichier ; Résoudre les conflits de synchronisation… dans la barre d’outils les compare."
+                }
+              }
+            }
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このファイルの同期競合コピーが%lld個あります。ツールバーの「同期の競合を解決…」で比較できます。"
+          }
+        },
+        "pt-BR": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld cópia de conflito de sincronização deste arquivo; Resolver Conflitos de Sincronização… na barra de ferramentas as compara."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld cópias de conflito de sincronização deste arquivo; Resolver Conflitos de Sincronização… na barra de ferramentas as compara."
                 }
               }
             }
@@ -4289,6 +4289,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tudo"
+          }
+        }
+      }
+    },
+    "All Commands": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle Befehle"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todos los comandos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toutes les commandes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "すべてのコマンド"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todos os comandos"
           }
         }
       }
@@ -25803,6 +25837,41 @@
         }
       }
     },
+    "No sync conflict copies": {
+      "comment": "Why Resolve Sync Conflicts… is greyed in the Commands list",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Konfliktkopien"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay copias de conflicto"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune copie de conflit"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "競合コピーはありません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhuma cópia de conflito"
+          }
+        }
+      }
+    },
     "No table at point": {
       "localizations": {
         "de": {
@@ -26281,6 +26350,76 @@
         }
       }
     },
+    "Not in a code block": {
+      "comment": "Why a command is greyed in the Commands list",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht in einem Codeblock"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No está en un bloque de código"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pas dans un bloc de code"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コードブロックの中ではありません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não está em um bloco de código"
+          }
+        }
+      }
+    },
+    "Not in a list": {
+      "comment": "Why a command is greyed in the Commands list",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht in einer Liste"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No está en una lista"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pas dans une liste"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リストの中ではありません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não está em uma lista"
+          }
+        }
+      }
+    },
     "Not in a subtree": {
       "localizations": {
         "de": {
@@ -26311,6 +26450,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fora de uma subárvore"
+          }
+        }
+      }
+    },
+    "Not on a link": {
+      "comment": "Why a command is greyed in the Commands list",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht auf einem Link"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No está en un enlace"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pas sur un lien"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リンクの上ではありません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não está em um link"
+          }
+        }
+      }
+    },
+    "Not on a timestamp": {
+      "comment": "Why a command is greyed in the Commands list",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht auf einem Zeitstempel"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No está en una marca de tiempo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pas sur un horodatage"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "タイムスタンプの上ではありません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não está em um carimbo de data"
           }
         }
       }
@@ -26617,6 +26826,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nada agendado"
+          }
+        }
+      }
+    },
+    "Nothing to do here": {
+      "comment": "Why a command is greyed in the Commands list",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hier gibt es nichts zu tun"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada que hacer aquí"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien à faire ici"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ここでは何もできません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada a fazer aqui"
           }
         }
       }
@@ -28712,6 +28956,41 @@
         }
       }
     },
+    "Plan": {
+      "comment": "Key bar button: a menu of Schedule, Deadline and Tags",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Planen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Planificar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Planifier"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "予定"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Planejar"
+          }
+        }
+      }
+    },
     "Plot": {
       "localizations": {
         "de": {
@@ -30607,6 +30886,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Recalculando no Emacs (%@)…"
+          }
+        }
+      }
+    },
+    "Recent": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zuletzt verwendet"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recientes"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Récentes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近使った項目"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recentes"
           }
         }
       }

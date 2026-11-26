@@ -36,7 +36,9 @@ struct EditorScreen: View {
     @State private var trust = TrustStore()
     /// The command chosen in the palette, run once the palette is gone.
     @State private var chosen: String?
-    @Environment(ClockModel.self) private var clock
+    /// The file's sync conflict copies and recovery versions, for their toolbar buttons.
+    @State private var syncCopies = 0
+    @State private var recoveries = 0
     @Environment(MobileModel.self) private var model
     @Environment(\.openURL) private var openURL
 
@@ -133,6 +135,12 @@ struct EditorScreen: View {
                 if pane?.conflict != nil {
                     Button("Conflict", systemImage: "exclamationmark.triangle") { sheet = .conflict }
                 }
+                if syncCopies > 0 {
+                    Button("Resolve Sync Conflicts…", systemImage: "doc.on.doc") { sheet = .syncCopies }
+                }
+                if recoveries > 0 {
+                    Button("Recovery Versions…", systemImage: "clock.arrow.circlepath") { sheet = .recovery }
+                }
                 Button("Find", systemImage: "magnifyingglass") {
                     textView?.interactions.lazy.compactMap { $0 as? UIFindInteraction }.first?.presentFindNavigator(showingReplace: false)
                 }
@@ -144,78 +152,10 @@ struct EditorScreen: View {
                 } primaryAction: {
                     editor?.run("edit.undo")
                 }
-                Menu("More", systemImage: "ellipsis.circle") {
-                    Button("Commands", systemImage: "command") { sheet = .palette }
-                    Button("Word Count", systemImage: "textformat.123") { message = wordCount() }
-                    Button("Clock In", systemImage: "stopwatch") { editor?.run("app.clock.in") }
-                    Button("Column View", systemImage: "rectangle.split.3x3") { editor?.run("org.columns") }
-                    Button("Column View of File", systemImage: "rectangle.split.3x3") { editor?.run("org.columns.global") }
-                    Menu("Table", systemImage: "tablecells") {
-                        Button("Import Table from File…", systemImage: "square.and.arrow.down") { importingTable = true }
-                        Button("Export Table as CSV…", systemImage: "square.and.arrow.up") { exportTable(csv: true) }
-                        Button("Export Table as TSV…", systemImage: "square.and.arrow.up") { exportTable(csv: false) }
-                        Button("Plot Table", systemImage: "chart.xyaxis.line") { plotTable() }
-                    }
-                    Toggle(isOn: Binding(get: { model.showMarkup }, set: { model.showMarkup = $0 })) {
-                        Label("Show Markup", systemImage: "eye")
-                    }
-                    RecentClockMenu(clock: clock) { editor?.run($0) }
-                    Button("Backlinks", systemImage: "arrow.uturn.backward.circle") { if ProAccess.shared.allows(.roam) { sheet = .backlinks } }
-                    Menu("Daily Notes", systemImage: "book.closed") {
-                        Button("Today", systemImage: "smallcircle.filled.circle") { roam("app.dailies.today") }
-                        Button("Yesterday", systemImage: "chevron.backward") { roam("app.dailies.yesterday") }
-                        Button("Tomorrow", systemImage: "chevron.forward") { roam("app.dailies.tomorrow") }
-                        Button("Date…", systemImage: "calendar.badge.clock") { roam("app.dailies.date") }
-                        Button("Capture to Today", systemImage: "square.and.pencil") { roam("app.dailies.capture-today") }
-                        Button("Previous Daily Note", systemImage: "arrow.left") { roam("app.dailies.previous") }
-                        Button("Next Daily Note", systemImage: "arrow.right") { roam("app.dailies.next") }
-                    }
-                    Button("Find Node…", systemImage: "point.3.connected.trianglepath.dotted") { roam("app.node.find") }
-                    Button("Insert Node Link…", systemImage: "link") { roam("app.node.insert") }
-                    Button("Node Graph", systemImage: "circle.hexagongrid") { if ProAccess.shared.allows(.roam) { sheet = .graph } }
-                    Menu("Attachments", systemImage: "paperclip") {
-                        Button("Attach File…", systemImage: "doc.badge.plus") { attaching = .cp }
-                        Button("Attach Photo or Video…", systemImage: "photo.badge.plus") { attachingPhotos = true }
-                        if CameraPicker.isAvailable {
-                            Button("Take Photo…", systemImage: "camera") { takingPhoto = true }
-                        }
-                        if DocumentScanner.isAvailable {
-                            Button("Scan Document…", systemImage: "doc.viewfinder") { scanning = true }
-                        }
-                        Button("Attach File from URL…", systemImage: "link.badge.plus") { attachActions.run("app.attach.url") }
-                        Button("New Attachment…", systemImage: "note.text.badge.plus") { attachActions.run("app.attach.new") }
-                        Button("Open Attachment…", systemImage: "paperclip") { attachActions.run("app.attach.open") }
-                        Button("Show Attachment Folder", systemImage: "folder") { attachActions.run("app.attach.reveal") }
-                        Button("Delete Attachment…", systemImage: "trash") { attachActions.run("app.attach.delete") }
-                        Button("Delete All Attachments…", systemImage: "trash.slash") { attachActions.run("app.attach.delete-all") }
-                        Button("Sync Attachments", systemImage: "arrow.triangle.2.circlepath") { attachActions.run("app.attach.sync") }
-                        Button("Set Attachment Folder…", systemImage: "folder.badge.gearshape") { attachActions.run("app.attach.set-directory") }
-                        Button("Unset Attachment Folder", systemImage: "folder.badge.minus") { attachActions.run("app.attach.unset-directory") }
-                    }
-                    Menu("Encryption", systemImage: "lock") {
-                        Button("Encrypt Entry…", systemImage: "lock") { crypt("app.crypt.encrypt-entry") }
-                        Button("Decrypt Entry…", systemImage: "lock.open") { crypt("app.crypt.open-entry") }
-                        Button("Decrypt Entry in File…", systemImage: "lock.open.trianglebadge.exclamationmark") { crypt("app.crypt.decrypt-entry") }
-                        Button("Encrypt Tagged Entries…", systemImage: "lock.rectangle.stack") { crypt("app.crypt.encrypt-entries") }
-                        Button("Forget Encryption Passphrase", systemImage: "key.slash") { crypt("app.crypt.forget-passphrase") }
-                    }
-                    if let tree = session.document(of: path)?.tree {
-                        ExportMenu(path: path, tree: tree, report: { message = $0 }, exportSubtree: exportSubtree)
-                    }
-                    Button("Resolve Sync Conflicts…", systemImage: "doc.on.doc") { sheet = .syncCopies }
-                    Button("Recovery Versions…", systemImage: "clock.arrow.circlepath") { sheet = .recovery }
-                    if onPaneCommand != nil, sizeClass == .regular {
-                        Menu("Panes", systemImage: "rectangle.split.2x1") {
-                            Button("Split Pane Right", systemImage: "rectangle.split.2x1") { _ = onPaneCommand?("app.split-right") }
-                            Button("Split Pane Below", systemImage: "rectangle.split.1x2") { _ = onPaneCommand?("app.split-below") }
-                            if inSplit {
-                                Button("Next Pane", systemImage: "arrow.right.square") { _ = onPaneCommand?("app.pane-next") }
-                                Button("Close Pane", systemImage: "xmark.square") { _ = onPaneCommand?("app.pane-close") }
-                                Button("Close Other Panes", systemImage: "square") { _ = onPaneCommand?("app.pane-only") }
-                            }
-                        }
-                    }
+                if let tree = session.document(of: path)?.tree {
+                    ExportMenu(path: path, tree: tree, report: { message = $0 }, exportSubtree: exportSubtree)
                 }
+                Button("Commands", systemImage: "command") { sheet = .palette }
             }
             }
         }
@@ -237,6 +177,7 @@ struct EditorScreen: View {
             }
         }
         .sheet(item: $sheet, onDismiss: {
+            countVersions()
             // After the sheet has gone, so a command's own prompt can show.
             if let id = chosen {
                 chosen = nil
@@ -244,7 +185,8 @@ struct EditorScreen: View {
             }
         }) { sheet in
             switch sheet {
-            case .palette: if let editor { CommandPalette(editor: editor, panes: onPaneCommand != nil && sizeClass == .regular, split: inSplit) { chosen = $0 } }
+            case .palette: if let editor { CommandPalette(editor: editor, panes: onPaneCommand != nil && sizeClass == .regular, split: inSplit,
+                                                                    recoveries: recoveries, syncCopies: syncCopies) { chosen = $0 } }
             case .conflict: ConflictSheet(session: session)
             case .syncCopies: SyncConflictSheet(session: session) { message = $0 }
             case .recovery: RecoverySheet(session: session) { message = $0 }
@@ -343,6 +285,7 @@ struct EditorScreen: View {
             if case .failure(let error) = result { message = error.localizedDescription } else { message = "Export done." }
         }
         .onChange(of: pane?.conflict) { _, conflict in
+            countVersions()
             if conflict != nil, isFocused { sheet = .conflict }
         }
         .onChange(of: session.lastError) { _, error in
@@ -355,6 +298,7 @@ struct EditorScreen: View {
         .onAppear(perform: start)
         // A pane command moved focus here.
         .onChange(of: isFocused) {
+            countVersions()
             guard isFocused, let textView, !textView.isFirstResponder else { return }
             editor?.focus(textView)
             textView.becomeFirstResponder()
@@ -445,11 +389,19 @@ struct EditorScreen: View {
         textView = view
         if let offset { editor.reveal(offset) }
         if let template = SnippetLibrary.shared.takeTemplate(for: path) { DispatchQueue.main.async { _ = editor.perform(ExpandNamedSnippet(snippet: template)) } }
+        countVersions()
         if pane.conflict != nil {
             sheet = .conflict
-        } else if case let copies = session.syncConflictCopies().count, copies > 0 {
-            message = String(localized: "\(copies) sync conflict copies of this file; More › Resolve Sync Conflicts… compares them.")
+        } else if syncCopies > 0 {
+            message = String(localized: "\(syncCopies) sync conflict copies of this file; Resolve Sync Conflicts… in the toolbar compares them.")
         }
+    }
+
+    /// Counts the focused file's sync conflict copies and recovery versions.
+    private func countVersions() {
+        guard isFocused else { return }
+        syncCopies = session.syncConflictCopies().count
+        recoveries = session.recoveryVersions().count
     }
 
     private func makeEditor() -> MobileEditor? {
@@ -508,8 +460,20 @@ struct EditorScreen: View {
                 sheet = .refile(id)
             } else if id == "app.table-import" {
                 importingTable = true
-            } else if id == "app.table-export" {
-                exportTable(csv: true)
+            } else if id == "app.table-export" || id == "app.table-export.tsv" {
+                exportTable(csv: id == "app.table-export")
+            } else if id == "app.word-count" {
+                message = wordCount()
+            } else if id == "app.recovery" {
+                sheet = .recovery
+            } else if id == "app.sync-conflicts" {
+                sheet = .syncCopies
+            } else if id == "app.attach.photo" {
+                attachingPhotos = true
+            } else if id == "app.attach.camera" {
+                takingPhoto = true
+            } else if id == "app.attach.scan" {
+                scanning = true
             } else if id == "app.plot" {
                 plotTable()
             } else if id.hasPrefix("app.crypt.") {
@@ -729,11 +693,6 @@ extension EditorScreen {
         }
     }
 
-    /// Org-roam's commands, with Pro.
-    private func roam(_ id: String) {
-        if ProAccess.shared.allows(.roam) { roamActions.run(id) }
-    }
-
     /// org-crypt's commands at the caret, through the passphrase sheet.
     private func crypt(_ id: String) {
         if let feature = ProFeature.required(byCommand: id), !ProAccess.shared.allows(feature) { return }
@@ -847,78 +806,155 @@ struct EditorTextView: UIViewRepresentable {
 }
 
 /// Org's keys for a touch keyboard: each button does what its key does at the caret, as the
-/// Emacs keymap binds it (M-→ demotes a heading, indents an item, moves a table column).
+/// Emacs keymap binds it (M-→ demotes a heading, indents an item, moves a table column). It holds
+/// what is repeated at the caret while typing; the rest is in Commands. Its buttons share the
+/// width, without scrolling.
 struct KeyBar: View {
     let editor: MobileEditor
     let palette: () -> Void
+    @Environment(\.horizontalSizeClass) private var sizeClass
 
-    private static let keys: [(label: String, symbol: String?, keys: String)] = [
-        (String(localized: "Fold", comment: "Key bar button"), "arrow.right.to.line", "TAB"),
-        (String(localized: "Overview", comment: "Key bar button"), "arrow.left.to.line", "S-TAB"),
-        (String(localized: "Promote", comment: "Key bar button"), "decrease.indent", "M-<left>"),
-        (String(localized: "Demote", comment: "Key bar button"), "increase.indent", "M-<right>"),
-        (String(localized: "Move Up", comment: "Key bar button"), "arrow.up.square", "M-<up>"),
-        (String(localized: "Move Down", comment: "Key bar button"), "arrow.down.square", "M-<down>"),
-        (String(localized: "New Heading or Item", comment: "Key bar button"), "plus", "M-RET"),
-        ("TODO", nil, "C-c C-t"),
-        (String(localized: "Act at Point", comment: "Key bar button"), "checkmark.square", "C-c C-c"),
-        (String(localized: "Schedule", comment: "Key bar button"), "calendar", "C-c C-s"),
-        (String(localized: "Deadline", comment: "Key bar button"), "calendar.badge.exclamationmark", "C-c C-d"),
-        (String(localized: "Tags", comment: "Key bar button"), "tag", "C-c C-q"),
-        (String(localized: "Open Link", comment: "Key bar button"), "link", "C-c C-o"),
+    /// A button the bar can hold.
+    struct Item {
+        enum Action {
+            /// What the keys are bound to at the caret.
+            case keys(String)
+            case command(String)
+            case palette
+            /// Schedule, Deadline and Tags in a menu.
+            case plan
+            case hideKeyboard
+        }
+
+        let label: String
+        /// Nil shows the label as text.
+        let symbol: String?
+        let action: Action
+    }
+
+    /// Every button the bar can hold, by id.
+    static let items: [String: Item] = [
+        "commands": Item(label: String(localized: "Commands"), symbol: "command", action: .palette),
+        "fold": Item(label: String(localized: "Fold", comment: "Key bar button"), symbol: "arrow.right.to.line", action: .keys("TAB")),
+        "overview": Item(label: String(localized: "Overview", comment: "Key bar button"), symbol: "arrow.left.to.line", action: .keys("S-TAB")),
+        "promote": Item(label: String(localized: "Promote", comment: "Key bar button"), symbol: "decrease.indent", action: .keys("M-<left>")),
+        "demote": Item(label: String(localized: "Demote", comment: "Key bar button"), symbol: "increase.indent", action: .keys("M-<right>")),
+        "move-up": Item(label: String(localized: "Move Up", comment: "Key bar button"), symbol: "arrow.up.square", action: .keys("M-<up>")),
+        "move-down": Item(label: String(localized: "Move Down", comment: "Key bar button"), symbol: "arrow.down.square", action: .keys("M-<down>")),
+        "new-heading": Item(label: String(localized: "New Heading or Item", comment: "Key bar button"), symbol: "plus", action: .keys("M-RET")),
+        "todo": Item(label: "TODO", symbol: nil, action: .keys("C-c C-t")),
+        "act": Item(label: String(localized: "Act at Point", comment: "Key bar button"), symbol: "checkmark.square", action: .keys("C-c C-c")),
+        "plan": Item(label: String(localized: "Plan", comment: "Key bar button: a menu of Schedule, Deadline and Tags"), symbol: "calendar.badge.clock", action: .plan),
+        "schedule": Item(label: String(localized: "Schedule", comment: "Key bar button"), symbol: "calendar", action: .keys("C-c C-s")),
+        "deadline": Item(label: String(localized: "Deadline", comment: "Key bar button"), symbol: "calendar.badge.exclamationmark", action: .keys("C-c C-d")),
+        "tags": Item(label: String(localized: "Tags", comment: "Key bar button"), symbol: "tag", action: .keys("C-c C-q")),
+        "open-link": Item(label: String(localized: "Open Link", comment: "Key bar button"), symbol: "link", action: .keys("C-c C-o")),
+        "bold": Item(label: String(localized: "Bold", comment: "Key bar button"), symbol: "bold", action: .command("org.emphasize.bold")),
+        "italic": Item(label: String(localized: "Italic", comment: "Key bar button"), symbol: "italic", action: .command("org.emphasize.italic")),
+        "code": Item(label: String(localized: "Code", comment: "Key bar button"), symbol: "chevron.left.forwardslash.chevron.right", action: .command("org.emphasize.code")),
+        "hide-keyboard": Item(label: String(localized: "Hide Keyboard"), symbol: "keyboard.chevron.compact.down", action: .hideKeyboard),
     ]
 
-    /// Emphasis for the selection, or a pair of markers with the caret between.
-    private static let emphasis: [(label: String, symbol: String, command: String)] = [
-        (String(localized: "Bold", comment: "Key bar button"), "bold", "org.emphasize.bold"),
-        (String(localized: "Italic", comment: "Key bar button"), "italic", "org.emphasize.italic"),
-        (String(localized: "Code", comment: "Key bar button"), "chevron.left.forwardslash.chevron.right", "org.emphasize.code"),
-    ]
+    /// The bar's buttons in order. On iPad, where it is wider, Plan's three are buttons.
+    static func layout(regular: Bool) -> [String] {
+        ["commands", "fold", "promote", "demote", "move-up", "move-down", "new-heading", "todo", "act"]
+            + (regular ? ["schedule", "deadline", "tags"] : ["plan"]) + ["hide-keyboard"]
+    }
 
-    /// The bar's buttons are at least 44 points square, scaled with the text size up to here.
+    /// The bar's buttons are at least 44 points tall, scaled with the text size up to here.
     static let largestSize = DynamicTypeSize.accessibility2
     static let target: CGFloat = 44
     static let padding: CGFloat = 4
+    /// The widest a button gets where the bar has room.
+    static let widest: CGFloat = 64
     @ScaledMetric(relativeTo: .body) private var size = KeyBar.target
 
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 4) {
-                Button("Commands", systemImage: "command", action: palette)
-                ForEach(Self.keys, id: \.keys) { key in
-                    Button {
-                        editor.run(keys: key.keys)
-                    } label: {
-                        if let symbol = key.symbol { Label(key.label, systemImage: symbol) } else { Text(key.label).font(.callout.weight(.semibold)) }
-                    }
-                    .accessibilityLabel(key.label)
-                }
-                ForEach(Self.emphasis, id: \.command) { item in
-                    Button(item.label, systemImage: item.symbol) { editor.run(item.command) }
-                }
-                Button("Hide Keyboard", systemImage: "keyboard.chevron.compact.down") { editor.textView.resignFirstResponder() }
+        HStack(spacing: 0) {
+            ForEach(Self.layout(regular: sizeClass == .regular), id: \.self) { id in
+                if let item = Self.items[id] { button(item) }
             }
-            .labelStyle(.iconOnly)
-            .buttonStyle(KeyStyle(size: size))
-            .padding(.horizontal, 8)
-            .padding(.vertical, Self.padding)
         }
+        .labelStyle(.iconOnly)
+        .padding(.horizontal, 6)
+        .padding(.vertical, Self.padding)
+        .frame(maxWidth: .infinity)
         .background(.bar)
+    }
+
+    @ViewBuilder
+    private func button(_ item: Item) -> some View {
+        switch item.action {
+        case .plan:
+            Menu {
+                ForEach(["schedule", "deadline", "tags"], id: \.self) { id in
+                    if let entry = Self.items[id], case .keys(let keys) = entry.action {
+                        Button(entry.label, systemImage: entry.symbol ?? "") { editor.run(keys: keys) }
+                    }
+                }
+            } label: {
+                label(item).modifier(KeyShape(size: size))
+            }
+            .accessibilityLabel(item.label)
+        default:
+            Button {
+                switch item.action {
+                case .keys(let keys): editor.run(keys: keys)
+                case .command(let id): editor.run(id)
+                case .palette: palette()
+                case .hideKeyboard: editor.textView.resignFirstResponder()
+                case .plan: break
+                }
+            } label: {
+                label(item)
+            }
+            .buttonStyle(KeyStyle(size: size))
+            .accessibilityLabel(item.label)
+        }
+    }
+
+    /// The buttons grow taller with the text size, but their symbols stop growing here, so
+    /// that they fit the button's share of the width.
+    static let largestSymbolSize = DynamicTypeSize.xxxLarge
+
+    @ViewBuilder
+    private func label(_ item: Item) -> some View {
+        Group {
+            if let symbol = item.symbol {
+                Label(item.label, systemImage: symbol)
+            } else {
+                // A word is wider than a symbol, so it stays at the default size.
+                Text(item.label).font(.callout.weight(.semibold)).lineLimit(1).minimumScaleFactor(0.5)
+                    .dynamicTypeSize(...DynamicTypeSize.large)
+            }
+        }
+        .dynamicTypeSize(...Self.largestSymbolSize)
     }
 }
 
-/// A key bar button: a tinted symbol on a capsule, at least `size` square.
+/// A key bar button's look: a tinted label on a rounded tile, `size` tall, sharing the bar's
+/// width with the others. The whole share is the touch target.
+private struct KeyShape: ViewModifier {
+    let size: CGFloat
+    var pressed = false
+
+    func body(content: Content) -> some View {
+        content
+            .foregroundStyle(.tint)
+            .frame(maxWidth: KeyBar.widest, minHeight: size)
+            .background(.fill.tertiary, in: .rect(cornerRadius: 10))
+            .opacity(pressed ? 0.5 : 1)
+            .padding(.horizontal, 2)
+            .frame(maxWidth: .infinity)
+            .contentShape(.rect)
+    }
+}
+
 private struct KeyStyle: ButtonStyle {
     let size: CGFloat
 
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .foregroundStyle(.tint)
-            .padding(.horizontal, 10)
-            .frame(minWidth: size, minHeight: size)
-            .background(.fill.tertiary, in: .capsule)
-            .opacity(configuration.isPressed ? 0.5 : 1)
-            .contentShape(.capsule)
+        configuration.label.modifier(KeyShape(size: size, pressed: configuration.isPressed))
     }
 }
 
@@ -1112,16 +1148,17 @@ struct CodeTextView: UIViewRepresentable {
     }
 }
 
-/// Every command that applies at the caret, by name.
+/// The editor's commands, those that don't apply at the caret greyed with the reason.
 struct CommandPalette: View {
     let editor: MobileEditor
     /// The pane commands are offered (on iPad), and those for more than one pane.
     var panes = false
     var split = false
+    /// Recovery versions and sync conflict copies of the file, which their commands show.
+    var recoveries = 0
+    var syncCopies = 0
     /// Called with the chosen command before the palette closes.
     let choose: (String) -> Void
-    @State private var query = ""
-    @Environment(\.dismiss) private var dismiss
 
     static let viewCommands: [(id: String, title: String)] = [
         ("org.cycle", "Cycle Visibility"), ("org.cycle-global", "Cycle Global Visibility"),
@@ -1136,12 +1173,14 @@ struct CommandPalette: View {
         ("app.export.icalendar-agenda", "Export Agenda Files to iCalendar"), ("app.export.icalendar-combined", "Combine Agenda Files into iCalendar"),
         ("app.publish", "Publish Project…"), ("app.publish.all", "Publish All Projects"), ("app.publish.current-file", "Publish Current File"),
         ("app.publish.current-project", "Publish Current Project"),
-        ("app.toggle-markup", "Show or Hide Markup"),
+        ("app.toggle-markup", "Show or Hide Markup"), ("app.word-count", "Word Count"),
+        ("app.recovery", "Recovery Versions…"), ("app.sync-conflicts", "Resolve Sync Conflicts…"),
         ("org.toggle-inline-images", "Show or Hide Inline Images"), ("org.toggle-inline-images-linked", "Show or Hide Inline Images, Including Described Links"), ("org.latex-preview", "Show or Hide LaTeX Previews"), ("editor.toggle-truncate-lines", "Truncate or Wrap Long Lines"), ("editor.toggle-auto-fill", "Turn Auto Fill On or Off"),
         ("edit.isearch-forward", "Incremental Search"), ("edit.isearch-backward", "Incremental Search Backward"),
         ("org.table.toggle-column-width", "Shrink or Expand Table Column"), ("org.table.shrink", "Shrink Table Columns with Widths"),
         ("org.table.expand", "Expand Table Columns"),
-        ("app.table-import", "Import Table from File…"), ("app.table-export", "Export Table to File…"), ("app.plot", "Plot Table"),
+        ("app.table-import", "Import Table from File…"), ("app.table-export", "Export Table to File…"),
+        ("app.table-export.tsv", "Export Table as TSV…"), ("app.plot", "Plot Table"),
         ("app.crypt.encrypt-entry", "Encrypt Entry…"), ("app.crypt.open-entry", "Decrypt Entry…"), ("app.crypt.decrypt-entry", "Decrypt Entry in File…"),
         ("app.crypt.encrypt-entries", "Encrypt Tagged Entries…"), ("app.crypt.forget-passphrase", "Forget Encryption Passphrase"),
         ("app.backlinks", "Show Backlinks"), ("app.node.find", "Find Node…"), ("app.node.insert", "Insert Node Link…"), ("app.node.graph", "Show Node Graph"),
@@ -1169,46 +1208,52 @@ struct CommandPalette: View {
         ("app.dailies.capture-today", "Capture to Today's Daily Note"), ("app.dailies.capture-yesterday", "Capture to Yesterday's Daily Note"),
         ("app.dailies.capture-tomorrow", "Capture to Tomorrow's Daily Note"), ("app.dailies.capture-date", "Capture to Daily Note for Date…"),
         ("app.dailies.next", "Next Daily Note"), ("app.dailies.previous", "Previous Daily Note"),
-        ("app.attach.attach", "Attach File…"), ("app.attach.url", "Attach File from URL…"), ("app.attach.new", "New Attachment…"),
+        ("app.attach.attach", "Attach File…"), ("app.attach.photo", "Attach Photo or Video…"), ("app.attach.camera", "Take Photo…"),
+        ("app.attach.scan", "Scan Document…"), ("app.attach.url", "Attach File from URL…"), ("app.attach.new", "New Attachment…"),
         ("app.attach.open", "Open Attachment…"), ("app.attach.reveal", "Show Attachment Folder"), ("app.attach.delete", "Delete Attachment…"),
         ("app.attach.delete-all", "Delete All Attachments…"), ("app.attach.sync", "Sync Attachments"),
         ("app.attach.set-directory", "Set Attachment Folder…"), ("app.attach.unset-directory", "Unset Attachment Folder"),
     ]
 
-    /// The commands that apply at the caret and their keys, worked out once when the palette
-    /// opens rather than on every keystroke in the search field.
-    @State private var applicable: [(id: String, title: String, keys: String?)]?
+    /// The commands and their keys, and why those that don't apply at the caret don't, worked
+    /// out once when the palette opens rather than on every keystroke in the search field.
+    @State private var rows: [CommandRow]?
 
     var body: some View {
-        let shown = (applicable ?? []).filter { query.isEmpty || $0.title.localizedCaseInsensitiveContains(query) }
-        NavigationStack {
-            List(shown, id: \.id) { command in
-                Button {
-                    choose(command.id)
-                    dismiss()
-                } label: {
-                    HStack {
-                        Text(command.title).foregroundStyle(.primary)
-                        Spacer()
-                        if let keys = command.keys {
-                            Text(keys).font(.caption.monospaced()).foregroundStyle(.secondary)
-                        }
-                    }
-                }
+        CommandList(rows: rows ?? [], choose: choose)
+            .onAppear {
+                guard rows == nil else { return }
+                rows = commandRows()
             }
-            .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always))
-            .navigationTitle("Commands")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+    }
+
+    private func commandRows() -> [CommandRow] {
+        let context = editor.editContext()
+        let paneCommands: [(id: String, title: String)] = !panes ? [] : [("app.split-right", "Split Pane Right"), ("app.split-below", "Split Pane Below")]
+            + (split ? [("app.pane-next", "Next Pane"), ("app.pane-close", "Close Pane"), ("app.pane-only", "Close Other Panes")] : [])
+        var seen = Set<String>()
+        return (paneCommands + Self.viewCommands + Commands.everything.map { ($0.id, $0.title) })
+            .filter { !AppStoreCommands.hidden.contains($0.id) && Self.offered($0.id) && seen.insert($0.id).inserted }
+            .map { command in
+                CommandRow(id: command.id, title: CommandTitle.localized(command.title), keys: editor.keymap.keyLabels(for: command.id).first,
+                           reason: reason(command.id, context))
+            }
+    }
+
+    /// Commands for a camera or scanner this device lacks aren't listed.
+    private static func offered(_ id: String) -> Bool {
+        switch id {
+        case "app.attach.camera": CameraPicker.isAvailable
+        case "app.attach.scan": DocumentScanner.isAvailable
+        default: true
         }
-        .onAppear {
-            guard applicable == nil else { return }
-            let context = editor.editContext()
-            let paneCommands: [(id: String, title: String)] = !panes ? [] : [("app.split-right", "Split Pane Right"), ("app.split-below", "Split Pane Below")]
-                + (split ? [("app.pane-next", "Next Pane"), ("app.pane-close", "Close Pane"), ("app.pane-only", "Close Other Panes")] : [])
-            applicable = paneCommands.map { ($0.id, CommandTitle.localized($0.title), editor.keymap.keyLabels(for: $0.id).first) } + (Self.viewCommands + Commands.everything.map { ($0.id, $0.title) })
-                .filter { editor.applies($0.id, in: context) }
-                .map { ($0.id, CommandTitle.localized($0.title), editor.keymap.keyLabels(for: $0.id).first) }
+    }
+
+    private func reason(_ id: String, _ context: EditContext) -> String? {
+        switch id {
+        case "app.recovery": return recoveries > 0 ? nil : String(localized: "No Recovery Versions")
+        case "app.sync-conflicts": return syncCopies > 0 ? nil : String(localized: "No sync conflict copies", comment: "Why Resolve Sync Conflicts… is greyed in the Commands list")
+        default: return editor.applies(id, in: context) ? nil : CommandReason.reason(for: id, in: context)
         }
     }
 }

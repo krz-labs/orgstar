@@ -477,7 +477,8 @@ final class MobileEditor: NSObject, DocumentBuffer {
         case _ where id.hasPrefix("app.dailies."): return onAppCommand != nil
         case "app.crypt.encrypt-entry": return onAppCommand != nil && OrgCrypt.heading(context.text, at: context.caret) != nil && OrgCrypt.encryptedRange(context.text, at: context.caret) == nil
         case "app.crypt.open-entry", "app.crypt.decrypt-entry": return onAppCommand != nil && OrgCrypt.encryptedRange(context.text, at: context.caret) != nil
-        case "app.table-export", "app.plot": return onAppCommand != nil && ImportTable.exportText(context.text, at: context.caret, path: "") != nil
+        case "app.table-export", "app.table-export.tsv", "app.plot": return onAppCommand != nil && ImportTable.exportText(context.text, at: context.caret, path: "") != nil
+        case "app.word-count", "app.recovery", "app.sync-conflicts", "app.attach.photo", "app.attach.camera", "app.attach.scan": return onAppCommand != nil
         case "app.refile", "app.refile.copy", "app.archive": return onAppCommand != nil && Presentation.heading(containing: context.caret, in: context.tree) != nil
         case "app.copy-rich-text", "app.export.html-open", "app.export-body-only", "app.export.icalendar-agenda", "app.export.icalendar-combined": return onAppCommand != nil
         case _ where id.hasPrefix("app.publish"): return onAppCommand != nil
@@ -682,7 +683,21 @@ extension MobileEditor: UITextViewDelegate {
     /// Another view's caret moves with edits made in this one; only the focused view's
     /// selection drives the display.
     func textView(_ textView: UITextView, editMenuForTextIn range: NSRange, suggestedActions: [UIMenuElement]) -> UIMenu? {
-        options.spellCheck ? spellingMenu(for: range, in: textView, suggested: suggestedActions) : nil
+        let suggested = range.length > 0 && textView.isEditable ? suggestedActions + [formatMenu] : suggestedActions
+        if options.spellCheck, let menu = spellingMenu(for: range, in: textView, suggested: suggested) { return menu }
+        return suggested.count == suggestedActions.count ? nil : UIMenu(children: suggested)
+    }
+
+    /// Org's emphasis for the selection, in its edit menu.
+    private var formatMenu: UIMenu {
+        let styles: [(title: String, symbol: String, command: String)] = [
+            (String(localized: "Bold"), "bold", "org.emphasize.bold"),
+            (String(localized: "Italic"), "italic", "org.emphasize.italic"),
+            (String(localized: "Code"), "chevron.left.forwardslash.chevron.right", "org.emphasize.code"),
+        ]
+        return UIMenu(title: String(localized: "Format"), image: UIImage(systemName: "bold.italic.underline"), children: styles.map { style in
+            UIAction(title: style.title, image: UIImage(systemName: style.symbol)) { [weak self] _ in self?.run(style.command) }
+        })
     }
 
     func textViewDidChangeSelection(_ textView: UITextView) {

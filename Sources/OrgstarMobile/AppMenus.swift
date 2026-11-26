@@ -99,32 +99,12 @@ struct AppMenus: SwiftUI.Commands {
     }
 }
 
-/// Org: the org commands and the app's commands for entries and notes, in the Mac's submenus,
-/// with the keys that run them in the current keymap.
+/// Org: the org commands and the app's commands for entries and notes, in the Org menu's
+/// submenus (`CommandGroups.orgMenu`), with the keys that run them in the current keymap.
 private struct OrgMenuItems: View {
     let editor: MobileEditor?
 
-    /// The Mac's Org submenus (`Sources/Orgstar/OrgstarApp.swift`) and the command id prefixes
-    /// they hold. A command goes in the first submenu with a prefix it starts with.
-    static let groups: [(title: LocalizedStringKey, prefixes: [String])] = [
-        ("Visibility", ["org.cycle", "org.fold.", "org.narrow.", "org.widen", "org.sparse-tree", "org.toggle-inline-images", "org.latex-preview"]),
-        ("Headings", ["org.heading.", "org.subtree.", "org.element.", "org.goto", "org.sort", "org.archive.", "app.refile", "app.archive"]),
-        ("TODO and Tags", ["org.todo.", "org.priority.", "org.tags.", "org.effort."]),
-        ("Properties and Columns", ["org.property.", "org.columns", "org.drawer."]),
-        ("Dates and Timers", ["org.schedule", "org.deadline", "org.timestamp.", "org.timer."]),
-        ("Lists", ["org.item.", "org.checkbox."]),
-        ("Tables", ["org.table", "app.table-", "app.plot"]),
-        ("Links and Footnotes", ["org.link.", "org.id.", "org.footnote."]),
-        ("Blocks", ["org.babel.", "org.structure-template", "org.edit-special", "org.dblock.", "org.clock.report", "org.denote."]),
-        ("Text", ["org.emphasize", "org.fill-"]),
-        ("Attachments", ["app.attach."]),
-        ("Notes", ["app.dailies.", "app.node."]),
-        ("Encryption", ["app.crypt."]),
-    ]
-
-    private static func group(of id: String) -> Int? {
-        groups.firstIndex { $0.prefixes.contains { id.hasPrefix($0) } }
-    }
+    private static func group(of id: String) -> Int? { CommandGroups.group(of: id) }
 
     /// The commands the iOS editor knows, less the ones the App Store build hides, once each.
     private static let shown: [(id: String, title: String)] = {
@@ -137,8 +117,8 @@ private struct OrgMenuItems: View {
         // Commands that fit no subject, such as Act at Point, come first.
         ForEach(Self.shown.filter { Self.group(of: $0.id) == nil }, id: \.id) { item($0) }
         Divider()
-        ForEach(Self.groups.indices, id: \.self) { index in
-            Menu(Self.groups[index].title) {
+        ForEach(CommandGroups.orgMenu.indices, id: \.self) { index in
+            Menu(CommandGroups.orgMenu[index].title) {
                 ForEach(Self.shown.filter { Self.group(of: $0.id) == index }, id: \.id) { item($0) }
             }
         }

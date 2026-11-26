@@ -36,7 +36,7 @@ Colours come from the theme and follow the system's light or dark appearance. Th
 
 Emphasize… (=C-c C-x C-f= in the Emacs and Doom presets, =org-emphasize=) asks for a marker: =*= bold, =/= italic, =_= underline, === verbatim, =~= code, =+= strike-through, or =SPC= to remove emphasis. With a selection it wraps the selection in the marker, replacing one the selection already has. Without one it inserts a pair of markers with the caret between them. A space goes before or after the markers where the text next to them couldn't border emphasis, as Org adds it.
 
-The Mac preset binds =⌘B=, =⌘I= and =⌘U= to bold, italic and underline. Each marker is also a command of its own in the palette (Bold, Italic, Underline, Verbatim, Code, Strike-Through), for binding in =keymap.toml=; see [[file:03-keys.org][Keys and commands]]. On iOS the key bar has Bold, Italic and Code.
+The Mac preset binds =⌘B=, =⌘I= and =⌘U= to bold, italic and underline. Each marker is also a command of its own in the palette (Bold, Italic, Underline, Verbatim, Code, Strike-Through), for binding in =keymap.toml=; see [[file:03-keys.org][Keys and commands]]. On iOS, Bold, Italic and Code are in the edit menu of a selection, under Format, and in Commands.
 
 ** Indentation and stars
 

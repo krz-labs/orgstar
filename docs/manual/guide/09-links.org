@@ -339,7 +339,7 @@ repeat show their file's name. A file node's title is its =#+TITLE=, or its name
 
 A title that no node has makes a new node, as org-roam's default capture template does: a file named =%<%Y%m%d%H%M%S>-${slug}.org= in =org-roam-directory= (the first folder unless it is set), starting with an =ID= property drawer and =#+title:= and the title. Find Node… opens it; Insert Node Link… links to it. The slug is the title in lower case, accents dropped, with everything but letters and digits as one =_=, as =org-roam-node-slugify= makes it.
 
-*The graph.* Show Node Graph, or Window ▸ Node Graph on the Mac and More ▸ Node Graph on iOS, draws every node as a dot and every =id:= link between two nodes as a line. It is part of orgstar+.
+*The graph.* Show Node Graph, or Window ▸ Node Graph on the Mac and Commands on iOS, draws every node as a dot and every =id:= link between two nodes as a line. It is part of orgstar+.
 
 - A link belongs to the innermost heading with an ID around it, else to its file's node; a link written where there is no node, or to an ID no node has, isn't drawn. Several links between the same two nodes are one line.
 - A dot is larger the more links its node has. The node the caret is in is orange. Titles are drawn where they have room, the most-linked nodes first; zooming in shows more.
@@ -637,7 +637,7 @@ web, mail and other files go to the system. The iOS editor shows inline images a
 Mac does, and so does the reader, except in headings. In the editor, Store Link, Store ID Link and Insert Link…
 are in Commands, and on a hardware keyboard the Emacs keys run them; they work as
 described above, and stored links last until the app quits. =org-protocol://store-link=
-links opened on the device are stored and copied too. More ▸ Backlinks lists the same
+links opened on the device are stored and copied too. Show Backlinks in Commands lists the same
 links as the Mac's backlinks pane, for the heading at the caret and the file. See
 [[file:14-ios.org][iOS]].
 

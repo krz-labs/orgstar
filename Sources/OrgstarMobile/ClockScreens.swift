@@ -33,6 +33,11 @@ final class ClockPrompter {
 /// The clock commands both the editor and the clock accessory run.
 @MainActor
 enum MobileClock {
+    /// The clock commands that need no caret, for the Commands list of a screen without one.
+    static let screenCommands: [(id: String, title: String)] = CommandPalette.viewCommands.filter {
+        $0.id.hasPrefix("app.clock.") && !["app.clock.in", "app.clock.default"].contains($0.id)
+    }
+
     /// Runs a clock command; false for other ids. Messages go to `show`; entries to show open.
     static func run(_ id: String, model: MobileModel, workspace: WorkspaceModel, show: @escaping (String) -> Void) -> Bool {
         let clock = model.clock

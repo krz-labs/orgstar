@@ -76,7 +76,7 @@ Syncthing writes files without file coordination. orgstar sees its changes throu
 - Its folders =.stfolder= and =.stversions= are in the default =ignored-folders=.
 - Conflict copies (=name.sync-conflict-YYYYMMDD-HHMMSS-ID.org=) are listed in the sidebar but never indexed, so they don't appear in the agenda, search or ID links.
 
-When a file with conflict copies opens, a message says how many there are. File ▸ Resolve Sync Conflicts… (More ▸ Resolve Sync Conflicts… on iOS) lists each copy against the file, with lines marked - in the file and + in the copy:
+When a file with conflict copies opens, a message says how many there are. File ▸ Resolve Sync Conflicts… (on iOS, a toolbar button while there are copies, and in Commands) lists each copy against the file, with lines marked - in the file and + in the copy:
 
 | Button             | Effect                                                                                     |
 |--------------------+--------------------------------------------------------------------------------------------|
@@ -111,7 +111,7 @@ Each file has a subfolder named from a hash of its path, holding its last 20 rep
 | =sync-conflict= | A Syncthing conflict copy was resolved                                        |
 | =snapshot=      | A save changed the file and the last snapshot was more than an hour before    |
 
-File ▸ Recovery Versions… (More ▸ Recovery Versions… on iOS) lists the open file's kept versions, newest first, each compared with the buffer (lines marked - in the buffer, + in the kept version). Restore puts a version's text in the buffer as an edit you can undo; the buffer as it was goes to the recovery folder first. On the Mac, Show in Finder selects the version's file.
+File ▸ Recovery Versions… (on iOS, a toolbar button while there are versions, and in Commands) lists the open file's kept versions, newest first, each compared with the buffer (lines marked - in the buffer, + in the kept version). Restore puts a version's text in the buffer as an edit you can undo; the buffer as it was goes to the recovery folder first. On the Mac, Show in Finder selects the version's file.
 
 * Features that use Emacs on the Mac
 

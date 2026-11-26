@@ -42,7 +42,7 @@ Tap a file in Folders or Search, or Open in File in an agenda entry's sheet, to 
 - Text is styled as in the editor, in the theme's colours, font, size, line spacing and heading sizes, on the theme's background: TODO keywords, priorities, tags, emphasis, code, timestamps, links, and the code in src blocks. Text can be selected and copied.
 - The reader follows the editor's display settings (see Themes and display below): Show Markup, hidden emphasis markers, pretty entities, indentation, leading stars, inline images and truncated lines. Tables show at full width, without narrowed columns.
 - Tap a link to follow it. Links to headings and files in your folders open in the reader; links to other files, such as an attached PDF or image, open in Quick Look; web links open in the browser.
-- The toolbar has Find, Outline (a list of headings to jump to), Export, and Edit (the pencil).
+- The toolbar has Find, Outline (a list of headings to jump to), Export, Edit (the pencil) and Commands: Find, Outline, Show or Hide Markup, Capture… and the clock commands that need no caret.
 - Tags aligned with spaces show at the right edge of the heading's line, or on a line of their own at the right when the heading wraps (see [[file:02-the-editor.org][The editor]], Wrapping and filling).
 - Find opens the system find bar over the file's text. Results are marked, and the one shown is unfolded and scrolled to.
 
@@ -50,14 +50,19 @@ Tap a file in Folders or Search, or Open in File in an agenda entry's sheet, to 
 
 Tap Edit in the reader. The title shows the buffer name, with =•= while there are unsaved changes. The tab bar is hidden while you edit.
 
-The editor folds headings, drawers and blocks (tap a fold's =…= to open it, and an open drawer's first line to fold it), styles text with the theme from the configuration folder (see Themes and display below), and runs the same Org commands as the Mac. Autocorrection, smart quotes and smart dashes are off; spell checking follows =spell-check= in =config.toml= and is off by default; it leaves out code, links, dates, tags and keywords, as on the Mac. More ▸ Word Count shows the words, characters and reading time of the selection, or of the file.
+The editor folds headings, drawers and blocks (tap a fold's =…= to open it, and an open drawer's first line to fold it), styles text with the theme from the configuration folder (see Themes and display below), and runs the same Org commands as the Mac. Autocorrection, smart quotes and smart dashes are off; spell checking follows =spell-check= in =config.toml= and is off by default; it leaves out code, links, dates, tags and keywords, as on the Mac. Word Count in Commands shows the words, characters and reading time of the selection, or of the file.
 
 The toolbar has:
 
 - Conflict :: shown while the file and your edits conflict; opens the conflict sheet.
 - Find :: the system find bar. The result shown is selected, and opened when it is in folded text.
+- Resolve Sync Conflicts… :: shown while the file has Syncthing conflict copies; see Conflicts below.
+- Recovery Versions… :: shown while the recovery folder holds versions of the file; see Conflicts below.
 - Undo :: touch and hold it for Redo.
-- More :: Commands, Clock In, Show Markup, Recent Entries, Export, Resolve Sync Conflicts…, and Recovery Versions….
+- Export :: the export formats, as in the reader; see Export below.
+- Commands :: every command; see Commands below.
+
+The key bar holds what you repeat at the caret while typing, the toolbar what acts on the whole file, and Commands everything else.
 
 Messages from commands show at the top of the editor and the column view, and at the bottom of the reader, the agenda and the board, for a few seconds; tap one to dismiss it. VoiceOver reads each message as it appears. An error opening, saving or reading a file shows what failed on its first line, such as =Couldn't Save File=.
 
@@ -65,13 +70,13 @@ Messages from commands show at the top of the editor and the column view, and at
 
 On iPad, the editor can show a file in several panes, as a Mac window does (see [[file:01-files-and-folders.org][Files and folders]]):
 
-| Command           | Where                                        | Emacs keys | Does                                                        |
-|-------------------+----------------------------------------------+------------+-------------------------------------------------------------|
-| Split Pane Right  | More ▸ Panes, Commands, a hardware keyboard  | =C-x 3=    | Halves the focused pane side by side; the new pane shows the same file |
-| Split Pane Below  | More ▸ Panes, Commands, a hardware keyboard  | =C-x 2=    | Halves the focused pane one above the other                 |
-| Next Pane         | More ▸ Panes, Commands, a hardware keyboard  | =C-x o=    | Moves focus to the next pane                                 |
-| Close Pane        | More ▸ Panes, Commands, a hardware keyboard  | =C-x 0=    | Closes the focused pane                                      |
-| Close Other Panes | More ▸ Panes, Commands, a hardware keyboard  | =C-x 1=    | Closes every pane but the focused one                        |
+| Command           | Where                                     | Emacs keys | Does                                                                   |
+|-------------------+-------------------------------------------+------------+------------------------------------------------------------------------|
+| Split Pane Right  | Commands, View menu, a hardware keyboard  | =C-x 3=    | Halves the focused pane side by side; the new pane shows the same file |
+| Split Pane Below  | Commands, View menu, a hardware keyboard  | =C-x 2=    | Halves the focused pane one above the other                            |
+| Next Pane         | Commands, View menu, a hardware keyboard  | =C-x o=    | Moves focus to the next pane                                           |
+| Close Pane        | Commands, View menu, a hardware keyboard  | =C-x 0=    | Closes the focused pane                                                |
+| Close Other Panes | Commands, View menu, a hardware keyboard  | =C-x 1=    | Closes every pane but the focused one                                  |
 
 The focused pane has a line along its top and the toolbar acts on it; tap in a pane to focus it. Drag the line between two panes to resize them; with VoiceOver, swipe up or down on it. Every pane shows the same buffer: text typed in one shows in the others at once, and folds, narrowing and styles are the buffer's. The caret and scroll position are each pane's own, and so is undo: Undo in a pane undoes what was typed or changed in that pane. A link to another file opens it on its own screen, leaving the panes as they are.
 
@@ -111,7 +116,7 @@ The editor and the reader apply these display settings; only the editor aligns t
 | =org-startup-align-all-tables=   | Every table is aligned                                                         | =align=, =noalign=               |
 | =org-startup-truncated=          | Long lines run off the right edge, and the editor scrolls sideways             |                                  |
 
-While markup is hidden, the line with the caret shows its markup, so you can edit it. More ▸ Show Markup, or Show or Hide Markup in Commands, switches markup in every editor and in the reader. The switch lasts until =show-markup= in =config.toml= changes; then the file's value applies.
+While markup is hidden, the line with the caret shows its markup, so you can edit it. Show or Hide Markup in Commands switches markup in every editor and in the reader. The switch lasts until =show-markup= in =config.toml= changes; then the file's value applies.
 
 The visibility from =#+STARTUP= applies first, then each heading's =VISIBILITY= property. As on the Mac, =VISIBILITY= properties apply only when =#+STARTUP= sets a visibility (=overview=, =content=, =showall= and the like).
 
@@ -123,34 +128,37 @@ Table columns with width cookies narrow as on the Mac: =#+STARTUP: shrink= narro
 
 ** The key bar
 
-A bar above the on-screen keyboard has buttons for Org's keys. Each does what its Emacs key does at the caret, so the arrows promote and demote headings, indent list items, or move table columns, depending on where the caret is. Scroll the bar sideways for more. Its buttons are at least 44 points high and grow with the text size up to the second accessibility size.
+A bar above the on-screen keyboard has buttons for Org's keys. Each does what its Emacs key does at the caret, so the arrows promote and demote headings, indent list items, or move table columns, depending on where the caret is. The buttons share the bar's width, so all of them show without scrolling. They are at least 44 points high and grow with the text size up to the second accessibility size.
 
 #+CAPTION: The iPhone editor with the key bar above the keyboard.
 #+ATTR_HTML: :width 368
 [[file:../images/ios-editor.png]]
 
-| Button               | Key         |
-|----------------------+-------------|
-| Commands             | the command list |
-| Fold                 | =TAB=       |
-| Overview             | =S-TAB=     |
-| Promote              | =M-<left>=  |
-| Demote               | =M-<right>= |
-| Move Up              | =M-<up>=    |
-| Move Down            | =M-<down>=  |
-| New Heading or Item  | =M-RET=     |
-| TODO                 | =C-c C-t=   |
-| Act at Point         | =C-c C-c=   |
-| Schedule             | =C-c C-s=   |
-| Deadline             | =C-c C-d=   |
-| Tags                 | =C-c C-q=   |
-| Open Link            | =C-c C-o=   |
-| Bold, Italic, Code   | Emphasize with =*=, =/= or =~=: the selection, or a pair of markers with the caret between |
-| Hide Keyboard        |             |
+| Button               | Key                                                        |
+|----------------------+------------------------------------------------------------|
+| Commands             | the command list                                           |
+| Fold                 | =TAB=                                                      |
+| Promote              | =M-<left>=                                                 |
+| Demote               | =M-<right>=                                                |
+| Move Up              | =M-<up>=                                                   |
+| Move Down            | =M-<down>=                                                 |
+| New Heading or Item  | =M-RET=                                                    |
+| TODO                 | =C-c C-t=                                                  |
+| Act at Point         | =C-c C-c=                                                  |
+| Plan                 | a menu of Schedule (=C-c C-s=), Deadline (=C-c C-d=) and Tags (=C-c C-q=) |
+| Hide Keyboard        |                                                            |
+
+On iPad, where the bar is wider, Schedule, Deadline and Tags are buttons of their own in place of Plan.
+
+Bold, Italic and Code are in the edit menu of a selection, under Format: each puts =*=, =/= or =~= around the selection. With no selection, the commands of the same names in Commands insert a pair of markers with the caret between. Overview (=S-TAB=, Cycle Global Visibility) and Open Link (=C-c C-o=, or a tap on the link) are in Commands.
 
 ** Commands
 
-Commands (in the key bar or More) lists every command that applies at the caret, with its Emacs key. Type to narrow the list. The command runs once the list closes.
+Commands, in the key bar and in the toolbar of the editor, the reader and the agenda, lists the commands of the screen. With nothing typed, the ten you ran from Commands most recently come first under Recent, then every command by subject, in the Org menu's groups (Visibility, Headings, TODO and Tags, and so on) followed by Clock, Export, File, Edit and View. Type to search: the letters you type must appear in the title in order, as in the Mac's command palette, and commands you run often rank a little higher. The command runs once the list closes.
+
+In the editor, a command that doesn't apply at the caret is listed greyed, with the reason, such as =Not in a list= or =No table at point=, so a search finds everything the editor can do. With a hardware keyboard attached, each command shows its Emacs key.
+
+The reader's list has Find, Outline, Show or Hide Markup, Capture… and the clock commands that need no caret. The agenda's has its views, Tags and Properties…, Search…, Save as View…, Today, Earlier, Later, Go to Date…, Log Mode, Filter…, Select, Board, Capture… and the same clock commands.
 
 When a command asks a question, a sheet opens:
 
@@ -162,17 +170,17 @@ Cancel answers nothing, as =C-g= does.
 
 =C-c '= on a block, and =C-c `= on a table field, open the text in a sheet of its own; Save puts it back. A src block's code is colored as its language, as in the editor.
 
-More ▸ Backlinks lists the links to the heading at the caret and to the file; More ▸ Daily Notes, Find Node…, Insert Node Link… and Node Graph work with org-roam-style notes, and the Folders tab's calendar menu opens today's, yesterday's and tomorrow's note. See [[file:09-links.org][Links]].
+Show Backlinks in Commands lists the links to the heading at the caret and to the file; the daily note commands, Find Node…, Insert Node Link… and Show Node Graph, all in Commands, work with org-roam-style notes, and the Folders tab's calendar menu opens today's, yesterday's and tomorrow's note. See [[file:09-links.org][Links]].
 
 Incremental Search is in Commands, and on =C-s= and =C-r= with a hardware keyboard; see [[file:02-the-editor.org][The editor]]. =auto-fill-mode= works as on the Mac.
 
 The org-timer commands are in Commands; a running timer shows above the text. See [[file:06-dates-and-clocking.org][Dates and clocking]].
 
-More ▸ Attachments has the org-attach commands, Attach Photo or Video…, Take Photo… and Scan Document…, which insert the link to the photo, or to the scanned pages as one PDF, at the caret; files shared to orgstar can be attached to an entry. Pasting an image and dropping files on the editor attach them and link them at the caret. Attachments are copied or moved: iOS doesn't let orgstar link a file from another app's storage, so the keys for attaching by hard link or symbolic link say "Attachments can't be linked on iPhone and iPad; Attach File… copies the file." See [[file:04-outlines.org][Outlines]] and [[file:09-links.org][Links]].
+Commands has the org-attach commands, and Attach Photo or Video…, Take Photo… and Scan Document…, which insert the link to the photo, or to the scanned pages as one PDF, at the caret; files shared to orgstar can be attached to an entry. Pasting an image and dropping files on the editor attach them and link them at the caret. Attachments are copied or moved: iOS doesn't let orgstar link a file from another app's storage, so the keys for attaching by hard link or symbolic link say "Attachments can't be linked on iPhone and iPad; Attach File… copies the file." See [[file:04-outlines.org][Outlines]] and [[file:09-links.org][Links]].
 
 Archive Subtree in Commands (or =C-c C-x C-s= with a hardware keyboard) archives the entry at the caret where =org-archive-location= says, as on the Mac.
 
-More ▸ Encryption has the org-crypt commands; see [[file:04-outlines.org][Outlines]]. A remembered passphrase is used after Face ID, Touch ID or the device passcode.
+Commands has the org-crypt commands; see [[file:04-outlines.org][Outlines]]. A remembered passphrase is used after Face ID, Touch ID or the device passcode.
 
 ** The menu bar on iPad
 
@@ -224,6 +232,7 @@ Tap a result to open it in the reader. A heading result opens at that heading.
 The Agenda tab shows the agenda over all your folders, with the span and start day from the settings (10 days from 3 days ago by default). Each day lists its entries in rows: the time or a status such as =Due today= or =3d late= on the left, the category, tags and keyword above the title, as on the Mac (see Rows in [[file:07-agenda.org][The agenda]]). Days without entries are hidden, except today. Under today's header, today's overdue entries come first under Overdue, and a line marks the current time between timed entries. Pull down to refresh.
 
 - Views (top left) :: the built-in views and those in =views.toml=, Tags and Properties… (a match such as =+work-home= or ~TODO="WAIT"~), and Search… (a phrase, or snippets such as =+invoice -paid=); Save as View… keeps the match or search showing as a view in =views.toml=. Below them are Go to Date…, Filter… and Select, which picks entries for an action on all of them.
+- Commands (top right) :: the agenda's views and actions, Capture… and the clock commands, in one searchable list; see Commands under The editor.
 - Folders (top right, with more than one folder) :: shows or hides each folder's files in the agenda, the widgets, the watch and the badge; the shown folders' names appear under the title. A Focus can hide folders too, and mute their reminders (see Hiding folders in [[file:07-agenda.org][The agenda]]).
 - The bar at the bottom :: Earlier, Today, the span (Day, Week, Month or the configured span, and Log Mode, which adds closed entries and clocked time) and Later. At accessibility text sizes Today is in the span's menu, and each entry's time or status is on a line of its own above it.
 - Filter :: keep or leave out tags and categories of the entries shown, or type a filter as Org's =/= takes it: =+keep= and =-drop= tags or categories, =<0:30= for effort, =/regexp/=. The filter in use shows above the bar.
@@ -338,7 +347,7 @@ See [[file:08-capture.org][Capture]] for the template format.
 
 * Clocking
 
-Clock in from the editor (More ▸ Clock In, or Clock In in Commands) or from an agenda entry's menu. While a clock runs, a bar above the tab bar shows the entry and the time so far as =H:MM=, updated every 30 seconds, and a Live Activity shows it on the Lock Screen and in the Dynamic Island (see [[*Widgets and the Live Activity][Widgets and the Live Activity]]). Tap the bar for:
+Clock in from the editor (Clock In in Commands) or from an agenda entry's menu. While a clock runs, a bar above the tab bar shows the entry and the time so far as =H:MM=, updated every 30 seconds, and a Live Activity shows it on the Lock Screen and in the Dynamic Island (see [[*Widgets and the Live Activity][Widgets and the Live Activity]]). Tap the bar for:
 
 - Clock Out
 - Cancel Clock
@@ -346,7 +355,7 @@ Clock in from the editor (More ▸ Clock In, or Clock In in Commands) or from an
 - Recent Entries
 - Clock Report
 
-Recent Entries, in the bar and in the editor's More menu, lists the recently clocked entries; tap one to clock in to it. It also has Clock In to Recent Entry… and Go to Recent Clocked Entry…, and is disabled until you have clocked in once. Commands has Clock In to Recent Entry…, Clock In to Last Entry, Go to Recent Clocked Entry…, Mark as Default Clock Task and Resolve Open Clocks….
+Recent Entries, in the bar, lists the recently clocked entries; tap one to clock in to it. It also has Clock In to Recent Entry… and Go to Recent Clocked Entry…, and is disabled until you have clocked in once. Commands has Clock In to Recent Entry…, Clock In to Last Entry, Go to Recent Clocked Entry…, Mark as Default Clock Task and Resolve Open Clocks….
 
 Clock questions open in a sheet: the task selection and the resolution keys as lists to tap, and minutes or a date and time as a field. Cancel answers nothing, as =q= does. Clocking in with no clock running first asks about open clocks in your folders, from the editor, an agenda entry's Clock In or a capture template with =clock-in=; Resolve Open Clocks… asks about every open clock. Both work as on the Mac.
 
@@ -366,7 +375,7 @@ The app icon's badge counts the entries in the agenda's Overdue section that are
 
 * Export
 
-Export (in the reader's toolbar and the editor's More menu) offers HTML, Markdown, PDF, Word, Rich Text (RTF), Plain Text, ODT, iCalendar, LaTeX and Plain Text (ASCII), and Copy as Rich Text. Each opens the share sheet with a file named after the org file, which you can send to another app or keep with Save to Files. The export reads the file's setup files and follows its export keywords, as the Mac's export does. For a file the LaTeX or ASCII export can't write as Emacs would, the share sheet stops and "Can't export to LaTeX: " or "Can't export to plain text: " and the reason show at the bottom of the screen.
+Export (in the reader's and the editor's toolbars) offers HTML, Markdown, PDF, Word, Rich Text (RTF), Plain Text, ODT, iCalendar, LaTeX and Plain Text (ASCII), and Copy as Rich Text. Each opens the share sheet with a file named after the org file, which you can send to another app or keep with Save to Files. The export reads the file's setup files and follows its export keywords, as the Mac's export does. For a file the LaTeX or ASCII export can't write as Emacs would, the share sheet stops and "Can't export to LaTeX: " or "Can't export to plain text: " and the reason show at the bottom of the screen.
 
 PDF export follows =pdf-margin=, =pdf-font= and =pdf-page-numbers= in =config.toml=, and Word files get heading styles and the file's images, as on the Mac. PDF through LaTeX isn't available on iOS.
 
@@ -405,9 +414,9 @@ When a file changes on disk while you have unsaved edits, orgstar merges the cha
 
 The version you don't keep goes to the recovery folder.
 
-More ▸ Resolve Sync Conflicts… lists Syncthing's conflict copies of the file (=name.sync-conflict-…=), each compared with the file, with Keep File, Merge and Use Copy. The copy goes to the recovery folder and is removed. When a file with conflict copies opens in the editor, a message says how many there are.
+Resolve Sync Conflicts… (in the editor's toolbar while there are copies, and in Commands) lists Syncthing's conflict copies of the file (=name.sync-conflict-…=), each compared with the file, with Keep File, Merge and Use Copy. The copy goes to the recovery folder and is removed. When a file with conflict copies opens in the editor, a message says how many there are.
 
-More ▸ Recovery Versions… lists the versions of the file kept in the recovery folder, newest first, each compared with the editor's text. Restore puts a version's text in the editor as an edit you can undo.
+Recovery Versions… (in the editor's toolbar while there are versions, and in Commands) lists the versions of the file kept in the recovery folder, newest first, each compared with the editor's text. Restore puts a version's text in the editor as an edit you can undo.
 
 See [[file:15-alongside-emacs.org][Working alongside Emacs and other tools]] for how merging and recovery work.
 

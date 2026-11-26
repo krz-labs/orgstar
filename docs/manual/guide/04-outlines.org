@@ -696,7 +696,7 @@ The allowed values are the property's =_ALL= values from the entry, an ancestor 
 earlier; Org 9.8.7 signals an error there instead. After each change the sheet captures
 the view again, so summaries follow. Parent summaries are not written into the file.
 
-On iOS, choose Column View or Column View of File from the editor's More menu. The view
+On iOS, choose Column View or Column View of File in the editor's Commands. The view
 scrolls both ways; tap a cell to select it. The bar at the bottom has Edit, which asks
 for the value with the allowed values listed, Previous Value and Next Value (=p= and
 =n=), and Go to Entry. Done closes it.
@@ -922,7 +922,7 @@ An entry's attachments are files in a folder that belongs to it, as with org-att
 
 The Doom keys are under =SPC m a=; see [[file:03-keys.org][Keys]]. Attaching a file stores an =attachment:= link to it, for Insert Link (=C-c C-l=). Deleting removes files for good, without the Trash.
 
-On iOS the commands are under More ▸ Attachments, with Attach Photo or Video… for the photo library. Moving and linking aren't offered there. Files, photos and videos shared to orgstar from another app are attached too: the share sheet offers Attach, and orgstar asks for the entry when it next opens.
+On iOS the commands are in the editor's Commands, with Attach Photo or Video… for the photo library. Moving and linking aren't offered there. Files, photos and videos shared to orgstar from another app are attached too: the share sheet offers Attach, and orgstar asks for the entry when it next opens.
 
 | Setting | Default | What it does |
 |-+-+-|
@@ -949,7 +949,7 @@ ww0ECQMI…
 | Encrypt Tagged Entries… (=app.crypt.encrypt-entries=) | Encrypts every entry with the =crypt= tag, its own or inherited, that isn't encrypted yet (=org-encrypt-entries=). A tagged entry's tagged children go inside its message. |
 | Forget Encryption Passphrase (=app.crypt.forget-passphrase=) | Removes the current file's passphrase from the Keychain. |
 
-The commands have no keys, as in Org; run them from the command palette, or bind them in =keymap.toml=. On iOS they are under More ▸ Encryption.
+The commands have no keys, as in Org; run them from the command palette, or bind them in =keymap.toml=. On iOS they are in the editor's Commands.
 
 Remember in the Keychain stores the passphrase for the file. The next command on that file uses it after Touch ID, Face ID or the device password, without asking. =org-crypt-tag-matcher= in =config.toml= sets the tag; it must be a single tag, not a match expression.
 

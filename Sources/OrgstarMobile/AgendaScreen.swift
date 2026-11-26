@@ -51,6 +51,9 @@ struct AgendaScreen: View, Equatable {
     @State private var bulkArchiving = false
     @State private var bulkPlanning: BulkPlanning?
     @State private var showingBoard = false
+    @State private var showingCommands = false
+    /// The command chosen in Commands, run once the list is gone.
+    @State private var chosenCommand: String?
     /// The entry open in its sheet.
     @State private var editing: AgendaItem?
 
@@ -222,6 +225,18 @@ struct AgendaScreen: View, Equatable {
             if workspace.rootPaths.count > 1 || shownFolders != nil {
                 ToolbarItem(placement: .topBarTrailing) { foldersMenu }
             }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Commands", systemImage: "command") { showingCommands = true }
+            }
+        }
+        .sheet(isPresented: $showingCommands, onDismiss: {
+            // After the list has gone, so the command's own sheet can show.
+            if let id = chosenCommand {
+                chosenCommand = nil
+                runCommand(id)
+            }
+        }) {
+            CommandList(rows: commandRows) { chosenCommand = $0 }
         }
         .fullScreenCover(isPresented: $showingBoard) {
             BoardScreen(workspace: workspace, session: session) { showingBoard = false }
@@ -596,6 +611,53 @@ struct AgendaScreen: View, Equatable {
         } else {
             let (first, span) = shown
             show(range, around: forward ? first + span : first - 1)
+        }
+    }
+
+    /// The agenda's commands: its views and toolbar actions, capture, and the clock's that need
+    /// no entry.
+    private var commandRows: [CommandRow] {
+        var rows = views.indices.map { CommandRow(id: "agenda.view.\($0)", title: views[$0].name) }
+        rows += [
+            CommandRow(id: "agenda.match", title: String(localized: "Tags and Properties…")),
+            CommandRow(id: "agenda.search", title: String(localized: "Search…")),
+        ]
+        if canSaveView { rows.append(CommandRow(id: "agenda.save", title: String(localized: "Save as View…"))) }
+        if case .agenda = agenda.mode {
+            rows += [
+                CommandRow(id: "agenda.today", title: String(localized: "Today")),
+                CommandRow(id: "agenda.earlier", title: String(localized: "Earlier")),
+                CommandRow(id: "agenda.later", title: String(localized: "agenda.later", defaultValue: "Later", comment: "Shows the next days in the agenda")),
+                CommandRow(id: "agenda.go-to-date", title: String(localized: "Go to Date…")),
+                CommandRow(id: "agenda.log-mode", title: String(localized: "Log Mode")),
+            ]
+        }
+        rows += [
+            CommandRow(id: "agenda.filter", title: String(localized: "Filter…")),
+            CommandRow(id: "agenda.select", title: String(localized: "Select")),
+            CommandRow(id: "agenda.board", title: CommandTitle.localized("Board")),
+            CommandRow(id: "app.capture", title: CommandTitle.localized("Capture…")),
+        ]
+        return rows + MobileClock.screenCommands.map { CommandRow(id: $0.id, title: CommandTitle.localized($0.title)) }
+    }
+
+    private func runCommand(_ id: String) {
+        switch id {
+        case let id where id.hasPrefix("agenda.view."):
+            if let index = Int(id.dropFirst("agenda.view.".count)), views.indices.contains(index) { show(views[index]) }
+        case "agenda.match": asking = .match
+        case "agenda.search": asking = .search
+        case "agenda.save": asking = .save
+        case "agenda.today": goToday()
+        case "agenda.earlier": step(forward: false)
+        case "agenda.later": step(forward: true)
+        case "agenda.go-to-date": jumping = true
+        case "agenda.log-mode": logMode.toggle()
+        case "agenda.filter": showingFilter = true
+        case "agenda.select": selecting = true
+        case "agenda.board": showingBoard = true
+        case "app.capture": model.captureRequest = CaptureRequest()
+        default: _ = MobileClock.run(id, model: model, workspace: workspace) { message = $0 }
         }
     }
 
