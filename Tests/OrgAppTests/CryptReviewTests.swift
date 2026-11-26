@@ -187,6 +187,19 @@ struct CryptReviewTests {
         #expect(session.document(of: b.path)?.text.contains("EMACSWORK") == true)
     }
 
+    @Test func aVersionWrittenAfterOursIsntOverwrittenByTheRestore() throws {
+        let files = InjectingFileSystem()
+        let session = DocumentSession(fileSystem: files, recovery: FileRecoveryStore(directory: recoveryFolder))
+        session.encryptsTaggedEntries = true
+        session.hasStoredPassphrase = { _ in false }
+        let b = try notes.write("b.org", "* B\nb\n")
+        files.inject[b.path] = "* B\nb\n* Emacs :crypt:\nemacs secret\n"
+        files.injectAfter[b.path] = "* B\nthird\n"
+        let message = session.applyChanges([TextEdit(range: 4..<5, replacement: "c")], to: b.path, expecting: "* B\nb\n")
+        #expect(message?.contains("changed on disk") == true)
+        #expect(read(b) == "* B\nthird\n")
+    }
+
     // Final check, 2
     @Test func sameFileMovesDontTakeAHeadingOutOfItsEntry() throws {
         let text = "#+ARCHIVE: ::* Archive\n* Parent :crypt:\nparent text\n** SECRETTITLE child\nchild secret\n* Last\n"
@@ -225,6 +238,31 @@ struct CryptReviewTests {
         _ = clock.clockOut(self.session)
         #expect(clock.history.count == 1)
         #expect(!read(clockFile).contains("s:"))
+    }
+
+    @Test func aRunWithoutTheKeyKeepsHiddenTasksHashedWithIt() throws {
+        let text = "* Bank :crypt:\nintro\n** Secret task\nbody\n* Plain\n"
+        try notes.write("a.org", text)
+        ClockTask.titleKey = SymmetricKey(size: .bits256)
+        let earlier = ClockTask(path: file.path, title: "Secret task", ordinal: 1, id: nil).hiding("Encrypted entry")
+        ClockTask.titleKey = nil
+        defer { ClockTask.titleKey = nil }
+        let clockFile = notes.url.appendingPathComponent("clock.json")
+        try JSONEncoder().encode(["history": [earlier]]).write(to: clockFile)
+        let clock = ClockModel(file: clockFile)
+        #expect(clock.history == [earlier])
+        session.open(file.path)
+        session.cryptUsed("pw", for: file.path)
+        _ = clock.clockIn(session, path: file.path, at: (text as NSString).range(of: "** Secret").location)
+        _ = clock.clockOut(session)
+        let now = try #require(session.document(of: file.path)?.text)
+        _ = clock.clockIn(session, path: file.path, at: (now as NSString).range(of: "* Plain").location)
+        _ = clock.clockOut(session)
+        // The earlier entry stays as it was; this run's hidden entry isn't written.
+        #expect(clock.history.count == 3 && clock.history.last == earlier)
+        let saved = read(clockFile)
+        #expect(saved.contains(try #require(earlier.titleHash)) && !saved.contains("s:"))
+        #expect(!saved.contains("Secret task"))
     }
 
     // Third review, C
@@ -472,15 +510,19 @@ struct CryptReviewTests {
     }
 }
 
-/// The disk, with another writer that puts `inject[path]` in place just before a replace.
+/// The disk, with another writer that puts `inject[path]` in place just before a replace, and
+/// a third that puts `injectAfter[path]` in place just after one.
 final class InjectingFileSystem: FileSystem, @unchecked Sendable {
     let base = CoordinatedFileSystem(writesInPlaceWhenDenied: false)
     var inject: [String: String] = [:]
+    var injectAfter: [String: String] = [:]
 
     func read(_ url: URL) throws -> [UInt8]? { try base.read(url) }
 
     func replace(_ url: URL, with bytes: [UInt8]) throws -> [UInt8]? {
         if let text = inject.removeValue(forKey: url.path) { try Data(text.utf8).write(to: url) }
-        return try base.replace(url, with: bytes)
+        let replaced = try base.replace(url, with: bytes)
+        if let text = injectAfter.removeValue(forKey: url.path) { try Data(text.utf8).write(to: url) }
+        return replaced
     }
 }

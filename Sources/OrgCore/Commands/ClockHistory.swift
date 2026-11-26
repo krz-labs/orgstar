@@ -90,7 +90,8 @@ public enum ClockHistory {
     public static let defaultLength = 5
 
     /// `org-clock-history-push`: `task` goes first, other entries for the same heading and
-    /// entries that are gone leave, and the oldest go past `length`. `text` reads a file.
+    /// entries that are gone leave, and the oldest go past `length`. `text` reads a file. Without
+    /// `ClockTask.titleKey`, hidden entries hashed with it are kept unchanged.
     public static func push(_ task: ClockTask, onto history: [ClockTask], length: Int, text: (String) -> String?) -> [ClockTask] {
         let length = max(1, length)
         var texts: [String: String?] = [:]
@@ -103,6 +104,11 @@ public enum ClockHistory {
         let target = read(task.path).flatMap { task.locate(in: $0) }
         var kept: [ClockTask] = []
         for entry in history {
+            // A hidden task hashed with the kept key can't be found with this run's; it stays as it was.
+            if ClockTask.titleKey == nil, entry.titleHash.map({ !$0.hasPrefix("s:") }) == true {
+                kept.append(entry)
+                continue
+            }
             guard let contents = read(entry.path), let current = entry.refreshed(in: contents) else { continue }
             if entry.path == task.path, let target, current.locate(in: contents) == target { continue }
             kept.append(current)

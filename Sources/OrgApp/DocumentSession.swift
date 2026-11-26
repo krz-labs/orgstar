@@ -613,13 +613,13 @@ public final class DocumentSession {
 
     /// The saver for a file that isn't open, whose state is thrown away after the save: a
     /// version another writer put on disk just before ours, which recovery can't keep, is put
-    /// back as it was, and the change fails.
+    /// back as it was, and the change fails. A version written after ours is left in place.
     private var closedFileSaver: Saver {
         var saver = saver
         let crypt = crypt, disk = diskFileSystem
         saver.restoreOverwritten = { url in
-            guard let theirs = crypt.takeReplaced(for: url.path) else { return }
-            _ = try disk.replace(url, with: theirs)
+            guard let last = crypt.takeReplaced(for: url.path), try disk.read(url) == last.written else { return }
+            _ = try disk.replace(url, with: last.replaced)
         }
         return saver
     }

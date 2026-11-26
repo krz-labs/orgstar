@@ -40,18 +40,18 @@ public final class CryptVault: @unchecked Sendable {
     private var sealing: Set<String> = []
     /// Files open in a buffer. Only they keep what the vault knows past a write.
     private var open: Set<String> = []
-    /// By file: the bytes the last write replaced, as they were on disk.
-    private var replacedBytes: [String: [UInt8]] = [:]
+    /// By file: the bytes the last write replaced and the bytes it wrote, as on disk.
+    private var replacedBytes: [String: (replaced: [UInt8], written: [UInt8])] = [:]
 
-    /// The bytes the last write to `path` replaced, as they were on disk; given once.
-    public func takeReplaced(for path: String) -> [UInt8]? {
+    /// The bytes the last write to `path` replaced and the bytes it wrote, as on disk; given once.
+    public func takeReplaced(for path: String) -> (replaced: [UInt8], written: [UInt8])? {
         let key = Self.key(path)
         return locked { replacedBytes.removeValue(forKey: key) }
     }
 
-    func noteReplaced(_ bytes: [UInt8]?, for path: String) {
+    func noteReplaced(_ bytes: [UInt8]?, written: [UInt8], for path: String) {
         let key = Self.key(path)
-        locked { replacedBytes[key] = bytes }
+        locked { replacedBytes[key] = bytes.map { ($0, written) } }
     }
 
     /// By encrypted file: its bytes on disk and their text, last read or written.
@@ -311,7 +311,7 @@ public struct CryptFileSystem: FileSystem {
         let known = vault.revealedMessages(for: url.path)
         let written = try vault.cipher(bytes, for: url.path)
         let replaced = try base.replace(url, with: written.bytes)
-        vault.noteReplaced(replaced, for: url.path)
+        vault.noteReplaced(replaced, written: written.bytes, for: url.path)
         // The version replaced, as it read before this write's messages were known (and while
         // the encrypted file's last bytes still decrypt from memory).
         let previous = replaced.map { (try? vault.plain($0, for: url.path, messages: known)) ?? $0 }
