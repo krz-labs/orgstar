@@ -2,6 +2,7 @@ import AppKit
 import OrgApp
 import OrgCore
 import OrgEditorAppKit
+import OrgIndex
 import OrgMathJax
 import OrgPresentation
 #if !APPSTORE
@@ -51,6 +52,8 @@ final class AppCommands {
     #endif
     /// Tags used across the workspace, for tag completion; the main window sets it.
     var knownTags: () -> [String] = { [] }
+    /// The index completion asks for headings, values and words; the main window sets it.
+    var completionIndex: IndexStore?
     /// The pending key prefix, and what can follow it.
     var pendingKeys: String?
     /// The editor's evil state in the Doom preset.
@@ -809,6 +812,11 @@ struct SettingsView: View {
     @AppStorage("logIntoDrawer") private var logIntoDrawer = ""
     @AppStorage("useSpeedCommands") private var useSpeedCommands = false
     @AppStorage("spellCheck") private var spellCheck = false
+    @AppStorage("completionAuto") private var completionAuto = "preset"
+    @AppStorage("completionAutoDelay") private var completionAutoDelay = 400
+    @AppStorage("completionAutoPrefix") private var completionAutoPrefix = 2
+    @AppStorage("completionStyle") private var completionStyle = "preset"
+    @AppStorage("completionWords") private var completionWords = false
     @AppStorage("enforceTodoDependencies") private var enforceTodoDependencies = false
     @AppStorage("enforceTodoCheckboxDependencies") private var enforceTodoCheckboxDependencies = false
     @AppStorage("agendaSpan") private var agendaSpan = 10
@@ -1029,6 +1037,31 @@ struct SettingsView: View {
                     .help(Text(verbatim: "spell-check"))
             } footer: {
                 Text("Spell checking applies to files as they open; Check Spelling While Typing switches the current file. Code, links, dates, tags and keywords aren't checked.")
+                    .settingsFooter()
+            }
+            Section {
+                Picker("Completion list opens", selection: $completionAuto) {
+                    Text("As the keys do (by itself with Doom)").tag("preset")
+                    Text("By itself as you type").tag("on")
+                    Text("Only with a key").tag("off")
+                }
+                .help(Text(verbatim: "completion-auto"))
+                Stepper("After a pause of \(completionAutoDelay) ms", value: $completionAutoDelay, in: 0...2000, step: 50)
+                    .help(Text(verbatim: "completion-auto-delay"))
+                Stepper("Once \(completionAutoPrefix) characters are typed", value: $completionAutoPrefix, in: 1...10)
+                    .help(Text(verbatim: "completion-auto-prefix"))
+                Picker("Candidates", selection: $completionStyle) {
+                    Text("As the keys do (letters in order with Doom)").tag("preset")
+                    Text("Start with what's typed").tag("prefix")
+                    Text("Have its letters in order, best first").tag("fuzzy")
+                }
+                .help(Text(verbatim: "completion-style"))
+                Toggle("The list offers words from open files and folders", isOn: $completionWords)
+                    .help(Text(verbatim: "completion-words"))
+            } header: {
+                Text("Completion")
+            } footer: {
+                Text("Doom's keys open the list by itself and match letters in order, as Doom's corfu does; the Emacs and Mac keys do neither unless set here. Expand Word completes the word before the caret from your files whatever is set.")
                     .settingsFooter()
             }
         }

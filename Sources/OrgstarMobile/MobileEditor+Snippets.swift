@@ -135,6 +135,7 @@ extension MobileEditor {
     func textViewDidChange(_ textView: UITextView) {
         guard textView === self.textView else { return }
         updateSnippetMirrors()
+        textTyped()
     }
 }
 #endif

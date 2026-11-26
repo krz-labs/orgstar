@@ -99,6 +99,8 @@ public struct EditingOptions: Sendable, Equatable, Codable {
     public var timerDefault = "0"
     /// The snippets and file templates of `snippets.toml`.
     public var snippets: [Snippet] = []
+    /// How the completion list opens and matches.
+    public var completion = CompletionOptions()
 
     public init(
         tagsColumn: Int = -77, insertHeadingRespectContent: Bool = false, metaReturnMaySplitLine: Bool = true,

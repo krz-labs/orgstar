@@ -118,6 +118,21 @@ final class MobileEditor: NSObject, DocumentBuffer {
     var onImage: ((Data, String) -> Void)?
     /// Tags used across the workspace, for completion.
     var knownTags: @Sendable () -> [String] = { [] }
+    /// Answers completion's questions to the index, off the main actor.
+    var completionSource: (@Sendable (CompletionQuery) async -> CompletionResult)?
+    /// Gives a heading in another file an ID for a link to it; nil when it can't.
+    var createID: ((CompletionItem) -> String?)?
+    /// The text of the other open buffers, for word completion.
+    var otherBuffers: () -> [String] = { [] }
+    /// The open completion list, the pause before one opens by itself, the index's answer
+    /// and the query running.
+    var completionList: CompletionListView?
+    var completionTimer: Timer?
+    var completionFetched: CompletionFlow.Fetched?
+    var completionTask: Task<Void, Never>?
+    /// `dabbrev-expand` being repeated, and the revision its last expansion left.
+    var dabbrev: DabbrevExpansion?
+    var dabbrevRevision: Int?
 
     var theme: MobileTheme
     var fold = FoldState()
@@ -425,6 +440,10 @@ final class MobileEditor: NSObject, DocumentBuffer {
         }
         switch id {
         case "org.snippet.next-field": nextSnippetField()
+        case "editor.complete": completeAtPoint()
+        case "editor.dabbrev-expand": dabbrevExpand()
+        case "editor.dabbrev-completion": completeWord(last: false)
+        case "editor.dabbrev-completion-previous": completeWord(last: true)
         case "org.snippet.previous-field": previousSnippetField()
         case "org.cycle":
             if !cycleAtCaret() { onMessage?("Not on a heading, drawer or block") }
@@ -470,7 +489,8 @@ final class MobileEditor: NSObject, DocumentBuffer {
             return Presentation.heading(containing: context.caret, in: context.tree) != nil || Wrappers.toggleable(at: context.caret, in: context.tree) != nil
         case _ where id.hasPrefix("org.fold."): return true
         case "org.cycle-global", "edit.undo", "edit.redo", "org.toggle-inline-images", "org.toggle-inline-images-linked", "org.latex-preview", "editor.toggle-truncate-lines",
-             "editor.toggle-auto-fill", "edit.isearch-forward", "edit.isearch-backward",
+             "editor.toggle-auto-fill", "edit.isearch-forward", "edit.isearch-backward", "editor.complete", "editor.dabbrev-expand",
+             "editor.dabbrev-completion", "editor.dabbrev-completion-previous",
              "edit.isearch-forward-regexp", "edit.isearch-backward-regexp": return true
         case "app.clock.in", "app.clock.out", "app.clock.cancel", "app.clock.goto", "app.clock.in-recent", "app.clock.in-last",
              "app.clock.goto-recent", "app.clock.default", "app.clock.resolve", "app.toggle-markup": return onAppCommand != nil
@@ -504,7 +524,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
         .keyboardTab: "TAB", .keyboardReturnOrEnter: "RET", .keypadEnter: "RET", .keyboardSpacebar: "SPC",
         .keyboardEscape: "ESC", .keyboardDeleteOrBackspace: "DEL", .keyboardDeleteForward: "<delete>",
         .keyboardLeftArrow: "<left>", .keyboardRightArrow: "<right>", .keyboardUpArrow: "<up>", .keyboardDownArrow: "<down>",
-        .keyboardHome: "<home>", .keyboardEnd: "<end>", .keyboardPageUp: "<prior>", .keyboardPageDown: "<next>",
+        .keyboardHome: "<home>", .keyboardEnd: "<end>", .keyboardPageUp: "<prior>", .keyboardPageDown: "<next>", .keyboardF5: "<f5>",
     ]
 
     /// A key press as a chord; Option is Meta, as `option-as-meta` makes it on the Mac.
@@ -543,6 +563,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
             }
         }
         if isearch != nil, isearchKey(chord) { return true }
+        if let handled = completionKey(chord) { return handled }
         if let handled = snippetKey(chord) { return handled }
         if modal { return handleModal(chord) }
         // Option alone types characters unless it begins a binding.
@@ -710,6 +731,7 @@ extension MobileEditor: UITextViewDelegate {
         if textView.isFirstResponder { focus(textView) }
         guard textView === self.textView else { return }
         selectionChanged()
+        if let open = completionList, textView.selectedRange.location != open.completion.range.upperBound { refreshCompletion() }
     }
 
     /// `electric-pair-mode` for typed brackets and quotes, DEL and RET, and `auto-fill-mode`

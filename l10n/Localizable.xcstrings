@@ -3852,6 +3852,40 @@
         }
       }
     },
+    "After a pause of %lld ms": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach einer Pause von %lld ms"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tras una pausa de %lld ms"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Après une pause de %lld ms"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld ms の休止後"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Após uma pausa de %lld ms"
+          }
+        }
+      }
+    },
     "Agenda": {
       "comment": "Command title",
       "localizations": {
@@ -5254,6 +5288,74 @@
         }
       }
     },
+    "As the keys do (by itself with Doom)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wie die Tasten es tun (bei Doom von selbst)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Como las teclas (sola con Doom)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comme les touches (d'elle-même avec Doom)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キー設定に従う（Doomでは自動）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Como as teclas fazem (sozinha com Doom)"
+          }
+        }
+      }
+    },
+    "As the keys do (letters in order with Doom)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wie die Tasten es tun (bei Doom Buchstaben in Reihenfolge)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Como las teclas (letras en orden con Doom)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comme les touches (lettres dans l'ordre avec Doom)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キー設定に従う（Doomでは文字の順序で一致）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Como as teclas fazem (letras em ordem com Doom)"
+          }
+        }
+      }
+    },
     "Ask what to do with idle time while clocked in": {
       "localizations": {
         "de": {
@@ -6598,6 +6700,40 @@
         }
       }
     },
+    "By itself as you type": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Von selbst beim Tippen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sola al escribir"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "D'elle-même pendant la frappe"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "入力中に自動で"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sozinha ao digitar"
+          }
+        }
+      }
+    },
     "C-c ' or ⌘Return saves, Escape or C-c C-k leaves": {
       "localizations": {
         "de": {
@@ -7216,6 +7352,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cancelar Tarefa em Execução"
+          }
+        }
+      }
+    },
+    "Candidates": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kandidaten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Candidatos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Candidats"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "候補"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Candidatos"
           }
         }
       }
@@ -10047,6 +10217,76 @@
         }
       }
     },
+    "Complete Word": {
+      "comment": "Command title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wort vervollständigen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Completar palabra"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compléter le mot"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "単語を補完"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Completar Palavra"
+          }
+        }
+      }
+    },
+    "Complete Word, Last First": {
+      "comment": "Command title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wort vervollständigen, letztes zuerst"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Completar palabra, la última primero"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compléter le mot, le dernier d'abord"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "単語を補完（最後から）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Completar Palavra, Última Primeiro"
+          }
+        }
+      }
+    },
     "Complete at Point": {
       "comment": "Command title",
       "localizations": {
@@ -10078,6 +10318,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "Completar no Cursor"
+          }
+        }
+      }
+    },
+    "Completion": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vervollständigung"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compleción"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Complétion"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "補完"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Completar"
+          }
+        }
+      }
+    },
+    "Completion list opens": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vervollständigungsliste öffnet sich"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La lista de compleción se abre"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La liste de complétion s'ouvre"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "補完リストを開く"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A lista de completar abre"
           }
         }
       }
@@ -13160,6 +13468,40 @@
         }
       }
     },
+    "Doom's keys open the list by itself and match letters in order, as Doom's corfu does; the Emacs and Mac keys do neither unless set here. Expand Word completes the word before the caret from your files whatever is set.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Doom-Tasten öffnen die Liste von selbst und finden Buchstaben in Reihenfolge, wie Dooms corfu; die Emacs- und Mac-Tasten tun beides nicht, außer es ist hier eingestellt. „Wort erweitern“ vervollständigt das Wort vor der Einfügemarke aus deinen Dateien, unabhängig von diesen Einstellungen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las teclas de Doom abren la lista solas y buscan letras en orden, como corfu en Doom; las teclas de Emacs y Mac no hacen ninguna de las dos cosas salvo que se ajuste aquí. Expandir palabra completa la palabra antes del cursor a partir de tus archivos, con cualquier ajuste."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les touches Doom ouvrent la liste d'elles-mêmes et cherchent les lettres dans l'ordre, comme corfu dans Doom ; les touches Emacs et Mac ne font ni l'un ni l'autre sauf si c'est réglé ici. Développer le mot complète le mot avant le curseur à partir de vos fichiers, quels que soient ces réglages."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doomのキーでは、Doomのcorfuのようにリストが自動で開き、文字の順序で一致します。EmacsとMacのキーでは、ここで設定しない限りどちらも行いません。「単語を展開」は設定にかかわらず、カーソルの前の単語をファイルから補完します。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As teclas do Doom abrem a lista sozinhas e buscam letras em ordem, como o corfu do Doom; as teclas do Emacs e do Mac não fazem nenhum dos dois, a menos que configurado aqui. Expandir Palavra completa a palavra antes do cursor a partir dos seus arquivos, qualquer que seja a configuração."
+          }
+        }
+      }
+    },
     "Doom's own org defaults are read from the folder Doom is installed in": {
       "localizations": {
         "de": {
@@ -14840,6 +15182,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Expandir Colunas da Tabela"
+          }
+        }
+      }
+    },
+    "Expand Word": {
+      "comment": "Command title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wort erweitern"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expandir palabra"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Développer le mot"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "単語を展開"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expandir Palavra"
           }
         }
       }
@@ -18179,6 +18556,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hábitos só hoje"
+          }
+        }
+      }
+    },
+    "Have its letters in order, best first": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enthalten seine Buchstaben in Reihenfolge, beste zuerst"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contienen sus letras en orden, las mejores primero"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contiennent ses lettres dans l'ordre, les meilleurs d'abord"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文字を順に含む（一致度順）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Têm as letras em ordem, melhores primeiro"
           }
         }
       }
@@ -27447,6 +27858,40 @@
         }
       }
     },
+    "Once %lld characters are typed": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sobald %lld Zeichen getippt sind"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuando se han escrito %lld caracteres"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dès que %lld caractères sont tapés"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 文字入力したら"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Depois de digitar %lld caracteres"
+          }
+        }
+      }
+    },
     "One payment, no subscription": {
       "localizations": {
         "de": {
@@ -27613,6 +28058,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Somente com Arquivo ▸ Salvar (⌘S)"
+          }
+        }
+      }
+    },
+    "Only with a key": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur mit einer Taste"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solo con una tecla"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seulement avec une touche"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キーを押したときのみ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Só com uma tecla"
           }
         }
       }
@@ -37631,6 +38110,40 @@
         }
       }
     },
+    "Start with what's typed": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beginnen mit dem Getippten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Empiezan por lo escrito"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commencent par ce qui est tapé"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "入力した文字で始まる"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Começam com o que foi digitado"
+          }
+        }
+      }
+    },
     "Starting point": {
       "localizations": {
         "de": {
@@ -40168,6 +40681,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "O ícone aparece no Dock enquanto o orgstar está aberto. O Finder, e o Dock depois que o orgstar é encerrado, mostram o ícone padrão."
+          }
+        }
+      }
+    },
+    "The list offers words from open files and folders": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Liste bietet Wörter aus offenen Dateien und Ordnern an"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La lista ofrece palabras de archivos abiertos y carpetas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La liste propose des mots des fichiers ouverts et des dossiers"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開いているファイルとフォルダの単語をリストに表示"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A lista oferece palavras de arquivos abertos e pastas"
           }
         }
       }
@@ -43407,6 +43954,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Com uma fonte do corpo, a prosa a usa enquanto tabelas, código, datas, tags e gavetas mantêm a fonte monoespaçada. A largura do texto limita as linhas a essa quantidade de colunas, centralizadas, em uma tela mais larga."
+          }
+        }
+      }
+    },
+    "With a hardware keyboard. Doom's keys open the list by itself and match letters in order, as Doom's corfu does; the Emacs and Mac keys do neither unless set here.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mit einer Hardwaretastatur. Die Doom-Tasten öffnen die Liste von selbst und finden Buchstaben in Reihenfolge, wie Dooms corfu; die Emacs- und Mac-Tasten tun beides nicht, außer es ist hier eingestellt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Con un teclado físico. Las teclas de Doom abren la lista solas y buscan letras en orden, como corfu en Doom; las teclas de Emacs y Mac no hacen ninguna de las dos cosas salvo que se ajuste aquí."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avec un clavier physique. Les touches Doom ouvrent la liste d'elles-mêmes et cherchent les lettres dans l'ordre, comme corfu dans Doom ; les touches Emacs et Mac ne font ni l'un ni l'autre sauf si c'est réglé ici."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ハードウェアキーボード使用時。Doomのキーでは、Doomのcorfuのようにリストが自動で開き、文字の順序で一致します。EmacsとMacのキーでは、ここで設定しない限りどちらも行いません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Com um teclado físico. As teclas do Doom abrem a lista sozinhas e buscam letras em ordem, como o corfu do Doom; as teclas do Emacs e do Mac não fazem nenhum dos dois, a menos que configurado aqui."
           }
         }
       }

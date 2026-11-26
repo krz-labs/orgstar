@@ -73,4 +73,65 @@ struct CompletionPopupTests {
         ModalTests().type(h, "C-SPC")
         #expect(h.editor.document.text.contains("\\alpha"))
     }
+
+    /// #139: typing schedules the list only when the setting is on.
+    @Test func typingOpensTheListOnlyWhenSet() {
+        let h = at("* H :work:\n* I :wo")
+        h.editor.textTyped()
+        #expect(h.editor.completionTimer == nil)
+        h.editor.options.completion = CompletionOptions(auto: true, delay: 0.01, prefix: 2)
+        h.editor.textTyped()
+        #expect(h.editor.completionTimer != nil)
+        h.editor.completionTimer?.perform()
+        #expect(h.editor.completionPopup?.completion.candidates == ["work:"])
+    }
+
+    /// #140: with fuzzy matching, letters in order, best first.
+    @Test func fuzzyListFollowsTyping() {
+        let h = at("#+STARTUP: lgd")
+        h.editor.options.completion.fuzzy = true
+        h.editor.run("editor.complete")
+        #expect(h.editor.completionPopup?.completion.candidates.first == "logdone")
+        h.textView.insertText("r", replacementRange: h.textView.selectedRange())
+        #expect(h.editor.completionPopup?.completion.candidates == ["logdrawer", "nologdrawer"])
+    }
+
+    /// #141: M-/ expands and cycles; Doom's C-n lists words with the first chosen.
+    @Test func wordsExpandAndList() {
+        let h = at("help hello\nhe")
+        h.editor.keymap = KeymapPreset.emacs.keymap
+        h.editor.otherBuffers = { ["helmet"] }
+        h.editor.run("editor.dabbrev-expand")
+        #expect(h.editor.document.text == "help hello\nhello")
+        h.editor.run("editor.dabbrev-expand")
+        #expect(h.editor.document.text == "help hello\nhelp")
+        h.editor.run("editor.dabbrev-expand")
+        #expect(h.editor.document.text == "help hello\nhelmet")
+        h.editor.run("editor.dabbrev-expand")
+        #expect(h.editor.document.text == "help hello\nhe" && h.caret == 13)
+
+        let doom = Harness("help hello\n\n")
+        doom.editor.keymap = KeymapPreset.doom.keymap
+        doom.editor.modal = true
+        doom.caret(at: 11)
+        ModalTests().type(doom, "a")
+        doom.textView.insertText("he", replacementRange: doom.textView.selectedRange())
+        ModalTests().type(doom, "C-n")
+        #expect(doom.editor.completionPopup?.completion.candidates == ["hello", "help"] && doom.editor.completionPopup?.selected == "hello")
+        ModalTests().type(doom, "C-n RET")
+        #expect(doom.editor.document.text == "help hello\nhelp\n")
+    }
+
+    /// #143: a heading here without an ID gets one, and the link has its title.
+    @Test func idLinkToAHeadingHere() {
+        let h = at("* Plan\nBody\n* Notes\nSee [[id:Pl")
+        h.editor.options.filePath = "/tmp/here.org"
+        h.editor.run("editor.complete")
+        #expect(h.editor.completionPopup?.completion.candidates == ["Plan"])
+        ModalTests().type(h, "TAB")
+        let text = h.editor.document.text
+        let id = try? #require(text.firstMatch(of: /:ID: +(\S+)/)).1
+        #expect(text.hasPrefix("* Plan\n:PROPERTIES:\n:ID:"))
+        #expect(id.map { text.hasSuffix("See [[id:\($0)][Plan]]") } == true && h.caret == text.utf16.count)
+    }
 }

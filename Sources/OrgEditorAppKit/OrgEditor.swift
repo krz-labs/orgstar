@@ -87,6 +87,11 @@ public final class OrgEditor: NSObject {
     /// The open completion list, and the pause before one opens by itself.
     var completionPopup: CompletionPopup?
     var completionTimer: DispatchWorkItem?
+    /// The index's answer for the completion starting at `start`, and the query running.
+    var completionFetched: (kind: Completion.Kind, start: Int, result: CompletionResult)?
+    var completionTask: Task<Void, Never>?
+    /// `dabbrev-expand` being repeated.
+    var dabbrev: DabbrevExpansion?
     /// The snippet whose fields are being filled in, and the range drawn for it last.
     var snippetSession: SnippetSession?
     var snippetHighlight: Range<Int>?
@@ -385,6 +390,12 @@ public final class OrgEditor: NSObject {
     public var onExternal: ((ExternalRequest) -> Void)?
     /// Tags used across the workspace, for tag completion.
     public var knownTags: @Sendable () -> [String] = { [] }
+    /// Answers completion's questions to the index; run off the main actor.
+    public var completionSource: (@Sendable (CompletionQuery) async -> CompletionResult)?
+    /// Gives a heading in another file an ID for a link to it; nil when it can't.
+    public var createID: ((CompletionItem) -> String?)?
+    /// The text of the other open buffers, most recent first, for word completion.
+    public var otherBuffers: () -> [String] = { [] }
     /// Effects other than messages, for the app to carry out.
     public var onEffect: ((Effect) -> Void)?
     /// Where paste looks for images and files; scripts checking the app set another.
@@ -597,7 +608,7 @@ public final class OrgEditor: NSObject {
     }
 
     /// The last command run and the revision it left, for `last-command`.
-    private var lastCommand: (id: String, revision: Int)?
+    var lastCommand: (id: String, revision: Int)?
 
     /// Runs a command by id, as a key, a menu item or the palette would.
     public func run(_ id: String) {
@@ -634,6 +645,9 @@ public final class OrgEditor: NSObject {
             case "org.latex-preview": toggleLatex()
             case "editor.toggle-spell-check": toggleSpellCheck()
             case "editor.complete": completeAtPoint()
+            case "editor.dabbrev-expand": dabbrevExpand()
+            case "editor.dabbrev-completion": completeWord(last: false)
+            case "editor.dabbrev-completion-previous": completeWord(last: true)
             case "org.snippet.next-field": nextSnippetField()
             case "org.snippet.previous-field": previousSnippetField()
             case "editor.toggle-truncate-lines": toggleTruncateLines()

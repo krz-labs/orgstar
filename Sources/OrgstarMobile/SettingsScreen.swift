@@ -120,6 +120,43 @@ struct SettingsScreen: View {
             } footer: {
                 Text("org-enforce-todo-dependencies and org-enforce-todo-checkbox-dependencies.")
             }
+            Section {
+                let _ = model.settingsVersion
+                Picker("Completion list opens", selection: Binding {
+                    UserDefaults.standard.string(forKey: "completionAuto") ?? "preset"
+                } set: { model.set("completionAuto", to: .string($0)) }) {
+                    Text("As the keys do (by itself with Doom)").tag("preset")
+                    Text("By itself as you type").tag("on")
+                    Text("Only with a key").tag("off")
+                }
+                .help(Text(verbatim: "completion-auto"))
+                let delay = OrgPreferences.completion().delay
+                Stepper("After a pause of \(Int(delay * 1000)) ms", value: Binding {
+                    Int(delay * 1000)
+                } set: { model.set("completionAutoDelay", to: .integer($0)) }, in: 0...2000, step: 50)
+                .help(Text(verbatim: "completion-auto-delay"))
+                let prefix = OrgPreferences.completion().prefix
+                Stepper("Once \(prefix) characters are typed", value: Binding {
+                    prefix
+                } set: { model.set("completionAutoPrefix", to: .integer($0)) }, in: 1...10)
+                .help(Text(verbatim: "completion-auto-prefix"))
+                Picker("Candidates", selection: Binding {
+                    UserDefaults.standard.string(forKey: "completionStyle") ?? "preset"
+                } set: { model.set("completionStyle", to: .string($0)) }) {
+                    Text("As the keys do (letters in order with Doom)").tag("preset")
+                    Text("Start with what's typed").tag("prefix")
+                    Text("Have its letters in order, best first").tag("fuzzy")
+                }
+                .help(Text(verbatim: "completion-style"))
+                Toggle("The list offers words from open files and folders", isOn: Binding {
+                    OrgPreferences.completion().words
+                } set: { model.set("completionWords", to: .bool($0)) })
+                .help(Text(verbatim: "completion-words"))
+            } header: {
+                Text("Completion")
+            } footer: {
+                Text("With a hardware keyboard. Doom's keys open the list by itself and match letters in order, as Doom's corfu does; the Emacs and Mac keys do neither unless set here.")
+            }
             calendarSection
             reminderSection
             Section {

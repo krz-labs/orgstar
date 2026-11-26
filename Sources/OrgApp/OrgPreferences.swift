@@ -54,6 +54,7 @@ public enum OrgPreferences {
         options.clockInSwitchToState = string("clockInSwitchToState", defaults).nonEmpty
         options.timerFormat = string("timerFormat", defaults).contains("%s") ? string("timerFormat", defaults) : "%s "
         options.timerDefault = string("timerDefault", defaults).nonEmpty ?? "0"
+        options.completion = completion(defaults)
         let templates = UserConfig.structureTemplates(defaults)
         options.structureTemplates = templates.isEmpty ? nil : StructureTemplate.merged(templates)
         options.trackOrderedPropertyWithTag = switch string("trackOrderedTag", defaults) {
@@ -62,6 +63,20 @@ public enum OrgPreferences {
         case let tag: tag
         }
         return options
+    }
+
+    /// The completion settings, `preset` resolved by the keymap preset: Doom's corfu opens
+    /// the list by itself and matches with orderless; Emacs and the Mac keys do neither.
+    public static func completion(_ defaults: UserDefaults = .standard) -> CompletionOptions {
+        let doom = string("keymap", defaults) == "doom"
+        func choice(_ key: String, on: String) -> Bool {
+            let value = string(key, defaults)
+            return value == "preset" ? doom : value == on
+        }
+        return CompletionOptions(
+            auto: choice("completionAuto", on: "on"), delay: Double(max(0, integer("completionAutoDelay", defaults))) / 1000,
+            prefix: max(1, integer("completionAutoPrefix", defaults)), fuzzy: choice("completionStyle", on: "fuzzy"), words: bool("completionWords", defaults)
+        )
     }
 
     /// `colors` with the type settings of `[theme]`: font, size, line spacing, heading step.
