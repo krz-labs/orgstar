@@ -29,7 +29,7 @@ done
 
 [ -f "$catalog" ] || printf '{\n  "sourceLanguage" : "en",\n  "strings" : {\n\n  },\n  "version" : "1.0"\n}\n' > "$catalog"
 find "$mac" "$ios" -path '*/arm64/*' -name '*.stringsdata' \
-    | grep -E '/(Orgstar|OrgstarMobile|OrgstarWidgets|OrgstarShare|OrgstarWatch|OrgstarWatchWidgets)-p\.build/|/(OrgApp|OrgPresentation|OrgEditorAppKit)-t?\.build/' \
+    | grep -E '/(Orgstar|OrgstarMobile|OrgstarWidgets|OrgstarShare|OrgstarWatch|OrgstarWatchWidgets)-p\.build/|/(OrgApp|OrgPresentation|OrgEditorAppKit|OrgPrograms)-t?\.build/' \
     > "$mac/stringsdata.txt"
 find "$mas" -path '*/arm64/*' -name '*.stringsdata' | grep -E '/(Orgstar macOS|OrgstarWidgets)\.build/' >> "$mac/stringsdata.txt"
 # The App Store target's folder name has a space, so the list is read a line at a time.

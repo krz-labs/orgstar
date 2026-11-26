@@ -301,6 +301,30 @@ Choose File ▸ Recovery Versions… to see the open file's versions, newest fir
 
 Select a version to see how it differs from the buffer (=-= in the buffer, =+= in the kept version). =Restore= puts the kept version's text in the buffer as one edit, which undo reverses; the buffer as it was goes to recovery first. =Show in Finder= reveals the kept file. For a file with no kept versions the sheet says so.
 
+** Committing to git
+
+The download version can commit your changes in a folder that is a git repository. It is off for every folder. In Settings ▸ Git, choose for each folder in the sidebar:
+
+| Choice                | What happens                                                                                     |
+|-----------------------+--------------------------------------------------------------------------------------------------|
+| Off                   | Nothing. The default.                                                                            |
+| Commit                | A minute after the last save in the folder, and when orgstar quits, orgstar commits the files it saved. |
+| Commit, Pull and Push | Before committing, =git pull --ff-only=; after the commit, =git push=.                          |
+
+Only the files orgstar wrote since the last commit are committed: files saved from a buffer, and files changed by refiling, archiving, capture and agenda commands. Other changes in the repository, staged or not, stay as they are, so your own work in progress is never committed. orgstar remembers these files until they are committed; files written before a crash are not committed. An encrypted =.org.gpg= file is committed as it is on disk, like any other file. A file that is ignored by =.gitignore=, or that is the same as in the last commit, is left out.
+
+The commit uses your git identity and configuration, including signing and hooks. Its message is =Update= followed by the file names, or =Update N files= with the paths in the body when there are more than three. The echo area says what was committed and pushed.
+
+orgstar runs the git it finds in =/opt/homebrew/bin=, =/usr/local/bin=, =/run/current-system/sw/bin= or on the =PATH= (=/usr/bin/git= only with the developer tools installed), or the one =ORGSTAR_GIT= names. It never asks for anything: a remote that needs a password or a host key confirmation fails, and the echo area says git couldn't sign in. Use an SSH key in the agent or a credential helper such as the keychain. Each git command is stopped after 30 seconds, or 60 for pull and push (15 when quitting).
+
+orgstar never merges, rebases or resolves a conflict:
+
+- When the pull can't fast-forward, because the remote and your repository both have commits or the remote changed a file you have changed, orgstar still commits locally, doesn't push, and says so. Pull and resolve it in a terminal (for example =git pull --rebase=).
+- While a merge, rebase, cherry-pick, revert or bisect is in progress, or another git command holds the index, orgstar doesn't run git in that repository. The files wait and are committed after the next save once it is finished.
+- A push runs only after the pull succeeded and something was committed.
+
+The Mac App Store version can't run git and has no Git pane.
+
 ** iCloud
 
 Files in iCloud Drive that aren't downloaded to the Mac show in the sidebar with a cloud icon and grey text, with the tooltip "Downloading from iCloud". orgstar asks iCloud to download them, and indexes them and lets you open them when they arrive. Files iCloud removes from the Mac to save space keep their index entries until they are back, so search and the agenda still find them.
@@ -318,4 +342,4 @@ orgstar does not convert between encodings or line endings.
 
 * On iOS
 
-The iOS app adds folders from its Folders screen and lists only org files there. Conflicts, Syncthing copies and recovery versions are in the editor's menu. Files are watched through file presenters rather than FSEvents. See [[file:14-ios.org][iOS]].
+The iOS app adds folders from its Folders screen and lists only org files there. Conflicts, Syncthing copies and recovery versions are in the editor's menu; the iOS app doesn't list git commits or commit to git. Files are watched through file presenters rather than FSEvents. See [[file:14-ios.org][iOS]].

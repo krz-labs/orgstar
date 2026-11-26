@@ -92,6 +92,8 @@ public final class DocumentSession {
     public var options: EditingOptions = .org
     /// Called with a file's path after its text changed through the session, typed or not.
     @ObservationIgnored public var textChanged: ((String) -> Void)?
+    /// Called with a file's path each time a save wrote it to disk.
+    @ObservationIgnored public var fileWritten: ((String) -> Void)?
     /// TODO keywords and priorities for files without their own settings.
     public var defaults: OrgSettings = .default
 
@@ -418,7 +420,9 @@ public final class DocumentSession {
 
     // MARK: - Saving
 
-    private var saver: Saver { Saver(fileSystem: fileSystem, recovery: recovery) }
+    private var saver: Saver {
+        Saver(fileSystem: WriteReporting(base: fileSystem) { [weak self] url in MainActor.assumeIsolated { self?.fileWritten?(url.path) } }, recovery: recovery)
+    }
 
     private func scheduleAutosave(_ entry: Entry) {
         entry.autosave?.cancel()
@@ -1134,5 +1138,19 @@ public final class DocumentSession {
             break
         }
         refresh(entry)
+    }
+}
+
+/// `base`, telling `written` about each file it replaced.
+private struct WriteReporting: FileSystem {
+    let base: FileSystem
+    let written: @Sendable (URL) -> Void
+
+    func read(_ url: URL) throws -> [UInt8]? { try base.read(url) }
+
+    func replace(_ url: URL, with bytes: [UInt8]) throws -> [UInt8]? {
+        let replaced = try base.replace(url, with: bytes)
+        written(url)
+        return replaced
     }
 }

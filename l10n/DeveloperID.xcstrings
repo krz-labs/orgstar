@@ -1,6 +1,74 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%@: git couldn't sign in to the remote (%@). orgstar can't answer prompts; use an SSH key in the agent or a credential helper.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: git konnte sich nicht beim Remote anmelden (%2$@). orgstar kann keine Abfragen beantworten; nutze einen SSH-Schlüssel im Agent oder einen Credential-Helper."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: git no pudo iniciar sesión en el remoto (%2$@). orgstar no puede responder solicitudes; usa una clave SSH en el agente o un asistente de credenciales."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ : git n’a pas pu se connecter au dépôt distant (%2$@). orgstar ne peut pas répondre aux invites ; utilisez une clé SSH dans l’agent ou un assistant d’identifiants."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: git がリモートにサインインできませんでした（%2$@）。orgstar は入力を求められても応答できません。エージェントの SSH 鍵か認証情報ヘルパーを使ってください。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: o git não conseguiu entrar no remoto (%2$@). O orgstar não responde a solicitações; use uma chave SSH no agente ou um auxiliar de credenciais."
+          }
+        }
+      }
+    },
+    "A minute after the last save in a folder, and when orgstar quits, orgstar commits the files it saved there, and only those. Commit, Pull and Push pulls with --ff-only first and pushes after the commit. orgstar never merges or resolves a conflict, and doesn't commit while a merge, rebase or cherry-pick is in progress.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Minute nach dem letzten Sichern in einem Ordner und beim Beenden committet orgstar die Dateien, die es dort gesichert hat, und nur diese. „Committen, Pull und Push“ holt zuerst mit --ff-only und pusht nach dem Commit. orgstar führt nie zusammen, löst keine Konflikte und committet nicht, solange ein Merge, Rebase oder Cherry-Pick läuft."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un minuto después del último guardado en una carpeta, y al salir, orgstar confirma los archivos que guardó allí, y solo esos. «Confirmar, pull y push» hace pull con --ff-only primero y push después de confirmar. orgstar nunca fusiona ni resuelve conflictos, y no confirma mientras haya un merge, rebase o cherry-pick en curso."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une minute après le dernier enregistrement dans un dossier, et à la fermeture, orgstar valide les fichiers qu’il y a enregistrés, et seulement ceux-là. « Valider, pull et push » fait d’abord un pull avec --ff-only et un push après la validation. orgstar ne fusionne jamais, ne résout aucun conflit et ne valide pas pendant un merge, un rebase ou un cherry-pick."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フォルダで最後に保存してから 1 分後と終了時に、orgstar はそこで保存したファイルだけをコミットします。「コミット、プル、プッシュ」は先に --ff-only でプルし、コミット後にプッシュします。orgstar はマージやコンフリクトの解決を行わず、マージ、リベース、チェリーピックの途中ではコミットしません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um minuto após o último salvamento em uma pasta, e ao sair, o orgstar faz commit dos arquivos que salvou ali, e só deles. “Commit, pull e push” faz pull com --ff-only antes e push depois do commit. O orgstar nunca faz merge nem resolve conflitos, e não faz commit durante um merge, rebase ou cherry-pick."
+          }
+        }
+      }
+    },
     "Activate": {
       "localizations": {
         "de": {
@@ -31,6 +99,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ativar"
+          }
+        }
+      }
+    },
+    "Add a folder to the sidebar to commit its changes automatically.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Füge der Seitenleiste einen Ordner hinzu, um seine Änderungen automatisch zu committen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Añade una carpeta a la barra lateral para confirmar sus cambios automáticamente."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajoutez un dossier à la barre latérale pour valider ses modifications automatiquement."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "変更を自動的にコミットするには、サイドバーにフォルダを追加してください。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adicione uma pasta à barra lateral para fazer commit das alterações automaticamente."
+          }
+        }
+      }
+    },
+    "Can't commit automatically: git isn't installed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatisches Committen nicht möglich: git ist nicht installiert."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede confirmar automáticamente: git no está instalado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de valider automatiquement : git n’est pas installé."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自動コミットできません: git がインストールされていません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível fazer commit automaticamente: o git não está instalado."
           }
         }
       }
@@ -103,6 +239,414 @@
         }
       }
     },
+    "Commit": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Committen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirmar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Valider"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コミット"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commit"
+          }
+        }
+      }
+    },
+    "Commit changes automatically": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Änderungen automatisch committen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirmar cambios automáticamente"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Valider les modifications automatiquement"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "変更を自動的にコミット"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fazer commit das alterações automaticamente"
+          }
+        }
+      }
+    },
+    "Commit, Pull and Push": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Committen, Pull und Push"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirmar, pull y push"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Valider, pull et push"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コミット、プル、プッシュ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commit, pull e push"
+          }
+        }
+      }
+    },
+    "Committed %@ in %@.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ in %2$@ committet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirmado %1$@ en %2$@."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ validé dans %2$@."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$@ で %1$@ をコミットしました。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commit de %1$@ em %2$@."
+          }
+        }
+      }
+    },
+    "Committed and pushed %@ in %@.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ in %2$@ committet und gepusht."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirmado y enviado %1$@ en %2$@."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ validé et poussé dans %2$@."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$@ で %1$@ をコミットしてプッシュしました。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commit e push de %1$@ em %2$@."
+          }
+        }
+      }
+    },
+    "Couldn't commit in %@: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commit in %1$@ fehlgeschlagen: %2$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo confirmar en %1$@: %2$@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Validation impossible dans %1$@ : %2$@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ でコミットできませんでした: %2$@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível fazer commit em %1$@: %2$@"
+          }
+        }
+      }
+    },
+    "Couldn't pull in %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pull in %@ fehlgeschlagen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo hacer pull en %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pull impossible dans %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ でプルできませんでした"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível fazer pull em %@"
+          }
+        }
+      }
+    },
+    "Couldn't pull in %@: %@. Not pushed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pull in %1$@ fehlgeschlagen: %2$@. Nicht gepusht."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo hacer pull en %1$@: %2$@. Sin push."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pull impossible dans %1$@ : %2$@. Pas de push."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ でプルできませんでした: %2$@。プッシュしていません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível fazer pull em %1$@: %2$@. Sem push."
+          }
+        }
+      }
+    },
+    "Couldn't push %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Push von %@ fehlgeschlagen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo hacer push de %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Push impossible pour %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ をプッシュできませんでした"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível fazer push de %@"
+          }
+        }
+      }
+    },
+    "Couldn't push %@: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Push von %1$@ fehlgeschlagen: %2$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo hacer push de %1$@: %2$@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Push impossible pour %1$@ : %2$@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ をプッシュできませんでした: %2$@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível fazer push de %1$@: %2$@"
+          }
+        }
+      }
+    },
+    "Didn't commit in %@: a git %@ is in progress. Finish or abort it; orgstar commits after the next save.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kein Commit in %1$@: Ein git-%2$@ läuft. Schließe ihn ab oder brich ihn ab; orgstar committet nach dem nächsten Sichern."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se confirmó en %1$@: hay un %2$@ de git en curso. Termínalo o cancélalo; orgstar confirmará tras el próximo guardado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune validation dans %1$@ : un %2$@ git est en cours. Terminez-le ou annulez-le ; orgstar validera après le prochain enregistrement."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ でコミットしませんでした: git の %2$@ が進行中です。完了するか中止してください。次の保存後にコミットします。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum commit em %1$@: um %2$@ do git está em andamento. Conclua ou cancele; o orgstar fará commit após o próximo salvamento."
+          }
+        }
+      }
+    },
+    "Didn't commit in %@: another git command is running there. orgstar tries again after the next save.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kein Commit in %@: Dort läuft ein anderer git-Befehl. orgstar versucht es nach dem nächsten Sichern erneut."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se confirmó en %@: hay otro comando git en ejecución. orgstar lo intentará de nuevo tras el próximo guardado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune validation dans %@ : une autre commande git y est en cours. orgstar réessaiera après le prochain enregistrement."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ でコミットしませんでした: 別の git コマンドが実行中です。次の保存後に再試行します。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum commit em %@: outro comando git está em execução. O orgstar tentará de novo após o próximo salvamento."
+          }
+        }
+      }
+    },
     "Get Your Key…": {
       "localizations": {
         "de": {
@@ -133,6 +677,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Obter sua chave…"
+          }
+        }
+      }
+    },
+    "Git": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Git"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Git"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Git"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Git"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Git"
           }
         }
       }
@@ -171,6 +749,74 @@
         }
       }
     },
+    "Not a git repository": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kein Git-Repository"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No es un repositorio git"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pas un dépôt git"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "git リポジトリではありません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é um repositório git"
+          }
+        }
+      }
+    },
+    "Nothing was merged; pull and resolve it in a terminal. Not pushed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nichts wurde zusammengeführt; hole und löse es im Terminal. Nicht gepusht."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se fusionó nada; haz pull y resuélvelo en un terminal. Sin push."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien n’a été fusionné ; faites le pull et résolvez-le dans un terminal. Pas de push."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "何もマージしていません。ターミナルでプルして解決してください。プッシュしていません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada foi mesclado; faça pull e resolva em um terminal. Sem push."
+          }
+        }
+      }
+    },
     "ORGSTAR1-…": {
       "localizations": {
         "de": {
@@ -201,6 +847,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "ORGSTAR1-…"
+          }
+        }
+      }
+    },
+    "Off": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aus"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desactivado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Désactivé"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オフ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desativado"
           }
         }
       }
@@ -371,6 +1051,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Os patrocinadores obtêm a chave entrando com o GitHub. Ela é verificada neste Mac; a chave de um patrocinador mensal é renovada com o krz.sh."
+          }
+        }
+      }
+    },
+    "git isn't installed. Install the Xcode command line tools or git from Homebrew.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "git ist nicht installiert. Installiere die Xcode-Befehlszeilentools oder git aus Homebrew."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "git no está instalado. Instala las herramientas de línea de comandos de Xcode o git desde Homebrew."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "git n’est pas installé. Installez les outils en ligne de commande de Xcode ou git depuis Homebrew."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "git がインストールされていません。Xcode コマンドラインツールか Homebrew の git をインストールしてください。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O git não está instalado. Instale as ferramentas de linha de comando do Xcode ou o git do Homebrew."
           }
         }
       }

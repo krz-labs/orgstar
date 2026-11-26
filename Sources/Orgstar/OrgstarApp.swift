@@ -279,7 +279,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         #else
         BufferRestore.save(session)
         #endif
-        return UnsavedChanges.resolve(session, paths: session.openPaths) ? .terminateNow : .terminateCancel
+        guard UnsavedChanges.resolve(session, paths: session.openPaths) else { return .terminateCancel }
+        #if !APPSTORE
+        // Files saved since their folder's last automatic commit are committed before quitting.
+        if GitAutoCommit.shared.hasPending {
+            Task {
+                await GitAutoCommit.shared.flush()
+                sender.reply(toApplicationShouldTerminate: true)
+            }
+            return .terminateLater
+        }
+        #endif
+        return .terminateNow
     }
 }
 
@@ -429,6 +440,10 @@ struct OrgstarApp: App {
                         delegate.commands = commands
                         #if APPSTORE
                         delegate.workspace = model
+                        #else
+                        GitAutoCommit.shared.roots = { model.rootPaths }
+                        GitAutoCommit.shared.report = { commands.show($0) }
+                        session.fileWritten = { GitAutoCommit.shared.fileWritten($0) }
                         #endif
                         CaptureIntent.environment = (model, session, clock, commands)
                     }
@@ -863,6 +878,11 @@ struct SettingsView: View {
             Tab("Appearance", systemImage: "paintpalette", value: "appearance") { appearance }
             Tab("Agenda", systemImage: "calendar", value: "agenda") { agenda }
             Tab("Capture", systemImage: "tray.and.arrow.down", value: "capture") { capture }
+            #if !APPSTORE
+            Tab(value: "git") { GitSettingsForm(workspace: workspace) } label: {
+                Label { Text("Git", tableName: "DeveloperID") } icon: { Image(systemName: "arrow.triangle.branch") }
+            }
+            #endif
             #if APPSTORE
             Tab("orgstar+", systemImage: "star", value: "pro") { StoreForm() }
             #else
