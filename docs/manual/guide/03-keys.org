@@ -1,5 +1,5 @@
 #+TITLE: Keys and commands
-#+DESCRIPTION: The three key presets, prefix keys and key hints, the echo area, the command palette, Option as Meta, keymap.toml, Vim editing in the Doom preset, and every binding.
+#+DESCRIPTION: The three key presets, prefix keys and key hints, the echo area, the command palette, Option as Meta, keymap.toml, keyboard macros, Vim editing in the Doom preset, and every binding.
 #+LEDE: Every action in orgstar is a named command; a keymap preset decides which keys run which commands, and keymap.toml lets you change that.
 
 * Commands and keymaps
@@ -290,6 +290,45 @@ Problems are reported in the echo area with the line number, for example =keymap
 ** Importing from Emacs
 
 Settings ▸ General ▸ Import from Emacs… reads your Emacs or Doom configuration and offers, among other things, the key bindings it finds: =global-set-key=, =keymap-global-set=, =define-key=, =keymap-set=, =evil-define-key= and Doom's =map!= with =:leader=, =:localleader=, state keywords and =:prefix=. Bindings to commands orgstar has are appended to =keymap.toml= under a =# Imported from Emacs.= comment, leaving out bindings the file already has. Keys written as vectors, such as =[f5]=, are skipped. See [[file:15-alongside-emacs.org][Alongside Emacs]].
+
+* Keyboard macros
+
+A keyboard macro records the keys you type and plays them back, as Emacs's =kmacro= does. Keys are recorded as they reach the keymap, so a macro holds keys that run commands as well as typed text, and plays them back through the same keymap. The Doom preset's =q= and =@= registers (see [[*Macros][Macros]] under Vim editing) record the same way and are separate from these.
+
+| Emacs | Mac | Edit ▸ Macros | Command | Does |
+|-+-+-+-+-|
+| =C-x (= | =⌃⌘R= | Start Recording | =macro.start= | Starts recording (=kmacro-start-macro=). The echo area shows =Defining keyboard macro…=. |
+| =C-x )= | =⌃⇧⌘R= | Stop Recording | =macro.end= | Stops recording; the keys become the last macro (=kmacro-end-macro=). |
+| =C-x e= | =⌃⌘M= | Run Last Macro | =macro.call= | Plays the last macro, stopping a recording first (=kmacro-end-and-call-macro=). After =C-x e=, =e= plays it again, until another key. |
+| =<f3>= | — | — | =macro.start-or-insert-counter= | Starts recording; while recording or playing, inserts the macro counter and adds one to it (=kmacro-start-macro-or-insert-counter=). The counter starts at 0 with each recording. |
+| =<f4>= | — | — | =macro.end-or-call= | Stops recording, or plays the last macro (=kmacro-end-or-call-macro=). |
+| =C-x C-k n= | — | Name Last Macro… | =macro.name= | Asks for a name and saves the last macro under it in =macros.toml= (=kmacro-name-last-macro=). |
+| — | — | Run Macro… | =macro.run= | Asks for a named macro and plays it. |
+
+In the Doom preset the Emacs keys above that start with =C-x= work in every state. The Edit ▸ Macros menu shows each item's keys in the current preset.
+
+*Counts.* In the Emacs preset, =C-u= /n/ before =C-x e=, =<f4>= or a key bound to a named macro plays it /n/ times; =C-u= alone plays it 4 times and =C-u C-u= 16. =C-u 0= plays it until a command fails, which is how a macro is run down a whole file: record one line's change ending with =C-n=, then =C-u 0 C-x e= stops when =C-n= reaches the last line. A round that changes neither the text nor the caret also stops it. Other commands don't take a prefix argument; =C-u= before one of them shows =… doesn't take a prefix argument= and does nothing. Key sequences that start with =C-u= in the presets, such as =C-u C-c C-w=, are unchanged.
+
+*Prompts.* A question a command asks while recording is answered as usual, and the answer is recorded as the keys that type it followed by =RET=, as in Emacs. When the macro plays, the command reads its answer from those keys instead of asking. Cancelling the question records =C-g=, which stops the macro when it plays.
+
+*Errors.* A command that fails while a macro plays stops it, with the command's message in the echo area, as in Emacs. Failing includes a key sequence nothing binds, =C-g=, editing a read-only file, a command that refuses at the caret, =C-f= at the end of the buffer, =C-b= at its start, =C-n= on the last line and =C-p= on the first.
+
+*What is recorded.* Keys typed in the editor, including =⌘= keys, which replay through the menus; the answers to the editor's questions; and keys typed during incremental search. Commands chosen with the mouse from a menu, the palette or the toolbar are not recorded, nor is what is typed into the palette, Quick Open or the app's own windows and sheets (refile targets, capture, export). Starting or stopping a recording from Edit ▸ Macros keeps every key typed in between.
+
+The last macro and the recording are shared by every buffer, as in Emacs. The last macro is gone when orgstar quits; name it to keep it.
+
+** Named macros
+
+=C-x C-k n= (Edit ▸ Macros ▸ Name Last Macro…) asks for a name of letters, digits, =-= and =_= and writes the last macro into =macros.toml= in the configuration folder, beside =keymap.toml= (see [[file:13-configuration.org][Configuration]]). A named macro is the command =macro.named.=/name/: it is in the command palette under its name, Edit ▸ Macros ▸ Run Macro… plays it, and =keymap.toml= can bind it:
+
+#+BEGIN_SRC toml
+# C-c m plays the macro named done-and-next; C-u 5 C-c m plays it five times.
+[[bind]]
+keys = "C-c m"
+command = "macro.named.done-and-next"
+#+END_SRC
+
+orgstar reloads =macros.toml= when you save it, and reads =keymap.toml= again so that bindings to new names apply.
 
 * Vim editing (Doom preset)
 
@@ -745,6 +784,7 @@ With a hardware keyboard, the iOS app runs the preset =keymap= names in the fold
 - Of the =app.= commands only the clock commands run from keys: =C-c C-x C-i=, =C-c C-x C-o=, =C-c C-x C-q=, =C-c C-x C-j=, =C-c C-x C-x= and =C-c C-x C-z=. Other =app.= keys, and editor commands such as narrowing, show =Not available on iOS yet=.
 - A sequence of two or more keys whose command cannot run at the caret runs it anyway and shows its message, as on the Mac (for example =Not on a heading=).
 - A pending prefix shows as a message, without key hints.
+- Keyboard macros work as on the Mac with the Emacs preset's keys (=C-x (=, =C-x )=, =C-x e=, =<f3>=, =<f4>=, =C-x C-k n=) and the named macros in =macros.toml=. While a macro plays, the editor types the keys the text system would have: characters, =RET=, =TAB=, =DEL=, =<delete>=, the arrow keys, and =C-f=, =C-b=, =C-n=, =C-p=, =C-a=, =C-e=, =C-d=, =C-k=, =M-f=, =M-b=, =M-<= and =M->=; other text-system keys stop the macro. =C-n= and =C-p= move by lines of text, not by lines on screen. Macros can't be recorded from the on-screen keyboard or the key bar.
 
 The on-screen key bar's buttons run what their Emacs keys run at the caret (Fold is =TAB=, Promote is =M-<left>=, TODO is =C-c C-t=). See [[file:14-ios.org][iOS]].
 
@@ -1063,6 +1103,17 @@ When a key appears in several rows, it runs the command whose condition holds at
 | Truncate or Wrap Long Lines (=editor.toggle-truncate-lines=) | =C-x x t= | — | =SPC t w= (N) | Switches between wrapping and truncating long lines (=toggle-truncate-lines=). |
 | Quit orgstar (=app.quit=) | — | — | =SPC q q= (N) | Quits orgstar (=save-buffers-kill-terminal=). |
 
+** Keyboard macros
+
+| Command | Emacs | Mac | Doom | What it does |
+|-+-+-+-+-|
+| Start Recording Macro (=macro.start=) | =C-x (= | =⌃⌘R= | — | Starts recording keys (=kmacro-start-macro=). |
+| Stop Recording Macro (=macro.end=) | =C-x )= | =⌃⇧⌘R= | — | Stops recording; the keys become the last macro (=kmacro-end-macro=). |
+| Run Last Macro (=macro.call=) | =C-x e= | =⌃⌘M= | — | Plays the last macro, stopping a recording first; =e= plays it again; =C-u= /n/ plays it /n/ times (=kmacro-end-and-call-macro=). |
+| Start Macro or Insert Counter (=macro.start-or-insert-counter=) | =<f3>= | — | — | Starts recording, or while recording or playing inserts the counter (=kmacro-start-macro-or-insert-counter=). |
+| Stop Macro or Run Last Macro (=macro.end-or-call=) | =<f4>= | — | — | Stops recording, or plays the last macro (=kmacro-end-or-call-macro=). |
+| Name Last Macro… (=macro.name=) | =C-x C-k n= | — | — | Names the last macro and saves it in =macros.toml= (=kmacro-name-last-macro=). |
+
 ** Attachments
 
 The Emacs keys also work with Control on the last key (=C-c C-a C-a=), as in Org's dispatcher. See [[file:04-outlines.org][Outlines]].
@@ -1142,6 +1193,7 @@ No preset binds these. Run them from the palette or a menu, or bind them in =key
 | Edit Config File (=app.edit-config=) | Opens =config.toml= in the editor. =⌥⌘,=. |
 | Import from Emacs… (=app.import-emacs=) | Opens Import from Emacs…. |
 | Revert to File on Disk (=app.revert=) | Replaces the buffer with the file on disk; unsaved changes go to recovery (=revert-buffer=). |
+| Run Macro… (=macro.run=) | Asks for a named keyboard macro and plays it. Edit ▸ Macros ▸ Run Macro…. |
 | Recovery Versions… (=app.recovery=) | Shows the recovery versions of the file. |
 | Resolve Sync Conflicts… (=app.sync-conflicts=) | Shows the file's sync conflict copies to resolve them. |
 | Import Table from File… (=app.table-import=) | Asks for a CSV, TSV or space-separated file and inserts it as a table (=org-table-import=). |

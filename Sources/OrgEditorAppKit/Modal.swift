@@ -37,6 +37,8 @@ extension OrgEditor {
                 if binding.command == "org.fill-paragraph", vim.mode == .visual || vim.mode == .visualLine || vim.mode == .visualBlock {
                     fillVisual()
                 } else {
+                    commandKeys = keys
+                    defer { commandKeys = nil }
                     run(binding.command)
                 }
                 updateCursor()
@@ -368,7 +370,7 @@ extension OrgEditor {
         if !history, kind == "/" || kind == "?" { return startISearch(forward: kind == "/", vim: true) }
         let earlier = Array((Self.promptHistory[kind] ?? []).reversed())
         let request = history ? Prompt(key: kind, message: kind, choices: earlier, requireMatch: false) : Prompt(key: kind, message: kind)
-        onPrompt?(request) { [weak self] answer in
+        ask(request) { [weak self] answer in
             guard let self, let answer, !answer.isEmpty else { return }
             var list = Self.promptHistory[kind] ?? []
             list.removeAll { $0 == answer }

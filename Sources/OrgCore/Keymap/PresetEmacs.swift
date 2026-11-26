@@ -445,6 +445,25 @@ extension KeymapPreset {
         [[bind]]
         keys = "C-x C-f"
         command = "app.quick-open"
+        # Keyboard macros. C-u N before C-x e or <f4> runs the macro N times; C-u alone, 4 times.
+        [[bind]]
+        keys = "C-x ("
+        command = "macro.start"
+        [[bind]]
+        keys = "C-x )"
+        command = "macro.end"
+        [[bind]]
+        keys = "C-x e"
+        command = "macro.call"
+        [[bind]]
+        keys = "<f3>"
+        command = "macro.start-or-insert-counter"
+        [[bind]]
+        keys = "<f4>"
+        command = "macro.end-or-call"
+        [[bind]]
+        keys = "C-x C-k n"
+        command = "macro.name"
         [[bind]]
         keys = "M-x"
         command = "app.palette"

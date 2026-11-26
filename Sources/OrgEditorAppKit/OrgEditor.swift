@@ -461,6 +461,16 @@ public final class OrgEditor: NSObject {
     var recordingRegister: Character?
     var recordedKeys: [KeyChord] = []
     var replayingMacro = 0
+    /// Keyboard macros: the keys left in the one being replayed, how deep replays are nested,
+    /// the error that stops them, the key that runs the last one again right after (`e` after
+    /// C-x e), and the keys of the command running, nil when a menu or the palette ran it.
+    var macroKeys: [KeyChord] = []
+    var kmacroDepth = 0
+    var macroError: String?
+    var macroRepeatKey: KeyChord?
+    var commandKeys: [KeyChord]?
+    /// Named macros (`macros.toml`).
+    public var namedMacros = NamedMacros.shared
     /// A region is active: movement extends the selection, as after C-SPC in Emacs.
     private(set) var markActive = false
     /// An incremental search in progress, and whether Vim's `/` or `?` started it.
@@ -482,6 +492,19 @@ public final class OrgEditor: NSObject {
     /// Offers a key press to the keymap. False lets the text system have it.
     func handleKey(_ event: NSEvent) -> Bool {
         guard let chord = KeyEvents.chord(for: event, optionAsMeta: optionAsMeta) else { return modal && vim.mode != .insert }
+        return handleChord(chord)
+    }
+
+    /// A key, typed or replayed from a keyboard macro. False lets the text system have it.
+    func handleChord(_ chord: KeyChord) -> Bool {
+        if kmacroDepth == 0 { Self.kmacro.record(chord, begins: dispatcher.pending.isEmpty) }
+        if let key = macroRepeatKey {
+            macroRepeatKey = nil
+            if chord == key, dispatcher.pending.isEmpty, isearch == nil {
+                callLastMacro(count: 1, repeatKey: key)
+                return true
+            }
+        }
         if isearch != nil, isearchKey(chord) { return true }
         if let handled = completionKey(chord) { return handled }
         if modal { return handleModal(chord) }
@@ -495,19 +518,27 @@ public final class OrgEditor: NSObject {
             return true
         case .cancelled:
             onKeysPending?(nil, [])
-            onMessage?("Quit")
+            fail("Quit")
             return true
         case .undefined(let keys):
             onKeysPending?(nil, [])
-            onMessage?("\(KeySequence.format(keys)) is undefined")
+            fail("\(KeySequence.format(keys)) is undefined")
             return true
         case .unbound:
             return electricPair(chord) || autoFill(chord)
         case .complete(let keys, let candidates):
-            if keys.count > 1 { onKeysPending?(nil, []) }
+            let argument = dispatcher.argument != nil
+            if keys.count > 1 || argument { onKeysPending?(nil, []) }
             let context = context()
             let runnable = candidates.first { runs($0, in: context) }
-            if let binding = runnable ?? (keys.count > 1 ? candidates.first : nil) {
+            if let binding = runnable ?? (keys.count > 1 || argument ? candidates.first : nil) {
+                // A prefix argument (C-u, C-u 3) counts keyboard macros only.
+                if argument, !binding.command.hasPrefix("macro.") {
+                    fail("\(KeySequence.format(keys)) doesn't take a prefix argument")
+                    return true
+                }
+                commandKeys = keys
+                defer { commandKeys = nil }
                 run(binding.command)
                 return true
             }
@@ -566,11 +597,11 @@ public final class OrgEditor: NSObject {
     public func run(_ id: String) {
         defer { lastCommand = (id, document.revision) }
         guard let command = EditorCommands.command(id) else {
-            onMessage?("Unknown command \(id)")
+            fail("Unknown command \(id)")
             return
         }
         if !isOrg, id.hasPrefix("org.") {
-            onMessage?("Not an org file")
+            fail("Not an org file")
             return
         }
         // `org-ctrl-c-ctrl-c` first removes sparse tree highlights.
@@ -599,15 +630,18 @@ public final class OrgEditor: NSObject {
             case "edit.isearch-backward": startISearch(forward: false)
             case "edit.isearch-forward-regexp": startISearch(forward: true, regexp: true)
             case "edit.isearch-backward-regexp": startISearch(forward: false, regexp: true)
+            case _ where id.hasPrefix("macro."): macroCommand(id)
             default: tableColumnWidth(id)
             }
         case .edit(let selector, let extending):
+            let before = textView.selectedRange()
             if markActive, let extending {
                 keepMark = true
                 textView.doCommand(by: NSSelectorFromString(extending))
             } else {
                 textView.doCommand(by: NSSelectorFromString(selector))
             }
+            if kmacroDepth > 0 { checkMovement(id, from: before) }
         case .find(let action):
             let item = NSMenuItem()
             item.tag = action.rawValue
@@ -638,7 +672,7 @@ public final class OrgEditor: NSObject {
         switch step {
         case .commit(let result):
             guard textView.isEditable || result.edits.isEmpty else {
-                onMessage?("This file is read-only.")
+                fail("This file is read-only.")
                 return .failed("read-only")
             }
             commandEditing = true
@@ -661,11 +695,11 @@ public final class OrgEditor: NSObject {
                 }
             }
         case .failed(let message):
-            onMessage?(message)
+            fail(message)
         case .external(let request):
             if let onExternal { onExternal(request) } else { onMessage?(EmacsFallback.wording("This needs Emacs, which isn't available here.", "This isn't available here.")) }
         case .prompt(let prompt):
-            onPrompt?(prompt) { [weak self] answer in
+            ask(prompt) { [weak self] answer in
                 guard let self else { return }
                 guard let answer else {
                     self.onMessage?("Quit")

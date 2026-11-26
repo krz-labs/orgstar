@@ -37,7 +37,10 @@ public struct EditorCommand: Sendable {
 }
 
 public enum EditorCommands {
-    public static let all: [EditorCommand] = Commands.everything.map { EditorCommand(id: $0.id, title: $0.title, action: .text($0)) } + [
+    /// Every command, with the named keyboard macros.
+    public static var all: [EditorCommand] { builtIn + namedMacros(NamedMacros.shared) }
+
+    public static let builtIn: [EditorCommand] = Commands.everything.map { EditorCommand(id: $0.id, title: $0.title, action: .text($0)) } + [
         EditorCommand(id: "org.cycle", title: "Cycle Visibility", action: .view),
         EditorCommand(id: "org.cycle-global", title: "Cycle Global Visibility", action: .view),
         EditorCommand(id: "org.fold.toggle", title: "Toggle Fold", action: .view),
@@ -231,7 +234,20 @@ public enum EditorCommands {
         EditorCommand(id: "edit.use-selection-for-find", title: "Use Selection for Find", action: .find(.setSearchString)),
         EditorCommand(id: "edit.set-mark", title: "Set Mark", action: .mark),
         EditorCommand(id: "edit.keyboard-quit", title: "Quit", action: .mark),
+
+        EditorCommand(id: "macro.start", title: "Start Recording Macro", action: .view),
+        EditorCommand(id: "macro.end", title: "Stop Recording Macro", action: .view),
+        EditorCommand(id: "macro.call", title: "Run Last Macro", action: .view),
+        EditorCommand(id: "macro.start-or-insert-counter", title: "Start Macro or Insert Counter", action: .view),
+        EditorCommand(id: "macro.end-or-call", title: "Stop Macro or Run Last Macro", action: .view),
+        EditorCommand(id: "macro.name", title: "Name Last Macro…", action: .view),
+        EditorCommand(id: "macro.run", title: "Run Macro…", action: .view),
     ]
+
+    /// A command for each named macro, titled with its name.
+    public static func namedMacros(_ store: NamedMacros) -> [EditorCommand] {
+        store.names.map { EditorCommand(id: NamedMacros.commandPrefix + $0, title: $0, action: .view) }
+    }
 
     private static func movement(_ name: String, _ title: String, _ selector: String) -> EditorCommand {
         let extending = String(selector.dropLast()) + "AndModifySelection:"
@@ -242,8 +258,13 @@ public enum EditorCommands {
         EditorCommand(id: "edit.\(name)", title: title, action: .edit(selector: selector))
     }
 
-    private static let byID = Dictionary(uniqueKeysWithValues: all.map { ($0.id, $0) })
+    private static let byID = Dictionary(uniqueKeysWithValues: builtIn.map { ($0.id, $0) })
 
-    public static func command(_ id: String) -> EditorCommand? { byID[id] }
+    /// A command by id; any `macro.named.` id is one, which says so when no macro has its name.
+    public static func command(_ id: String) -> EditorCommand? {
+        if let command = byID[id] { return command }
+        guard id.hasPrefix(NamedMacros.commandPrefix) else { return nil }
+        return EditorCommand(id: id, title: String(id.dropFirst(NamedMacros.commandPrefix.count)), action: .view)
+    }
 }
 #endif

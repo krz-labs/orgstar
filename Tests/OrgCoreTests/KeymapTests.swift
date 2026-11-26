@@ -228,6 +228,34 @@ struct KeymapTests {
         #expect(dispatcher.feed(KeyChord("z")) == .unbound)
     }
 
+    /// C-u is `universal-argument` where no binding starts with the keys typed.
+    @Test func universalArgument() {
+        var dispatcher = KeyDispatcher(keymap: KeymapPreset.emacs.keymap)
+        func feed(_ keys: String) -> KeyDispatcher.Outcome {
+            var outcome = KeyDispatcher.Outcome.unbound
+            for key in KeySequence.parse(keys)! { outcome = dispatcher.feed(key) }
+            return outcome
+        }
+        let callMacro = { (outcome: KeyDispatcher.Outcome) in
+            if case .complete(let keys, let found) = outcome { return keys == KeySequence.parse("C-x e") && found.first?.command == "macro.call" }
+            return false
+        }
+        #expect(callMacro(feed("C-u 1 2 C-x e")))
+        #expect(dispatcher.argument == 12)
+        #expect(callMacro(feed("C-u C-u C-x e")))
+        #expect(dispatcher.argument == 16)
+        #expect(callMacro(feed("C-x e")))
+        #expect(dispatcher.argument == nil)
+        // Bindings that start with C-u keep it, with no argument.
+        guard case .complete(let keys, _) = feed("C-u C-c C-w") else {
+            Issue.record("expected a binding")
+            return
+        }
+        #expect(keys == KeySequence.parse("C-u C-c C-w") && dispatcher.argument == nil)
+        #expect(feed("C-u 3 C-g") == .cancelled)
+        #expect(feed("C-u C-z") == .undefined(KeySequence.parse("C-u C-z")!))
+    }
+
     @Test func continuationsListNextKeys() {
         let keymap = KeymapPreset.emacs.keymap
         let next = keymap.continuations(of: [KeyChord("x", .control)])

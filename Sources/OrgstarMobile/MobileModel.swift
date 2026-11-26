@@ -147,6 +147,7 @@ final class MobileModel {
         keymap = loaded.keymap
         modalKeys = preset.isModal
         configProblems += loaded.problems.map { "keymap.toml: " + $0 }
+        configProblems += MacroFile.load().map { "\(NamedMacros.fileName): " + $0 }
         let settings = OrgPreferences.orgSettings()
         session.defaults = settings
         session.options = OrgPreferences.options()

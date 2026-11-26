@@ -70,6 +70,16 @@ final class MobileEditor: NSObject, DocumentBuffer {
     var recordingRegister: Character?
     var recordedKeys: [KeyChord] = []
     var replayingMacro = 0
+    /// Keyboard macros: the keys left in the one being replayed, how deep replays are nested,
+    /// the error that stops them, the key that runs the last one again right after (`e` after
+    /// C-x e), and the keys of the command running, nil when it didn't come from keys.
+    var macroKeys: [KeyChord] = []
+    var kmacroDepth = 0
+    var macroError: String?
+    var macroRepeatKey: KeyChord?
+    var commandKeys: [KeyChord]?
+    /// Named macros (`macros.toml`).
+    var namedMacros = NamedMacros.shared
     static var vimRegisters: [Character: (text: String, linewise: Bool)] = [:]
     static var vimClipboardRecord: (text: String, linewise: Bool)?
     static var macros: [Character: [KeyChord]] = [:]
@@ -309,7 +319,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
         switch step {
         case .commit(let result):
             guard textView.isEditable || result.edits.isEmpty else {
-                onMessage?("This file is read-only.")
+                fail("This file is read-only.")
                 return .failed("read-only")
             }
             commandEditing = true
@@ -333,9 +343,9 @@ final class MobileEditor: NSObject, DocumentBuffer {
                 }
             }
         case .failed(let message):
-            onMessage?(message)
+            fail(message)
         case .prompt(let prompt):
-            onPrompt?(prompt) { [weak self] answer in
+            ask(prompt) { [weak self] answer in
                 guard let self else { return }
                 guard let answer else { return self.onMessage?("Quit") ?? () }
                 _ = self.perform(command, now: now, answers: answers.merging([prompt.key: answer]) { $1 })
@@ -421,13 +431,14 @@ final class MobileEditor: NSObject, DocumentBuffer {
         case "edit.undo": textView.undoManager?.undo()
         case "edit.redo": textView.undoManager?.redo()
         case "org.table.toggle-column-width", "org.table.shrink", "org.table.expand": tableColumnWidth(id)
+        case _ where id.hasPrefix("macro."): macroCommand(id)
         case _ where id.hasPrefix("app.") || Self.linkCommands.contains(id):
             if let onAppCommand { onAppCommand(id) } else { onMessage?(Self.unavailable(command: id)) }
         default:
             if let command = Commands.command(id) {
                 _ = perform(command)
             } else {
-                onMessage?(Self.unavailable(command: id))
+                fail(Self.unavailable(command: id))
             }
         }
     }
@@ -499,6 +510,19 @@ final class MobileEditor: NSObject, DocumentBuffer {
     func handleKey(_ key: UIKey) -> Bool {
         movedByArrow = [.keyboardUpArrow, .keyboardDownArrow, .keyboardLeftArrow, .keyboardRightArrow].contains(key.keyCode)
         guard let chord = Self.chord(key), !chord.modifiers.contains(.command) else { return false }
+        return handleChord(chord)
+    }
+
+    /// A key, typed or replayed from a keyboard macro. False lets the text system have it.
+    func handleChord(_ chord: KeyChord) -> Bool {
+        if kmacroDepth == 0 { Self.kmacro.record(chord, begins: dispatcher.pending.isEmpty) }
+        if let key = macroRepeatKey {
+            macroRepeatKey = nil
+            if chord == key, dispatcher.pending.isEmpty, isearch == nil {
+                callLastMacro(count: 1, repeatKey: key)
+                return true
+            }
+        }
         if isearch != nil, isearchKey(chord) { return true }
         if modal { return handleModal(chord) }
         // Option alone types characters unless it begins a binding.
@@ -509,10 +533,10 @@ final class MobileEditor: NSObject, DocumentBuffer {
             onMessage?(KeySequence.format(keys) + "-")
             return true
         case .cancelled:
-            onMessage?("Quit")
+            fail("Quit")
             return true
         case .undefined(let keys):
-            onMessage?("\(KeySequence.format(keys)) is undefined")
+            fail("\(KeySequence.format(keys)) is undefined")
             return true
         case .unbound:
             return false
@@ -522,8 +546,16 @@ final class MobileEditor: NSObject, DocumentBuffer {
                 (binding.when.map { KeyContext.holds($0, in: context) } ?? true) && applies(binding.command, in: context)
             }
             // A sequence runs its command even where it doesn't apply, which says why, as on the Mac.
-            guard let binding = runnable ?? (keys.count > 1 ? candidates.first : nil) else { return false }
+            let argument = dispatcher.argument != nil
+            guard let binding = runnable ?? (keys.count > 1 || argument ? candidates.first : nil) else { return false }
+            // A prefix argument (C-u, C-u 3) counts keyboard macros only.
+            if argument, !binding.command.hasPrefix("macro.") {
+                fail("\(KeySequence.format(keys)) doesn't take a prefix argument")
+                return true
+            }
             if keys.count == 1, binding.command.hasPrefix("edit."), !["edit.undo", "edit.redo"].contains(binding.command) { return false }
+            commandKeys = keys
+            defer { commandKeys = nil }
             run(binding.command)
             return true
         }

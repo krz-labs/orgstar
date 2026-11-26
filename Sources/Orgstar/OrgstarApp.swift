@@ -553,6 +553,7 @@ struct OrgstarApp: App {
             CommandGroup(after: .pasteboard) {
                 Divider()
                 FindMenu(commands: commands)
+                MacroMenu(commands: commands)
             }
             CommandGroup(after: .textEditing) {
                 Button("Cancel Running Task") { commands.run("app.babel.cancel") }
@@ -738,6 +739,32 @@ struct FindMenu: View {
         Button(title) { commands.editor?.run(id) }
             .keyboardShortcut(key, modifiers: modifiers)
             .disabled(commands.editor == nil)
+    }
+}
+
+/// Edit ▸ Macros: keyboard macros, with the keys that run them in the current keymap.
+struct MacroMenu: View {
+    let commands: AppCommands
+
+    var body: some View {
+        Menu("Macros") {
+            item("Start Recording", "macro.start")
+            item("Stop Recording", "macro.end")
+            item("Run Last Macro", "macro.call")
+            Divider()
+            item("Name Last Macro…", "macro.name")
+            item("Run Macro…", "macro.run")
+        }
+    }
+
+    private func item(_ title: LocalizedStringKey, _ id: String) -> some View {
+        Button {
+            commands.editor?.run(id)
+        } label: {
+            Text(title)
+            if let keys = commands.keyLabel(for: id) { Text(keys) }
+        }
+        .disabled(commands.editor == nil)
     }
 }
 

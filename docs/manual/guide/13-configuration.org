@@ -21,6 +21,7 @@ The folder holds these files:
 | =keymap.toml=        | Your key bindings, on top of the preset                          | Only by Import from Emacs             |
 | =capture.toml=       | Capture templates                                                | Only by Import from Emacs             |
 | =views.toml=         | Saved agenda views                                               | No                                    |
+| =macros.toml=        | Named keyboard macros                                            | Yes, when you name a macro            |
 | =default-theme.toml= | The default theme's colors, for reference                        | Yes, at every launch                  |
 
 =config.toml= is the source of truth. The Settings window writes each change into it, keeping your comments and the order of lines, and edits you make to the file apply while orgstar runs. If the file doesn't exist at launch, orgstar creates it with every setting at its current value and a comment after each one. A file that is there but can't be read, such as one that isn't UTF-8, is left as it is: the change isn't written and a message says why, as it does when a write fails. Import from Emacs and saving an agenda view treat =capture.toml=, =views.toml= and =keymap.toml= the same way.
@@ -43,7 +44,7 @@ If =config.toml= has a line orgstar can't use, the problem shows in the message 
 - =config.toml: org-agenda-start-day must look like "-3d" or "+0d"=
 - =config.toml: theme.light.background must be a color such as "#1f2328"=
 
-A file that isn't valid TOML is reported with its parse error, and none of it applies. =keymap.toml=, =capture.toml= and =views.toml= report their problems the same way when they are read.
+A file that isn't valid TOML is reported with its parse error, and none of it applies. =keymap.toml=, =capture.toml=, =views.toml= and =macros.toml= report their problems the same way when they are read.
 
 * The Settings window
 
@@ -464,7 +465,7 @@ save = "explicit"
 
 Earlier versions used keys such as =editor.fill-column= and =agenda.span=. orgstar still reads them. At launch, each such key in the file is renamed in place to its current name and moved to its current section; the rest of the file, and the comments on those lines, stay as they are. When a setting is in the file under both names, the current name wins and the old line is removed. A section the move leaves empty is removed. A file that lacks a whole section (such as =[theme]=) gets that section added at the end.
 
-* keymap.toml and capture.toml
+* keymap.toml, capture.toml and macros.toml
 
 =keymap.toml= holds =[[bind]]= tables with =keys=, =command=, and optionally =mode= and =when=. They layer over the preset chosen in Keys. orgstar reloads the file when it changes. See [[file:03-keys.org][Keys and commands]].
 
@@ -477,6 +478,18 @@ command = "app.agenda"
 =capture.toml= holds =[[template]]= tables. Without the file, orgstar uses two templates: =t= (Personal todo, under =Inbox= in =todo.org=) and =n= (Personal notes, under =Inbox= in =notes.org=). See [[file:08-capture.org][Capture]].
 
 =views.toml= holds =[[view]]= tables for the agenda; see [[file:07-agenda.org][The agenda]].
+
+=macros.toml= holds named keyboard macros in a =[macros]= table, one line per macro: the name, then the keys in =keymap.toml='s notation, separated by spaces. Typed text is one key per character, with =SPC= for a space, and a question's answer is the keys that type it followed by =RET=. Name Last Macro… (=C-x C-k n=) adds a line, or replaces the line with the same name, and leaves the rest of the file as it is. orgstar reloads the file when it changes; the iOS app reads it with the folder's other files. Each macro runs as the command =macro.named.=/name/, which =keymap.toml= can bind. See [[file:03-keys.org::*Keyboard macros][Keyboard macros]].
+
+#+BEGIN_SRC toml
+[macros]
+# Marks the heading DONE and moves to the next one.
+done-and-next = "C-c C-t C-n"
+# Adds the tags work and review, answering C-c C-q's question.
+tag-review = "C-c C-q w o r k : r e v i e w RET"
+#+END_SRC
+
+A name has letters, digits, =-= and =_=. A line whose keys can't be read, or a table other than =[macros]=, is reported and skipped.
 
 * In-file settings
 

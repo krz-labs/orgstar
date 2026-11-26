@@ -205,6 +205,11 @@ public struct KeyDispatcher: Sendable {
     public var keymap: Keymap
     public var mode: String?
     public private(set) var pending: [KeyChord] = []
+    /// The prefix argument of the sequence completed last: the number typed after C-u
+    /// (`C-u 3`), or 4 for each C-u. C-u is `universal-argument` when no binding starts with
+    /// the keys typed: the sequence completes without it, and with this set.
+    public private(set) var argument: Int?
+    private var digits = ""
 
     public init(keymap: Keymap, mode: String? = nil) {
         self.keymap = keymap
@@ -212,24 +217,50 @@ public struct KeyDispatcher: Sendable {
     }
 
     public static let quit = KeyChord("g", .control)
+    public static let universalArgument = KeyChord("u", .control)
 
     public mutating func feed(_ chord: KeyChord) -> Outcome {
+        if pending.isEmpty { argument = nil }
         if !pending.isEmpty, chord == Self.quit {
             pending = []
+            digits = ""
             return .cancelled
+        }
+        if !pending.isEmpty, pending.allSatisfy({ $0 == Self.universalArgument }), chord.modifiers.isEmpty, chord.key.count == 1,
+           let digit = chord.key.first, digit.isASCII, digit.isNumber {
+            digits.append(digit)
+            return .pending(pending)
         }
         let sequence = pending + [chord]
         if keymap.isPrefix(sequence, mode: mode) {
             pending = sequence
             return .pending(sequence)
         }
-        pending = []
         let candidates = keymap.candidates(for: sequence, mode: mode)
+        let universal = sequence.prefix { $0 == Self.universalArgument }.count
+        if candidates.isEmpty, universal > 0, universal < sequence.count {
+            let rest = Array(sequence.dropFirst(universal))
+            if keymap.isPrefix(rest, mode: mode) {
+                pending = sequence
+                return .pending(sequence)
+            }
+            let found = keymap.candidates(for: rest, mode: mode)
+            if !found.isEmpty {
+                argument = Int(digits) ?? (0..<universal).reduce(1) { value, _ in value * 4 }
+                pending = []
+                digits = ""
+                return .complete(rest, found)
+            }
+        }
+        pending = []
+        digits = ""
         if !candidates.isEmpty { return .complete(sequence, candidates) }
         return sequence.count == 1 ? .unbound : .undefined(sequence)
     }
 
     public mutating func reset() {
         pending = []
+        digits = ""
+        argument = nil
     }
 }

@@ -16,7 +16,7 @@ extension MobileEditor {
         case .notInTable: onMessage?("Not in a table")
         case .set(let columns, let table): setShrunk(columns, in: table)
         case .ask(let table, let current, let max):
-            onPrompt?(Prompt(key: "columns", message: "Column ranges (e.g. 2-4 6-):")) { [weak self] answer in
+            ask(Prompt(key: "columns", message: "Column ranges (e.g. 2-4 6-):")) { [weak self] answer in
                 guard let self, let answer else { return }
                 self.setShrunk(ShrunkColumns.toggled(current, TableShrink.columns(answer, max: max)), in: table)
             }

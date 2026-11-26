@@ -21,6 +21,8 @@ extension MobileEditor {
             if let binding = candidates.first(where: { binding in
                 (binding.when.map { KeyContext.holds($0, in: context) } ?? true) && applies(binding.command, in: context)
             }) {
+                commandKeys = keys
+                defer { commandKeys = nil }
                 run(binding.command)
                 updateCursor()
                 return true
@@ -272,7 +274,7 @@ extension MobileEditor {
     private func prompt(_ kind: String, history: Bool = false) {
         let earlier = Array((Self.promptHistory[kind] ?? []).reversed())
         let request = history ? Prompt(key: kind, message: kind, choices: earlier, requireMatch: false) : Prompt(key: kind, message: kind)
-        onPrompt?(request) { [weak self] answer in
+        ask(request) { [weak self] answer in
             guard let self, let answer, !answer.isEmpty else { return }
             var list = Self.promptHistory[kind] ?? []
             list.removeAll { $0 == answer }

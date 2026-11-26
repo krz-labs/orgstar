@@ -482,7 +482,8 @@ struct ContentView: View {
             }
         }
         .onChange(of: ConfigSync.shared.changedFile?.serial) {
-            if ConfigSync.shared.changedFile?.name == "keymap.toml" { loadKeymap() }
+            // Named macros are commands keymap.toml can bind.
+            if ["keymap.toml", NamedMacros.fileName].contains(ConfigSync.shared.changedFile?.name) { loadKeymap() }
         }
         .onChange(of: commands.jumpRequest?.id) {
             guard let request = commands.jumpRequest else { return }

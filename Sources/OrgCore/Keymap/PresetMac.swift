@@ -301,6 +301,15 @@ extension KeymapPreset {
         [[bind]]
         keys = "M-ESC"
         command = "editor.complete"
+        [[bind]]
+        keys = "C-s-r"
+        command = "macro.start"
+        [[bind]]
+        keys = "C-S-s-r"
+        command = "macro.end"
+        [[bind]]
+        keys = "C-s-m"
+        command = "macro.call"
 
         """
 }

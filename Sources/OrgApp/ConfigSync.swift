@@ -25,6 +25,7 @@ public final class ConfigSync {
     @ObservationIgnored private var text: String?
     @ObservationIgnored private var configProblems: [String] = []
     @ObservationIgnored private var themeProblems: [String] = []
+    @ObservationIgnored private var macroProblems: [String] = []
     /// Why the file couldn't be read or written, the last time a setting was to go into it.
     @ObservationIgnored private var fileProblem: String?
     @ObservationIgnored private var applying = false
@@ -62,6 +63,7 @@ public final class ConfigSync {
             let template = UserConfig.template(from: defaults)
             if write(template) { text = template }
         }
+        loadMacros()
         observer = NotificationCenter.default.addObserver(forName: UserDefaults.didChangeNotification, object: defaults, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.writeBack() }
         }
@@ -86,6 +88,7 @@ public final class ConfigSync {
                     let name = file.lastPathComponent
                     if name == self.url.lastPathComponent { self.reload() }
                     if self.isThemeFile(file) { self.readTheme() }
+                    if name == NamedMacros.fileName { self.loadMacros() }
                     self.serial += 1
                     self.changedFile = (name, self.serial)
                 }
@@ -105,6 +108,7 @@ public final class ConfigSync {
         text = nil
         configProblems = []
         themeProblems = []
+        macroProblems = []
         fileProblem = nil
         self.url = url
         start(watch: watches)
@@ -122,6 +126,13 @@ public final class ConfigSync {
         configProblems = UserConfig.apply(new, to: defaults)
         applying = false
         readTheme()
+    }
+
+    /// `macros.toml`, beside the file, into the named macros.
+    private func loadMacros() {
+        let problems = MacroFile.load(from: url.deletingLastPathComponent().appendingPathComponent(NamedMacros.fileName))
+        macroProblems = problems.map { "\(NamedMacros.fileName): \($0)" }
+        updateProblems()
     }
 
     /// `theme-file`, relative to the configuration folder.
@@ -148,7 +159,7 @@ public final class ConfigSync {
     }
 
     private func updateProblems() {
-        let all = (fileProblem.map { [$0] } ?? []) + configProblems + themeProblems
+        let all = (fileProblem.map { [$0] } ?? []) + configProblems + themeProblems + macroProblems
         if all != problems { problems = all }
     }
 

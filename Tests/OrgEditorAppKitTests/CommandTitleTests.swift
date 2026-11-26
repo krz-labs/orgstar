@@ -13,7 +13,7 @@ struct CommandTitleTests {
     static func titles() throws -> [String] {
         let ios = try String(contentsOf: root.appendingPathComponent("Sources/OrgstarMobile/EditorScreen.swift"), encoding: .utf8)
         let iosTitles = ios.matches(of: /\("(?:app|org|edit|editor|view)\.[^"]+", "([^"\\]+)"\)/).map { String($0.1) }
-        return Array(Set(EditorCommands.all.map(\.title) + iosTitles)).sorted()
+        return Array(Set(EditorCommands.builtIn.map(\.title) + iosTitles)).sorted()
     }
 
     static func source(_ titles: [String]) -> String {
