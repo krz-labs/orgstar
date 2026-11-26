@@ -995,7 +995,7 @@ The decrypted text is kept in memory only:
 - Recovery versions and hourly snapshots are kept encrypted with the file's passphrase, and Recovery Versions… shows them decrypted. Changes made to the file elsewhere are merged in memory, and a conflict is compared in memory.
 - The index, search, Spotlight, Quick Look, the agenda, widgets and the watch don't read the file's text. iCalendar export and publishing leave it out, and Emacs isn't given a copy of it. A clocked heading shows as "Encrypted entry" outside the editor. Handoff doesn't offer the file, and Share Subtree… refuses its entries.
 - Archiving from =NAME.org.gpg= goes to =NAME_archive.org.gpg=, encrypted with the same passphrase (Org would write =NAME.org.gpg_archive=, unencrypted). Entries aren't refiled or copied from it to a file that isn't encrypted.
-- Saved passphrases are kept by the file's path, on this device only, readable while it's unlocked and after Face ID, Touch ID or the device password; renaming the file forgets it. Passphrases saved by earlier versions move to this kind of item the first time they're used with the setting on. The version of orgstar downloaded from the website can't make such items (it has no Keychain entitlement): it keeps saved passphrases in the login keychain, not limited to this Mac, still asking for Touch ID or the password before one is used, and says so under Use Touch ID to Decrypt.
+- Saved passphrases are kept by the file's path, on this device only, readable while it's unlocked and after Face ID, Touch ID or the device password; renaming the file forgets it. Passphrases saved by earlier versions move to this kind of item the first time they're used with the setting on.
 
 =age= files (=.age=) aren't supported.
 

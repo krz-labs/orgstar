@@ -46311,40 +46311,6 @@
         }
       }
     },
-    "This version of orgstar keeps remembered passphrases in your login keychain without limiting them to this Mac; Touch ID or your password is still asked before one is used.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Diese Version von orgstar bewahrt gemerkte Passwörter im Anmeldeschlüsselbund auf, ohne sie auf diesen Mac zu beschränken; Touch ID oder dein Passwort wird trotzdem abgefragt, bevor eines verwendet wird."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Esta versión de orgstar guarda las frases de contraseña recordadas en tu llavero de inicio de sesión sin limitarlas a este Mac; aun así se pide Touch ID o tu contraseña antes de usar una."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cette version d'orgstar garde les phrases secrètes mémorisées dans votre trousseau de session sans les limiter à ce Mac ; Touch ID ou votre mot de passe est quand même demandé avant d'en utiliser une."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "このバージョンのorgstarは、保存したパスフレーズをこのMacに限定せずログインキーチェーンに保持します。使用する前にTouch IDまたはパスワードを求めます。"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Esta versão do orgstar guarda as senhas lembradas nas suas chaves de início de sessão sem limitá-las a este Mac; o Touch ID ou sua senha ainda são pedidos antes de usar uma."
-          }
-        }
-      }
-    },
     "This view can't be saved from here; write it in views.toml.": {
       "localizations": {
         "de": {

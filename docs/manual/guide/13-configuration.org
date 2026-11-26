@@ -173,7 +173,7 @@ The footer shows the path of =capture.toml=. Templates are covered in [[file:08-
 | Use Touch ID to Decrypt | On or off             | Off, asked the first time a passphrase works |
 | Saved Passphrases       | Forget, for each file |                                              |
 
-With it on, a passphrase typed for an encrypted entry or file is saved in the Keychain, and Touch ID or your password unlocks it from then on. With it off, nothing is saved in the Keychain or read from it. Turning it off asks first, saying how many saved passphrases it removes. Saved Passphrases lists the files with a saved passphrase. In the download version, a note under the switch says passphrases are kept in the login keychain, not limited to this Mac.
+With it on, a passphrase typed for an encrypted entry or file is saved in the Keychain, and Touch ID or your password unlocks it from then on. With it off, nothing is saved in the Keychain or read from it. Turning it off asks first, saying how many saved passphrases it removes. Saved Passphrases lists the files with a saved passphrase.
 
 The choice is kept on this Mac, not in =config.toml=, so it isn't synced and can't be changed by editing a file. On iPhone and iPad the same switch, Use Face ID to Decrypt, is in the Settings tab. See [[file:04-outlines.org::*Face ID and Touch ID][Face ID and Touch ID]].
 

@@ -25,7 +25,6 @@ public struct DecryptSettings: View {
         } footer: {
             VStack(alignment: .leading, spacing: 6) {
                 Text(CryptPassphrases.explanation)
-                if !CryptPassphrases.protectsItems { Text(CryptPassphrases.caveat) }
             }
             .font(.caption)
             .foregroundStyle(.secondary)

@@ -294,7 +294,6 @@ struct CryptReviewTests {
         session.cancelUnlock()
         #expect(session.passphrases.context(for: path.path) !== context)
         session.passphrases.endSession(for: path.path)
-        #expect(!CryptPassphrases.protectsItems)
     }
 
     // 3b

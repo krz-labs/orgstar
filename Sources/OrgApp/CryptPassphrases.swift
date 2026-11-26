@@ -61,21 +61,6 @@ public final class CryptPassphrases {
         defaults.set(setting.rawValue, forKey: Self.settingKey)
     }
 
-    /// Whether this build can keep passphrases limited to this device: the Developer ID Mac app
-    /// has no Keychain entitlement and keeps them in the login keychain.
-    public static var protectsItems: Bool {
-        #if os(macOS) && !APPSTORE
-        false
-        #else
-        true
-        #endif
-    }
-
-    /// Said beside the setting where `protectsItems` is false.
-    public static var caveat: String {
-        String(localized: "This version of orgstar keeps remembered passphrases in your login keychain without limiting them to this Mac; Touch ID or your password is still asked before one is used.")
-    }
-
     /// Face ID, Touch ID or Optic ID, as this device has it; the Mac's is Touch ID.
     public static var biometryName: String {
         #if os(macOS)
@@ -228,7 +213,7 @@ public final class CryptPassphrases {
 
 /// The Keychain. New items are this device only, unlocked, after user presence. Items earlier
 /// versions saved without that move over at their first read. A build without a Keychain
-/// entitlement (the Developer ID Mac app) can't make such items and keeps the old kind.
+/// entitlement (a local build) can't make such items and keeps the old kind.
 @MainActor
 public final class SystemKeychain: PassphraseKeychain {
     public init() {}
