@@ -874,7 +874,7 @@ struct AgendaScreen: View, Equatable {
             }
             last = action(mark.path, offset)
         }
-        message = failed > 0 ? "\(failed) selected \(failed == 1 ? "entry" : "entries") changed and \(failed == 1 ? "was" : "were") skipped" : last
+        message = failed > 0 ? String(localized: "\(failed) selected entries changed and were skipped") : last
         marked = []
         selecting = false
         tick += 1

@@ -447,7 +447,7 @@ struct EditorScreen: View {
         if pane.conflict != nil {
             sheet = .conflict
         } else if case let copies = session.syncConflictCopies().count, copies > 0 {
-            message = "\(copies) sync conflict \(copies == 1 ? "copy" : "copies") of this file; More › Sync Conflict Copies compares them."
+            message = String(localized: "\(copies) sync conflict copies of this file; More › Resolve Sync Conflicts… compares them.")
         }
     }
 
@@ -721,7 +721,8 @@ extension EditorScreen {
             let report = try Publish.publish(chosen, all: all, only: only, author: "", read: read) { function, text, file, bodyOnly in
                 try Publish.export(function, text: text, path: file, bodyOnly: bodyOnly, settings: OrgPreferences.orgSettings(), codeStyle: codeStyle, author: "")
             }
-            message = "Published \(report.published.count) files" + (report.skipped.isEmpty ? "" : ", \(report.skipped.count) up to date")
+            message = report.skipped.isEmpty ? String(localized: "Published \(report.published.count) files")
+                : String(localized: "Published \(report.published.count) files, \(report.skipped.count) up to date")
         } catch {
             message = "\(error)"
         }

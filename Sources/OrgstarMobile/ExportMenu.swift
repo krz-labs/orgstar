@@ -260,7 +260,7 @@ struct AgendaCalendars: Transferable {
     func exportEach() -> String {
         do {
             let written = try ICalendarFiles.exportEach(paths, options: OrgPreferences.icalendarOptions(), read: read)
-            return "Exported \(written.count) agenda files to iCalendar"
+            return String(localized: "Exported \(written.count) agenda files to iCalendar")
         } catch {
             return "Can't export: \(error.localizedDescription)"
         }

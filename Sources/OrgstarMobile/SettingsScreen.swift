@@ -310,10 +310,12 @@ struct SettingsScreen: View {
 
     /// The span and start day, worded as the Mac's Settings word the start.
     private var agenda: String {
-        func days(_ count: Int) -> String { count == 1 ? "1 day" : "\(count) days" }
         let offset = OrgPreferences.agendaStartOffset()
-        let start = offset == 0 ? "today" : offset < 0 ? "\(days(-offset)) before today" : "\(days(offset)) after today"
-        return "\(days(OrgPreferences.agendaSpan())), starting \(start)"
+        let span = String(localized: "\(OrgPreferences.agendaSpan()) days", comment: "Agenda span in Settings ▸ In Use")
+        let start = offset == 0 ? String(localized: "starting today", comment: "Agenda start in Settings ▸ In Use")
+            : offset < 0 ? String(localized: "starting \(-offset) days before today", comment: "Agenda start in Settings ▸ In Use")
+            : String(localized: "starting \(offset) days after today", comment: "Agenda start in Settings ▸ In Use")
+        return String(localized: "\(span), \(start)", comment: "Agenda span and start in Settings ▸ In Use")
     }
 
     /// The theme's family, or the system's monospaced font when it's unset or not on the device.

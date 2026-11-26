@@ -190,7 +190,7 @@ extension AgendaView {
             }
             last = action(entry, offset)
         }
-        return failed > 0 ? "\(failed) marked \(failed == 1 ? "entry" : "entries") changed and \(failed == 1 ? "was" : "were") skipped" : last
+        return failed > 0 ? String(localized: "\(failed) marked entries changed and were skipped") : last
     }
 
     func mark(_ on: Bool) {

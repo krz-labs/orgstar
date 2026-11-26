@@ -139,7 +139,7 @@ struct AgendaList: View {
                         if !text.isEmpty { link.send(.capture(text: text)) }
                     }
                 if link.sentCaptures > 0 {
-                    Text(link.sentCaptures == 1 ? "Sent to orgstar on iPhone." : "\(link.sentCaptures) sent to orgstar on iPhone.")
+                    Text("\(link.sentCaptures) sent to orgstar on iPhone.")
                         .font(.footnote).foregroundStyle(.secondary)
                 }
             } footer: {
