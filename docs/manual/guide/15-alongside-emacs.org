@@ -111,7 +111,7 @@ Each file has a subfolder named from a hash of its path, holding its last 20 rep
 | =sync-conflict= | A Syncthing conflict copy was resolved                                        |
 | =snapshot=      | A save changed the file and the last snapshot was more than an hour before    |
 
-File ▸ Recovery Versions… (on iOS, a toolbar button while there are versions, and in Commands) lists the open file's kept versions, newest first, each compared with the buffer (lines marked - in the buffer, + in the kept version). Restore puts a version's text in the buffer as an edit you can undo; the buffer as it was goes to the recovery folder first. On the Mac, Show in Finder selects the version's file.
+File ▸ History… on the Mac, and Recovery Versions… on iOS (a toolbar button while there are versions, and in Commands), lists the open file's kept versions, newest first, each compared with the buffer (lines marked - in the buffer, + in the kept version). In the download version, History also lists the commits that changed the file when it is in a git repository. Restore puts a version's text in the buffer as an edit you can undo; the buffer as it was goes to the recovery folder first. On the Mac, Show in Finder selects the version's file. See [[file:01-files-and-folders.org::*Recovery versions][Recovery versions]] and, for committing to git as you save, [[file:01-files-and-folders.org::*Committing to git][Committing to git]].
 
 * Features that use Emacs on the Mac
 

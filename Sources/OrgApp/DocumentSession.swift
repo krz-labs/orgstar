@@ -594,7 +594,14 @@ public final class DocumentSession {
     /// Puts a kept version's text in the buffer, as an edit that can be undone; the buffer as it
     /// was goes to recovery.
     public func restore(_ version: URL) -> String? {
-        guard let buffer, let url, let text = recoveryText(version) else { return "Can't read that version" }
+        guard let text = recoveryText(version) else { return "Can't read that version" }
+        return restore(text: text)
+    }
+
+    /// Puts `text`, an earlier version of the file, in the buffer as an edit that can be undone;
+    /// the buffer as it was goes to recovery.
+    public func restore(text: String) -> String? {
+        guard let buffer, let url else { return "Can't read that version" }
         do {
             try recovery.keep(try buffer.document.encodedText(), for: url, label: "local")
         } catch {

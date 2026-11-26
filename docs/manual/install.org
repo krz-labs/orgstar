@@ -63,7 +63,7 @@ App Store version.
 | Settings                   | In the app's container, or a folder you choose                                | =~/.config/orgstar=                                                                             |
 | Files outside your folders | After you grant access to their folder                                        | Directly                                                                                        |
 | Attachments                | Copied, or moved from inside your folders                                     | Copied, moved, linked or symlinked                                                              |
-| Git                        | No                                                                            | Commits as you save, with pull and push                                                         |
+| Git                        | No                                                                            | Commits as you save, with pull and push; commits in File ▸ History…                             |
 | Updates                    | The Mac App Store                                                             | Built in, or Homebrew                                                                           |
 | orgstar+                   | In-app purchase, shared with iPhone and iPad                                  | License key                                                                                     |
 

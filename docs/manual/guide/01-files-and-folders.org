@@ -291,15 +291,18 @@ Each choice moves the copy to recovery and deletes it from the folder. The buffe
 
 Whenever orgstar replaces a version of a file, it keeps a copy: your buffer when you take the disk version, the disk version when you keep yours, a version another program wrote while orgstar saved, and resolved Syncthing copies. It also keeps a snapshot of the file as it was before a save, at most once an hour, so there is a version of your own writing to go back to. orgstar keeps the last 20 replaced versions and the last 10 snapshots per file in =~/Library/Application Support/Orgstar/Recovery= (in the Mac App Store version, the same folder inside its container).
 
-Choose File ▸ Recovery Versions… to see the open file's versions, newest first, each with its date and why it was kept:
+Choose File ▸ History… to see the open file's versions, newest first, each with its date and why it was kept:
 
 | Label                   | Meaning                                         |
 |-------------------------+-------------------------------------------------|
 | Your version, replaced  | Your buffer, before it was replaced             |
 | Disk version, replaced  | The file on disk, before orgstar wrote over it  |
 | Sync conflict copy      | A Syncthing conflict copy you resolved          |
+| Snapshot, before a save | The file as it was before a save                |
 
-Select a version to see how it differs from the buffer (=-= in the buffer, =+= in the kept version). =Restore= puts the kept version's text in the buffer as one edit, which undo reverses; the buffer as it was goes to recovery first. =Show in Finder= reveals the kept file. For a file with no kept versions the sheet says so.
+In the download version, when the file is in a git repository, the list also has the commits that changed it, found with =git log --follow= so they reach past a rename, among the kept versions by date. A commit shows its subject, its short hash and its author.
+
+Select a version to see how it differs from the buffer (=-= in the buffer, =+= in the selected version). =Restore= puts that version's text in the buffer as one edit, which undo reverses; the buffer as it was goes to recovery first. Restoring a commit changes only the buffer: nothing is checked out, and the file is written by the next save as usual. =Show in Finder= reveals a kept file. For a file with no versions the sheet says so.
 
 ** Committing to git
 

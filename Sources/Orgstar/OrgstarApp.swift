@@ -527,7 +527,7 @@ struct OrgstarApp: App {
                     .disabled(session.path == nil)
                 Button("Resolve Sync Conflicts…") { commands.run("app.sync-conflicts") }
                     .disabled(session.path == nil)
-                Button("Recovery Versions…") { commands.run("app.recovery") }
+                Button("History…") { commands.run("app.recovery") }
                     .disabled(session.path == nil)
             }
             CommandGroup(replacing: .saveItem) {

@@ -2,6 +2,9 @@ import AppKit
 import OrgApp
 import OrgDocument
 import OrgPresentation
+#if !APPSTORE
+import OrgPrograms
+#endif
 import SwiftUI
 
 /// A diff in the theme's colours: removed lines in its TODO red, added ones in its DONE green.
@@ -100,20 +103,24 @@ struct SyncConflictSheet: View {
     }
 }
 
-/// Versions of the open file kept in the recovery folder, newest first, against the buffer.
-struct RecoverySheet: View {
+/// The open file's history, newest first, each version against the buffer: the versions kept
+/// in the recovery folder and, in the download version where the folder is a git repository,
+/// the commits that changed the file (`git log --follow`).
+struct HistorySheet: View {
     let session: DocumentSession
     let report: (String) -> Void
-    @State private var versions: [(url: URL, date: Date, label: String)] = []
-    @State private var selected: URL?
+    @State private var entries: [FileHistory.Entry] = []
+    @State private var selected: FileHistory.Entry?
+    /// The selected version's text, once read.
+    @State private var text: String?
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         Group {
-            if versions.isEmpty {
+            if entries.isEmpty {
                 VStack {
                     ContentUnavailableView(
-                        "No Recovery Versions", systemImage: "clock.arrow.circlepath",
+                        "No History", systemImage: "clock.arrow.circlepath",
                         description: Text("orgstar keeps a copy of this file here when it replaces a version, and a snapshot before a save at most once an hour.")
                     )
                     HStack {
@@ -127,39 +134,60 @@ struct RecoverySheet: View {
             }
         }
         .frame(minWidth: 760, minHeight: 460)
-        .onAppear {
-            versions = session.recoveryVersions()
-            selected = versions.first?.url
+        .task {
+            let recovery = session.recoveryVersions()
+            entries = FileHistory.merged(recovery: recovery, commits: [])
+            selected = entries.first
+            #if !APPSTORE
+            guard let path = session.path else { return }
+            let commits = await GitHistory.commits(for: URL(fileURLWithPath: path))
+            guard !commits.isEmpty else { return }
+            entries = FileHistory.merged(recovery: recovery, commits: commits)
+            if selected == nil { selected = entries.first }
+            #endif
+        }
+        .task(id: selected) {
+            text = nil
+            if let selected { text = await load(selected) }
+        }
+    }
+
+    /// The text of `entry`: a kept file, or the file in a commit.
+    private func load(_ entry: FileHistory.Entry) async -> String? {
+        switch entry {
+        case .recovery(let url, _, _): return session.recoveryText(url)
+        case .commit(let commit):
+            #if APPSTORE
+            return nil
+            #else
+            return await GitHistory.text(of: commit)
+            #endif
         }
     }
 
     private var versionList: some View {
         HSplitView {
-            List(versions, id: \.url, selection: $selected) { version in
-                VStack(alignment: .leading) {
-                    Text(version.date.formatted(date: .abbreviated, time: .standard))
-                    Text(Self.describe(version.label)).font(.caption).foregroundStyle(.secondary)
-                }
-                .tag(version.url)
+            List(entries, id: \.self, selection: $selected) { entry in
+                row(entry).tag(entry)
             }
-            .frame(minWidth: 200, idealWidth: 220)
+            .frame(minWidth: 220, idealWidth: 260)
             VStack(alignment: .leading, spacing: 10) {
-                Text("Recovery Versions").font(.headline)
-                Text("Lines marked - are in the buffer, + in the kept version.").foregroundStyle(.secondary)
-                if let selected, let kept = session.recoveryText(selected), let mine = session.document?.text {
-                    ThemedDiff(old: mine, new: kept)
+                Text("History").font(.headline)
+                Text("Lines marked - are in the buffer, + in the selected version.").foregroundStyle(.secondary)
+                if let text, let mine = session.document?.text {
+                    ThemedDiff(old: mine, new: text)
                 } else {
                     Spacer()
                 }
                 HStack {
                     Button("Cancel") { dismiss() }.keyboardShortcut(.cancelAction)
-                    if let selected {
-                        Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([selected]) }
+                    if case .recovery(let url, _, _) = selected {
+                        Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
                     }
                     Spacer()
-                    if let selected {
+                    if let text {
                         Button("Restore") {
-                            if let message = session.restore(selected) { report(message) } else { report("Restored; undo brings back what was there.") }
+                            if let message = session.restore(text: text) { report(message) } else { report("Restored; undo brings back what was there.") }
                             dismiss()
                         }
                         .keyboardShortcut(.defaultAction)
@@ -167,6 +195,20 @@ struct RecoverySheet: View {
                 }
             }
             .padding()
+        }
+    }
+
+    @ViewBuilder
+    private func row(_ entry: FileHistory.Entry) -> some View {
+        VStack(alignment: .leading) {
+            Text(entry.date.formatted(date: .abbreviated, time: .standard))
+            switch entry {
+            case .recovery(_, _, let label):
+                Text(Self.describe(label)).font(.caption).foregroundStyle(.secondary)
+            case .commit(let commit):
+                Text(verbatim: commit.subject).font(.caption).lineLimit(1)
+                Text(verbatim: "\(commit.hash.prefix(7)) · \(commit.author)").font(.caption.monospaced()).foregroundStyle(.secondary)
+            }
         }
     }
 

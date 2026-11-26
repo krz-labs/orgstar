@@ -128,6 +128,7 @@ enum CommandTitles {
         String(localized: "Go to Tomorrow's Daily Note", comment: "Command title"),
         String(localized: "Go to Yesterday's Daily Note", comment: "Command title"),
         String(localized: "Hide Next Fold Level", comment: "Command title"),
+        String(localized: "History…", comment: "Command title"),
         String(localized: "Import Table from File…", comment: "Command title"),
         String(localized: "Import from Emacs…", comment: "Command title"),
         String(localized: "Increase Timestamp Part", comment: "Command title"),

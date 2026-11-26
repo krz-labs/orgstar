@@ -96,7 +96,7 @@ The palette lists every command by title with its keys in the current keymap. Op
 
 Type part of a title; matching is fuzzy and the best matches come first. =↑= and =↓= (or =C-p= and =C-n=) move the highlight, =Return= runs the highlighted command, a click runs any row, and =Esc= closes the palette. Quick Open (=⌘P=) works the same way. Each row shows up to two key sequences; in the Doom preset these are normal-state keys first, then insert-state keys.
 
-The palette leaves out text-system movement and editing commands (Forward Character, Kill Line, Set Mark and the like), which only make sense from keys. Every other command is in it, including the ones no preset binds, such as Show or Hide Backlinks, Import Table from File…, Recovery Versions… and Delete Property…. The Mac App Store version leaves out the Emacs exports and Attach File as Hard Link… and as Symbolic Link…; a key bound to Export to PDF with Emacs runs Export to PDF. Commands that cannot run at the caret show a message instead.
+The palette leaves out text-system movement and editing commands (Forward Character, Kill Line, Set Mark and the like), which only make sense from keys. Every other command is in it, including the ones no preset binds, such as Show or Hide Backlinks, Import Table from File…, History… and Delete Property…. The Mac App Store version leaves out the Emacs exports and Attach File as Hard Link… and as Symbolic Link…; a key bound to Export to PDF with Emacs runs Export to PDF. Commands that cannot run at the caret show a message instead.
 
 The Org menu in the menu bar lists every =org.= command with its keys in the current keymap, and is a way to find a key without the palette. Act at Point and Update at Point come first; the rest are in submenus by subject: Visibility, Headings, TODO and Tags, Properties and Columns, Dates and Timers, Lists, Tables, Links and Footnotes, Blocks and Text, followed by Attachments, Notes and Encryption, which hold the attachment, note and encryption commands. Its Clock submenu lists the clock commands the same way, followed by the recently clocked entries. The search field in the Help menu finds any menu item by name.
 
@@ -1197,7 +1197,7 @@ No preset binds these. Run them from the palette or a menu, or bind them in =key
 | Import from Emacs… (=app.import-emacs=) | Opens Import from Emacs…. |
 | Revert to File on Disk (=app.revert=) | Replaces the buffer with the file on disk; unsaved changes go to recovery (=revert-buffer=). |
 | Run Macro… (=macro.run=) | Asks for a named keyboard macro and plays it. Edit ▸ Macros ▸ Run Macro…. |
-| Recovery Versions… (=app.recovery=) | Shows the recovery versions of the file. |
+| History… (=app.recovery=) | Shows the file's recovery versions and, in the download version, its git commits. Recovery Versions… on iOS. |
 | Resolve Sync Conflicts… (=app.sync-conflicts=) | Shows the file's sync conflict copies to resolve them. |
 | Import Table from File… (=app.table-import=) | Asks for a CSV, TSV or space-separated file and inserts it as a table (=org-table-import=). |
 | Export Table to File… (=app.table-export=) | Writes the table at point to a CSV or TSV file (=org-table-export=). |

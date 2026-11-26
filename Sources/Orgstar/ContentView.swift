@@ -982,7 +982,7 @@ struct ContentView: View {
         case .syncCopies:
             SyncConflictSheet(session: session) { commands.show($0) }
         case .recovery:
-            RecoverySheet(session: session) { commands.show($0) }
+            HistorySheet(session: session) { commands.show($0) }
         }
     }
 
