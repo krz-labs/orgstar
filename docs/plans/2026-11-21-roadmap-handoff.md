@@ -2,6 +2,8 @@
 
 For a session that coordinates subagents working through the open issues on gitbay (`krz/orgstar`), reviews what they submit, merges it and closes the issues.
 
+The current state, what milestone 1 taught, the device checks owed and the effort estimates are in `docs/plans/2026-11-25-roadmap-status.md`. Read it after this document.
+
 ## State on 2026-11-21
 
 - Version 1.2.0 is released. `main` is clean.
