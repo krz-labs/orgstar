@@ -243,16 +243,16 @@ struct AgendaScreen: View, Equatable {
         }
         .sheet(item: $asking) { kind in
             if kind == .save {
-                PromptSheet(prompt: Prompt(key: "view-name", message: "Name for this view:")) { saveView($0) }
+                PromptSheet(prompt: Prompt(key: "view-name", message: String(localized: "Name for this view:"))) { saveView($0) }
             } else if kind == .search {
-                PromptSheet(prompt: Prompt(key: "search", message: "Search: a phrase, or +word -word {regexp}; * for headlines, ! for TODO entries")) { answer in
+                PromptSheet(prompt: Prompt(key: "search", message: String(localized: "Search: a phrase, or +word -word {regexp}; * for headlines, ! for TODO entries"))) { answer in
                     asking = nil
                     guard let answer, answer.contains(where: { !$0.isWhitespace }) else { return }
                     agenda.mode = .search(answer, todoOnly: false)
                     viewName = answer
                 }
             } else {
-                PromptSheet(prompt: Prompt(key: "match", message: "Match: tags and properties, as +work-home or TODO=\"WAIT\"")) { answer in
+                PromptSheet(prompt: Prompt(key: "match", message: String(localized: "Match: tags and properties, as +work-home or TODO=\"WAIT\""))) { answer in
                     asking = nil
                     guard let answer, !answer.isEmpty else { return }
                     agenda.mode = .match(answer, todoOnly: false)
@@ -430,10 +430,9 @@ struct AgendaScreen: View, Equatable {
     /// at most 64, and sets no more while the app isn't opened.
     private var reminderStatus: String? {
         guard OrgPreferences.reminders() else { return nil }
-        if !scheduler.isAuthorized { return "Notifications are off for orgstar in Settings." }
+        if !scheduler.isAuthorized { return String(localized: "Notifications are off for orgstar in Settings.") }
         guard let through = scheduler.scheduledThrough else { return nil }
-        return "Notifications are set through " + through.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated).hour().minute())
-            + ". Open orgstar to set later ones."
+        return String(localized: "Notifications are set through \(through.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated).hour().minute())). Open orgstar to set later ones.")
     }
 
     // MARK: - Days
@@ -556,7 +555,7 @@ struct AgendaScreen: View, Equatable {
         let (first, span) = shown
         let start = date(first)
         if span == 1 { return start.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated)) }
-        if span == 7, first == weekStart(first) { return "Week of " + start.formatted(.dateTime.day().month(.abbreviated)) }
+        if span == 7, first == weekStart(first) { return String(localized: "Week of \(start.formatted(.dateTime.day().month(.abbreviated)))", comment: "Agenda title; the date is the week's first day") }
         let d = Days.date(first)
         if d.day == 1, span == Days.absolute(year: d.year, month: d.month + 1, day: 1) - first {
             return start.formatted(.dateTime.month(.wide).year())
@@ -892,7 +891,7 @@ struct AgendaScreen: View, Equatable {
 
     private func askBulkTodo() {
         let keywords = OrgPreferences.orgSettings().todoSequences.flatMap { $0.active.map(\.name) + $0.done.map(\.name) }
-        prompt = EditorScreen.PromptRequest(prompt: Prompt(key: "todo", message: "TODO state (empty for none):", choices: keywords)) { answer in
+        prompt = EditorScreen.PromptRequest(prompt: Prompt(key: "todo", message: String(localized: "TODO state (empty for none):"), choices: keywords)) { answer in
             guard let answer else { return }
             let word = answer.trimmingCharacters(in: .whitespaces)
             bulk { perform(SetTodo(keyword: word.isEmpty ? nil : word), $0, $1) }
@@ -900,7 +899,7 @@ struct AgendaScreen: View, Equatable {
     }
 
     private func askBulkTag(on: Bool) {
-        prompt = EditorScreen.PromptRequest(prompt: Prompt(key: "tag", message: on ? "Tag to add:" : "Tag to remove:")) { answer in
+        prompt = EditorScreen.PromptRequest(prompt: Prompt(key: "tag", message: on ? String(localized: "Tag to add:") : String(localized: "Tag to remove:"))) { answer in
             guard let tag = answer?.trimmingCharacters(in: .whitespaces), !tag.isEmpty else { return }
             bulk { perform(ToggleTag(tag: tag, on: on), $0, $1) }
         }
@@ -1189,8 +1188,8 @@ struct HabitStrip: View {
 
 /// A date to go to or to schedule on.
 struct DateSheet: View {
-    let title: String
-    let action: String
+    let title: LocalizedStringKey
+    let action: LocalizedStringKey
     let initial: Date
     let done: (Date?) -> Void
     @State private var date = Date()
@@ -1291,7 +1290,7 @@ struct RefileSheet: View {
     /// `org-refile-allow-creating-parent-nodes`: `parent/new` in the search field offers to
     /// add the heading.
     var create: ((RefileTarget, String) -> Void)?
-    var title = "Refile to"
+    var title = String(localized: "Refile to")
     let choose: (RefileTarget?) -> Void
     @State private var query = ""
 

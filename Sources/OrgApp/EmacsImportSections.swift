@@ -4,13 +4,13 @@ extension EmacsImport {
     /// The items by kind of change, empty kinds left out; agenda folders only when `folders`.
     public func groups(folders: Bool) -> [(String, [Item])] {
         [
-            ("Settings", items.filter { if case .setting = $0.change { true } else { false } }),
-            ("Folders", folders ? items.filter { if case .folder = $0.change { true } else { false } } : []),
-            ("Capture templates", items.filter { if case .capture = $0.change { true } else { false } }),
-            ("Key bindings", items.filter { if case .binding = $0.change { true } else { false } }),
-            ("Structure templates", items.filter { if case .structureTemplate = $0.change { true } else { false } }),
-            ("Denote templates", items.filter { if case .denoteTemplate = $0.change { true } else { false } }),
-            ("Agenda views", items.filter { if case .view = $0.change { true } else { false } }),
+            (String(localized: "Settings", bundle: .main), items.filter { if case .setting = $0.change { true } else { false } }),
+            (String(localized: "Folders", bundle: .main), folders ? items.filter { if case .folder = $0.change { true } else { false } } : []),
+            (String(localized: "Capture Templates", bundle: .main), items.filter { if case .capture = $0.change { true } else { false } }),
+            (String(localized: "Key Bindings", bundle: .main), items.filter { if case .binding = $0.change { true } else { false } }),
+            (String(localized: "Structure Templates", bundle: .main), items.filter { if case .structureTemplate = $0.change { true } else { false } }),
+            (String(localized: "Denote Templates", bundle: .main), items.filter { if case .denoteTemplate = $0.change { true } else { false } }),
+            (String(localized: "Agenda Views", bundle: .main), items.filter { if case .view = $0.change { true } else { false } }),
         ].filter { !$0.1.isEmpty }
     }
 }

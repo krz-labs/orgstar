@@ -315,7 +315,7 @@ struct CaptureView: View {
         let document = session.openDocuments.first { $0.path == entry.path }?.document
             ?? FileManager.default.contents(atPath: entry.path).map { DocumentState(bytes: [UInt8]($0)) }
         let targets = workspace.refileTargets(openPath: entry.path, document: document)
-        commands.ask(Prompt(key: "refile", message: "Refile to:", choices: targets.map(\.label))) { answer in
+        commands.ask(Prompt(key: "refile", message: String(localized: "Refile to:"), choices: targets.map(\.label))) { answer in
             guard let answer, let target = targets.first(where: { $0.label == answer }) else { return }
             if let message = session.refile(to: target, from: entry) { commands.show(message) }
         }

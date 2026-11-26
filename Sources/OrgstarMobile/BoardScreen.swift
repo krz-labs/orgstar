@@ -235,7 +235,7 @@ struct BoardScreen: View {
     }
 
     private func askProperty(_ entry: BoardEntry) {
-        prompt = EditorScreen.PromptRequest(prompt: Prompt(key: "property", message: "Property (NAME value):")) { answer in
+        prompt = EditorScreen.PromptRequest(prompt: Prompt(key: "property", message: String(localized: "Property (NAME value):"))) { answer in
             guard let answer, let space = answer.firstIndex(of: " ") else { return }
             let key = String(answer[..<space])
             let value = String(answer[answer.index(after: space)...]).trimmingCharacters(in: .whitespaces)

@@ -157,7 +157,7 @@ struct SettingsScreen: View {
                 let _ = model.settingsVersion
                 LabeledContent("TODO keywords", value: todoKeywords)
                 LabeledContent("Agenda", value: agenda)
-                LabeledContent("Notifications", value: OrgPreferences.reminders() ? "\(OrgPreferences.reminderLead()) min before" : "Off")
+                LabeledContent("Notifications", value: OrgPreferences.reminders() ? String(localized: "\(OrgPreferences.reminderLead()) min before") : String(localized: "Off"))
                 LabeledContent("Capture templates", value: CaptureTemplates.load().templates.map(\.key).joined(separator: " "))
                 LabeledContent("Theme", value: themeInUse)
                 LabeledContent("Font", value: font)

@@ -162,7 +162,7 @@ extension AgendaView {
             return
         }
         let targets = workspace.refileTargets(openPath: session.path, document: session.document)
-        ask(Prompt(key: "refile", message: "Refile to:", choices: targets.map(\.label))) { answer in
+        ask(Prompt(key: "refile", message: String(localized: "Refile to:"), choices: targets.map(\.label))) { answer in
             guard targets.contains(where: { $0.label == answer }) else { return }
             message = eachEntry(entries) { entry, offset in
                 // Targets in the entry's own file from its text now, as earlier moves shift them.
@@ -212,25 +212,25 @@ extension AgendaView {
             message = "No entries are marked"
             return
         }
-        ask(Prompt(key: "action", message: "Bulk action on \(marked.count): [$] archive [r] refile [t] TODO state [+] tag [-] untag [s] schedule [d] deadline")) { answer in
+        ask(Prompt(key: "action", message: String(localized: "Bulk action on \(marked.count): [$] archive [r] refile [t] TODO state [+] tag [-] untag [s] schedule [d] deadline"))) { answer in
             switch answer.trimmingCharacters(in: .whitespaces) {
             case "$": bulk { session.archive(from: ($0.path, $1)) }
             case "r": refile(marked: true)
             case "t":
-                ask(Prompt(key: "todo", message: "TODO state (empty for none):")) { keyword in
+                ask(Prompt(key: "todo", message: String(localized: "TODO state (empty for none):"))) { keyword in
                     let word = keyword.trimmingCharacters(in: .whitespaces)
                     bulk { performAt($0, $1, SetTodo(keyword: word.isEmpty ? nil : word)) }
                 }
             case "+", "-":
                 let on = answer.trimmingCharacters(in: .whitespaces) == "+"
-                ask(Prompt(key: "tag", message: on ? "Tag to add:" : "Tag to remove:")) { tag in
+                ask(Prompt(key: "tag", message: on ? String(localized: "Tag to add:") : String(localized: "Tag to remove:"))) { tag in
                     let tag = tag.trimmingCharacters(in: .whitespaces)
                     guard !tag.isEmpty else { return }
                     bulk { performAt($0, $1, ToggleTag(tag: tag, on: on)) }
                 }
             case "s", "d":
                 let deadline = answer.trimmingCharacters(in: .whitespaces) == "d"
-                ask(Prompt(key: "date", message: deadline ? "Deadline (+2d, fri, 2026-10-12):" : "Schedule (+2d, fri, 2026-10-12):")) { date in
+                ask(Prompt(key: "date", message: deadline ? String(localized: "Deadline (+2d, fri, 2026-10-12):") : String(localized: "Schedule (+2d, fri, 2026-10-12):"))) { date in
                     bulk { performAt($0, $1, SetPlanning(deadline: deadline), answers: ["date": date]) }
                 }
             default:

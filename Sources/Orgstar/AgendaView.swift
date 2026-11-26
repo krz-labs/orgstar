@@ -336,7 +336,7 @@ struct AgendaView: View {
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if prompt != nil {
                 PromptBar(request: $prompt)
-            } else if let message = message ?? (filter.isEmpty ? reminderStatus : "Filter: " + filter.description) {
+            } else if let message = message ?? (filter.isEmpty ? reminderStatus : String(localized: "Filter: \(filter.description)")) {
                 Text(message)
                     .font(.callout)
                     .frame(maxWidth: .infinity, alignment: .leading)

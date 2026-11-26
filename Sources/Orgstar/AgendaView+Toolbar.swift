@@ -124,12 +124,12 @@ extension AgendaView {
     /// the current one.
     var title: String {
         guard isAgenda else { return viewName.replacingOccurrences(of: "…", with: "") }
-        guard let first = agenda.days.first?.day, let last = agenda.days.last?.day else { return "Agenda" }
+        guard let first = agenda.days.first?.day, let last = agenda.days.last?.day else { return String(localized: "Agenda") }
         let thisYear = Days.date(agenda.today).year
         let year = Days.date(first).year == thisYear && Days.date(last).year == thisYear ? "" : " yyyy"
         switch spanKind {
         case .day: return Self.format(first, "EEEE d MMMM" + year)
-        case .week: return "Week of " + Self.format(first, "d MMM" + year)
+        case .week: return String(localized: "Week of \(Self.format(first, "d MMM" + year))", comment: "Agenda title; the date is the week's first day")
         case .month: return Self.format(first, "MMMM" + year)
         case nil:
             if first == last { return Self.format(first, "EEEE d MMMM" + year) }
@@ -215,9 +215,9 @@ extension AgendaView {
     /// How far ahead notifications are set, as the design asks the agenda to show.
     var reminderStatus: String? {
         guard let scheduler, remindersEnabled else { return nil }
-        if !scheduler.isAuthorized { return "Notifications are off for orgstar in System Settings." }
+        if !scheduler.isAuthorized { return String(localized: "Notifications are off for orgstar in System Settings.") }
         guard let through = scheduler.scheduledThrough else { return nil }
-        return "Notifications are set through " + through.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated).hour().minute()) + "."
+        return String(localized: "Notifications are set through \(through.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated).hour().minute())).")
     }
 
     var listTitle: String {
@@ -299,10 +299,10 @@ extension AgendaView {
 
     func askFilter(_ kind: Character) {
         let title = switch kind {
-        case "/": "Filter [+cat-tag<0:10-/regexp/]:"
-        case "\\": "Tag filter (+tag-tag):"
-        case "=": "Regexp filter (-re to drop):"
-        default: "Effort filter (<0:30, >1:00, =1:00):"
+        case "/": String(localized: "Filter [+cat-tag<0:10-/regexp/]:")
+        case "\\": String(localized: "Tag filter (+tag-tag):")
+        case "=": String(localized: "Regexp filter (-re to drop):")
+        default: String(localized: "Effort filter (<0:30, >1:00, =1:00):")
         }
         let tags = kind == "/" || kind == "\\" ? shown.tags.sorted() : []
         ask(Prompt(key: "filter", message: title, initial: kind == "/" ? filter.description : "", choices: tags, requireMatch: false)) { text in

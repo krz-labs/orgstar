@@ -1646,6 +1646,40 @@
         }
       }
     },
+    "%lld min before": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Min. vorher"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld min antes"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld min avant"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld分前"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld min antes"
+          }
+        }
+      }
+    },
     "%lld minutes before": {
       "localizations": {
         "de": {
@@ -3711,6 +3745,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Agenda"
+          }
+        }
+      }
+    },
+    "Agenda Views": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agenda-Ansichten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vistas de agenda"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vues d'agenda"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アジェンダビュー"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visualizações da Agenda"
           }
         }
       }
@@ -6152,6 +6220,40 @@
         }
       }
     },
+    "Bulk action on %lld: [$] archive [r] refile [t] TODO state [+] tag [-] untag [s] schedule [d] deadline": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sammelaktion für %lld: [$] archivieren [r] verschieben [t] TODO-Status [+] Tag hinzufügen [-] Tag entfernen [s] planen [d] Frist"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acción en bloque sobre %lld: [$] archivar [r] reubicar [t] estado TODO [+] etiquetar [-] quitar etiqueta [s] programar [d] fecha límite"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Action groupée sur %lld : [$] archiver [r] reclasser [t] état TODO [+] ajouter un tag [-] retirer un tag [s] planifier [d] échéance"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld件に一括操作：[$] アーカイブ [r] 移動 [t] TODO状態 [+] タグ追加 [-] タグ削除 [s] スケジュール [d] 締め切り"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ação em lote em %lld: [$] arquivar [r] realocar [t] estado TODO [+] adicionar etiqueta [-] remover etiqueta [s] agendar [d] prazo"
+          }
+        }
+      }
+    },
     "Buy orgstar+…": {
       "extractionState": "stale",
       "localizations": {
@@ -7077,6 +7179,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Modelo de Captura"
+          }
+        }
+      }
+    },
+    "Capture Templates": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erfassungsvorlagen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plantillas de captura"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modèles de capture"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キャプチャテンプレート"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modelos de Captura"
           }
         }
       }
@@ -11771,6 +11907,40 @@
         }
       }
     },
+    "Deadline (+2d, fri, 2026-10-12):": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frist (+2d, fri, 2026-10-12):"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fecha límite (+2d, fri, 2026-10-12):"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Échéance (+2d, fri, 2026-10-12) :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "締め切り（+2d, fri, 2026-10-12）："
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prazo (+2d, fri, 2026-10-12):"
+          }
+        }
+      }
+    },
     "Deadline…": {
       "localizations": {
         "de": {
@@ -12596,6 +12766,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Rebaixar Subárvore"
+          }
+        }
+      }
+    },
+    "Denote Templates": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denote-Vorlagen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plantillas de Denote"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modèles Denote"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denoteテンプレート"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modelos do Denote"
           }
         }
       }
@@ -13770,6 +13974,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Editor"
+          }
+        }
+      }
+    },
+    "Effort filter (<0:30, >1:00, =1:00):": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aufwandsfilter (<0:30, >1:00, =1:00):"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtro de esfuerzo (<0:30, >1:00, =1:00):"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtre d'effort (<0:30, >1:00, =1:00) :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "工数フィルタ（<0:30, >1:00, =1:00）："
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtro de esforço (<0:30, >1:00, =1:00):"
           }
         }
       }
@@ -16215,6 +16453,40 @@
         }
       }
     },
+    "Filter [+cat-tag<0:10-/regexp/]:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filter [+cat-tag<0:10-/regexp/]:"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtro [+cat-tag<0:10-/regexp/]:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtre [+cat-tag<0:10-/regexp/] :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フィルタ [+cat-tag<0:10-/regexp/]："
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtro [+cat-tag<0:10-/regexp/]:"
+          }
+        }
+      }
+    },
     "Filter the entries (/, \\, <, =, _; | removes)": {
       "localizations": {
         "de": {
@@ -16245,6 +16517,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Filtrar as entradas (/, \\, <, =, _; | remove)"
+          }
+        }
+      }
+    },
+    "Filter: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filter: %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtro: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtre : %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フィルタ：%@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtro: %@"
           }
         }
       }
@@ -20327,6 +20633,40 @@
         }
       }
     },
+    "Key Bindings": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tastenbelegungen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atajos de teclado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raccourcis clavier"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キーバインド"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atalhos de Teclado"
+          }
+        }
+      }
+    },
     "Keymap reloaded": {
       "localizations": {
         "de": {
@@ -22077,6 +22417,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Correspondência: +work/!TODO"
+          }
+        }
+      }
+    },
+    "Match: tags and properties, as +work-home or TODO=\"WAIT\"": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Treffer: Tags und Eigenschaften, wie +work-home oder TODO=\"WAIT\""
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coincidencia: etiquetas y propiedades, como +work-home o TODO=\"WAIT\""
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Correspondance : tags et propriétés, comme +work-home ou TODO=\"WAIT\""
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "マッチ：タグとプロパティ（+work-home や TODO=\"WAIT\" など）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Correspondência: etiquetas e propriedades, como +work-home ou TODO=\"WAIT\""
           }
         }
       }
@@ -26885,6 +27259,142 @@
         }
       }
     },
+    "Notifications are off for orgstar in Settings.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mitteilungen für orgstar sind in den Einstellungen ausgeschaltet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las notificaciones de orgstar están desactivadas en Ajustes."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les notifications d'orgstar sont désactivées dans Réglages."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定でorgstarの通知がオフになっています。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As notificações do orgstar estão desativadas nos Ajustes."
+          }
+        }
+      }
+    },
+    "Notifications are off for orgstar in System Settings.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mitteilungen für orgstar sind in den Systemeinstellungen ausgeschaltet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las notificaciones de orgstar están desactivadas en Ajustes del Sistema."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les notifications d'orgstar sont désactivées dans Réglages Système."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "システム設定でorgstarの通知がオフになっています。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As notificações do orgstar estão desativadas nos Ajustes do Sistema."
+          }
+        }
+      }
+    },
+    "Notifications are set through %@.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mitteilungen sind bis %@ geplant."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las notificaciones están programadas hasta el %@."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les notifications sont programmées jusqu'au %@."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通知は%@まで設定されています。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As notificações estão definidas até %@."
+          }
+        }
+      }
+    },
+    "Notifications are set through %@. Open orgstar to set later ones.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mitteilungen sind bis %@ geplant. Öffne orgstar, um spätere zu planen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las notificaciones están programadas hasta el %@. Abre orgstar para programar las siguientes."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les notifications sont programmées jusqu'au %@. Ouvrez orgstar pour programmer les suivantes."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通知は%@まで設定されています。以降の通知を設定するにはorgstarを開いてください。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As notificações estão definidas até %@. Abra o orgstar para definir as próximas."
+          }
+        }
+      }
+    },
     "Notify before timed agenda entries": {
       "localizations": {
         "de": {
@@ -26983,6 +27493,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "OK"
+          }
+        }
+      }
+    },
+    "Off": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aus"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desactivado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Désactivé"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オフ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desativado"
           }
         }
       }
@@ -29775,6 +30319,40 @@
         }
       }
     },
+    "Property (NAME value):": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eigenschaft (NAME Wert):"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Propiedad (NOMBRE valor):"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Propriété (NOM valeur) :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プロパティ（名前 値）："
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Propriedade (NOME valor):"
+          }
+        }
+      }
+    },
     "Property Action…": {
       "comment": "Command title",
       "localizations": {
@@ -30946,6 +31524,40 @@
         }
       }
     },
+    "Refile to": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verschieben nach"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reubicar en"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reclasser vers"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移動先"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Realocar em"
+          }
+        }
+      }
+    },
     "Refile to:": {
       "comment": "Echo area prompt for a refile target",
       "localizations": {
@@ -31012,6 +31624,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Realocar…"
+          }
+        }
+      }
+    },
+    "Regexp filter (-re to drop):": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regexp-Filter (-re zum Ausschließen):"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtro de regexp (-re para excluir):"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtre regexp (-re pour exclure) :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正規表現フィルタ（-reで除外）："
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtro de regexp (-re para excluir):"
           }
         }
       }
@@ -33380,6 +34026,40 @@
         }
       }
     },
+    "Schedule (+2d, fri, 2026-10-12):": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Planen (+2d, fri, 2026-10-12):"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Programar (+2d, fri, 2026-10-12):"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Planifier (+2d, fri, 2026-10-12) :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スケジュール（+2d, fri, 2026-10-12）："
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agendar (+2d, fri, 2026-10-12):"
+          }
+        }
+      }
+    },
     "Scheduled": {
       "localizations": {
         "de": {
@@ -33719,6 +34399,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Buscar nas notas"
+          }
+        }
+      }
+    },
+    "Search: a phrase, or +word -word {regexp}; * for headlines, ! for TODO entries": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suche: ein Ausdruck oder +Wort -Wort {Regexp}; * für Überschriften, ! für TODO-Einträge"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar: una frase, o +palabra -palabra {regexp}; * para encabezados, ! para entradas TODO"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rechercher : une expression, ou +mot -mot {regexp} ; * pour les titres, ! pour les entrées TODO"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "検索：フレーズ、または +単語 -単語 {正規表現}。* で見出し、! でTODOエントリ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar: uma frase, ou +palavra -palavra {regexp}; * para cabeçalhos, ! para entradas TODO"
           }
         }
       }
@@ -37276,6 +37990,40 @@
         }
       }
     },
+    "Structure Templates": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strukturvorlagen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plantillas de estructura"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modèles de structure"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "構造テンプレート"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modelos de Estrutura"
+          }
+        }
+      }
+    },
     "Subscriptions renew automatically until cancelled in your Apple Account settings, at least 24 hours before the period ends.": {
       "localizations": {
         "de": {
@@ -37827,6 +38575,40 @@
         }
       }
     },
+    "TODO state (empty for none):": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TODO-Status (leer für keinen):"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estado TODO (vacío para ninguno):"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "État TODO (vide pour aucun) :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TODO状態（空欄でなし）："
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estado TODO (vazio para nenhum):"
+          }
+        }
+      }
+    },
     "Table": {
       "localizations": {
         "de": {
@@ -37892,6 +38674,108 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tabelas"
+          }
+        }
+      }
+    },
+    "Tag filter (+tag-tag):": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tag-Filter (+tag-tag):"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtro de etiquetas (+tag-tag):"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtre de tags (+tag-tag) :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "タグフィルタ（+tag-tag）："
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtro de etiquetas (+tag-tag):"
+          }
+        }
+      }
+    },
+    "Tag to add:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hinzuzufügendes Tag:"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etiqueta para añadir:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tag à ajouter :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "追加するタグ："
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etiqueta a adicionar:"
+          }
+        }
+      }
+    },
+    "Tag to remove:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zu entfernendes Tag:"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etiqueta para quitar:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tag à retirer :"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "削除するタグ："
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etiqueta a remover:"
           }
         }
       }
@@ -41949,6 +42833,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Semana"
+          }
+        }
+      }
+    },
+    "Week of %@": {
+      "comment": "Agenda title; the date is the week's first day",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woche vom %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Semana del %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Semaine du %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@の週"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Semana de %@"
           }
         }
       }
