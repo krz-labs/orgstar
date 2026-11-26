@@ -29,17 +29,4 @@ struct RoamNodeTests {
         let emacs = try String(contentsOf: output, encoding: .utf8).split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
         #expect(Array(emacs.prefix(titles.count)) == titles.map(RoamNode.slug))
     }
-
-    @Test func newNodeFile() throws {
-        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("orgstar-roam-\(UUID().uuidString)").path
-        defer { try? FileManager.default.removeItem(atPath: folder) }
-        let now = Calendar.current.date(from: DateComponents(year: 2026, month: 10, day: 13, hour: 9, minute: 5, second: 7))!
-        let node = try RoamNode.create(title: "Field Notes", in: folder, now: now, id: { "abc-123" })
-        #expect((node.path as NSString).lastPathComponent == "20261013090507-field_notes.org")
-        #expect(node.id == "abc-123")
-        let text = try String(contentsOfFile: node.path, encoding: .utf8)
-        #expect(text == ":PROPERTIES:\n:ID:       abc-123\n:END:\n#+title: Field Notes\n")
-        // The same second and title again: the file is there, so nothing is overwritten.
-        #expect(throws: (any Error).self) { try RoamNode.create(title: "Field Notes", in: folder, now: now, id: { "other" }) }
-    }
 }

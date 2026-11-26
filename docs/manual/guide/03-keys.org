@@ -1143,7 +1143,8 @@ See [[file:09-links.org][Links]].
 
 | Command | Emacs | Mac | Doom | What it does |
 |-+-+-+-+-|
-| Find Node… (=app.node.find=) | =C-c n f= | — | =SPC n r f= (N) | Opens a heading or file with an ID, chosen by title (=org-roam-node-find=). |
+| Find Node… (=app.node.find=) | =C-c n f= | — | =SPC n r f= (N) | Opens a heading or file with an ID, chosen by title or alias (=org-roam-node-find=). |
+| Find Ref… (=app.node.find-ref=) | — | — | =SPC n r F= (N) | Opens the node with a =ROAM_REFS= link or citation key (=org-roam-ref-find=). |
 | Insert Node Link… (=app.node.insert=) | =C-c n i= | — | =SPC n r i= (N) | Inserts an =id:= link to a node (=org-roam-node-insert=). |
 | Show Node Graph (=app.node.graph=) | =C-c n g= | — | =SPC n r g= (N) | Opens the graph of nodes and the links between them. |
 | Go to Today's Daily Note (=app.dailies.today=) | =C-c n d d= | — | =SPC n r d t= (N) | =org-roam-dailies-goto-today=. |

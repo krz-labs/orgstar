@@ -248,7 +248,7 @@ struct DailiesTests {
                                   open: { _, _ in }, insertLink: { _, _ in }, refresh: {})
         actions.createDenote("Field Notes", roots: [folder.path], prompts: ["title", "signature", "subdirectory", "date", "file-type", "template", "keywords"],
                              templates: [("report", "* R\n"), ("memo", "* M\n")], keywords: []) { choice in
-            if case .created(let path, _, _) = choice { created = path }
+            if case .created(let path, _, _, _) = choice { created = path }
         }
         #expect(asked == ["signature", "subdirectory", "date", "template", "keywords"])
         let path = try #require(created)
@@ -284,14 +284,16 @@ struct DailiesTests {
         defer { try? FileManager.default.removeItem(at: folder) }
         let session = DocumentSession(recovery: FileRecoveryStore(directory: folder.appendingPathComponent(".r")))
         var opened: (String, Int)?
-        let actions = RoamActions(session: session, roots: { [folder.path] }, nodes: { [] }, show: { Issue.record("\($0)") }, ask: { $1(nil) },
+        var actions = RoamActions(session: session, roots: { [folder.path] }, nodes: { [] }, show: { Issue.record("\($0)") }, ask: { $1(nil) },
                                   open: { opened = ($0, $1) }, insertLink: { _, _ in }, refresh: {})
+        actions.templates = { (RoamTemplate.defaults($0), []) }
         actions.capture(Self.day)
         let path = folder.appendingPathComponent("daily/2026-10-11.org").path
         let text = try String(contentsOfFile: path, encoding: .utf8)
         #expect(text.hasPrefix(":PROPERTIES:\n:ID:       "))
         #expect(text.hasSuffix(":END:\n#+title: 2026-10-11\n* \n"))
-        #expect(opened?.0 == path && opened?.1 == (text as NSString).length - 1)
+        // Without a capture window, the entry is filed at once and opens where it starts.
+        #expect(opened?.0 == path && opened?.1 == (text as NSString).length - 3)
     }
 
     /// An index that can't be read is reported, not offered as an empty list of nodes.

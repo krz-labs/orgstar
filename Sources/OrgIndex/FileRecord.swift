@@ -116,6 +116,10 @@ public struct FileRecord: Sendable, Equatable {
     public let title: String?
     /// The text before the first heading, searched as the file itself.
     public let preamble: String
+    /// `#+FILETAGS`: the file node's tags.
+    public let fileTags: [String]
+    /// The file's own `ROAM_ALIASES`, `ROAM_REFS` and `ROAM_EXCLUDE`, as written.
+    public let fileRoam: RoamProperties
 
     public static func hash(_ bytes: [UInt8]) -> String {
         SHA256.hash(data: Data(bytes)).map { String(format: "%02x", $0) }.joined()
@@ -132,7 +136,8 @@ public struct FileRecord: Sendable, Equatable {
         var resolved = settings
         resolved.org = settings.org.resolvingSetupFiles(in: source.text, path: path, read: OrgSettings.readFile)
         self.settingsVersion = Self.settingsVersion(settings, text: source.text, setupKeywords: resolved.org.setupKeywords)
-        (headings, links, fileID, title, preamble) = kind == .conflict ? ([], [], nil, nil, "") : Self.rows(source.text, settings: resolved)
+        (headings, links, fileID, title, preamble, fileTags, fileRoam) = kind == .conflict
+            ? ([], [], nil, nil, "", [], RoamProperties()) : Self.rows(source.text, settings: resolved)
     }
 
     /// The settings version a file's rows are built under: the index's, with the keywords of
@@ -169,11 +174,14 @@ public struct FileRecord: Sendable, Equatable {
         fileID = nil
         title = nil
         preamble = ""
+        fileTags = []
+        fileRoam = RoamProperties()
     }
 
     public static func unreadHash(size: Int, mtime: Double) -> String { "unread:\(size):\(mtime)" }
 
-    static func rows(_ text: String, settings: IndexSettings) -> (headings: [HeadingRecord], links: [LinkRow], fileID: String?, title: String?, preamble: String) {
+    static func rows(_ text: String, settings: IndexSettings)
+        -> (headings: [HeadingRecord], links: [LinkRow], fileID: String?, title: String?, preamble: String, fileTags: [String], fileRoam: RoamProperties) {
         let model = DocumentModel(tree: OrgParser.parse(text, defaults: settings.org), settings: settings.semantic)
         let utf16 = text.utf16
         func slice(_ range: Range<Int>) -> String {
@@ -215,7 +223,10 @@ public struct FileRecord: Sendable, Equatable {
         let fileID = model.property("ID", of: nil)?.value.trimmingCharacters(in: .whitespaces)
         let zeroth = model.headings.first.map { slice(0..<$0.sectionRange.lowerBound) } ?? text
         let titles = zeroth.matches(of: /(?im)^[ \t]*#\+title:[ \t]*(.*?)[ \t]*$/).map { String($0.1) }
-        return (headings, model.links.map(linkRow), fileID?.isEmpty == false ? fileID : nil, titles.isEmpty ? nil : titles.joined(separator: " "), zeroth)
+        let roam = RoamProperties(aliases: model.property("ROAM_ALIASES", of: nil)?.value, refs: model.property("ROAM_REFS", of: nil)?.value,
+                                  exclude: model.property("ROAM_EXCLUDE", of: nil)?.value)
+        return (headings, model.links.map(linkRow), fileID?.isEmpty == false ? fileID : nil, titles.isEmpty ? nil : titles.joined(separator: " "), zeroth,
+                model.fileTags, roam)
     }
 
     static func linkRow(_ target: String) -> LinkRow {

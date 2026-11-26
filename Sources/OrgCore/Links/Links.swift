@@ -22,9 +22,10 @@ public struct OrgLink: Sendable, Equatable {
 }
 
 public enum Links {
-    /// `org-link-parameters` in Emacs with Org's default modules, org-attach's and Denote's.
+    /// `org-link-parameters` in Emacs with Org's default modules, org-attach's, Denote's and
+    /// org-roam's.
     static let types = [
-        "attachment", "id", "denote", "eww", "rmail", "mhe", "irc", "info", "gnus", "docview", "bibtex", "bbdb", "w3m", "doi", "file+sys", "file+emacs",
+        "attachment", "id", "denote", "roam", "eww", "rmail", "mhe", "irc", "info", "gnus", "docview", "bibtex", "bbdb", "w3m", "doi", "file+sys", "file+emacs",
         "shell", "news", "mailto", "https", "http", "ftp", "shortdoc", "help", "file", "elisp",
     ]
 

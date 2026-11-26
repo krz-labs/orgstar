@@ -43,7 +43,7 @@ extension RoamActions {
             let known: [IndexStore.Node]
             do { known = try nodes() } catch { return show(error.localizedDescription) }
             createDenote(title.trimmingCharacters(in: .whitespaces), known: known, signature: signature) { choice in
-                if case .created(let path, _, _) = choice { open(path, (session.text(of: path).map { ($0 as NSString).length }) ?? 0) }
+                if case .created(let path, let offset, _, _) = choice { open(path, offset) }
             }
         }
     }

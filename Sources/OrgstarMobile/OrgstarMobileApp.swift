@@ -142,6 +142,8 @@ struct CaptureRequest: Identifiable {
     var properties: [String: String] = [:]
     /// An agenda day (a `Days` number) the entry is scheduled on.
     var day: Int?
+    /// An org-roam capture, whose templates take the place of capture.toml's.
+    var roam: RoamCapture?
 }
 
 extension CaptureRequest {
@@ -509,6 +511,13 @@ struct RootView: View {
         } else if case .storeLink(let link, let title)? = OrgProtocol.parse(url.absoluteString) {
             message = StoredLink.add(StoredLink(link: link, description: title), to: &model.storedLinks)
             UIPasteboard.general.string = link
+        } else if let request = OrgProtocol.parse(url.absoluteString), ProAccess.shared.allows(.roam) {
+            // org-roam-protocol's `roam-ref` and `roam-node`.
+            var actions = RoamActions(session: session, roots: { workspace.rootPaths }, nodes: { try workspace.nodes(overlay: workspace.overlay(session.openDocuments)) },
+                                      show: { message = $0 }, ask: { $1(nil) }, open: { path, offset in model.openRequest = .offset(path, offset) },
+                                      insertLink: { _, _ in }, refresh: { Task { await workspace.refresh() } })
+            actions.capture = { capture = CaptureRequest(roam: $0) }
+            actions.follow(request)
         } else if url.scheme == "org-protocol" {
             message = "orgstar handles org-protocol capture and store-link"
         }

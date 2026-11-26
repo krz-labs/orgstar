@@ -11,11 +11,25 @@ public enum OrgProtocol {
         case capture(template: String?, properties: [String: String])
         /// `org-protocol-store-link`: the link and its title.
         case storeLink(url: String, title: String?)
+        /// org-roam-protocol's `roam-ref`: the node with a ref, made with a ref template when
+        /// there's none.
+        case roamRef(ref: String, title: String?, body: String?, template: String?)
+        /// org-roam-protocol's `roam-node`: the node with an ID.
+        case roamNode(id: String)
     }
 
     public static func parse(_ url: String) -> Request? {
         guard let protocolMatch = url.firstMatch(of: /^org-protocol:\/+/) else { return nil }
         let rest = url[protocolMatch.range.upperBound...]
+        // org-roam-protocol's handlers take the new `?key=value` form only.
+        for name in ["roam-ref", "roam-node"] {
+            guard rest.hasPrefix(name), let separator = rest.dropFirst(name.count).firstMatch(of: /^\/*\?/) else { continue }
+            let parts = query(String(rest.dropFirst(name.count)[separator.range.upperBound...]))
+            func value(_ key: String) -> String? { parts.first { $0.0 == key }?.1 ?? nil }
+            if name == "roam-node" { return value("node").map { .roamNode(id: $0) } }
+            guard let ref = value("ref"), !ref.isEmpty else { return nil }
+            return .roamRef(ref: ref, title: value("title"), body: value("body"), template: value("template").flatMap { $0.isEmpty ? nil : $0 })
+        }
         for name in ["store-link", "capture"] {
             guard rest.hasPrefix(name), let separator = rest.dropFirst(name.count).firstMatch(of: /^(:\/+|\/*\?)/) else { continue }
             let info = String(rest.dropFirst(name.count)[separator.range.upperBound...])

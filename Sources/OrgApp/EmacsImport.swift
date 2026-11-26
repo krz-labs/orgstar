@@ -13,6 +13,9 @@ public struct EmacsImport: Sendable {
         case folder(String)
         /// A `[[template]]` table for capture.toml.
         case capture(key: String, toml: String)
+        /// A `[[roam-template]]`, `[[roam-dailies-template]]` or `[[roam-ref-template]]` table
+        /// for capture.toml, by its table name.
+        case roamTemplate(set: String, key: String, toml: String)
         /// A `[[bind]]` table for keymap.toml.
         case binding(keys: String, command: String, mode: String?)
         /// An `[org-structure-template-alist]` entry for config.toml.
@@ -628,15 +631,22 @@ public struct EmacsImport: Sendable {
             guard let dir = value.string else { return note("not a string") }
             add(name, .string(dir))
         case "org-roam-dailies-capture-templates":
-            // The first template's entry and its `(file+head NAME HEAD)` target.
-            guard let first = value.elements?.first?.elements, first.count >= 4, let entry = first[3].string,
+            // One template with a `(file+head NAME HEAD)` target: the settings; otherwise each
+            // template as a table.
+            let templates = value.elements ?? []
+            guard templates.count == 1, let first = templates[0].elements, first.count >= 4, let entry = first[3].string,
                   let at = first.firstIndex(of: .symbol(":target")), at + 1 < first.count, let target = first[at + 1].elements,
                   target.count == 3, target[0].symbol == "file+head", let file = target[1].string, let head = target[2].string else {
-                return note("not a template with a (file+head NAME HEAD) target")
+                for template in templates { roamTemplate(template, set: .dailies, variable: name, source: source, id: id) }
+                return
             }
             add("org-roam-dailies-file", .string(file))
             add("org-roam-dailies-head", .string(head))
             add("org-roam-dailies-entry", .string(entry))
+        case "org-roam-capture-templates":
+            for template in value.elements ?? [] { roamTemplate(template, set: .node, variable: name, source: source, id: id) }
+        case "org-roam-capture-ref-templates":
+            for template in value.elements ?? [] { roamTemplate(template, set: .ref, variable: name, source: source, id: id) }
         case "org-attach-id-dir":
             guard let dir = value.string else { return note("not a string") }
             add(name, .string(dir))
@@ -1055,6 +1065,56 @@ public struct EmacsImport: Sendable {
         items.append(Item(id: id(), name: "capture \"\(key)\" \(name)", summary: "capture template \"\(key)\"", source: source, change: .capture(key: key, toml: toml)))
     }
 
+    /// An org-roam capture template, `(KEY NAME TYPE TEMPLATE :target TARGET …)`, as a table:
+    /// targets `file`, `file+head`, `file+olp` and `file+head+olp` (`:if-new` too, as org-roam
+    /// 2.0 named it).
+    mutating func roamTemplate(_ entry: Sexp, set: RoamTemplate.Set, variable: String, source: String, id: () -> Int) {
+        func quoted(_ s: String) -> String { UserConfig.format(.string(s)) }
+        guard let parts = entry.elements, parts.count >= 4, let key = parts[0].string, let type = parts[2].symbol, let template = parts[3].string else {
+            unsupported.append(Note(id: id(), name: variable, reason: "a template that isn't (KEY NAME TYPE \"TEMPLATE\" …)", source: source))
+            return
+        }
+        let name = "\(variable) \"\(key)\""
+        guard ["entry", "item", "checkitem", "plain", "table-line"].contains(type) else {
+            unsupported.append(Note(id: id(), name: name, reason: "\(type) templates aren't supported", source: source))
+            return
+        }
+        var properties: [String: Sexp] = [:]
+        let rest = Array(parts.dropFirst(4))
+        for i in stride(from: 0, to: rest.count - 1, by: 2) { if let name = rest[i].symbol { properties[name] = rest[i + 1] } }
+        var toml = "[[\(set.rawValue)]]\nkey = \(quoted(key))\nname = \(quoted(parts[1].string ?? key))\ntype = \(quoted(type))\n"
+        let target = (properties[":target"] ?? properties[":if-new"])?.elements ?? []
+        let olp = target.last?.elements.flatMap { list in list.allSatisfy { $0.string != nil } ? list.compactMap(\.string).joined(separator: "/") : nil }
+        switch (target.first?.symbol, target.count) {
+        case ("file", 2) where target[1].string != nil:
+            toml += "file = \(quoted(target[1].string!))\n"
+        case ("file+head", 3) where target[1].string != nil && target[2].string != nil:
+            toml += "file = \(quoted(target[1].string!))\nhead = \(quoted(target[2].string!))\n"
+        case ("file+olp", 3) where target[1].string != nil && olp != nil:
+            toml += "file = \(quoted(target[1].string!))\nolp = \(quoted(olp!))\n"
+        case ("file+head+olp", 4) where target[1].string != nil && target[2].string != nil && olp != nil:
+            toml += "file = \(quoted(target[1].string!))\nhead = \(quoted(target[2].string!))\nolp = \(quoted(olp!))\n"
+        default:
+            let kind = target.first?.symbol.map { "target \($0) isn't supported" } ?? "no :target"
+            unsupported.append(Note(id: id(), name: name, reason: kind, source: source))
+            return
+        }
+        for flag in ["prepend", "immediate-finish", "jump-to-captured"] {
+            if let value = properties[":" + flag], value.symbol != "nil" { toml += "\(flag) = true\n" }
+        }
+        for count in ["empty-lines", "empty-lines-before", "empty-lines-after"] {
+            if let n = properties[":" + count]?.integer { toml += "\(count) = \(n)\n" }
+        }
+        // The capture window shows the template's text whether or not it's narrowed.
+        let known = [":target", ":if-new", ":unnarrowed", ":prepend", ":immediate-finish", ":jump-to-captured", ":empty-lines", ":empty-lines-before", ":empty-lines-after"]
+        let ignored = properties.keys.filter { !known.contains($0) }
+        if !ignored.isEmpty {
+            unsupported.append(Note(id: id(), name: name, reason: "\(ignored.sorted().joined(separator: ", ")) left out", source: source))
+        }
+        toml += "template = \(quoted(template))\n"
+        items.append(Item(id: id(), name: name, summary: "\(set.rawValue) \"\(key)\"", source: source, change: .roamTemplate(set: set.rawValue, key: key, toml: toml)))
+    }
+
     /// Emacs commands and the Orgstar commands that do the same.
     static let commands: [String: String] = [
         "org-todo": "org.todo.cycle", "org-shiftright": "org.todo.next", "org-shiftleft": "org.todo.previous", "org-priority-up": "org.priority.up", "org-priority-down": "org.priority.down",
@@ -1227,6 +1287,12 @@ extension EmacsImport {
             guard case .capture(let key, let toml) = item.change, !existingKeys.contains(key) else { continue }
             addedCapture += "\n" + toml
             if toml.contains("\ntemplate = ") { templates += 1 }
+        }
+        var roamKeys = Set((try? TOML.parse(capture))?.compactMap { table in table.values["key"]?.string.map { table.name + " " + $0 } } ?? [])
+        for item in items {
+            guard case .roamTemplate(let set, let key, let toml) = item.change, roamKeys.insert(set + " " + key).inserted else { continue }
+            addedCapture += "\n" + toml
+            templates += 1
         }
         if !addedCapture.isEmpty {
             capture += (capture.isEmpty ? "# Capture templates. Imported from Emacs.\n" : "\n# Imported from Emacs.\n") + addedCapture

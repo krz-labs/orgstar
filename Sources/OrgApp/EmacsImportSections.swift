@@ -6,7 +6,7 @@ extension EmacsImport {
         [
             (String(localized: "Settings", bundle: .main), items.filter { if case .setting = $0.change { true } else { false } }),
             (String(localized: "Folders", bundle: .main), folders ? items.filter { if case .folder = $0.change { true } else { false } } : []),
-            (String(localized: "Capture Templates", bundle: .main), items.filter { if case .capture = $0.change { true } else { false } }),
+            (String(localized: "Capture Templates", bundle: .main), items.filter { if case .capture = $0.change { true } else if case .roamTemplate = $0.change { true } else { false } }),
             (String(localized: "Key Bindings", bundle: .main), items.filter { if case .binding = $0.change { true } else { false } }),
             (String(localized: "Structure Templates", bundle: .main), items.filter { if case .structureTemplate = $0.change { true } else { false } }),
             (String(localized: "Denote Templates", bundle: .main), items.filter { if case .denoteTemplate = $0.change { true } else { false } }),

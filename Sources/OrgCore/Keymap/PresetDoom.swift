@@ -224,6 +224,10 @@ extension KeymapPreset {
         command = "app.node.find"
         mode = "normal"
         [[bind]]
+        keys = "SPC n r F"
+        command = "app.node.find-ref"
+        mode = "normal"
+        [[bind]]
         keys = "SPC n r i"
         command = "app.node.insert"
         mode = "normal"

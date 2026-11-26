@@ -24,6 +24,11 @@ public struct RoamActions {
     /// In the Mac sandbox, asks for access to folders outside the sidebar's that new notes go
     /// in. False when one is still out of reach.
     public var reachFolders: ([String]) -> Bool = { _ in true }
+    /// Shows the capture window for an org-roam capture. Without it, the first template is
+    /// filed at once and its file opened there.
+    public var capture: ((RoamCapture) -> Void)?
+    /// org-roam's capture templates, from capture.toml.
+    public var templates: (RoamTemplate.Set) -> (templates: [RoamTemplate], problems: [String]) = { RoamTemplate.load($0) }
 
     public init(
         session: DocumentSession, roots: @escaping () -> [String], nodes: @escaping () throws -> [IndexStore.Node], show: @escaping (String) -> Void,
@@ -92,10 +97,12 @@ public struct RoamActions {
         case "app.node.find":
             chooseNode("Node: ") { choice in
                 switch choice {
-                case .existing(let node): open(node.location.path, node.location.start)
-                case .created(let path, _, _): open(path, (session.text(of: path).map { ($0 as NSString).length }) ?? 0)
+                case .existing(let node, _): open(node.location.path, node.location.start)
+                case .created(let path, let offset, _, _): open(path, offset)
                 }
             }
+        case "app.node.find-ref":
+            findRef()
         case "app.node.silo-find", "app.node.silo-create":
             // denote-silo: a folder of `denote-silo-directories` in place of `denote-directory`.
             let silos = DenoteNote.silos(roots: roots())
@@ -104,8 +111,8 @@ public struct RoamActions {
                 guard let answer, let silo = silos.first(where: { DenoteNote.abbreviated($0) == answer }) else { return }
                 let opened: (NodeChoice) -> Void = { choice in
                     switch choice {
-                    case .existing(let node): open(node.location.path, node.location.start)
-                    case .created(let path, _, _): open(path, (session.text(of: path).map { ($0 as NSString).length }) ?? 0)
+                    case .existing(let node, _): open(node.location.path, node.location.start)
+                    case .created(let path, _, _, _): open(path, (session.text(of: path).map { ($0 as NSString).length }) ?? 0)
                     }
                 }
                 guard id == "app.node.silo-create" else { return chooseNode("Node: ", silo: silo, opened) }
@@ -117,8 +124,8 @@ public struct RoamActions {
         case "app.node.insert":
             chooseNode("Node: ") { choice in
                 switch choice {
-                case .existing(let node): insertLink(linkType + node.id, node.title)
-                case .created(_, let id, let title): insertLink(linkType + id, title)
+                case .existing(let node, let title): insertLink(linkType + node.id, title)
+                case .created(_, _, let id, let title): insertLink(linkType + id, title)
                 }
             }
         default:
@@ -126,89 +133,150 @@ public struct RoamActions {
         }
     }
 
-    /// `org-roam-dailies-goto-*`: the day's file, made if missing.
+    /// The daily-note templates: `[[roam-dailies-template]]`, or one from the
+    /// `org-roam-dailies-…` settings; for a Denote journal, one for the day's entry.
+    private func dailyTemplates(_ dailies: Dailies, _ day: Date) -> [RoamTemplate] {
+        if dailies.journal != nil {
+            return [RoamTemplate(key: "d", name: "default", kind: .entry, template: dailies.entry, file: dailies.path(for: day), head: dailies.newText(day, id: ""))]
+        }
+        let (templates, problems) = self.templates(.dailies)
+        if let problem = problems.first { show(problem) }
+        return templates
+    }
+
+    /// `org-roam-dailies-goto-*`: the day's file, made if missing. With templates aimed at
+    /// different files, asks which.
     func goto(_ day: Date) {
         guard let dailies else { return show("No folder for daily notes") }
         guard reachFolders([dailies.directory]) else { return }
-        do {
-            let (path, created) = try dailies.ensure(day)
-            if created { refresh() }
-            open(path, (session.text(of: path).map { ($0 as NSString).length }) ?? 0)
-        } catch {
-            show("Can't make the daily note: \(error.localizedDescription)")
-        }
-    }
-
-    /// `org-roam-dailies-capture-*`: the entry template filed at the end of the day's file,
-    /// which opens with the caret at `%?`.
-    func capture(_ day: Date) {
-        guard let dailies else { return show("No folder for daily notes") }
-        guard reachFolders([dailies.directory]) else { return }
-        let context = CaptureContext(now: day, file: session.path ?? "", userName: NSFullUserName())
-        let questions = Capture.questions(dailies.entry, context: context)
-        func ask(_ answers: [String]) {
-            guard answers.count < questions.count else { return file(answers) }
-            let question = questions[answers.count]
-            self.ask(Prompt(key: "q\(answers.count)", message: question.prompt + ": ", initial: question.defaultValue, requireMatch: false)) { answer in
-                if let answer { ask(answers + [answer]) }
+        let templates = dailyTemplates(dailies, day)
+        func go(_ template: RoamTemplate) {
+            var dailies = dailies
+            if dailies.journal == nil {
+                dailies.file = template.file
+                dailies.head = template.head
             }
-        }
-        func file(_ answers: [String]) {
             do {
                 let (path, created) = try dailies.ensure(day)
                 if created { refresh() }
-                guard let text = session.text(of: path) else { return show("Can't read \((path as NSString).lastPathComponent)") }
-                let filled: (text: String, cursor: Int)
-                switch Capture.fill(dailies.entry, context: context, answers: answers) {
-                case .success(let result): filled = result
-                case .failure(.message(let message)): return show(message)
-                }
-                let template = CaptureTemplate(key: "d", name: "daily", target: .file(path), template: dailies.entry)
-                switch Capture.placement(filled.text, template: template, in: text, now: day) {
-                case .failure(.message(let message)): show(message)
-                case .success(let placed):
-                    if case .failed(let message) = session.perform(ReplaceText(old: text, new: placed.text), path: path, at: 0, expect: nil) { return show(message) }
-                    open(path, placed.start + filled.cursor)
-                }
+                open(path, (session.text(of: path).map { ($0 as NSString).length }) ?? 0)
             } catch {
                 show("Can't make the daily note: \(error.localizedDescription)")
             }
         }
-        ask([])
+        guard Set(templates.map(\.file)).count > 1 else { return go(templates[0]) }
+        chooseTemplate(templates) { go($0) }
+    }
+
+    /// `org-capture`'s template menu, for a command that files nothing.
+    private func chooseTemplate(_ templates: [RoamTemplate], _ then: @escaping (RoamTemplate) -> Void) {
+        let labels = templates.map { "[\($0.key)] \($0.name)" }
+        ask(Prompt(key: "template", message: "Template: ", choices: labels)) { answer in
+            guard let answer, let index = labels.firstIndex(of: answer) else { return }
+            then(templates[index])
+        }
+    }
+
+    /// `org-roam-dailies-capture-*`: the capture window with the daily-note templates; the
+    /// entry goes at the end of the day's file, made with its head when it's new.
+    func capture(_ day: Date) {
+        guard let dailies else { return show("No folder for daily notes") }
+        guard reachFolders([dailies.directory]) else { return }
+        start(RoamCapture(dailyTemplates(dailies, day), title: "", directory: dailies.directory, now: day, ids: dailies.journal == nil,
+                          session: session, refresh: refresh) { _, _, _ in })
+    }
+
+    /// Shows the capture window, or without one, files the first template at once and opens
+    /// what it filed.
+    func start(_ roam: RoamCapture) {
+        if let capture { return capture(roam) }
+        switch roam.fileFirst() {
+        case .success(let entry): open(entry.path, entry.offset)
+        case .failure(let error): show(error.message)
+        }
     }
 
     enum NodeChoice {
-        case existing(IndexStore.Node)
-        case created(path: String, id: String, title: String)
+        /// A node, by the title or alias chosen.
+        case existing(IndexStore.Node, title: String)
+        /// A new node, with where its text went.
+        case created(path: String, offset: Int, id: String, title: String)
     }
 
-    /// `org-roam-node-read`: a node by its title, with its file's name when titles repeat. A
-    /// title no node has makes a node with it, as org-roam's default capture template does;
-    /// with Denote, `denote` asks for its keywords and makes the note.
+    /// `org-roam-node-read--completions`: a candidate for each node's title and each of its
+    /// aliases, with its file's name when names repeat, and its tags after it as Doom's
+    /// `org-roam-node-display-template` shows them.
+    nonisolated static func candidates(_ nodes: [IndexStore.Node]) -> [(label: String, node: IndexStore.Node, title: String)] {
+        let names = nodes.flatMap { node in ([node.title] + node.aliases).map { (node: node, name: $0) } }
+        let counts = Dictionary(names.map { ($0.name, 1) }, uniquingKeysWith: +)
+        return names.map { node, name in
+            var label = counts[name, default: 0] > 1 ? "\(name) (\((node.location.path as NSString).lastPathComponent))" : name
+            if !node.tags.isEmpty { label += "  " + node.tags.map { "#" + $0 }.joined(separator: " ") }
+            return (label, node, name)
+        }
+    }
+
+    /// `org-roam-node-read`: a node by its title or an alias. A title no node has goes to the
+    /// capture window with `[[roam-template]]`'s templates, as `org-roam-capture-` does, and
+    /// once filed makes the node; with Denote, `denote` asks for its keywords and makes the note.
     private func chooseNode(_ message: String, silo: String? = nil, _ then: @escaping (NodeChoice) -> Void) {
         let known: [IndexStore.Node]
         do { known = try nodes() } catch { return show(error.localizedDescription) }
         let all = silo.map { silo in known.filter { $0.location.path.hasPrefix(silo.hasSuffix("/") ? silo : silo + "/") } } ?? known
-        let counts = Dictionary(all.map { ($0.title, 1) }, uniquingKeysWith: +)
-        let labels = all.map { node in
-            counts[node.title, default: 0] > 1 ? "\(node.title) (\((node.location.path as NSString).lastPathComponent))" : node.title
-        }
-        ask(Prompt(key: "node", message: message, choices: labels, requireMatch: false)) { answer in
+        let candidates = Self.candidates(all)
+        ask(Prompt(key: "node", message: message, choices: candidates.map(\.label), requireMatch: false)) { answer in
             guard let answer else { return }
-            if let index = labels.firstIndex(of: answer) { return then(.existing(all[index])) }
+            if let chosen = candidates.first(where: { $0.label == answer }) ?? candidates.first(where: { $0.title == answer }) {
+                return then(.existing(chosen.node, title: chosen.title))
+            }
             let title = answer.trimmingCharacters(in: .whitespaces)
             guard !title.isEmpty else { return }
             if denote || silo != nil { return createDenote(title, known: all, silo: silo, then) }
             guard let folder = RoamNode.directory(roots: roots()) else { return show("No folder for new nodes") }
             guard reachFolders([folder]) else { return }
-            do {
-                let node = try RoamNode.create(title: title, in: folder)
-                refresh()
-                show("Created \((node.path as NSString).lastPathComponent)")
-                then(.created(path: node.path, id: node.id, title: title))
-            } catch {
-                show("Can't make the node: \(error)")
-            }
+            let (templates, problems) = self.templates(.node)
+            if let problem = problems.first { show(problem) }
+            start(RoamCapture(templates, title: title, directory: folder, session: session, refresh: refresh) { path, offset, id in
+                then(.created(path: path, offset: offset, id: id, title: title))
+            })
+        }
+    }
+
+    /// `org-roam-ref-find`: a node by one of its `ROAM_REFS`, shown with its title.
+    private func findRef() {
+        let known: [IndexStore.Node]
+        do { known = try nodes() } catch { return show(error.localizedDescription) }
+        let refs = known.flatMap { node in node.refs.map { (label: "\($0)  \(node.title)", node: node) } }
+        guard !refs.isEmpty else { return show("No node has refs") }
+        ask(Prompt(key: "ref", message: "Ref: ", choices: refs.map(\.label))) { answer in
+            guard let answer, let chosen = refs.first(where: { $0.label == answer }) else { return }
+            open(chosen.node.location.path, chosen.node.location.start)
+        }
+    }
+
+    /// org-roam-protocol's `roam-ref`: the node with the ref, else the capture window with
+    /// `[[roam-ref-template]]`'s templates (only the one keyed `template` when given) for a new
+    /// node with the ref in its `ROAM_REFS`; and `roam-node`: the node with the ID.
+    public func follow(_ request: OrgProtocol.Request) {
+        let known: [IndexStore.Node]
+        do { known = try nodes() } catch { return show(error.localizedDescription) }
+        switch request {
+        case .roamNode(let id):
+            guard let node = known.first(where: { $0.id == id }) else { return show("No node has the ID \(id)") }
+            open(node.location.path, node.location.start)
+        case .roamRef(let ref, let title, let body, let key):
+            if let node = known.first(where: { $0.refs.contains(ref) }) { return open(node.location.path, node.location.start) }
+            guard let folder = RoamNode.directory(roots: roots()) else { return show("No folder for new nodes") }
+            guard reachFolders([folder]) else { return }
+            let (all, problems) = self.templates(.ref)
+            if let problem = problems.first { show(problem) }
+            let templates = key.map { key in all.filter { $0.key == key } } ?? all
+            guard !templates.isEmpty else { return show("No roam-ref template \"\(key ?? "")\"") }
+            let quoted = ref.contains(where: \.isWhitespace) ? "\"" + ref.replacingOccurrences(of: "\"", with: "\\\"") + "\"" : ref
+            start(RoamCapture(templates, title: title ?? ref, directory: folder, fields: ["ref": ref, "body": body ?? ""], properties: [("ROAM_REFS", quoted)],
+                              session: session, refresh: refresh) { path, offset, _ in open(path, offset) })
+        default:
+            break
         }
     }
 
@@ -254,7 +322,7 @@ public struct RoamActions {
                                                  now: answers.date ?? Date(), signature: answers.signature, template: answers.template)
                 refresh()
                 show("Created \((note.path as NSString).lastPathComponent)")
-                then(.created(path: note.path, id: note.id, title: title))
+                then(.created(path: note.path, offset: (session.text(of: note.path).map { ($0 as NSString).length }) ?? 0, id: note.id, title: title))
             } catch {
                 show("Can't make the note: \(error)")
             }

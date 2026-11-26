@@ -142,6 +142,7 @@ public enum EditorCommands {
         EditorCommand(id: "app.dailies.next", title: "Next Daily Note", action: .app),
         EditorCommand(id: "app.dailies.previous", title: "Previous Daily Note", action: .app),
         EditorCommand(id: "app.node.find", title: "Find Node…", action: .app),
+        EditorCommand(id: "app.node.find-ref", title: "Find Ref…", action: .app),
         EditorCommand(id: "app.node.insert", title: "Insert Node Link…", action: .app),
         EditorCommand(id: "app.node.graph", title: "Show Node Graph", action: .app),
         EditorCommand(id: "app.sidebar-agenda", title: "Show Agenda or Files in Sidebar", action: .app),

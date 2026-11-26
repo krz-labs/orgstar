@@ -46,7 +46,7 @@ public enum CaptureTemplates {
         var templates: [CaptureTemplate] = []
         var groups: [CaptureGroup] = []
         var problems: [String] = []
-        for table in tables where !(table.name.isEmpty && table.values.isEmpty) {
+        for table in tables where !(table.name.isEmpty && table.values.isEmpty) && RoamTemplate.Set(rawValue: table.name) == nil {
             guard table.name == "template", table.isArrayElement else {
                 problems.append("capture.toml line \(table.line): expected [[template]]")
                 continue
@@ -86,17 +86,21 @@ public enum CaptureTemplates {
             } else {
                 target = .file(file)
             }
-            func flag(_ name: String) -> Bool { values[name]?.bool ?? false }
-            func lines(_ name: String) -> Int? { values[name]?.integer }
-            let options = CaptureTemplate.Options(
-                prepend: flag("prepend"), immediateFinish: flag("immediate-finish"), emptyLines: lines("empty-lines"),
-                emptyLinesBefore: lines("empty-lines-before"), emptyLinesAfter: lines("empty-lines-after"),
-                jumpToCaptured: flag("jump-to-captured"), clockIn: flag("clock-in"), clockKeep: flag("clock-keep"), clockResume: flag("clock-resume"),
-                tableLinePos: values["table-line-pos"]?.string, timePrompt: flag("time-prompt"), denote: flag("denote")
-            )
-            templates.append(CaptureTemplate(key: key, name: values["name"]?.string ?? key, kind: kind, target: target, template: body, options: options))
+            templates.append(CaptureTemplate(key: key, name: values["name"]?.string ?? key, kind: kind, target: target, template: body, options: options(values)))
         }
         return (templates.isEmpty ? defaults : templates, templates.isEmpty ? [] : groups, problems)
+    }
+
+    /// A table's template properties beyond the target.
+    nonisolated static func options(_ values: [String: TOML.Value]) -> CaptureTemplate.Options {
+        func flag(_ name: String) -> Bool { values[name]?.bool ?? false }
+        func lines(_ name: String) -> Int? { values[name]?.integer }
+        return CaptureTemplate.Options(
+            prepend: flag("prepend"), immediateFinish: flag("immediate-finish"), emptyLines: lines("empty-lines"),
+            emptyLinesBefore: lines("empty-lines-before"), emptyLinesAfter: lines("empty-lines-after"),
+            jumpToCaptured: flag("jump-to-captured"), clockIn: flag("clock-in"), clockKeep: flag("clock-keep"), clockResume: flag("clock-resume"),
+            tableLinePos: values["table-line-pos"]?.string, timePrompt: flag("time-prompt"), denote: flag("denote")
+        )
     }
 
     /// What `org-capture` lists after the keys typed so far: the groups and templates one key

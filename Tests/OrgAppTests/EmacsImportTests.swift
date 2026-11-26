@@ -262,6 +262,39 @@ struct EmacsImportTests {
         #expect(s["org-roam-dailies-entry"] == .string("* %<%H:%M> %?"))
     }
 
+    /// Several daily-note templates, and org-roam's node templates, become tables in
+    /// capture.toml beside org-capture's.
+    @MainActor
+    @Test func importsRoamTemplates() async throws {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("orgstar-import-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        try #"""
+            (setq org-capture-templates '(("d" "Diary" entry (file "diary.org") "* %?")))
+            (setq org-roam-capture-templates
+                  '(("d" "default" plain "%?" :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n") :unnarrowed t)
+                    ("p" "project" entry "* ${title}" :if-new (file+head+olp "projects.org" "#+title: Projects\n" ("Active")))
+                    ("x" "odd" plain "%?" :target (node "abc"))))
+            (setq org-roam-dailies-capture-templates
+                  '(("d" "default" entry "* %?" :target (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))
+                    ("w" "work" entry "* %<%H:%M> %?" :target (file+olp "%<%Y-%m-%d>.org" ("Work")) :clock-in t)))
+            """#.write(to: folder.appendingPathComponent("init.el"), atomically: true, encoding: .utf8)
+        let result = EmacsImport.scan(EmacsImport.files(in: folder))
+        #expect(settings(result)["org-roam-dailies-entry"] == nil)
+        #expect(result.unsupported.map(\.name).sorted() == ["org-roam-capture-templates \"x\"", "org-roam-dailies-capture-templates \"w\""])
+        _ = await EmacsImport.apply(result.items, defaults: TestDefaults("orgstar-import-roam"), workspace: nil, directory: folder, writeConfig: true)
+        let file = folder.appendingPathComponent("capture.toml")
+        #expect(CaptureTemplates.load(userFile: file).templates.map(\.key) == ["d"])
+        #expect(RoamTemplate.load(.node, userFile: file).templates == [
+            RoamTemplate(key: "d", name: "default", kind: .plain, template: "%?", file: "%<%Y%m%d%H%M%S>-${slug}.org", head: "#+title: ${title}\n"),
+            RoamTemplate(key: "p", name: "project", kind: .entry, template: "* ${title}", file: "projects.org", head: "#+title: Projects\n", olp: ["Active"]),
+        ])
+        #expect(RoamTemplate.load(.dailies, userFile: file).templates == [
+            RoamTemplate(key: "d", name: "default", kind: .entry, template: "* %?", file: "%<%Y-%m-%d>.org", head: "#+title: %<%Y-%m-%d>\n"),
+            RoamTemplate(key: "w", name: "work", kind: .entry, template: "* %<%H:%M> %?", file: "%<%Y-%m-%d>.org", head: "", olp: ["Work"]),
+        ])
+    }
+
     @Test func readsDenote() throws {
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent("orgstar-import-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)

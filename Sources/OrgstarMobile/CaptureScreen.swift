@@ -91,7 +91,7 @@ struct CaptureScreen: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
-                if editing, template?.kind == .entry {
+                if editing, template?.kind == .entry, request.roam == nil {
                     ToolbarItem(placement: .bottomBar) { Button("Refile…") { file(refile: true) } }
                 }
                 ToolbarItem(placement: .confirmationAction) {
@@ -104,6 +104,11 @@ struct CaptureScreen: View {
             }
         }
         .onAppear {
+            if let roam = request.roam {
+                templates = roam.templates
+                key = templates.first?.key
+                return
+            }
             let loaded = CaptureTemplates.load()
             templates = loaded.templates
             groups = loaded.groups
@@ -147,7 +152,7 @@ struct CaptureScreen: View {
     static let treeQuestion = Capture.Question(prompt: "Date for tree entry", defaultValue: "", choices: [], kind: .date(withTime: false, inactive: false))
 
     /// The template's date: the tree's day, the agenda day, or now.
-    private var captureDate: Date { treeDate ?? request.day.map(Self.date) ?? Date() }
+    private var captureDate: Date { treeDate ?? request.roam?.now ?? request.day.map(Self.date) ?? Date() }
 
     private func fill() {
         guard let template else { return }
@@ -197,7 +202,9 @@ struct CaptureScreen: View {
         guard let template else { return }
         let now = Date()
         let placed: Result<(path: String, offset: Int), CaptureError>
-        if let denote {
+        if let roam = request.roam {
+            placed = roam.file(text, with: template)
+        } else if let denote {
             do {
                 let file = try denoteFile ?? denote.create(denoteAnswers, now: now)
                 if denoteFile == nil { Task { await workspace.refresh() } }

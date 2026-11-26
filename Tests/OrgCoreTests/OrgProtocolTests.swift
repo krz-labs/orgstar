@@ -25,6 +25,8 @@ struct OrgProtocolTests {
             }).joined(separator: "\n")
         case .storeLink(let url, let title)?:
             return "store url=\(url)\ntitle=\(title ?? "nil")"
+        case .roamRef, .roamNode:
+            return "roam"
         case nil:
             return "none"
         }
@@ -59,6 +61,15 @@ struct OrgProtocolTests {
             let ours = describe(OrgProtocol.parse(url))
             #expect(ours == result.text, "\(url)\nours:  \(ours.debugDescription)\nemacs: \(result.text.debugDescription) \(result.error)")
         }
+    }
+
+    /// org-roam-protocol's handlers, which read the `?key=value` form.
+    @Test func roamProtocols() {
+        #expect(OrgProtocol.parse("org-protocol://roam-ref?template=r&ref=https%3A%2F%2Fexample.com%2Fa&title=A+page&body=Some+text")
+            == .roamRef(ref: "https://example.com/a", title: "A page", body: "Some text", template: "r"))
+        #expect(OrgProtocol.parse("org-protocol://roam-ref?ref=cite%3Akey") == .roamRef(ref: "cite:key", title: nil, body: nil, template: nil))
+        #expect(OrgProtocol.parse("org-protocol://roam-ref?title=no+ref") == nil)
+        #expect(OrgProtocol.parse("org-protocol://roam-node?node=5f0c-1e2a") == .roamNode(id: "5f0c-1e2a"))
     }
 
     @Test func captureURLRoundTrips() {

@@ -143,6 +143,20 @@ final class AppCommands {
     var captureRequest: (template: String?, properties: [String: String], day: Int?, serial: Int)?
     private var captureSerial = 0
 
+    /// An org-roam capture waiting for the capture window, with its templates in place of
+    /// capture.toml's.
+    var roamCapture: RoamCapture?
+    /// An org-roam-protocol link waiting for the main window.
+    var roamProtocol: OrgProtocol.Request?
+
+    /// Opens the capture window on an org-roam capture.
+    func capture(roam: RoamCapture) {
+        captureSerial += 1
+        roamCapture = roam
+        captureRequest = (nil, [:], nil, captureSerial)
+        run("app.capture")
+    }
+
     /// Capture from an agenda day, as `org-agenda-capture`: that day is the capture's date, and
     /// the entry is scheduled on it. The caller opens the capture window.
     func capture(on day: Int) {
@@ -173,6 +187,9 @@ final class AppCommands {
             storeLink(StoredLink(link: link, description: title))
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(link, forType: .string)
+        case .roamRef, .roamNode:
+            roamProtocol = OrgProtocol.parse(url)
+            run("app.node.protocol")
         case nil:
             show(String(localized: "orgstar handles org-protocol capture and store-link"))
         }

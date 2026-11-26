@@ -33,6 +33,8 @@ struct CaptureView: View {
     @State private var keys = ""
     /// The agenda day the entry is captured for, as `Days` numbers it.
     @State private var day: Int?
+    /// An org-roam capture: its templates in place of capture.toml's, filed through it.
+    @State private var roam: RoamCapture?
     @FocusState private var focused: Bool
     @Environment(\.dismissWindow) private var dismissWindow
     @Environment(\.openWindow) private var openWindow
@@ -40,7 +42,7 @@ struct CaptureView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             if let template, editing {
-                Text("\(template.name) → \(Self.target(template))").font(.headline)
+                Text("\(template.name) → \(target(template))").font(.headline)
                 TextEditor(text: $text, selection: $selection)
                     .font(.body.monospaced())
                     .focused($focused)
@@ -49,7 +51,7 @@ struct CaptureView: View {
                     Spacer()
                     Button("Cancel", role: .cancel) { close() }
                         .keyboardShortcut(.cancelAction)
-                    if template.kind == .entry {
+                    if template.kind == .entry, roam == nil {
                         Button("Refile…") { finish(refile: true) }
                     }
                     Button("Capture") { finish() }
@@ -97,7 +99,7 @@ struct CaptureView: View {
                             case .template(let template):
                                 Text(template.name)
                                 Spacer()
-                                Text(Self.target(template)).foregroundStyle(.secondary).font(.caption)
+                                Text(target(template)).foregroundStyle(.secondary).font(.caption)
                             }
                         }
                     }
@@ -145,6 +147,13 @@ struct CaptureView: View {
         }
     }
 
+    /// Where the template files; for org-roam, the file's name, marked when it's new.
+    private func target(_ template: CaptureTemplate) -> String {
+        guard let roam else { return Self.target(template) }
+        let name = Self.target(template)
+        return roam.isNew(template) ? String(localized: "\(name) (new)", comment: "Capture window: an org-roam template's file that capturing makes") : name
+    }
+
     static func target(_ template: CaptureTemplate) -> String {
         if template.options.denote { return "a new Denote note" }
         let file = (template.target.file as NSString).lastPathComponent
@@ -169,6 +178,7 @@ struct CaptureView: View {
         editing = false
         keys = ""
         day = nil
+        roam = nil
         let clocked = clock.running
         let clockFile = clocked.map { Links.abbreviate($0.path, home: OrgPaths.home) }
         context = CaptureContext(
@@ -190,6 +200,16 @@ struct CaptureView: View {
     private func takeRequest() {
         guard let request = commands.captureRequest else { return }
         commands.captureRequest = nil
+        if let roam = commands.roamCapture {
+            commands.roamCapture = nil
+            self.roam = roam
+            templates = roam.templates
+            groups = []
+            problem = nil
+            context.now = roam.now
+            if templates.count == 1 { choose(templates[0]) }
+            return
+        }
         day = request.day
         context.initial = request.properties["initial"] ?? ""
         context.annotation = request.properties["annotation"] ?? ""
@@ -254,6 +274,7 @@ struct CaptureView: View {
     /// and the date tree's day.
     private func captureDate(_ now: Date) -> Date {
         if let treeDate { return treeDate }
+        if let roam { return roam.now }
         guard let day else { return now }
         let d = Days.date(day)
         let time = Calendar.current.dateComponents([.hour, .minute, .second], from: now)
@@ -265,7 +286,9 @@ struct CaptureView: View {
         let opened = context.now
         let now = Date()
         let placed: Result<(path: String, offset: Int), CaptureError>
-        if let denote {
+        if let roam {
+            placed = roam.file(text, with: template)
+        } else if let denote {
             do {
                 let file = try denoteFile ?? denote.create(denoteAnswers, now: now)
                 if denoteFile == nil { Task { await workspace.refresh() } }

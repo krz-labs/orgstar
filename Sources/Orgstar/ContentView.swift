@@ -954,6 +954,7 @@ struct ContentView: View {
                 editor.perform(PrecomputedEdit(EditResult(baseRevision: context.revision, edits: [TextEdit(range: range, replacement: text)], selection: [end..<end])))
             },
             refresh: { [workspace] in Task { await workspace.refresh() } })
+        actions.capture = { [commands] in commands.capture(roam: $0) }
         #if APPSTORE
         actions.reachFolders = { [workspace] in GrantAccess.reach($0, directories: true, workspace: workspace) }
         #endif
@@ -1574,6 +1575,10 @@ struct ContentView: View {
         case let id where id.hasPrefix("app.attach."):
             guard reach(attachActions.entry().flatMap { Attachments.directory($0, noFSCheck: true) }.map { [$0] } ?? [], directories: true) else { return }
             attachActions.run(id)
+        case "app.node.protocol":
+            guard let request = commands.roamProtocol else { return }
+            commands.roamProtocol = nil
+            roamActions.follow(request)
         case let id where id.hasPrefix("app.dailies.") || id.hasPrefix("app.node."):
             roamActions.run(id)
         default:

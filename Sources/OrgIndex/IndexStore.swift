@@ -187,6 +187,16 @@ public final class IndexStore: Sendable {
                 UPDATE files SET settings_version = -1;
                 """)
         }
+        migrator.registerMigration("v5") { db in
+            // File tags and org-roam properties, for file nodes; files are read again to fill them.
+            try db.execute(sql: """
+                ALTER TABLE files ADD COLUMN tags TEXT;
+                ALTER TABLE files ADD COLUMN roam_aliases TEXT;
+                ALTER TABLE files ADD COLUMN roam_refs TEXT;
+                ALTER TABLE files ADD COLUMN roam_exclude TEXT;
+                UPDATE files SET settings_version = -1;
+                """)
+        }
         return migrator
     }
 
@@ -220,11 +230,14 @@ public final class IndexStore: Sendable {
         try db.execute(sql: "DELETE FROM files WHERE path = ?", arguments: [record.path])
         try db.execute(
             sql: """
-                INSERT INTO files (path, root, kind, size, mtime, hash, settings_version, parsed_at, org_id, title)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO files (path, root, kind, size, mtime, hash, settings_version, parsed_at, org_id, title,
+                                   tags, roam_aliases, roam_refs, roam_exclude)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
             arguments: [record.path, record.root, record.kind.rawValue, record.size, record.mtime, record.hash,
-                        record.settingsVersion, Date().timeIntervalSince1970, record.fileID, record.title]
+                        record.settingsVersion, Date().timeIntervalSince1970, record.fileID, record.title,
+                        record.fileTags.isEmpty ? nil : record.fileTags.joined(separator: ":"),
+                        record.fileRoam.aliases, record.fileRoam.refs, record.fileRoam.exclude]
         )
         let fileID = db.lastInsertedRowID
         if !record.preamble.allSatisfy(\.isWhitespace) {
@@ -414,29 +427,52 @@ public final class IndexStore: Sendable {
         public let id: String
         public let title: String
         public let location: HeadingLocation
+        /// `ROAM_ALIASES`: other titles the node is found by.
+        public var aliases: [String] = []
+        /// `ROAM_REFS`: links and `cite:` keys the node stands for.
+        public var refs: [String] = []
+        /// A file's `#+FILETAGS`; a heading's tags, inherited ones first.
+        public var tags: [String] = []
     }
 
-    /// Every heading and file with an ID, files first, unsaved buffers' in place of their
-    /// files'. A file's title is its `#+TITLE`, else its name without `.org`.
+    /// Every heading and file with an ID and without `ROAM_EXCLUDE`, files first, unsaved
+    /// buffers' in place of their files'. A file's title is its `#+TITLE`, else its name
+    /// without `.org`.
     public func nodes(overlay: [String: FileRecord] = [:]) throws -> [Node] {
         func fileTitle(_ path: String, _ title: String?) -> String { title ?? ((path as NSString).lastPathComponent as NSString).deletingPathExtension }
+        func node(_ id: String, _ title: String, _ location: HeadingLocation, _ roam: RoamProperties, _ tags: [String]) -> Node? {
+            roam.excluded ? nil : Node(id: id, title: title, location: location, aliases: roam.aliasList, refs: roam.refList, tags: tags)
+        }
+        func tags(_ joined: String?) -> [String] { joined?.split(separator: ":").map(String.init) ?? [] }
         let indexed = try database.read { db in
-            let files = try Row.fetchAll(db, sql: "SELECT path, hash, org_id, title FROM files WHERE org_id IS NOT NULL AND kind = 'org' ORDER BY path").map { row in
-                Node(id: row["org_id"], title: fileTitle(row["path"], row["title"]), location: .file(row["path"], contentHash: row["hash"]))
+            let files = try Row.fetchAll(
+                db,
+                sql: "SELECT path, hash, org_id, title, tags, roam_aliases, roam_refs, roam_exclude FROM files WHERE org_id IS NOT NULL AND kind = 'org' ORDER BY path"
+            ).compactMap { row in
+                node(row["org_id"], fileTitle(row["path"], row["title"]), .file(row["path"], contentHash: row["hash"]),
+                     RoamProperties(aliases: row["roam_aliases"], refs: row["roam_refs"], exclude: row["roam_exclude"]), tags(row["tags"]))
             }
             let headings = try Row.fetchAll(
                 db,
                 sql: """
-                    SELECT f.path, f.hash, h.ordinal, h.title, h.start_offset, h.org_id
+                    SELECT f.path, f.hash, h.ordinal, h.title, h.start_offset, h.org_id,
+                        (SELECT value FROM properties WHERE heading_id = h.id AND key = 'ROAM_ALIASES' AND inherited = 0) AS aliases,
+                        (SELECT value FROM properties WHERE heading_id = h.id AND key = 'ROAM_REFS' AND inherited = 0) AS refs,
+                        (SELECT value FROM properties WHERE heading_id = h.id AND key = 'ROAM_EXCLUDE' AND inherited = 0) AS exclude,
+                        (SELECT group_concat(tag, ':') FROM (SELECT tag FROM tags WHERE heading_id = h.id ORDER BY rowid)) AS tags
                     FROM headings h JOIN files f ON f.id = h.file_id
                     WHERE h.org_id IS NOT NULL AND f.kind = 'org' ORDER BY f.path, h.ordinal
                     """
-            ).map { Node(id: $0["org_id"], title: $0["title"], location: location($0)) }
+            ).compactMap { row in
+                node(row["org_id"], row["title"], location(row), RoamProperties(aliases: row["aliases"], refs: row["refs"], exclude: row["exclude"]), tags(row["tags"]))
+            }
             return files + headings
         }
         let live = overlay.values.sorted { $0.path < $1.path }.flatMap { record in
-            (record.fileID.map { [Node(id: $0, title: fileTitle(record.path, record.title), location: .file(record.path, contentHash: record.hash))] } ?? [])
-                + record.headings.compactMap { heading in heading.orgID.map { Node(id: $0, title: heading.title, location: location(record, heading)) } }
+            (record.fileID.flatMap { node($0, fileTitle(record.path, record.title), .file(record.path, contentHash: record.hash), record.fileRoam, record.fileTags) }.map { [$0] } ?? [])
+                + record.headings.compactMap { heading in
+                    heading.orgID.flatMap { node($0, heading.title, location(record, heading), RoamProperties(heading.properties), heading.tags.map(\.name)) }
+                }
         }
         return indexed.filter { overlay[$0.location.path] == nil } + live
     }
@@ -455,21 +491,25 @@ public final class IndexStore: Sendable {
         return indexed.filter { overlay[$0.location.path] == nil } + live
     }
 
-    /// Where every heading with an ID starts and ends, subtree included, by file: the text each
-    /// of org-roam's heading nodes covers. Unsaved buffers' in place of their files'.
+    /// Where every heading with an ID and without `ROAM_EXCLUDE` starts and ends, subtree
+    /// included, by file: the text each of org-roam's heading nodes covers. Unsaved buffers' in place of their files'.
     public func nodeSections(overlay: [String: FileRecord] = [:]) throws -> [String: [(id: String, range: Range<Int>)]] {
         var sections: [String: [(id: String, range: Range<Int>)]] = [:]
         try database.read { db in
             let rows = try Row.fetchAll(db, sql: """
-                SELECT f.path, h.org_id, h.start_offset, h.end_offset FROM headings h JOIN files f ON f.id = h.file_id
+                SELECT f.path, h.org_id, h.start_offset, h.end_offset,
+                    (SELECT value FROM properties WHERE heading_id = h.id AND key = 'ROAM_EXCLUDE' AND inherited = 0) AS exclude
+                FROM headings h JOIN files f ON f.id = h.file_id
                 WHERE h.org_id IS NOT NULL AND f.kind = 'org' ORDER BY f.path, h.ordinal
                 """)
-            for row in rows where overlay[row["path"]] == nil {
+            for row in rows where overlay[row["path"]] == nil && !RoamProperties(exclude: row["exclude"]).excluded {
                 sections[row["path"], default: []].append((row["org_id"], (row["start_offset"] as Int)..<(row["end_offset"] as Int)))
             }
         }
         for record in overlay.values {
-            sections[record.path] = record.headings.compactMap { heading in heading.orgID.map { ($0, heading.start..<heading.end) } }
+            sections[record.path] = record.headings.compactMap { heading in
+                RoamProperties(heading.properties).excluded ? nil : heading.orgID.map { ($0, heading.start..<heading.end) }
+            }
         }
         return sections
     }

@@ -112,6 +112,7 @@ enum CommandTitles {
         String(localized: "Find Node…", comment: "Command title"),
         String(localized: "Find Note in Silo…", comment: "Command title"),
         String(localized: "Find Previous", comment: "Command title"),
+        String(localized: "Find Ref…", comment: "Command title"),
         String(localized: "Find Sequence Relatives…", comment: "Command title"),
         String(localized: "Find and Replace", comment: "Command title"),
         String(localized: "Footnote Action", comment: "Command title"),

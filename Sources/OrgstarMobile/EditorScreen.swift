@@ -625,7 +625,7 @@ extension EditorScreen {
 
     /// org-roam's daily notes and nodes.
     private var roamActions: RoamActions {
-        RoamActions(
+        var actions = RoamActions(
             session: session, roots: { workspace.rootPaths },
             nodes: { try workspace.nodes(overlay: workspace.overlay(session.openDocuments)) },
             show: { message = $0 }, ask: { prompt = PromptRequest(prompt: $0, reply: $1) },
@@ -642,6 +642,8 @@ extension EditorScreen {
                 _ = editor.perform(PrecomputedEdit(EditResult(baseRevision: context.revision, edits: [TextEdit(range: range, replacement: text)], selection: [end..<end])))
             },
             refresh: { Task { await workspace.refresh() } })
+        actions.capture = { model.captureRequest = CaptureRequest(roam: $0) }
+        return actions
     }
 
     /// org-attach's commands for the entry at the caret.
@@ -1128,7 +1130,7 @@ struct CommandPalette: View {
         ("app.crypt.encrypt-entry", "Encrypt Entry…"), ("app.crypt.open-entry", "Decrypt Entry…"), ("app.crypt.decrypt-entry", "Decrypt Entry in File…"),
         ("app.crypt.encrypt-entries", "Encrypt Tagged Entries…"), ("app.crypt.forget-passphrase", "Forget Encryption Passphrase"),
         ("app.rename-tag", "Rename Tag…"), ("app.rename-todo-keyword", "Rename TODO Keyword…"),
-        ("app.backlinks", "Show Backlinks"), ("app.node.find", "Find Node…"), ("app.node.insert", "Insert Node Link…"), ("app.node.graph", "Show Node Graph"),
+        ("app.backlinks", "Show Backlinks"), ("app.node.find", "Find Node…"), ("app.node.find-ref", "Find Ref…"), ("app.node.insert", "Insert Node Link…"), ("app.node.graph", "Show Node Graph"),
         ("app.node.rename-from-front-matter", "Rename Note from Front Matter"),
         ("app.node.rename", "Rename Note…"),
         ("app.node.rename-folder-from-front-matter", "Rename Notes in Folder from Front Matter…"),

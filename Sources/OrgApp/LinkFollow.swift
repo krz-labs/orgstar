@@ -16,7 +16,7 @@ public enum LinkFollow: Equatable, Sendable {
 
 extension DocumentSession {
     /// Follows a link as `org-link-open` does: files open as buffers (with a `::` search),
-    /// `id:` and `denote:` links through the index, internal and radio links in the current file,
+    /// `id:`, `roam:` and `denote:` links through the index, internal and radio links in the current file,
     /// `attachment:` links in their entry's attachment folder, and web and mail links go to
     /// their apps.
     public func follow(_ link: OrgLink, workspace: WorkspaceModel?, isText: (String) -> Bool) -> LinkFollow {
@@ -32,6 +32,16 @@ extension DocumentSession {
                 return .message("No heading has the ID \(link.path)")
             }
             show(location)
+            return .shown
+        case "roam":
+            // `org-roam-link-follow-link`: the node with the title or alias.
+            guard let workspace, let nodes = try? workspace.nodes(overlay: workspace.overlay(openDocuments), denote: false) else {
+                return .message("Can't read the index")
+            }
+            let matches = nodes.filter { $0.title == link.path || $0.aliases.contains(link.path) }
+            guard let node = matches.first else { return .message("No node has the title or alias \(link.path)") }
+            guard Set(matches.map(\.id)).count == 1 else { return .message("Multiple nodes exist with title or alias \"\(link.path)\"") }
+            show(node.location)
             return .shown
         case "denote":
             let paths = ((try? workspace?.index.files()) ?? []).map(\.path)
