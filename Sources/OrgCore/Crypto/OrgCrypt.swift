@@ -5,9 +5,10 @@ import Foundation
 /// nil: an entry's text after its planning, properties and logbook, through the end of its
 /// subtree, replaced by an armored OpenPGP message under the heading.
 public enum OrgCrypt {
-    public struct Failure: Error, Equatable, CustomStringConvertible {
+    public struct Failure: Error, Equatable, CustomStringConvertible, LocalizedError {
         public let description: String
         public init(_ description: String) { self.description = description }
+        public var errorDescription: String? { description }
     }
 
     /// `org-end-of-meta-data 'standard`: past planning, the property drawer, clock lines,

@@ -151,8 +151,10 @@ struct EditorScreen: View {
                     Image(systemName: "lock.trianglebadge.exclamationmark").foregroundStyle(.orange)
                     Text(hold.notice(for: path)).font(.callout).fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 4)
-                    Button(hold == .file ? "Set Passphrase…" : "Encrypt…") { sheet = .crypt(CryptRequest.save(path, hold: hold)) }
-                        .buttonStyle(.borderedProminent)
+                    if hold.takesPassphrase {
+                        Button(hold == .file ? "Set Passphrase…" : "Encrypt…") { sheet = .crypt(CryptRequest.save(path, hold: hold)) }
+                            .buttonStyle(.borderedProminent)
+                    }
                 }
                 .padding(.horizontal, 14).padding(.vertical, 8)
                 .glassEffect(.regular, in: .rect(cornerRadius: 18))

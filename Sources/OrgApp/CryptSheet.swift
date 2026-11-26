@@ -67,6 +67,8 @@ public struct CryptSheet: View {
     @State private var passphrase = ""
     @State private var repeated = ""
     @State private var remember = false
+    /// What the Keychain said when the passphrase was remembered, shown with the result.
+    @State private var keychainNote: String?
     @State private var problem: String?
     /// The decrypted entry being edited, and the passphrase it came with.
     @State private var editing: (original: String, passphrase: String)?
@@ -187,7 +189,7 @@ public struct CryptSheet: View {
                 finish("Encrypted \(count) \(count == 1 ? "entry" : "entries")", passphrase: passphrase, remembered: remembered)
             case .open:
                 let plain = try OrgCrypt.decrypt(current, at: request.offset, passphrase: passphrase).plaintext
-                if remember, !remembered { CryptPassphrases.store(passphrase, for: request.path) }
+                if remember, !remembered { keychainNote = CryptPassphrases.store(passphrase, for: request.path) }
                 session?.cryptUsed(passphrase, for: request.path)
                 plaintext = plain
                 editing = (plain, passphrase)
@@ -210,9 +212,10 @@ public struct CryptSheet: View {
     }
 
     private func finish(_ message: String?, passphrase: String, remembered: Bool) {
-        if remember, !remembered { CryptPassphrases.store(passphrase, for: request.path) }
+        if remember, !remembered { keychainNote = CryptPassphrases.store(passphrase, for: request.path) }
         if !request.unlocks { session?.cryptUsed(passphrase, for: request.path) }
-        done(message)
+        let text = [message, keychainNote].compactMap { $0 }.joined(separator: " ")
+        done(text.isEmpty ? nil : text)
     }
 
     /// The edited text encrypted again in the message's place; nothing changes if it wasn't edited.

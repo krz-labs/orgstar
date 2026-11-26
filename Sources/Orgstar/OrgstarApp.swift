@@ -363,8 +363,17 @@ enum UnsavedChanges {
     /// Saves `path`. One held for its passphrase asks for it, or whether to leave without saving.
     static func save(_ session: DocumentSession, _ path: String) -> Bool {
         if session.save(path) { return true }
-        guard let hold = session.held[path] else { return false }
         let name = (path as NSString).lastPathComponent
+        guard let hold = session.held[path], hold.takesPassphrase else {
+            // A save that failed otherwise (a conflict, an error, an entry the passphrase can't
+            // encrypt) still lets the file be left without saving.
+            let alert = NSAlert()
+            alert.messageText = String(localized: "Changes to \(name) aren't saved")
+            alert.informativeText = session.held[path]?.notice(for: path) ?? session.conflict ?? session.lastError ?? ""
+            alert.addButton(withTitle: String(localized: "Cancel"))
+            alert.addButton(withTitle: String(localized: "Don't Save"))
+            return alert.runModal() == .alertSecondButtonReturn
+        }
         // A new passphrase is typed twice; one that must open what's encrypted already, once.
         let twice = hold == .file || OrgCrypt.firstMessage(session.document(of: path)?.text ?? "") == nil
         let fields = (twice ? [String(localized: "Passphrase"), String(localized: "Repeat passphrase")] : [String(localized: "Passphrase")]).map { placeholder in

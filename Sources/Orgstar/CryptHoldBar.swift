@@ -14,7 +14,7 @@ struct CryptHoldBar: View {
                 Image(systemName: "lock.trianglebadge.exclamationmark").foregroundStyle(.orange)
                 Text(hold.notice(for: path)).lineLimit(3)
                 Spacer(minLength: 8)
-                Button(hold == .file ? "Set Passphrase…" : "Encrypt…", action: encrypt)
+                if hold.takesPassphrase { Button(hold == .file ? "Set Passphrase…" : "Encrypt…", action: encrypt) }
             }
             .font(.callout)
             .padding(.horizontal, 10)

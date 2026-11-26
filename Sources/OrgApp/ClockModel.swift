@@ -100,7 +100,7 @@ public final class ClockModel {
             let interrupted = runningTask(session)
             let message = clockOut(session, now: now)
             if self.running != nil { return message }
-            interruptedTask = interrupted
+            interruptedTask = interrupted.map { Self.shareable($0, session) }
             // Clocking out may have moved the entry.
             let target = ClockTask(path: path, title: entry.title, ordinal: index, id: entry.id)
             guard let moved = Self.text(path, session).flatMap(target.locate) else { return "Can't find \(entry.title) after clocking out." }
@@ -308,9 +308,15 @@ public final class ClockModel {
 
     private func push(_ task: ClockTask, _ session: DocumentSession) {
         // The history is kept in the clock's file and shown by the widgets.
-        let heading = Self.text(task.path, session).flatMap(task.locate) ?? 0
-        let task = ClockTask(path: task.path, title: session.shareableTitle(task.title, path: task.path, heading: heading), ordinal: task.ordinal, id: task.id)
         history = ClockHistory.push(task, onto: history, length: OrgPreferences.clockHistoryLength(defaults)) { Self.text($0, session) }
+            .map { Self.shareable($0, session) }
+    }
+
+    /// `task` with a placeholder title when its heading is encrypted on disk.
+    static func shareable(_ task: ClockTask, _ session: DocumentSession) -> ClockTask {
+        guard task.titleHidden != true, let heading = text(task.path, session).flatMap(task.locate) else { return task }
+        let shown = session.shareableTitle(task.title, path: task.path, heading: heading)
+        return shown == task.title ? task : task.hiding(shown)
     }
 
     /// Where a remembered entry's heading is now.
@@ -328,7 +334,7 @@ public final class ClockModel {
     public func markDefault(_ session: DocumentSession, path: String, at offset: Int) -> String {
         guard let text = Self.text(path, session) else { return "Can't read \(path)" }
         guard let task = ClockTask.at(offset, in: text, path: path) else { return "Before first headline" }
-        defaultTask = task
+        defaultTask = Self.shareable(task, session)
         return "Default clock task: \(task.title)"
     }
 

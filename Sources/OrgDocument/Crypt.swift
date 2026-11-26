@@ -7,6 +7,9 @@ public enum CryptHold: Error, Equatable, Sendable {
     case entries(Int)
     /// An encrypted file (`.org.gpg`) whose passphrase isn't known.
     case file
+    /// Saving failed for a reason a passphrase can't fix, said here: an entry with text below
+    /// a message that the file's passphrase doesn't open.
+    case blocked(String)
 }
 
 /// Why an encrypted file can't be read.
@@ -35,6 +38,8 @@ public final class CryptVault: @unchecked Sendable {
     /// Files that seal tagged entries until they close, whatever the setting says now: those
     /// it was on for, so that turning it off never writes what was encrypted in plaintext.
     private var sealing: Set<String> = []
+    /// Files open in a buffer. Only they keep what the vault knows past a write.
+    private var open: Set<String> = []
     /// By encrypted file: its bytes on disk and their text, last read or written.
     private var lastFile: [String: (encrypted: [UInt8], plain: [UInt8])] = [:]
 
@@ -70,7 +75,7 @@ public final class CryptVault: @unchecked Sendable {
     /// Whether saving `key` seals its tagged entries: the setting is on, or was while the
     /// file was open. Call with the lock held.
     private func seals(_ key: String) -> Bool {
-        if entries { sealing.insert(key) }
+        if entries, open.contains(key) { sealing.insert(key) }
         return entries || sealing.contains(key) || !(revealed[key]?.isEmpty ?? true)
     }
 
@@ -103,10 +108,35 @@ public final class CryptVault: @unchecked Sendable {
         }
     }
 
+    private func dropIfClosed(_ key: String) {
+        locked {
+            guard !open.contains(key) else { return }
+            passphrases[key] = nil
+            reuse[key] = nil
+            revealed[key] = nil
+            armored[key] = nil
+            lastFile[key] = nil
+            sealing.remove(key)
+        }
+    }
+
+    /// Whether the vault keeps anything for `path`.
+    public func keepsAnything(for path: String) -> Bool {
+        let key = Self.key(path)
+        return locked { passphrases[key] != nil || !(revealed[key]?.isEmpty ?? true) || !(reuse[key]?.isEmpty ?? true) || lastFile[key] != nil || sealing.contains(key) }
+    }
+
+    /// `path` is open in a buffer.
+    public func opened(_ path: String) {
+        let key = Self.key(path)
+        locked { _ = open.insert(key) }
+    }
+
     /// Drops everything kept for `path`, as when its buffer closes.
     public func close(_ path: String) {
         let key = Self.key(path)
         locked {
+            open.remove(key)
             passphrases[key] = nil
             reuse[key] = nil
             revealed[key] = nil
@@ -189,6 +219,9 @@ public final class CryptVault: @unchecked Sendable {
         if Self.isEncryptedFile(path) {
             guard let passphrase else { throw CryptHold.file }
             let plain = bytes
+            // The text the file holds already (a snapshot of it) is its bytes on disk, without
+            // another key's 65 MB of hashing.
+            if let last = locked({ lastFile[key] }), last.plain == plain { return (last.encrypted, messages, plain) }
             let message = try OpenPGP.encryptedMessage(Data(bytes), passphrase: passphrase)
             bytes = locked { armored[key] ?? false } ? Array(OpenPGP.armor(message).utf8) : [UInt8](message)
             return (bytes, messages, plain)
@@ -202,6 +235,11 @@ public final class CryptVault: @unchecked Sendable {
     public func didWrite(_ written: (bytes: [UInt8], messages: [(message: String, plaintext: String)], plain: [UInt8]?), to path: String) {
         let key = Self.key(path)
         locked {
+            // A file that isn't open keeps nothing (passphrase, messages, text) once the
+            // write's own reads are done.
+            if !open.contains(key) {
+                DispatchQueue.main.async { [weak self] in self?.dropIfClosed(key) }
+            }
             revealed[key] = Dictionary(written.messages.map { ($0.message, $0.plaintext) }, uniquingKeysWith: { a, _ in a })
             reuse[key] = Dictionary(written.messages.map { (OrgCrypt.checksum($0.plaintext), $0.message) }, uniquingKeysWith: { a, _ in a })
             if let plain = written.plain { lastFile[key] = (written.bytes, plain) }
@@ -259,9 +297,11 @@ public struct CryptFileSystem: FileSystem {
         let known = vault.revealedMessages(for: url.path)
         let written = try vault.cipher(bytes, for: url.path)
         let replaced = try base.replace(url, with: written.bytes)
+        // The version replaced, as it read before this write's messages were known (and while
+        // the encrypted file's last bytes still decrypt from memory).
+        let previous = replaced.map { (try? vault.plain($0, for: url.path, messages: known)) ?? $0 }
         vault.didWrite(written, to: url.path)
-        // The version replaced, as it read before this write's messages were known.
-        return replaced.map { (try? vault.plain($0, for: url.path, messages: known)) ?? $0 }
+        return previous
     }
 }
 

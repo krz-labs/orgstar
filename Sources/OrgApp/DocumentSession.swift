@@ -182,6 +182,9 @@ public final class DocumentSession {
     /// Open files that aren't saved until a passphrase is given: tagged entries that would be
     /// written unencrypted, or an encrypted file without one. Other edits to them wait too.
     public private(set) var held: [String: CryptHold] = [:]
+    /// Holds from saves that failed: a version on disk with tagged entries that can't be kept
+    /// encrypted, or an entry the passphrase can't encrypt. Kept until a save succeeds.
+    @ObservationIgnored private var failedHolds: [String: CryptHold] = [:]
 
     /// An encrypted file waiting for its passphrase to open, and the pane to show it in.
     public private(set) var unlockRequest: String?
@@ -277,7 +280,8 @@ public final class DocumentSession {
 
     /// Whether `path`'s buffer is held back from disk now.
     private func updateHold(_ entry: Entry) -> CryptHold? {
-        let hold = entry.buffer.document.isDirty ? crypt.hold(entry.buffer.document.text, for: entry.path) : nil
+        let dirty = entry.buffer.document.isDirty
+        let hold = dirty ? crypt.hold(entry.buffer.document.text, for: entry.path) ?? failedHolds[entry.path] : nil
         if held[entry.path] != hold { held[entry.path] = hold }
         return hold
     }
@@ -451,6 +455,7 @@ public final class DocumentSession {
                 return
             }
             let entry = Entry(path: path, buffer: StateBuffer(loaded(bytes, path: path)))
+            crypt.opened(path)
             let index = pane.path.flatMap(self.entry).flatMap { c in entries.firstIndex { $0 === c } }.map { $0 + 1 } ?? entries.count
             entries.insert(entry, at: index)
             show(entry, in: pane)
@@ -489,7 +494,9 @@ public final class DocumentSession {
         entry.autosave?.cancel()
         entries.removeAll { $0 === entry }
         crypt.close(entry.path)
+        CryptPassphrases.endSession(for: entry.path)
         held[entry.path] = nil
+        failedHolds[entry.path] = nil
         refusedKeychain.remove(entry.path)
         history.removeAll { $0 == path }
         outlineUpdates[path]?.cancel()
@@ -641,15 +648,18 @@ public final class DocumentSession {
         defer { interval.end((entry.path as NSString).lastPathComponent) }
         entry.autosave?.cancel()
         let name = (entry.path as NSString).lastPathComponent
-        guard updateHold(entry) == nil else {
+        // A failed save is tried again: what failed may be fixed by now.
+        guard updateHold(entry) == nil || held[entry.path] == failedHolds[entry.path] else {
             askKeychain(entry)
             refresh(entry)
             return false
         }
         guard entry.buffer.document.isDirty else { return true }
         guard entry.conflict == nil else { return false }
+        defer { _ = updateHold(entry) }
         do {
             let outcome = try entry.buffer.update { try saver.save(&$0, to: URL(fileURLWithPath: entry.path)) }
+            failedHolds[entry.path] = nil
             switch outcome {
             case .saved, .mergedAndSaved:
                 break
@@ -660,6 +670,12 @@ public final class DocumentSession {
                     entry.conflict = "\(name) changed on disk while saving, and the changes conflict with yours."
                 }
             }
+        } catch let hold as CryptHold {
+            // A version on disk with tagged entries in plaintext can be kept only encrypted.
+            failedHolds[entry.path] = hold
+            askKeychain(entry)
+        } catch let failure as OrgCrypt.Failure {
+            failedHolds[entry.path] = .blocked(failure.description)
         } catch {
             showError(String(localized: "Couldn't Save File", comment: "Error alert title"), "Can't save \(name): \(error.localizedDescription)")
         }
@@ -989,6 +1005,13 @@ public final class DocumentSession {
     /// passphrase; tagged entries with text in the subtree are encrypted where they are first,
     /// since the tag they inherit doesn't go with them.
     private func prepareMove(_ path: String, context: EditContext, to target: String) -> MovePreparation {
+        // The target's passphrase, lent by the source for the move, isn't kept after it.
+        if Self.isEncryptedFile(target), !isOpen(target) {
+            DispatchQueue.main.async { [weak self] in
+                guard let self, !self.isOpen(target) else { return }
+                self.crypt.close(target)
+            }
+        }
         let from = (path as NSString).lastPathComponent, to = (target as NSString).lastPathComponent
         if Self.isEncryptedFile(path) {
             guard Self.isEncryptedFile(target) else {

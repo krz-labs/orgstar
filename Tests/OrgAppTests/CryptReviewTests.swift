@@ -174,6 +174,77 @@ struct CryptReviewTests {
         #expect(!disk.contains("Secret task") && !disk.contains("intro"))
     }
 
+    // Second review, 2
+    @Test func clockHistoryKeepsNoEncryptedTitle() throws {
+        let text = "* Bank :crypt:\nintro\n** Secret task\n:PROPERTIES:\n:ID: s-1\n:END:\nbody\n** Hidden no id\nmore\n* Open task\n"
+        try notes.write("a.org", text)
+        session.open(file.path)
+        session.cryptUsed("pw", for: file.path)
+        let clockFile = notes.url.appendingPathComponent("clock.json")
+        let clock = ClockModel(file: clockFile)
+        _ = clock.clockIn(session, path: file.path, at: (text as NSString).range(of: "** Secret").location)
+        _ = clock.clockIn(session, path: file.path, at: (session.document!.text as NSString).range(of: "** Hidden").location)
+        _ = clock.clockIn(session, path: file.path, at: (session.document!.text as NSString).range(of: "* Open").location)
+        #expect(!read(clockFile).contains("Secret task") && !read(clockFile).contains("Hidden no id"))
+        #expect(clock.history.map(\.title) == ["Open task", "Encrypted entry", "Encrypted entry"])
+    }
+
+    // Second review, 3
+    @Test func eachFileHasItsOwnAuthentication() throws {
+        let a = CryptPassphrases.context(for: "/x/a.org"), b = CryptPassphrases.context(for: "/x/b.org")
+        #expect(a !== b && CryptPassphrases.context(for: "/x/a.org") === a)
+        #expect(a.touchIDAuthenticationAllowableReuseDuration == 0)
+        CryptPassphrases.endSession(for: "/x/a.org")
+        #expect(CryptPassphrases.context(for: "/x/a.org") !== a)
+    }
+
+    // Second review, 4a
+    @Test func anEntryThePassphraseCantEncryptHoldsTheFile() throws {
+        let text = "* A :crypt:\na secret\n* B :crypt:\nb secret\n* End\n"
+        var both = try #require(try OrgCrypt.encrypt(text, at: 0, passphrase: "one"))
+        both = try #require(try OrgCrypt.encrypt(both, at: (both as NSString).range(of: "* B").location, passphrase: "two"))
+        try notes.write("a.org", both)
+        session.open(file.path)
+        #expect(session.unlock("one", for: file.path) == nil)
+        try type("typed below b\n", at: offset(of: "* End"))
+        #expect(!session.save())
+        guard case .blocked(let reason)? = session.held[file.path] else { Issue.record("\(String(describing: session.held[file.path]))"); return }
+        #expect(reason.contains("public key") && session.lastError == nil)
+        #expect(OrgCrypt.Failure("x").localizedDescription == "x")
+        #expect(!disk.contains("typed below b"))
+    }
+
+    // Second review, 4b
+    @Test func plaintextEntriesOnDiskHoldTheFileUntilThePassphrase() throws {
+        session.open(file.path)
+        try type("x", at: 0)
+        // Written elsewhere, with no file event.
+        try notes.write("a.org", "* Plain\nOpen text.\n* Last\n* Theirs :crypt:\ntheir secret\n")
+        #expect(!session.save())
+        #expect(session.held[file.path] == .entries(1) && session.lastError == nil)
+        #expect(session.unlock("pw", for: file.path) == nil)
+        #expect(!session.isDirty && !disk.contains("their secret") && session.document?.text.contains("their secret") == true)
+        #expect(recoveryFiles.allSatisfy { !$0.contains("their secret") })
+    }
+
+    // Second review, 6
+    @Test func anEncryptedFileSavesWithOneKey() throws {
+        let path = notes.url.appendingPathComponent("d.org.gpg")
+        try OpenPGP.encryptedMessage(Data("* D\nbody\n".utf8), passphrase: "pw").write(to: path)
+        session.open(path.path)
+        #expect(session.unlock("pw", for: path.path) == nil)
+        try type("x", at: 0)
+        #expect(session.save())
+        let clock = ContinuousClock()
+        var took: [Duration] = []
+        for n in 0..<3 {
+            try type("\(n)", at: 0)
+            took.append(clock.measure { _ = session.save() })
+        }
+        print("Autosave of an .org.gpg file: \(took)")
+        #expect(try OpenPGP.decryptFile(Data(contentsOf: path), passphrase: "pw") == Data("210x* D\nbody\n".utf8))
+    }
+
     // 9
     @Test func unchangedEntriesKeepTheirMessageAcrossSaves() throws {
         session.open(file.path)
