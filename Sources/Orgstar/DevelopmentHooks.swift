@@ -38,7 +38,14 @@ enum DevelopmentHooks {
             let visible = NSApp.windows.filter(\.isVisible)
             let chosen = windowToOpen.flatMap { id in visible.first { $0.identifier?.rawValue.lowercased().contains(id) == true } } ?? visible.first
             let window = chosen?.attachedSheet ?? chosen
-            if let view = window?.contentView?.superview,
+            // The window server's image of the app's own window, which needs no permission and,
+            // unlike cacheDisplay, draws the sidebar. Swift can't call it directly since macOS 15.
+            typealias Capture = @convention(c) (CGRect, CGWindowListOption, CGWindowID, CGWindowImageOption) -> Unmanaged<CGImage>?
+            if let window, let symbol = dlsym(UnsafeMutableRawPointer(bitPattern: -2), "CGWindowListCreateImage"),
+               let image = unsafeBitCast(symbol, to: Capture.self)(.null, .optionIncludingWindow, CGWindowID(window.windowNumber),
+                                                                   [.boundsIgnoreFraming, .bestResolution])?.takeRetainedValue() {
+                try? NSBitmapImageRep(cgImage: image).representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: path))
+            } else if let view = window?.contentView?.superview,
                let bitmap = view.bitmapImageRepForCachingDisplay(in: view.bounds) {
                 view.cacheDisplay(in: view.bounds, to: bitmap)
                 try? bitmap.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: path))

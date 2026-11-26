@@ -115,6 +115,20 @@ week), =03-table= (=home.org= and its table) and =04-capture= (the capture windo
 template). Show nothing the App Store build leaves out: no code block results from languages
 other than Emacs Lisp, no Emacs exports, no license key form and no update settings.
 
+The Developer ID app can render each window itself instead: =ORGSTAR_SNAPSHOT= (see
+=Sources/Orgstar/DevelopmentHooks.swift=) writes the window as the window server draws it, so
+=raw.png= needs no screen-recording permission. Run a copy with its own bundle ID and
+=ORGSTAR_DATA_DIR=, =ORGSTAR_CONFIG_DIR= and =ORGSTAR_ROOT= pointing at throwaway folders.
+
+** Screenshot languages
+
+Shots are light, with the clock at Friday 16 October 2026 09:41 and =body-font = "system"=
+in =config.toml=. English sets are in
+=ios/AppStore/screenshots/<device>/=; German sets are in =ios/AppStore/screenshots/de/<device>/=,
+at the same sizes, taken from =ios/AppStore/demo-de= with the app in German. Nothing uploads
+them: in App Store Connect, open the version's German localization and drop each set into its
+device's media slot. The 6.9" iPhone sets are the 6.3" shots scaled to 1320x2868.
+
 * Mac licenses
 
 orgstar+ for Mac comes with GitHub Sponsors: $60 once for a key that doesn't expire, or $5 a

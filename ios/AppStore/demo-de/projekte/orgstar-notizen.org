@@ -1,0 +1,25 @@
+#+TITLE: Projektnotizen
+#+CATEGORY: orgstar
+
+* Überblick
+Notizen als reiner Text in einem Ordner, der zwischen Mac und Telefon synchronisiert wird.
+Beim Bearbeiten werden nur die geänderten Bytes geschrieben.
+
+* Aufgaben
+** DONE Sync-Ordner einrichten
+CLOSED: [2026-10-07 Wed 10:12]
+** NEXT Build-Skript per Tangle erzeugen
+SCHEDULED: <2026-10-16 Fri>
+
+* Build-Skript
+#+begin_src sh :tangle build.sh
+#!/bin/sh
+set -eu
+swift build -c release
+echo "built"
+#+end_src
+
+* Leseliste
+- /The Pragmatic Programmer/
+- /A Philosophy of Software Design/
+- *Org Mode Manual* --- [[https://orgmode.org/manual/][online]]

@@ -1,0 +1,8 @@
+#+TITLE: Eingang
+
+* TODO „Designing Data-Intensive Applications“ Kap. 5 lesen
+* TODO Zahnarzt wegen der Reinigung anrufen
+SCHEDULED: <2026-10-19 Mon>
+* Idee: eine Vorlage für den Wochenrückblick am Freitag
+Über das Teilen-Menü erfasst.
+[[https://orgmode.org/manual/Capture.html][Capture (The Org Manual)]]

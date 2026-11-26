@@ -1,0 +1,20 @@
+#+TITLE: Zuhause
+
+* TODO Einkaufen :besorgung:
+SCHEDULED: <2026-10-16 Fri 17:30>
+- [X] Haferdrink
+- [ ] Kaffeebohnen
+- [ ] Zitronen
+* TODO Reisepass verlängern
+DEADLINE: <2026-10-25 Sun -7d>
+* TODO Pflanzen gießen
+SCHEDULED: <2026-10-16 Fri +3d>
+* Lauftagebuch
+| Datum            |   km | Zeit  | Tempo |
+|------------------+------+-------+-------|
+| [2026-10-09 Fri] |  8.2 | 42:10 |  5.14 |
+| [2026-10-12 Mon] |  5.0 | 25:30 |  5.10 |
+| [2026-10-15 Thu] | 12.1 | 63:05 |  5.21 |
+|------------------+------+-------+-------|
+| Summe            | 25.3 |       |       |
+#+TBLFM: @>$2=vsum(@I..@II)

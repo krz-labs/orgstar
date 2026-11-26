@@ -1,0 +1,31 @@
+#+TITLE: Arbeit
+#+TODO: TODO NEXT WAITING | DONE CANCELLED
+
+* Planung Q4 :planung:
+** NEXT Roadmap für Q4 entwerfen
+DEADLINE: <2026-10-19 Mon> SCHEDULED: <2026-10-16 Fri>
+:LOGBOOK:
+CLOCK: [2026-10-15 Thu 09:05]--[2026-10-15 Thu 10:40] =>  1:35
+:END:
+- [X] Ziele des Teams sammeln
+- [X] Kennzahlen des letzten Quartals prüfen
+- [ ] Meilensteine festlegen
+- [ ] Mit den Teamleitungen teilen
+** TODO Budgetrunde mit der Buchhaltung :termin:
+SCHEDULED: <2026-10-16 Fri 14:00-15:00>
+** WAITING Freigabe des Stellenplans :personal:
+SCHEDULED: <2026-10-19 Mon>
+
+* Version 1.2 :release:
+** TODO Versionshinweise schreiben
+DEADLINE: <2026-10-19 Mon>
+** DONE Sync-Konflikt beim Umbenennen beheben
+CLOSED: [2026-10-14 Wed 16:22]
+** TODO Bildschirmfotos aktualisieren
+SCHEDULED: <2026-10-16 Fri 11:00>
+
+* Termine
+** Team-Standup
+<2026-10-16 Fri 09:30-09:45 +1d>
+** Einzelgespräch mit Sam
+<2026-10-20 Tue 15:00-15:30>
