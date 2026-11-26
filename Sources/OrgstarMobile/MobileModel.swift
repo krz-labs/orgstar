@@ -167,6 +167,8 @@ final class MobileModel {
         let settings = OrgPreferences.orgSettings()
         session.defaults = settings
         session.options = OrgPreferences.options()
+        session.encryptsTaggedEntries = OrgPreferences.cryptBeforeSave()
+        session.cryptTag = OrgPreferences.cryptTag()
         session.options.snippets = SnippetLibrary.shared.snippets
         workspace?.settings = .with(todoKeywords: settings)
         if let agenda {

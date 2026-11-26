@@ -218,7 +218,7 @@ These settings have no control in the Settings window. Some are in the View menu
 | =notes-package=, =denote-directory=, =denote-prompts=, =denote-silo-directories=, =denote-sequence-scheme=, =denote-journal-directory=, =denote-journal-keyword=, =denote-journal-interval=, =denote-journal-title-format= | |
 | =org-attach-id-dir=, =org-attach-use-inheritance= |              |
 | =org-yank-image-save-method=, =org-yank-dnd-method= |            |
-| =org-crypt-tag-matcher=          |                            |
+| =org-crypt-tag-matcher=, =org-crypt-use-before-save-magic= | |
 | =org-agenda-start-on-weekday=    |                            |
 | =org-deadline-warning-days=      |                            |
 | =org-agenda-skip-scheduled-if-done= |                         |
@@ -291,6 +291,7 @@ A key you remove from the file goes back to its default. A key that isn't in the
 | =org-yank-image-save-method= | string | ="attach"= | Where a pasted image goes: =attach= for the entry's attachment folder, or a folder, relative to the org file's folder unless absolute. See [[file:09-links.org][Links]]. Mirrors =org-yank-image-save-method=. |
 | =org-yank-dnd-method= | string | ="ask"= | What dropping files on the editor does: =ask=, =attach=, =open= or =file-link=. See [[file:09-links.org][Links]]. Mirrors =org-yank-dnd-method=. |
 | =org-crypt-tag-matcher= | string | ="crypt"= | The tag Encrypt Tagged Entries… encrypts. A single tag. See [[file:04-outlines.org][Outlines]]. Mirrors =org-crypt-tag-matcher=. |
+| =org-crypt-use-before-save-magic= | boolean | =false= | Encrypt the entries with =org-crypt-tag-matcher='s tag on every save. Without their passphrase the file isn't saved until it's given. See [[file:04-outlines.org][Outlines]]. Mirrors =org-crypt-use-before-save-magic=. |
 | =org-startup-indented=               | boolean | =true=  | Indent bodies under their headings, as =org-indent-mode=. =#+STARTUP: indent= / =noindent= override it. Mirrors =org-startup-indented=. |
 | =org-hide-leading-stars=             | boolean | =false= | Show only a heading's last star, without indentation. =#+STARTUP: hidestars= / =showstars= override it. Mirrors =org-hide-leading-stars=. |
 | =org-startup-align-all-tables=       | boolean | =false= | Align every table when a file opens. =#+STARTUP: align= / =noalign= override it. Mirrors =org-startup-align-all-tables=. |

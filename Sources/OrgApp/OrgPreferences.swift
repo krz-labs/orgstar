@@ -236,6 +236,10 @@ public enum OrgPreferences {
         let tag = string("cryptTagMatcher", defaults).trimmingCharacters(in: .whitespaces)
         return tag.isEmpty ? "crypt" : tag
     }
+    /// `org-crypt-use-before-save-magic`.
+    public static func cryptBeforeSave(_ defaults: UserDefaults = .standard) -> Bool {
+        bool("cryptBeforeSave", defaults)
+    }
     /// `org-icalendar-combined-agenda-file`, `~` expanded.
     public static func icalendarCombinedFile(_ defaults: UserDefaults = .standard) -> String {
         OrgPaths.expandingTilde(string("icalendarCombinedAgendaFile", defaults))

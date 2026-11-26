@@ -329,6 +329,22 @@ public enum OpenPGP {
     /// `gpg --symmetric --armor`: AES-256, an iterated and salted SHA-256 key, integrity
     /// protection, binary literal data without a name.
     public static func encrypt(_ data: Data, passphrase: String, now: Date = Date()) throws -> String {
+        armor(try encryptedMessage(data, passphrase: passphrase, now: now))
+    }
+
+    /// Whether `data` is an armored message rather than packets.
+    public static func isArmored(_ data: Data) -> Bool {
+        let head = String(decoding: data.prefix(64), as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
+        return head.hasPrefix("-----BEGIN PGP MESSAGE")
+    }
+
+    /// The literal data of a passphrase-encrypted file, armored or not, as `gpg --decrypt` reads it.
+    public static func decryptFile(_ data: Data, passphrase: String) throws -> Data {
+        try decrypt(isArmored(data) ? dearmor(String(decoding: data, as: UTF8.self)) : data, passphrase: passphrase)
+    }
+
+    /// `gpg --symmetric` without `--armor`: the packets of `encrypt`.
+    public static func encryptedMessage(_ data: Data, passphrase: String, now: Date = Date()) throws -> Data {
         let salt = random(8)
         let s2k = S2K(type: 3, hash: 8, salt: salt, count: (16 + (96 & 15)) << ((96 >> 4) + 6))
         let key = try s2k.key(passphrase, size: 32)
@@ -340,6 +356,6 @@ public enum OpenPGP {
         var plain = prefix + literal + Data([0xD3, 0x14])
         plain.append(Data(Insecure.SHA1.hash(data: plain)))
         let seipd = packet(18, Data([1]) + (try cfb(plain, key: key, encrypt: true)))
-        return armor(skesk + seipd)
+        return skesk + seipd
     }
 }

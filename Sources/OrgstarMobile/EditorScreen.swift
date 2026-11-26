@@ -134,8 +134,30 @@ struct EditorScreen: View {
             if let editor, let textView {
                 EditorTextView(editor: editor, view: textView, palette: { sheet = .palette })
                     .ignoresSafeArea(.container, edges: .bottom)
+            } else if DocumentSession.isEncryptedFile(path), !session.isOpen(path) {
+                ContentUnavailableView {
+                    Label("\((path as NSString).lastPathComponent) is encrypted", systemImage: "lock")
+                } actions: {
+                    Button("Decrypt…") { sheet = .crypt(CryptRequest(mode: .openFile, path: path, offset: 0)) }
+                }
             } else {
                 ProgressView()
+            }
+        }
+        // While the file isn't saved for want of a passphrase, and why; stays while it applies.
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if let hold = session.held[path] {
+                HStack(spacing: 10) {
+                    Image(systemName: "lock.trianglebadge.exclamationmark").foregroundStyle(.orange)
+                    Text(hold.notice(for: path)).font(.callout).fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 4)
+                    Button(hold == .file ? "Set Passphrase…" : "Encrypt…") { sheet = .crypt(CryptRequest.save(path, hold: hold)) }
+                        .buttonStyle(.borderedProminent)
+                }
+                .padding(.horizontal, 14).padding(.vertical, 8)
+                .glassEffect(.regular, in: .rect(cornerRadius: 18))
+                .padding(8)
+                .accessibilityElement(children: .combine)
             }
         }
         .modifier(EditorTitle(title: session.bufferName(path) + (session.dirtyPaths.contains(path) ? " •" : ""), shown: !inSplit))
@@ -190,6 +212,8 @@ struct EditorScreen: View {
             }
         }
         .sheet(item: $sheet, onDismiss: {
+            // An encrypted file opened with its passphrase.
+            if editor == nil, session.isOpen(path) { start() }
             countVersions()
             // After the sheet has gone, so a command's own prompt can show.
             if let id = chosen {
@@ -394,6 +418,10 @@ struct EditorScreen: View {
             }
         }
         if pane.path != path { session.open(path, in: pane) }
+        if session.unlockRequest == path {
+            sheet = .crypt(CryptRequest(mode: .openFile, path: path, offset: 0))
+            return
+        }
         model.editors.prune(session)
         guard let editor = model.editors.editor(for: path, session: session, make: makeEditor) else { return }
         let view = model.editors.view(for: pane.id, of: editor)
@@ -751,7 +779,7 @@ extension EditorScreen {
         let context = editor.editContext()
         switch id {
         case "app.crypt.forget-passphrase":
-            CryptPassphrases.forget(path)
+            session.forgetPassphrase(for: path)
             message = "Passphrase forgotten for \((path as NSString).lastPathComponent)"
         case "app.crypt.encrypt-entries":
             sheet = .crypt(CryptRequest(mode: .encryptAll(tag: OrgPreferences.cryptTag()), path: path, offset: context.caret))
@@ -1227,7 +1255,7 @@ struct CryptScreen: View {
 
     var body: some View {
         NavigationStack {
-            CryptSheet(request: request, text: { session.document?.text ?? "" }, apply: apply) { message in
+            CryptSheet(request: request, session: session, text: { session.document(of: request.path)?.text ?? "" }, apply: apply) { message in
                 dismiss()
                 if let message { report(message) }
             }

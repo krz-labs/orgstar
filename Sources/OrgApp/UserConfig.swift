@@ -222,6 +222,8 @@ public enum UserConfig {
                 comment: "files dropped on the editor: ask, attach, open or file-link", legacy: ""),
         Setting(section: "", key: "org-crypt-tag-matcher", defaultsKey: "cryptTagMatcher", kind: .string, fallback: .string("crypt"),
                 comment: "the tag of entries Encrypt Tagged Entries encrypts", legacy: ""),
+        Setting(section: "", key: "org-crypt-use-before-save-magic", defaultsKey: "cryptBeforeSave", kind: .bool, fallback: .bool(false),
+                comment: "encrypt entries with org-crypt-tag-matcher's tag on every save; without their passphrase the file isn't saved", legacy: ""),
         Setting(section: "", key: "org-display-remote-inline-images", defaultsKey: "remoteInlineImages",
                 kind: .choice([("skip", "skip"), ("download", "download"), ("cache", "cache")]), fallback: .string("skip"),
                 comment: "images at http(s) links: skip, download (each run) or cache (kept on disk)", legacy: ""),

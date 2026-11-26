@@ -26,6 +26,8 @@ struct OrgstarMobileApp: App {
         #endif
         LiveClock.install()
         ProStore.shared.start()
+        // Read before the app becomes active and clears it.
+        _ = UnsavedHeldFiles.atLaunch
         // Early, so that the watch's actions are taken when iOS wakes the app for them.
         WatchLink.shared.activate(MobileModel.shared)
     }
@@ -406,6 +408,7 @@ struct RootView: View {
         }
         .task {
             TimerModel.shared.onDone = { message = $0 }
+            if let lost = UnsavedHeldFiles.atLaunch { message = lost }
             takeShared()
             // Development: `ORGSTAR_ROOT` adds a folder at launch, as on the Mac.
             if let root = ProcessInfo.processInfo.environment["ORGSTAR_ROOT"] { try? await workspace.addRoot(URL(fileURLWithPath: root)) }
@@ -430,10 +433,14 @@ struct RootView: View {
             if let path = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String { model.openRequest = .file(path) }
         }
         .onChange(of: scenePhase) { _, phase in
-            // Unsaved edits are written before the app may be stopped.
+            // Unsaved edits are written before the app may be stopped. A file held for its
+            // passphrase stays in memory; its name is kept so that, if iOS ends the app
+            // meanwhile, the next launch says its edits were lost.
             if phase == .background {
                 for path in session.dirtyPaths { _ = session.save(path) }
+                UnsavedHeldFiles.record(session.held.keys.filter(session.dirtyPaths.contains).sorted())
             }
+            if phase == .active { UnsavedHeldFiles.record([]) }
             // Files and settings synced while away; not every sync tool tells file presenters.
             guard phase == .active else { return }
             // iOS has no idle time: time away from the app while a clock ran stands in for it.

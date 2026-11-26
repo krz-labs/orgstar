@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 
 /// org-crypt (org-crypt.el, Org 9.8.7) with symmetric encryption, as with `org-crypt-key`
@@ -133,5 +134,70 @@ public enum OrgCrypt {
             from = next + 1
         }
         return (text, count)
+    }
+
+    /// The tagged entries `seal` encrypts whose text isn't blank: those a save can't write
+    /// without the passphrase. Their headings' offsets.
+    public static func unencrypted(_ text: String, tag: String = "crypt", settings: OrgSettings = .default) -> [Int] {
+        guard text.contains(tag) else { return [] }
+        let ns = text as NSString
+        var found: [Int] = []
+        var covered = 0
+        for heading in taggedHeadings(text, tag: tag, settings: settings) where heading >= covered {
+            guard encryptedRange(text, at: heading) == nil, let range = bodyRange(text, at: heading) else { continue }
+            // Tagged children go inside this entry's message.
+            covered = range.upperBound
+            if !ns.substring(with: NSRange(range)).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { found.append(heading) }
+        }
+        return found
+    }
+
+    /// `org-encrypt-entries` as `org-crypt-use-before-save-magic` runs it before a save. An
+    /// entry whose text `reuse` knows by its `checksum` gets that message again, as org-crypt
+    /// keeps an entry decrypted and left unchanged byte for byte. The text, and each message
+    /// with the text it holds.
+    public static func seal(
+        _ text: String, passphrase: String, tag: String = "crypt", settings: OrgSettings = .default,
+        reuse: (String) -> String? = { _ in nil }, now: Date = Date()
+    ) throws -> (text: String, messages: [(message: String, plaintext: String)]) {
+        guard text.contains(tag) else { return (text, []) }
+        var result = text as NSString
+        var messages: [(String, String)] = []
+        var shift = 0
+        var covered = 0
+        for heading in taggedHeadings(text, tag: tag, settings: settings) where heading >= covered {
+            let current = result as String
+            guard encryptedRange(current, at: heading + shift) == nil, let range = bodyRange(current, at: heading + shift) else { continue }
+            covered = range.upperBound - shift
+            let contents = result.substring(with: NSRange(range))
+            let message = try reuse(checksum(contents)) ?? OpenPGP.encrypt(Data(contents.utf8), passphrase: passphrase, now: now)
+            result = result.replacingCharacters(in: NSRange(range), with: message) as NSString
+            shift += (message as NSString).length - range.count
+            messages.append((message, contents))
+        }
+        return (result as String, messages)
+    }
+
+    /// What an entry's text is known by, as `org-crypt-checksum` is.
+    public static func checksum(_ contents: String) -> String {
+        SHA256.hash(data: Data(contents.utf8)).map { String(format: "%02x", $0) }.joined()
+    }
+
+    /// The first encrypted entry's message in `text`.
+    public static func firstMessage(_ text: String) -> String? {
+        let ns = text as NSString
+        var search = NSRange(location: 0, length: ns.length)
+        while true {
+            let begin = ns.range(of: "-----BEGIN PGP MESSAGE-----", options: [], range: search)
+            guard begin.location != NSNotFound else { return nil }
+            let lineStart = ns.lineRange(for: NSRange(location: begin.location, length: 0)).location
+            if let range = encryptedRange(text, at: lineStart), range.lowerBound == lineStart { return ns.substring(with: NSRange(range)) }
+            search = NSRange(location: NSMaxRange(begin), length: ns.length - NSMaxRange(begin))
+        }
+    }
+
+    /// Whether `passphrase` opens `message`.
+    public static func opens(_ message: String, passphrase: String) -> Bool {
+        (try? OpenPGP.decrypt(OpenPGP.dearmor(message), passphrase: passphrase)) != nil
     }
 }

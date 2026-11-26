@@ -208,6 +208,8 @@ Commands has the org-crypt commands; see [[file:04-outlines.org][Outlines]]. A r
 
 Rename Tag… and Rename TODO Keyword… in the editor's Commands, under TODO and Tags, rename a tag or a keyword in every org file of one folder or all folders, as on the Mac: a sheet asks for the old and new name (the menu beside the first field lists the tags of your folders, or the keywords), the folder, and whether to change =config.toml= too; Find lists each line that changes, with a switch to leave it out, and Rename applies them. A change to =config.toml= goes into the synced folder's file. See [[file:05-todos-and-tags.org][TODOs and tags]].
 
+With =org-crypt-use-before-save-magic=, a file whose tagged entries can't be encrypted isn't saved; a notice at the top of the editor says so, with Encrypt…. Going to the background saves every other file; the held file's edits stay in memory and the notice is there on return. iOS can end orgstar in the background without asking: the held edits are then lost, and the next launch names the files. Files named =NAME.org.gpg= are listed with the org files and open after their passphrase; see [[file:04-outlines.org][Outlines]].
+
 ** The menu bar on iPad
 
 The iPad's menu bar, and the list of keys shown while =⌘= is held on a hardware keyboard, have these menus, after the Mac's and with the Mac's keys:
@@ -525,7 +527,7 @@ These settings from =config.toml= apply on iOS:
 - =org-log-done=, =org-log-reschedule=, =org-log-redeadline=, =org-log-into-drawer=
 - =org-enforce-todo-dependencies=, =org-enforce-todo-checkbox-dependencies=, =org-track-ordered-property-with-tag=, =org-agenda-dim-blocked-tasks=
 - =org-roam-directory=, =org-roam-dailies-directory=, =org-roam-dailies-file=, =org-roam-dailies-head=, =org-roam-dailies-entry=
-- =org-crypt-tag-matcher=, =org-attach-id-dir=, =org-attach-use-inheritance=, =org-yank-image-save-method=, =org-timer-format=, =org-timer-default-timer=
+- =org-crypt-tag-matcher=, =org-crypt-use-before-save-magic=, =org-attach-id-dir=, =org-attach-use-inheritance=, =org-yank-image-save-method=, =org-timer-format=, =org-timer-default-timer=
 - =org-archive-location=, =[org-structure-template-alist]=
 - =org-use-tag-inheritance=, =org-tags-exclude-from-inheritance=, =org-tag-alist=
 - =org-use-speed-commands=, with a hardware keyboard

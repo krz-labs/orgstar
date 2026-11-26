@@ -953,7 +953,32 @@ The commands have no keys, as in Org; run them from the command palette, or bind
 
 Remember in the Keychain stores the passphrase for the file. The next command on that file uses it after Touch ID, Face ID or the device password, without asking. =org-crypt-tag-matcher= in =config.toml= sets the tag; it must be a single tag, not a match expression.
 
-Messages are written with AES-256 and an iterated and salted SHA-256 key, which GnuPG and Emacs read. Messages using AES-128, AES-192 or AES-256 are read, compressed or not. Messages encrypted to a public key, other ciphers, and AEAD (OpenPGP version 5 and 6) packets are not supported. Saving doesn't encrypt tagged entries, as =org-crypt-use-before-save-magic= does in Emacs; run Encrypt Tagged Entries….
+Messages are written with AES-256 and an iterated and salted SHA-256 key, which GnuPG and Emacs read. Messages using AES-128, AES-192 or AES-256 are read, compressed or not. Messages encrypted to a public key, other ciphers, and AEAD (OpenPGP version 5 and 6) packets are not supported.
+
+** Encrypting on save
+
+With =org-crypt-use-before-save-magic = true= in =config.toml=, every save, the automatic one included, encrypts the tagged entries that aren't encrypted, as =org-crypt-use-before-save-magic= does in Emacs. It is off by default.
+
+- The editor keeps the entries' text; the file gets the messages. Emacs leaves the encrypted messages in its buffer after a save; orgstar doesn't, since it saves a second after typing stops.
+- An entry decrypted with Decrypt Entry in File… and saved unchanged gets its old message back, byte for byte, as org-crypt does. Only entries that changed get a new message, so syncing and git see no other change.
+- The passphrase comes from the Keychain when it was remembered for the file, after Touch ID, Face ID or the device password. That is asked once while the file is open, at the first save that needs it; a passphrase typed for an org-crypt command on the file is used too. Closing the file or Forget Encryption Passphrase forgets it.
+- Without the passphrase, or when Touch ID is declined, the file isn't saved at all, and no recovery version or snapshot of it is kept, until the entries can be encrypted. A notice above the mode line (on iOS, at the top of the editor) says how many tagged entries aren't encrypted, and stays while that's so; its Encrypt… button asks for the passphrase and saves. Other edits to the file wait meanwhile. An entry with no text doesn't keep the file from being saved.
+- When the file has encrypted entries already, the passphrase must open them. A first passphrase is asked twice.
+- Closing the file, its window, or quitting while it's held asks for the passphrase, or whether to leave without saving. On iOS, the edits stay in memory while orgstar is in the background, and the notice is there on return; if iOS ends orgstar meanwhile, the edits are lost, and orgstar says so when it next opens.
+- While an entry is decrypted in the editor, the agenda, widgets, the watch and reminders read the file from disk, where the entry is encrypted. The index, Spotlight and Quick Look read files from disk too.
+
+* Encrypted files
+
+orgstar opens and saves files encrypted with a passphrase as GnuPG (=gpg --symmetric=) and Emacs's EasyPG (=epa-file=) write them, named =NAME.org.gpg=. They show in the sidebar and the file list by name.
+
+Opening one asks for its passphrase, or takes it from the Keychain after Touch ID, Face ID or the device password; Remember in the Keychain keeps it for the file. A wrong passphrase leaves the file closed and as it was. While the file is open, saves encrypt it with that passphrase; closing it forgets the passphrase. A new file named =NAME.org.gpg= is empty: it isn't saved until Set Passphrase… in its notice gives it a passphrase, typed twice.
+
+The decrypted text is kept in memory only:
+- Files are written with AES-256 and an iterated and salted SHA-256 key, binary, or armored when the file was armored.
+- Recovery versions and hourly snapshots are kept encrypted with the file's passphrase, and Recovery Versions… shows them decrypted. Changes made to the file elsewhere are merged in memory, and a conflict is compared in memory.
+- The index, search, Spotlight, Quick Look, the agenda, widgets and the watch don't read the file's text.
+
+=age= files (=.age=) aren't supported.
 
 * The outline pane
 

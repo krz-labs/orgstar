@@ -137,8 +137,13 @@ public final class DocumentSession {
         }
     }
 
+    /// Files and recovery through `crypt`, and as they are on disk.
     private let fileSystem: FileSystem
     private let recovery: RecoveryStore
+    private let diskFileSystem: FileSystem
+    private let diskRecovery: RecoveryStore
+    /// Passphrases and encrypted entries of the open files.
+    @ObservationIgnored public let crypt = CryptVault()
     @ObservationIgnored private var entries: [Entry] = []
     /// The focused pane's buffer.
     private var current: Entry? { focused.path.flatMap(entry) }
@@ -151,11 +156,142 @@ public final class DocumentSession {
         fileSystem: FileSystem = CoordinatedFileSystem(),
         recovery: RecoveryStore = FileRecoveryStore(directory: WorkspaceModel.defaultDirectory.appendingPathComponent("Recovery"))
     ) {
-        self.fileSystem = fileSystem
-        self.recovery = recovery
+        diskFileSystem = fileSystem
+        diskRecovery = recovery
+        self.fileSystem = CryptFileSystem(base: fileSystem, vault: crypt)
+        self.recovery = CryptRecoveryStore(base: recovery, vault: crypt)
         let pane = EditorPane()
         panes = [pane]
         focused = pane
+        crypt.written = { [weak self] path in
+            if Thread.isMainThread {
+                MainActor.assumeIsolated { self?.fileSaved?(path) }
+            } else {
+                Task { @MainActor in self?.fileSaved?(path) }
+            }
+        }
+    }
+
+    // MARK: - Encryption
+
+    /// Called with a file's path each time the session wrote it to disk: a buffer saved (by
+    /// hand or on its own), Keep Mine, and refile, archive or agenda changes to files that
+    /// aren't open. Not called for a save that was held, failed or conflicted.
+    @ObservationIgnored public var fileSaved: ((String) -> Void)?
+
+    /// `org-crypt-use-before-save-magic`: entries with `cryptTag` are encrypted on every save.
+    public var encryptsTaggedEntries: Bool {
+        get { crypt.encryptsTaggedEntries }
+        set { crypt.encryptsTaggedEntries = newValue }
+    }
+
+    /// `org-crypt-tag-matcher`.
+    public var cryptTag: String {
+        get { crypt.tag }
+        set { crypt.tag = newValue }
+    }
+
+    /// Open files that aren't saved until a passphrase is given: tagged entries that would be
+    /// written unencrypted, or an encrypted file without one. Other edits to them wait too.
+    public private(set) var held: [String: CryptHold] = [:]
+
+    /// An encrypted file waiting for its passphrase to open, and the pane to show it in.
+    public private(set) var unlockRequest: String?
+    @ObservationIgnored private var unlockPane: EditorPane?
+
+    /// The passphrase remembered in the Keychain, after Touch ID, Face ID or the device's
+    /// password; nil when there's none or it wasn't given.
+    @ObservationIgnored public var storedPassphrase: (String) async -> String? = { await CryptPassphrases.stored(for: $0) }
+    @ObservationIgnored public var hasStoredPassphrase: (String) -> Bool = { CryptPassphrases.hasStored($0) }
+    /// Files whose remembered passphrase is being asked for, and those where it was refused:
+    /// the Keychain is asked once per file until the file closes or Encrypt is chosen.
+    @ObservationIgnored private var askingKeychain: Set<String> = []
+    @ObservationIgnored private var refusedKeychain: Set<String> = []
+
+    public static func isEncryptedFile(_ path: String) -> Bool { CryptVault.isEncryptedFile(path) }
+
+    /// An encrypted org file, which lists with the org files.
+    public static func isEncryptedOrgFile(_ path: String) -> Bool { path.hasSuffix(".org.gpg") }
+
+    /// Gives `passphrase` for `path`: an encrypted file opens with it, and a held file is saved.
+    /// It must open the file, or the file's encrypted entries if it has any. A message when it
+    /// doesn't.
+    public func unlock(_ passphrase: String, for path: String) -> String? {
+        if let entry = entry(path) {
+            if let message = OrgCrypt.firstMessage(entry.buffer.document.text), !OrgCrypt.opens(message, passphrase: passphrase) {
+                return String(localized: "Wrong passphrase")
+            }
+            // An encrypted file on disk keeps its passphrase: a passphrase given after Forget
+            // must open it.
+            if Self.isEncryptedFile(entry.path), let disk = try? diskFileSystem.read(URL(fileURLWithPath: entry.path)),
+               !CryptVault.opens(disk, passphrase: passphrase) {
+                return String(localized: "Wrong passphrase")
+            }
+            crypt.unlock(passphrase, for: entry.path)
+            refusedKeychain.remove(entry.path)
+            save(entry)
+            return nil
+        }
+        guard Self.isEncryptedFile(path) else { return nil }
+        let bytes: [UInt8]
+        do {
+            guard let read = try diskFileSystem.read(URL(fileURLWithPath: path)) else { return "\((path as NSString).lastPathComponent) no longer exists." }
+            bytes = read
+        } catch {
+            return error.localizedDescription
+        }
+        guard CryptVault.opens(bytes, passphrase: passphrase) else { return String(localized: "Wrong passphrase") }
+        crypt.unlock(passphrase, for: path)
+        let pane = unlockPane.flatMap { pane in panes.contains { $0 === pane } ? pane : nil } ?? focused
+        unlockRequest = nil
+        unlockPane = nil
+        open(path, in: pane)
+        return nil
+    }
+
+    /// The encrypted file waiting for its passphrase stays closed.
+    public func cancelUnlock() {
+        unlockRequest = nil
+        unlockPane = nil
+    }
+
+    /// A crypt command used `passphrase` for `path`: saves use it from now on, without asking.
+    public func cryptUsed(_ passphrase: String, for path: String) {
+        crypt.unlock(passphrase, for: path)
+        refusedKeychain.remove(path)
+    }
+
+    /// The entry holding `plaintext` in `path`'s buffer was decrypted from `message`.
+    public func cryptDecrypted(message: String, plaintext: String, for path: String) {
+        crypt.remember(message: message, plaintext: plaintext, for: path)
+    }
+
+    /// Forget Encryption Passphrase: the passphrase leaves the Keychain and the session.
+    public func forgetPassphrase(for path: String) {
+        CryptPassphrases.forget(path)
+        crypt.forgetPassphrase(for: path)
+    }
+
+    /// Whether `path`'s buffer is held back from disk now.
+    private func updateHold(_ entry: Entry) -> CryptHold? {
+        let hold = entry.buffer.document.isDirty ? crypt.hold(entry.buffer.document.text, for: entry.path) : nil
+        if held[entry.path] != hold { held[entry.path] = hold }
+        return hold
+    }
+
+    /// Asks the Keychain for `entry`'s passphrase, once, and saves with it.
+    private func askKeychain(_ entry: Entry) {
+        let path = entry.path
+        guard !askingKeychain.contains(path), !refusedKeychain.contains(path), hasStoredPassphrase(path) else { return }
+        askingKeychain.insert(path)
+        Task { [weak self, weak entry] in
+            guard let self else { return }
+            let passphrase = await self.storedPassphrase(path)
+            self.askingKeychain.remove(path)
+            guard let entry, self.entries.contains(where: { $0 === entry }) else { return }
+            if let passphrase, self.unlock(passphrase, for: path) == nil { return }
+            self.refusedKeychain.insert(path)
+        }
     }
 
     // MARK: - Panes
@@ -187,7 +323,7 @@ public final class DocumentSession {
     public var isOrg: Bool { path.map(Self.isOrgPath) ?? false }
 
     public static func isOrgPath(_ path: String) -> Bool {
-        path.hasSuffix(".org") || path.hasSuffix(".org_archive")
+        path.hasSuffix(".org") || path.hasSuffix(".org_archive") || path.hasSuffix(".org.gpg")
     }
 
     /// The caret in the open file.
@@ -248,9 +384,12 @@ public final class DocumentSession {
         entries.map { ($0.path, $0.buffer.document) }
     }
 
-    /// The text of every open file by path, for the agenda.
+    /// The text of every open file by path, for the agenda and what it writes (widgets, the
+    /// watch, reminders). Encrypted files, and files with entries decrypted that saving
+    /// encrypts, are left out: those views read them from disk.
     public var openTexts: [String: String] {
-        Dictionary(entries.map { ($0.path, $0.buffer.document.text) }, uniquingKeysWith: { a, _ in a })
+        let shown = entries.filter { !crypt.isPrivate($0.buffer.document.text, for: $0.path) }
+        return Dictionary(shown.map { ($0.path, $0.buffer.document.text) }, uniquingKeysWith: { a, _ in a })
     }
 
     /// Open buffers, most recently shown first.
@@ -267,6 +406,12 @@ public final class DocumentSession {
         defer { interval.end((path as NSString).lastPathComponent) }
         if let existing = entry(path) {
             show(existing, in: pane)
+            return
+        }
+        if Self.isEncryptedFile(path), crypt.passphrase(for: path) == nil,
+           (try? diskFileSystem.read(URL(fileURLWithPath: path)))??.isEmpty == false {
+            unlockRequest = path
+            unlockPane = pane
             return
         }
         do {
@@ -312,6 +457,9 @@ public final class DocumentSession {
         guard let entry = entry(path) else { return }
         entry.autosave?.cancel()
         entries.removeAll { $0 === entry }
+        crypt.close(entry.path)
+        held[entry.path] = nil
+        refusedKeychain.remove(entry.path)
         history.removeAll { $0 == path }
         outlineUpdates[path]?.cancel()
         outlineUpdates[path] = nil
@@ -426,6 +574,8 @@ public final class DocumentSession {
 
     private func scheduleAutosave(_ entry: Entry) {
         entry.autosave?.cancel()
+        // A held file whose edits were undone, or whose tagged entries went, isn't held.
+        if held[entry.path] != nil, updateHold(entry) == nil { refresh(entry) }
         guard saveMode == .automatic, entry.buffer.document.isDirty, entry.conflict == nil else { return }
         entry.autosave = Task { [weak self, weak entry, autosaveDelay] in
             try? await Task.sleep(for: autosaveDelay)
@@ -460,6 +610,11 @@ public final class DocumentSession {
         defer { interval.end((entry.path as NSString).lastPathComponent) }
         entry.autosave?.cancel()
         let name = (entry.path as NSString).lastPathComponent
+        guard updateHold(entry) == nil else {
+            askKeychain(entry)
+            refresh(entry)
+            return false
+        }
         guard entry.buffer.document.isDirty else { return true }
         guard entry.conflict == nil else { return false }
         do {
@@ -484,6 +639,7 @@ public final class DocumentSession {
     /// Resolves a conflict by writing the buffer over the disk version, which goes to recovery.
     public func keepMine() {
         guard let buffer, let url else { return }
+        if let current, updateHold(current) != nil { return refresh() }
         do {
             try buffer.update { try saver.overwrite(&$0, to: url) }
             current?.conflict = nil
@@ -553,7 +709,7 @@ public final class DocumentSession {
     public func resolve(copy: URL, _ resolution: CopyResolution) -> String? {
         guard let buffer, let url else { return "No file is open" }
         do {
-            guard let bytes = try fileSystem.read(copy) else { return "\(copy.lastPathComponent) is gone" }
+            guard let bytes = try diskFileSystem.read(copy).map({ try crypt.plain($0, for: url.path) }) else { return "\(copy.lastPathComponent) is gone" }
             let copyText = SourceText(bytes: bytes).text
             let mine = buffer.document.text
             let new: String? = switch resolution {
@@ -577,7 +733,7 @@ public final class DocumentSession {
     /// Versions of the open file kept in recovery, newest first, with when and why each was
     /// kept.
     public func recoveryVersions() -> [(url: URL, date: Date, label: String)] {
-        guard let url, let store = recovery as? FileRecoveryStore, let versions = try? store.versions(for: url) else { return [] }
+        guard let url, let store = diskRecovery as? FileRecoveryStore, let versions = try? store.versions(for: url) else { return [] }
         // `STAMP-LABEL-UUID8-NAME`, as `FileRecoveryStore.keep` names them.
         return versions.reversed().map { version in
             let m = version.lastPathComponent.firstMatch(of: /^([0-9]+)-(.+?)-([0-9A-Fa-f]{8})-/)
@@ -588,7 +744,9 @@ public final class DocumentSession {
 
     /// The text of a kept version.
     public func recoveryText(_ version: URL) -> String? {
-        (try? fileSystem.read(version)).flatMap { $0 }.map { SourceText(bytes: $0).text }
+        guard let bytes = (try? diskFileSystem.read(version)).flatMap({ $0 }) else { return nil }
+        // Kept as the open file is: encrypted with its passphrase, its entries' messages known.
+        return (try? path.map { try crypt.plain(bytes, for: $0) } ?? bytes).map { SourceText(bytes: $0).text }
     }
 
     /// Puts a kept version's text in the buffer, as an edit that can be undone; the buffer as it

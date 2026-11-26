@@ -324,8 +324,8 @@ enum UnsavedChanges {
     /// Whether the open file can be left: saved in automatic mode, or as the user chooses in
     /// explicit mode. A save that fails or conflicts keeps the file open.
     static func resolve(_ session: DocumentSession) -> Bool {
-        guard session.isDirty else { return true }
-        if session.saveMode == .automatic { return session.save() }
+        guard session.isDirty, let path = session.path else { return true }
+        if session.saveMode == .automatic { return save(session, path) }
         let alert = NSAlert()
         alert.messageText = session.path.map { String(localized: "Save changes to \(($0 as NSString).lastPathComponent)?") }
             ?? String(localized: "Save changes to this file?")
@@ -334,7 +334,7 @@ enum UnsavedChanges {
         alert.addButton(withTitle: String(localized: "Don't Save"))
         alert.addButton(withTitle: String(localized: "Cancel"))
         switch alert.runModal() {
-        case .alertFirstButtonReturn: return session.save()
+        case .alertFirstButtonReturn: return save(session, path)
         case .alertSecondButtonReturn: return true
         default: return false
         }
@@ -345,7 +345,7 @@ enum UnsavedChanges {
     static func resolve(_ session: DocumentSession, paths: [String]) -> Bool {
         let dirty = paths.filter(session.dirtyPaths.contains)
         guard !dirty.isEmpty else { return true }
-        if session.saveMode == .automatic { return dirty.map(session.save).allSatisfy { $0 } }
+        if session.saveMode == .automatic { return dirty.map { save(session, $0) }.allSatisfy { $0 } }
         if dirty == [session.path] { return resolve(session) }
         let alert = NSAlert()
         alert.messageText = String(localized: "Save changes to \(dirty.count) files?")
@@ -354,9 +354,54 @@ enum UnsavedChanges {
         alert.addButton(withTitle: String(localized: "Don't Save"))
         alert.addButton(withTitle: String(localized: "Cancel"))
         switch alert.runModal() {
-        case .alertFirstButtonReturn: return dirty.map(session.save).allSatisfy { $0 }
+        case .alertFirstButtonReturn: return dirty.map { save(session, $0) }.allSatisfy { $0 }
         case .alertSecondButtonReturn: return true
         default: return false
+        }
+    }
+
+    /// Saves `path`. One held for its passphrase asks for it, or whether to leave without saving.
+    static func save(_ session: DocumentSession, _ path: String) -> Bool {
+        if session.save(path) { return true }
+        guard let hold = session.held[path] else { return false }
+        let name = (path as NSString).lastPathComponent
+        // A new passphrase is typed twice; one that must open what's encrypted already, once.
+        let twice = hold == .file || OrgCrypt.firstMessage(session.document(of: path)?.text ?? "") == nil
+        let fields = (twice ? [String(localized: "Passphrase"), String(localized: "Repeat passphrase")] : [String(localized: "Passphrase")]).map { placeholder in
+            let field = NSSecureTextField(frame: NSRect(x: 0, y: 0, width: 260, height: 22))
+            field.placeholderString = placeholder
+            return field
+        }
+        let stack = NSStackView(views: fields)
+        stack.orientation = .vertical
+        stack.spacing = 6
+        stack.frame = NSRect(x: 0, y: 0, width: 260, height: CGFloat(fields.count) * 28)
+        var problem: String?
+        while true {
+            let alert = NSAlert()
+            alert.messageText = String(localized: "Changes to \(name) aren't saved")
+            alert.informativeText = (problem.map { $0 + "\n\n" } ?? "") + hold.notice(for: path) + " "
+                + String(localized: "Enter the passphrase to encrypt and save them, or leave without saving.")
+            alert.accessoryView = stack
+            alert.addButton(withTitle: String(localized: "Encrypt and Save"))
+            alert.addButton(withTitle: String(localized: "Don't Save"))
+            alert.addButton(withTitle: String(localized: "Cancel"))
+            alert.window.initialFirstResponder = fields[0]
+            switch alert.runModal() {
+            case .alertFirstButtonReturn:
+                let passphrase = fields[0].stringValue
+                if passphrase.isEmpty {
+                    problem = String(localized: "Enter a passphrase.")
+                } else if twice, fields[1].stringValue != passphrase {
+                    problem = String(localized: "The passphrases differ")
+                } else if let failure = session.unlock(passphrase, for: path) {
+                    problem = failure
+                } else {
+                    return !session.dirtyPaths.contains(path)
+                }
+            case .alertSecondButtonReturn: return true
+            default: return false
+            }
         }
     }
 }

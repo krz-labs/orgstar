@@ -471,6 +471,74 @@
         }
       }
     },
+    "%@ has another passphrase; open it first.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ hat ein anderes Passwort; öffne die Datei zuerst."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» tiene otra frase de contraseña; ábrelo primero."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« %@ » a une autre phrase secrète ; ouvrez-le d'abord."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”のパスフレーズは異なります。先に開いてください。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"%@\" tem outra senha; abra-o primeiro."
+          }
+        }
+      }
+    },
+    "%@ has decrypted entries that are encrypted on disk, so Emacs isn't given a copy of it.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ hat entschlüsselte Einträge, die auf dem Datenträger verschlüsselt sind, daher erhält Emacs keine Kopie davon."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» tiene entradas descifradas que están cifradas en el disco, así que Emacs no recibe una copia."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« %@ » contient des entrées déchiffrées qui sont chiffrées sur le disque, donc Emacs n'en reçoit pas de copie."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”にはディスク上で暗号化されている復号済みエントリがあるため、Emacsにはコピーを渡しません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"%@\" tem entradas descriptografadas que estão criptografadas no disco, então o Emacs não recebe uma cópia."
+          }
+        }
+      }
+    },
     "%@ in a buffer": {
       "localizations": {
         "de": {
@@ -501,6 +569,210 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ em um buffer"
+          }
+        }
+      }
+    },
+    "%@ is encrypted": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ ist verschlüsselt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» está cifrado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« %@ » est chiffré"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”は暗号化されています"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"%@\" está criptografado"
+          }
+        }
+      }
+    },
+    "%@ is encrypted, and %@ isn't; the entry wasn't moved.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%1$@“ ist verschlüsselt, „%2$@“ nicht; der Eintrag wurde nicht verschoben."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%1$@» está cifrado y «%2$@» no; la entrada no se movió."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« %1$@ » est chiffré, « %2$@ » ne l'est pas ; l'entrée n'a pas été déplacée."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%1$@”は暗号化されていますが“%2$@”はされていないため、エントリは移動しませんでした。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"%1$@\" está criptografado e \"%2$@\" não; a entrada não foi movida."
+          }
+        }
+      }
+    },
+    "%@ is encrypted, so Emacs isn't given a copy of it.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ ist verschlüsselt, daher erhält Emacs keine Kopie davon."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» está cifrado, así que Emacs no recibe una copia."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« %@ » est chiffré, donc Emacs n'en reçoit pas de copie."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”は暗号化されているため、Emacsにはコピーを渡しません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"%@\" está criptografado, então o Emacs não recebe uma cópia."
+          }
+        }
+      }
+    },
+    "%@ is encrypted.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ ist verschlüsselt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» está cifrado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« %@ » est chiffré."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”は暗号化されています。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"%@\" está criptografado."
+          }
+        }
+      }
+    },
+    "%@ is saved encrypted with this passphrase.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ wird mit diesem Passwort verschlüsselt gesichert."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» se guarda cifrado con esta frase de contraseña."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« %@ » est enregistré chiffré avec cette phrase secrète."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”はこのパスフレーズで暗号化して保存されます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"%@\" é salvo criptografado com esta senha."
+          }
+        }
+      }
+    },
+    "%@ is saved with its tagged entries encrypted.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ wird mit verschlüsselten markierten Einträgen gesichert."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» se guarda con sus entradas etiquetadas cifradas."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« %@ » est enregistré avec ses entrées taguées chiffrées."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”はタグ付きエントリを暗号化して保存されます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"%@\" é salvo com as entradas etiquetadas criptografadas."
           }
         }
       }
@@ -606,6 +878,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ não está em nenhuma das suas pastas, então não pode ser movido. Anexe uma cópia em vez disso."
+          }
+        }
+      }
+    },
+    "%@ isn't saved until it has a passphrase.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ wird erst gesichert, wenn es ein Passwort hat."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» no se guarda hasta que tenga una frase de contraseña."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« %@ » n'est pas enregistré tant qu'il n'a pas de phrase secrète."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "パスフレーズが設定されるまで“%@”は保存されません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"%@\" só é salvo quando tiver uma senha."
           }
         }
       }
@@ -2949,6 +3255,74 @@
         }
       }
     },
+    "%lld tagged entries aren't encrypted": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld markierte Einträge sind nicht verschlüsselt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld entradas etiquetadas no están cifradas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld entrées taguées ne sont pas chiffrées"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld件のタグ付きエントリが暗号化されていません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld entradas etiquetadas não estão criptografadas"
+          }
+        }
+      }
+    },
+    "%lld tagged entries aren't encrypted. Changes to %@ aren't saved until they are.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld markierte Einträge sind nicht verschlüsselt. Änderungen an „%@“ werden erst gesichert, wenn sie es sind."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld entradas etiquetadas no están cifradas. Los cambios en «%@» no se guardan hasta que lo estén."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld entrées taguées ne sont pas chiffrées. Les modifications de « %@ » ne sont pas enregistrées tant qu'elles ne le sont pas."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld件のタグ付きエントリが暗号化されていません。暗号化されるまで“%@”への変更は保存されません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld entradas etiquetadas não estão criptografadas. As alterações em \"%@\" só são salvas quando elas estiverem."
+          }
+        }
+      }
+    },
     "%lld words": {
       "comment": "Modeline: words in the file",
       "localizations": {
@@ -3242,6 +3616,74 @@
           "stringUnit": {
             "state": "translated",
             "value": ".import de linhas que não cabem na tabela"
+          }
+        }
+      }
+    },
+    "1 tagged entry isn't encrypted": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 markierter Eintrag ist nicht verschlüsselt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 entrada etiquetada no está cifrada"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 entrée taguée n'est pas chiffrée"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1件のタグ付きエントリが暗号化されていません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 entrada etiquetada não está criptografada"
+          }
+        }
+      }
+    },
+    "1 tagged entry isn't encrypted. Changes to %@ aren't saved until it is.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 markierter Eintrag ist nicht verschlüsselt. Änderungen an „%@“ werden erst gesichert, wenn er es ist."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 entrada etiquetada no está cifrada. Los cambios en «%@» no se guardan hasta que lo esté."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 entrée taguée n'est pas chiffrée. Les modifications de « %@ » ne sont pas enregistrées tant qu'elle ne l'est pas."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1件のタグ付きエントリが暗号化されていません。暗号化されるまで“%@”への変更は保存されません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 entrada etiquetada não está criptografada. As alterações em \"%@\" só são salvas quando ela estiver."
           }
         }
       }
@@ -8702,6 +9144,74 @@
         }
       }
     },
+    "Changes to %@ aren't saved": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Änderungen an „%@“ sind nicht gesichert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los cambios en «%@» no están guardados"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les modifications de « %@ » ne sont pas enregistrées"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”への変更は保存されていません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As alterações em \"%@\" não estão salvas"
+          }
+        }
+      }
+    },
+    "Changes to %@ aren't saved until that's fixed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Änderungen an „%@“ werden erst gesichert, wenn das behoben ist."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los cambios en «%@» no se guardan hasta que se corrija."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les modifications de « %@ » ne sont pas enregistrées tant que ce n'est pas corrigé."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "これが解決されるまで“%@”への変更は保存されません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As alterações em \"%@\" só são salvas quando isso for corrigido."
+          }
+        }
+      }
+    },
     "Check Spelling While Typing": {
       "comment": "Command title",
       "localizations": {
@@ -12051,6 +12561,41 @@
         }
       }
     },
+    "Couldn't Keep a Copy": {
+      "comment": "Error alert title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kopie nicht behalten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo guardar una copia"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de garder une copie"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コピーを保持できません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não Foi Possível Manter uma Cópia"
+          }
+        }
+      }
+    },
     "Couldn't Merge": {
       "comment": "Error alert title",
       "localizations": {
@@ -13189,6 +13734,40 @@
         }
       }
     },
+    "Decrypt File": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Datei entschlüsseln"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descifrar archivo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Déchiffrer le fichier"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルを復号"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descriptografar Arquivo"
+          }
+        }
+      }
+    },
     "Decrypt in File": {
       "localizations": {
         "de": {
@@ -13219,6 +13798,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Descriptografar no Arquivo"
+          }
+        }
+      }
+    },
+    "Decrypt…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entschlüsseln …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descifrar…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Déchiffrer…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "復号…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descriptografar…"
           }
         }
       }
@@ -15053,6 +15666,40 @@
         }
       }
     },
+    "Edits to %@ weren't saved: they were waiting for a passphrase when orgstar was closed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Änderungen an %@ wurden nicht gesichert: Sie warteten auf ein Passwort, als orgstar beendet wurde."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los cambios en %@ no se guardaron: esperaban una frase de contraseña cuando orgstar se cerró."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les modifications de %@ n'ont pas été enregistrées : elles attendaient une phrase secrète quand orgstar a été fermé."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@への編集は保存されませんでした。orgstarが終了したとき、パスフレーズの入力を待っていました。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As alterações em %@ não foram salvas: aguardavam uma senha quando o orgstar foi fechado."
+          }
+        }
+      }
+    },
     "Effort filter (<0:30, >1:00, =1:00):": {
       "localizations": {
         "de": {
@@ -15364,6 +16011,40 @@
         }
       }
     },
+    "Encrypt Tagged Entries": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markierte Einträge verschlüsseln"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cifrar entradas etiquetadas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chiffrer les entrées taguées"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "タグ付きエントリを暗号化"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Criptografar Entradas Etiquetadas"
+          }
+        }
+      }
+    },
     "Encrypt Tagged Entries…": {
       "comment": "Command title",
       "localizations": {
@@ -15395,6 +16076,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Criptografar Entradas Etiquetadas…"
+          }
+        }
+      }
+    },
+    "Encrypt and Save": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verschlüsseln und sichern"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cifrar y guardar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chiffrer et enregistrer"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暗号化して保存"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Criptografar e Salvar"
           }
         }
       }
@@ -15433,6 +16148,74 @@
         }
       }
     },
+    "Encrypted entry": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verschlüsselter Eintrag"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entrada cifrada"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entrée chiffrée"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暗号化されたエントリ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entrada criptografada"
+          }
+        }
+      }
+    },
+    "Encrypted files were left out, and encrypted entries were exported as they are on disk.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verschlüsselte Dateien wurden ausgelassen, und verschlüsselte Einträge wurden so exportiert, wie sie auf dem Datenträger stehen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se omitieron los archivos cifrados, y las entradas cifradas se exportaron tal como están en el disco."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les fichiers chiffrés ont été omis, et les entrées chiffrées ont été exportées telles qu'elles sont sur le disque."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暗号化されたファイルは除外され、暗号化されたエントリはディスク上のまま書き出されました。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arquivos criptografados foram deixados de fora, e entradas criptografadas foram exportadas como estão no disco."
+          }
+        }
+      }
+    },
     "Encryption": {
       "localizations": {
         "de": {
@@ -15463,6 +16246,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Criptografia"
+          }
+        }
+      }
+    },
+    "Encrypt…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verschlüsseln …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cifrar…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chiffrer…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暗号化…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Criptografar…"
           }
         }
       }
@@ -15567,6 +16384,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "Termina"
+          }
+        }
+      }
+    },
+    "Enter a passphrase.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gib ein Passwort ein."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce una frase de contraseña."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisissez une phrase secrète."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "パスフレーズを入力してください。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Digite uma senha."
+          }
+        }
+      }
+    },
+    "Enter the passphrase to encrypt and save them, or leave without saving.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gib das Passwort ein, um sie zu verschlüsseln und zu sichern, oder verlasse die Datei ohne Sichern."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce la frase de contraseña para cifrarlos y guardarlos, o sal sin guardar."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisissez la phrase secrète pour les chiffrer et les enregistrer, ou quittez sans enregistrer."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "パスフレーズを入力して暗号化して保存するか、保存せずに閉じてください。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Digite a senha para criptografá-las e salvá-las, ou saia sem salvar."
           }
         }
       }
@@ -18767,6 +19652,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Informe o nome antigo e o novo."
+          }
+        }
+      }
+    },
+    "Give the passphrase with Encrypt… first, so that a copy of your edits can be kept encrypted.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gib zuerst mit „Verschlüsseln …“ das Passwort ein, damit eine Kopie deiner Änderungen verschlüsselt behalten werden kann."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce primero la frase de contraseña con Cifrar… para que se pueda guardar cifrada una copia de tus cambios."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisissez d'abord la phrase secrète avec Chiffrer… pour qu'une copie de vos modifications puisse être gardée chiffrée."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "編集内容のコピーを暗号化して保持できるよう、まず「暗号化…」でパスフレーズを入力してください。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Informe primeiro a senha em Criptografar… para que uma cópia das suas alterações possa ser mantida criptografada."
           }
         }
       }
@@ -36643,6 +37562,40 @@
         }
       }
     },
+    "Saved encrypted": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verschlüsselt gesichert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardado cifrado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistré chiffré"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暗号化して保存しました"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salvo criptografado"
+          }
+        }
+      }
+    },
     "Save…": {
       "localizations": {
         "de": {
@@ -37776,6 +38729,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "Definir Marca"
+          }
+        }
+      }
+    },
+    "Set Passphrase": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passwort festlegen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Definir frase de contraseña"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Définir la phrase secrète"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "パスフレーズを設定"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Definir Senha"
+          }
+        }
+      }
+    },
+    "Set Passphrase…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passwort festlegen …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Definir frase de contraseña…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Définir la phrase secrète…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "パスフレーズを設定…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Definir Senha…"
           }
         }
       }
@@ -42261,6 +43282,74 @@
         }
       }
     },
+    "Tagged entries encrypted and saved": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markierte Einträge verschlüsselt und gesichert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entradas etiquetadas cifradas y guardadas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entrées taguées chiffrées et enregistrées"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "タグ付きエントリを暗号化して保存しました"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entradas etiquetadas criptografadas e salvas"
+          }
+        }
+      }
+    },
+    "Tagged entries in the subtree aren't encrypted; give the passphrase with Encrypt… first.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markierte Einträge im Teilbaum sind nicht verschlüsselt; gib zuerst mit „Verschlüsseln …“ das Passwort ein."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hay entradas etiquetadas sin cifrar en el subárbol; introduce primero la frase de contraseña con Cifrar…."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Des entrées taguées du sous-arbre ne sont pas chiffrées ; saisissez d'abord la phrase secrète avec Chiffrer…."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サブツリー内のタグ付きエントリが暗号化されていません。まず「暗号化…」でパスフレーズを入力してください。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Há entradas etiquetadas não criptografadas na subárvore; informe primeiro a senha em Criptografar…."
+          }
+        }
+      }
+    },
     "Tags": {
       "comment": "Key bar button",
       "localizations": {
@@ -43354,6 +44443,74 @@
         }
       }
     },
+    "The file has no passphrase yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Datei hat noch kein Passwort"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El archivo aún no tiene frase de contraseña"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le fichier n'a pas encore de phrase secrète"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このファイルにはまだパスフレーズがありません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O arquivo ainda não tem senha"
+          }
+        }
+      }
+    },
+    "The file is encrypted, and its passphrase isn't known": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Datei ist verschlüsselt, und ihr Passwort ist nicht bekannt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El archivo está cifrado y no se conoce su frase de contraseña"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le fichier est chiffré et sa phrase secrète n'est pas connue"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このファイルは暗号化されていて、パスフレーズが不明です"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O arquivo está criptografado e sua senha não é conhecida"
+          }
+        }
+      }
+    },
     "The folder and its files stay on disk.": {
       "localizations": {
         "de": {
@@ -43657,6 +44814,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "A nota aberta não é um nó, ou nada está aberto."
+          }
+        }
+      }
+    },
+    "The passphrase wasn't remembered: the Keychain refused it.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Passwort wurde nicht gemerkt: Der Schlüsselbund hat es abgelehnt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se recordó la frase de contraseña: el llavero la rechazó."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La phrase secrète n'a pas été mémorisée : le trousseau l'a refusée."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "パスフレーズは保存されませんでした。キーチェーンが拒否しました。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A senha não foi lembrada: as Chaves a recusaram."
+          }
+        }
+      }
+    },
+    "The passphrases differ": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Passwörter stimmen nicht überein"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las frases de contraseña no coinciden"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les phrases secrètes diffèrent"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "パスフレーズが一致しません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As senhas não coincidem"
           }
         }
       }
@@ -44452,6 +45677,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "As fórmulas desta tabela executam Lisp. Executá-las? (yes, no, always)"
+          }
+        }
+      }
+    },
+    "This version of orgstar keeps remembered passphrases in your login keychain without limiting them to this Mac; Touch ID or your password is still asked before one is used.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Version von orgstar bewahrt gemerkte Passwörter im Anmeldeschlüsselbund auf, ohne sie auf diesen Mac zu beschränken; Touch ID oder dein Passwort wird trotzdem abgefragt, bevor eines verwendet wird."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta versión de orgstar guarda las frases de contraseña recordadas en tu llavero de inicio de sesión sin limitarlas a este Mac; aun así se pide Touch ID o tu contraseña antes de usar una."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette version d'orgstar garde les phrases secrètes mémorisées dans votre trousseau de session sans les limiter à ce Mac ; Touch ID ou votre mot de passe est quand même demandé avant d'en utiliser une."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このバージョンのorgstarは、保存したパスフレーズをこのMacに限定せずログインキーチェーンに保持します。使用する前にTouch IDまたはパスワードを求めます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta versão do orgstar guarda as senhas lembradas nas suas chaves de início de sessão sem limitá-las a este Mac; o Touch ID ou sua senha ainda são pedidos antes de usar uma."
           }
         }
       }
@@ -47206,6 +48465,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Working Copy…"
+          }
+        }
+      }
+    },
+    "Wrong passphrase": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Falsches Passwort"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frase de contraseña incorrecta"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phrase secrète incorrecte"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "パスフレーズが違います"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Senha incorreta"
           }
         }
       }

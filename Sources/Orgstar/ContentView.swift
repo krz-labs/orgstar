@@ -35,6 +35,8 @@ struct ContentView: View {
     @State private var menuToday: [AgendaSnapshot.Row] = []
     @State private var hour = 0
     @AppStorage("saveMode") private var saveMode = SaveMode.automatic
+    @AppStorage("cryptBeforeSave") private var cryptBeforeSave = false
+    @AppStorage("cryptTagMatcher") private var cryptTagMatcher = "crypt"
     @AppStorage("keymap") private var preset = KeymapPreset.emacs
     @AppStorage("optionAsMeta") private var optionAsMeta = OptionAsMeta.left.rawValue
     @State private var keymap = KeymapPreset.emacs.keymap
@@ -194,6 +196,7 @@ struct ContentView: View {
                             .frame(height: 190)
                         Divider()
                     }
+                    CryptHoldBar(session: session) { commands.run("app.crypt.save") }
                     ModeLine(session: session, commands: commands)
                     EchoArea(commands: commands)
                 }
@@ -404,6 +407,11 @@ struct ContentView: View {
             commands.editor = nil
         }
         .onChange(of: saveMode, initial: true) { _, mode in session.saveMode = mode }
+        .onChange(of: cryptBeforeSave, initial: true) { _, on in session.encryptsTaggedEntries = on }
+        .onChange(of: cryptTagMatcher, initial: true) { session.cryptTag = OrgPreferences.cryptTag() }
+        .onChange(of: session.unlockRequest, initial: true) { _, path in
+            if let path { panel = .crypt(UUID(), CryptRequest(mode: .openFile, path: path, offset: 0)) }
+        }
         .onChange(of: options, initial: true) { _, options in session.options = options }
         .onAppear { TimerModel.shared.onDone = { [commands] in commands.show($0) } }
         .onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)) { _ in defaultsChanges += 1 }
@@ -902,12 +910,17 @@ struct ContentView: View {
 
     /// org-crypt's commands at the caret, through the passphrase sheet.
     private func crypt(_ id: String) {
+        if id == "app.crypt.save" {
+            guard let path = session.path, let hold = session.held[path] else { return }
+            panel = .crypt(UUID(), CryptRequest.save(path, hold: hold))
+            return
+        }
         guard let editor = commands.editor, let path = session.path else { return commands.show(String(localized: "No file is open")) }
         let caret = editor.context().caret
         let text = editor.context().text
         switch id {
         case "app.crypt.forget-passphrase":
-            CryptPassphrases.forget(path)
+            session.forgetPassphrase(for: path)
             commands.show(String(localized: "Passphrase forgotten for \((path as NSString).lastPathComponent)"))
         case "app.crypt.encrypt-entries":
             panel = .crypt(UUID(), CryptRequest(mode: .encryptAll(tag: OrgPreferences.cryptTag()), path: path, offset: caret))
@@ -996,8 +1009,10 @@ struct ContentView: View {
         case .shareSubtree(_, let share):
             ShareSubtreeSheet(share: share) { commands.show($0) }
         case .crypt(_, let request):
-            CryptSheet(request: request, text: { session.document?.text ?? "" }, apply: { applyText($0) }) { message in
+            CryptSheet(request: request, session: session, text: { session.document(of: request.path)?.text ?? "" }, apply: { applyText($0) }) { message in
                 self.panel = nil
+                // An encrypted file left closed: the sidebar shows the open file again.
+                if case .openFile = request.mode, !session.isOpen(request.path) { selectedFile = session.path }
                 if let message { commands.show(message) }
             }
         case .conflict:

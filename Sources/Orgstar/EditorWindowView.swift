@@ -24,6 +24,7 @@ struct EditorWindowView: View {
                 }
                 .safeAreaInset(edge: .bottom, spacing: 0) {
                     VStack(spacing: 0) {
+                        CryptHoldBar(session: session) { run("app.crypt.save") }
                         ModeLine(session: session, commands: commands)
                         EchoArea(commands: commands)
                     }
