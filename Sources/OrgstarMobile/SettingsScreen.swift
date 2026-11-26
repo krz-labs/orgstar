@@ -321,9 +321,9 @@ struct SettingsScreen: View {
     /// The theme's family, or the system's monospaced font when it's unset or not on the device.
     private var font: String {
         let spec = model.theme
-        let family = spec.font.isEmpty || UIFont.fontNames(forFamilyName: spec.font).isEmpty ? "System monospaced" : spec.font
-        let missing = !spec.font.isEmpty && family != spec.font ? " (\(spec.font) isn't installed)" : ""
-        return "\(family), \(spec.fontSize) pt\(missing)"
+        let family = spec.font.isEmpty || UIFont.fontNames(forFamilyName: spec.font).isEmpty ? String(localized: "System monospaced") : spec.font
+        return !spec.font.isEmpty && family != spec.font ? String(localized: "\(family), \(spec.fontSize) pt (\(spec.font) isn't installed)")
+            : String(localized: "\(family), \(spec.fontSize) pt")
     }
 
     private var todoKeywords: String {
