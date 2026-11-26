@@ -4,9 +4,10 @@ Where the milestone work stands, so a session can pick it up at any point. Read 
 
 ## State
 
-- `main` is at `c287e0e`, in sync with gitbay. No worktrees, work branches or open merge requests.
+- `main` is at `7f0c7bf`, in sync with gitbay. No worktrees, work branches or open merge requests.
 - Milestone 1 (Reviews and cleanup) is closed: 32 issues, 30 merge requests (447–476).
-- On `main` with everything merged: `swift test` (1,240 tests), both Xcode builds and every performance gate pass.
+- Milestone 4 (Commands and editing speed) is closed: 12 issues (#236 added during it; #156 closed with #142), 6 merge requests (479–484), about one day.
+- On `main` with everything merged: `swift test` (about 1,315 tests), both Xcode builds and every performance gate pass (three gate runs on 2026-11-26: 1 MB open 86–97 ms, typing p95 unchanged from milestone 1).
 - Not released. The code is past 1.2.0; the plan pencils milestone 1 as 1.3.0. Releasing is the owner's call.
 - Simulators: "iPhone 17", "iPad Air 11-inch (M4)" (iOS 27.0) and "Apple Watch Series 11 (46mm)" (watchOS 27.0). Reuse them; do not create others.
 
@@ -15,12 +16,12 @@ Where the milestone work stands, so a session can pick it up at any point. Read 
 | 1 Reviews and cleanup | 0 | 32 |
 | 2 Capture | 6 | 0 |
 | 3 Agenda and planning | 9 | 0 |
-| 4 Commands and editing speed | 11 | 0 |
+| 4 Commands and editing speed | 0 | 12 |
 | 5 Sync and files | 9 | 0 |
 | 6 Formats, import and export | 6 | 0 |
 | 7 Notes and knowledge | 3 | 0 |
 | 8 Automation and extension | 3 | 0 |
-| Backlog | 39 | 0 |
+| Backlog | 40 | 0 |
 
 #109 (code scanning) has no milestone and stays out of scope.
 
@@ -88,7 +89,26 @@ gitbay milestone list
 15. #195: TAB doesn't realign after a row was changed and left another way.
 16. #208: script sandboxing is off on four Xcode targets so a build phase can trim SwiftMath's fonts.
 
+## Decisions taken in milestone 4, for the owner to confirm or overrule
+
+1. #135 as the design review recommended: iPhone key bar of ten buttons plus Plan (Schedule, Deadline, Tags), no sideways scrolling; Bold, Italic, Code in the selection's Format menu; a Commands button in the editor, reader and agenda; the More menu removed. Key bar buttons are about 36 pt wide and 44 pt tall; at larger text sizes fewer fit and the rest go under More.
+2. Reader toolbar: Find, Edit, Commands; Outline and Export in its Commands list. iPhone editor toolbar: Find, Undo, Commands (plus Conflict and Resolve Sync Conflicts when they apply); Export, Export Subtree and Recovery Versions in Commands. iPad keeps Export and Recovery Versions in the toolbar.
+3. Palette and iOS Commands recents and use counts come only from runs through the palette or the Commands list, not keys or menus.
+4. `C-u` before a sequence with no binding of its own is the universal argument; only macro commands take it.
+5. Mac preset macro keys: ⌃⌘R start, ⌃⇧⌘R stop, ⌃⌘M run (not checked against system shortcuts).
+6. Snippets: TAB expands a trigger only where TAB has no other meaning at the caret (headings still cycle, tables still move); templates are snippets with `file = true` in `snippets.toml`.
+7. Completion defaults: opens by itself and fuzzy only in the Doom preset; Emacs and Mac keep prefix matching and manual opening. Word completion keys: `M-/` (Emacs), `F5` (Mac), `C-n`/`C-p` in Doom insert state.
+8. iOS candidates: with the on-screen keyboard, in a suggestion row in the key bar's place; with a hardware keyboard, the floating list.
+9. Key bar configuration lives in `[key-bar]` in `config.toml` (`iphone`, `ipad` lists of command ids).
+
 ## Device checks owed
+
+### From milestone 4
+
+- iOS with a hardware keyboard: Doom and Emacs macros, `F5` / `M-/` / Doom `C-n`, the floating completion list, snippet fields with TAB and S-TAB, key hints appearing in Commands on connect.
+- iPhone: the feel of the 36 pt key bar buttons, the Plan menu, the Format edit menu with a pointer on iPad, the suggestion row while typing, VoiceOver on the row and the key bar.
+- Mac: Edit ▸ Macros and its three keys in the running app; File ▸ New File from Template…; snippet field bands; a named macro in the palette after `macros.toml` reloads.
+
 
 By the owner's rule, an issue closes on merge and its device checks are tracked here. A problem found becomes a new issue.
 
@@ -139,6 +159,9 @@ By the owner's rule, an issue closes on merge and its device checks are tracked 
 
 ## Open questions before the next milestones
 
+Milestone 4's questions are settled. Still open:
+
+
 From the handoff, still unanswered:
 
 - #115: an option on capture templates, or a separate quick-add field?
@@ -150,7 +173,6 @@ From the handoff, still unanswered:
 
 New:
 
-- #135 and #138: the design review's recommendations are posted as comments on each. #138 is partly done (palette selection, first run, menus). Confirm the rest before milestone 4.
 - #229: is 10 MB a supported file size?
 
 ## Estimated effort, relative to milestone 1
@@ -169,4 +191,4 @@ Milestone 1 took about four and a half days, 30 merge requests and about 35 agen
 
 Milestones 2–8 together: about five to six times milestone 1. The Backlog's performance items (#197–#203 and others) are about one milestone 1 more.
 
-Milestone 4 is the cheapest to run well next, being testable on this Mac; milestone 2 is next in order but most dependent on devices.
+Milestone 4 took about one day against milestone 1's four and a half: well under its 0.9–1.1× estimate. It had no review phase, no usage-limit stops, few decisions for the owner, and most of it was testable on this Mac. Treat the other estimates as high by the same reasoning where those conditions hold, and not where devices or open questions set the pace. Of the rest, milestone 7 (small) and milestone 6 (mostly testable on the Mac) are the next cheapest to run well; milestone 2 is next in order but most dependent on devices.
