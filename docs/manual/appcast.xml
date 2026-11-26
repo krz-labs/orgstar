@@ -4,6 +4,30 @@
     <title>orgstar</title>
     <link>https://gitbay.org/krz/orgstar</link>
     <item>
+      <title>orgstar 1.3.0</title>
+      <link>https://krz.sh/apps/orgstar/</link>
+      <sparkle:version>883</sparkle:version>
+      <sparkle:shortVersionString>1.3.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+      <pubDate>Thu, 26 Nov 2026 11:05:58 -0600</pubDate>
+      <description><![CDATA[<h2>orgstar 1.3.0</h2>
+<ul>
+<li>A completion list that opens as you type, in every preset, with fuzzy matching, words from your files, id links by title, property values and Denote notes.</li>
+<li>Keyboard macros in the Emacs and Mac presets; snippets with tab stops, and templates for new files.</li>
+<li>The command palette lists recent commands first and ranks the ones you use most higher.</li>
+<li>Replace in Files, and renaming a tag or TODO keyword everywhere.</li>
+<li>File ▸ History…: recovery versions and git commits of a file in one list.</li>
+<li>Git auto-commit per folder (Settings ▸ Git).</li>
+<li>Lint File and Lint All Folders, matched to <code>org-lint</code>.</li>
+<li>Encrypted <code>.org.gpg</code> files, entries tagged <code>crypt</code> encrypted on save, and Use Touch ID to Decrypt for saved passphrases, which now live in the protected Keychain.</li>
+<li>Handoff of the open file and caret between Mac, iPhone and iPad; Share Subtree… by AirDrop, Mail or Messages.</li>
+<li>A customisable toolbar, a grouped Org menu, Help ▸ Manual, and a first run for people without Emacs.</li>
+<li>Faster opening, parsing and styling of large files, and many fixes to layout, wording and accessibility from a design review.</li>
+</ul>
+<p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
+      <enclosure url="https://files.krz.sh/orgstar/orgstar-1.3.0.dmg" type="application/octet-stream" sparkle:edSignature="1FaWA46aeZcVHgwzRdfZr230Xm+AORbzpxAvK9t4iUeYnkz6+pv5Pwrg9Gys7rBFHme3dVze+N2w2Aqwb+SECw==" length="59977294"/>
+    </item>
+    <item>
       <title>orgstar 1.2.0</title>
       <link>https://krz.sh/apps/orgstar/</link>
       <sparkle:version>728</sparkle:version>
