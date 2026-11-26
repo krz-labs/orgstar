@@ -1420,6 +1420,8 @@ struct LinkFollowTests {
         #expect(follow("file:pic.png") == .message("No file " + (notes.url.appendingPathComponent("sub/pic.png").path as NSString).standardizingPath))
         #expect(follow("https://orgmode.org/a b") == .openExternally(URL(string: "https://orgmode.org/a%20b")!))
         #expect(follow("doi:10.1000/182") == .openExternally(URL(string: "https://doi.org/10.1000/182")!))
+        #expect(follow("zotero://select/items/@doe2020") == .openExternally(URL(string: "zotero://select/items/@doe2020")!))
+        #expect(session.follow(OrgLink(type: "cite", path: "a;b", raw: "cite:a;b"), workspace: workspace, isText: { _ in false }) == .citation(["a", "b"]))
         #expect(follow("shell:rm -rf x") == .message("orgstar doesn't run shell links"))
         #expect(follow("elisp:(+ 1 2)") == .elisp("(+ 1 2)"))
         #expect(follow("elisp:org-agenda") == .message("orgstar doesn't run Emacs commands from elisp: links"))

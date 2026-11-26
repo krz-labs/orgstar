@@ -169,6 +169,7 @@ public final class OrgEditor: NSObject {
         }
         view.onCommandClick = { [weak self, unowned view] offset in
             guard let self, Links.link(at: offset, text: self.document.text, tree: self.document.tree) != nil
+                || Links.citation(at: offset, text: self.document.text, tree: self.document.tree) != nil
                 || Links.timestampDays(at: offset, text: self.document.text) != nil else { return false }
             self.active = view
             self.setCaret(offset)

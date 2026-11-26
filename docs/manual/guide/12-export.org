@@ -429,7 +429,7 @@ As shown in [cite:@smith2020], and again [cite/t:@smith2020; see @lee2019 p. 4].
 
 ** Bibliography files
 
-Each =#+bibliography:= line names one file, relative to the Org file, optionally in quotes. A file ending in =.json= is read as CSL-JSON; anything else is read as BibTeX, with =@string= abbreviations expanded and =@comment= and =@preamble= skipped. You can have several =#+bibliography:= lines; for a key in more than one file, the first file wins.
+Each =#+bibliography:= line names one file, relative to the Org file, optionally in quotes. A file ending in =.json= is read as CSL-JSON; anything else is read as BibTeX, with =@string= abbreviations expanded and =@comment= and =@preamble= skipped. You can have several =#+bibliography:= lines; for a key in more than one file, the first file wins. The files of =org-cite-global-bibliography= (see [[file:13-configuration.org][Configuration]]) come after the file's own. Inserting and following citations are in [[file:09-links.org][Links]].
 
 ** =#+cite_export:=
 

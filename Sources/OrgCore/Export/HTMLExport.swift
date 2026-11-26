@@ -64,7 +64,7 @@ public enum HTMLExport {
         renderer.inTitle = true
         let titleHTML = renderer.inlineString(title)
         renderer.inTitle = false
-        renderer.citations = CiteProcessor(text: text, directory: directory)
+        renderer.citations = CiteProcessor(text: text, directory: directory, global: settings.citeGlobalBibliography)
         var header = options.title ? "<h1 class=\"title\">\(titleHTML)</h1>\n" : ""
         let byline = [options.author ? meta.author : nil, options.date ? meta.date : nil].compactMap { $0 }.filter { !$0.isEmpty }
         if !byline.isEmpty { header += "<p class=\"byline\">\(byline.map(HTMLRenderer.escape).joined(separator: " · "))</p>\n" }

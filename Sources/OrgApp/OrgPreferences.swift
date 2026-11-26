@@ -18,6 +18,7 @@ public enum OrgPreferences {
         settings.tagsExcludedFromInheritance = Set(string("tagsExcludedFromInheritance", defaults).split(whereSeparator: \.isWhitespace).map(String.init))
         settings.attachIDDir = attachIDDir(defaults)
         settings.attachUseInheritance = attachUseInheritance(defaults)
+        settings.citeGlobalBibliography = citeGlobalBibliography(defaults)
         return settings
     }
 
@@ -222,6 +223,10 @@ public enum OrgPreferences {
         case "nil": false
         default: nil
         }
+    }
+    /// `org-cite-global-bibliography`: bibliography files, separated by `:`.
+    public static func citeGlobalBibliography(_ defaults: UserDefaults = .standard) -> [String] {
+        string("citeGlobalBibliography", defaults).split(separator: ":").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
     }
     /// `org-yank-image-save-method`: "attach", or the folder pasted images go in.
     public static func yankImageSaveMethod(_ defaults: UserDefaults = .standard) -> String {

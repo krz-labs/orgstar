@@ -19,6 +19,10 @@ public enum CompletionSources {
             return CompletionResult(strings: values.allowed + values.used)
         case .words(let prefix):
             return CompletionResult(strings: (try? index.words(prefix, excluding: path)) ?? [])
+        case .citationKeys(let files):
+            // With `org-cite-global-bibliography` as it is now, not as the buffer was parsed.
+            let global = OrgPreferences.citeGlobalBibliography().map { OrgPaths.expandingTilde($0) }
+            return CompletionResult(entries: BibliographyCache.shared.entries(files + global.filter { !files.contains($0) }))
         }
     }
 

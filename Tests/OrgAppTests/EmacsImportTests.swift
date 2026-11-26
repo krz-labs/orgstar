@@ -197,6 +197,17 @@ struct EmacsImportTests {
         #expect(s["org-yank-dnd-method"] == .string("attach"))
     }
 
+    @Test func readsTheGlobalBibliography() throws {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("orgstar-import-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        try #"""
+            (setq org-cite-global-bibliography '("~/refs/zotero.bib" "/data/more.json"))
+            """#.write(to: folder.appendingPathComponent("init.el"), atomically: true, encoding: .utf8)
+        let s = settings(EmacsImport.scan(EmacsImport.files(in: folder)))
+        #expect(s["org-cite-global-bibliography"] == .string("~/refs/zotero.bib:/data/more.json"))
+    }
+
     @Test func readsLiterateConfig() throws {
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent("orgstar-import-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)

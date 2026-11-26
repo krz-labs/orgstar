@@ -256,23 +256,37 @@ public enum Links {
     }
 }
 
-/// `org-open-at-point` on a link or a timestamp (C-c C-o).
+/// `org-open-at-point` on a link, a citation or a timestamp (C-c C-o). A citation is followed
+/// as a `cite` link whose path is its keys, separated by `;`.
 public struct OpenLinkAtPoint: OrgCommand {
     public init() {}
     public var id: String { "org.link.open" }
     public var title: String { "Open Link" }
     public func applies(in context: EditContext) -> Bool {
         Links.link(at: context.caret, text: context.text, tree: context.tree) != nil
+            || Citations.keys(at: context.caret, text: context.text, tree: context.tree) != nil
             || Links.timestampDays(at: context.caret, text: context.text) != nil
     }
     public func run(in context: EditContext) -> CommandStep {
         if let found = Links.link(at: context.caret, text: context.text, tree: context.tree) {
             return .external(.openLink(found.link))
         }
+        if let link = Links.citation(at: context.caret, text: context.text, tree: context.tree) {
+            return .external(.openLink(link))
+        }
         if let days = Links.timestampDays(at: context.caret, text: context.text) {
             return .external(.agenda(start: days.start, days: days.count))
         }
         return .failed("No link to follow here")
+    }
+}
+
+extension Links {
+    /// The citation at `offset` as a `cite` link to follow: its keys, separated by `;`.
+    public static func citation(at offset: Int, text: String, tree: OrgTree) -> OrgLink? {
+        guard let keys = Citations.keys(at: offset, text: text, tree: tree), !keys.isEmpty else { return nil }
+        let path = keys.joined(separator: ";")
+        return OrgLink(type: "cite", path: path, raw: "cite:" + path)
     }
 }
 

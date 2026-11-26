@@ -8767,6 +8767,41 @@
         }
       }
     },
+    "Cannot find citation key: %@": {
+      "comment": "Following a citation whose key no bibliography has",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zitierschlüssel nicht gefunden: %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se encuentra la clave de cita: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clé de citation introuvable : %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "引用キーが見つかりません：%@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chave de citação não encontrada: %@"
+          }
+        }
+      }
+    },
     "Capture": {
       "localizations": {
         "de": {
@@ -22578,6 +22613,41 @@
         }
       }
     },
+    "Insert Citation…": {
+      "comment": "Command title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zitat einfügen …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insertar cita…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insérer une citation…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "引用を挿入…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserir Citação…"
+          }
+        }
+      }
+    },
     "Insert Column View Table": {
       "comment": "Command title",
       "localizations": {
@@ -23863,6 +23933,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Atalhos de Teclado"
+          }
+        }
+      }
+    },
+    "Key: ": {
+      "comment": "Insert Citation… asks for a bibliography entry",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schlüssel: "
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clave: "
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clé : "
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キー："
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chave: "
           }
         }
       }
@@ -29349,6 +29454,41 @@
         }
       }
     },
+    "No bibliography set": {
+      "comment": "Insert Citation… in a file without #+bibliography",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Bibliografie festgelegt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay bibliografía definida"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune bibliographie définie"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "参考文献が設定されていません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhuma bibliografia definida"
+          }
+        }
+      }
+    },
     "No body-only export": {
       "localizations": {
         "de": {
@@ -31743,6 +31883,41 @@
         }
       }
     },
+    "Open %@": {
+      "comment": "Opens a citation's file",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ öffnen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@を開く"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir %@"
+          }
+        }
+      }
+    },
     "Open Agenda Window": {
       "localizations": {
         "de": {
@@ -31843,6 +32018,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Abrir Anexo…"
+          }
+        }
+      }
+    },
+    "Open DOI": {
+      "comment": "Opens a citation's DOI",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DOI öffnen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir DOI"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir le DOI"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DOIを開く"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir DOI"
           }
         }
       }
@@ -31948,6 +32158,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Expandir Dobras da Subárvore"
+          }
+        }
+      }
+    },
+    "Open URL": {
+      "comment": "Opens a citation's URL",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL öffnen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir URL"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir l'URL"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URLを開く"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir URL"
           }
         }
       }
@@ -33674,6 +33919,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Recursos avançados e integrações com a Apple, além de tudo o que continua gratuito."
+          }
+        }
+      }
+    },
+    "Prefix (empty for none): ": {
+      "comment": "Insert Citation… asks for text before the key",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Präfix (leer für keins): "
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prefijo (vacío para ninguno): "
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Préfixe (vide pour aucun) : "
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "前置き（空欄でなし）："
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prefixo (vazio para nenhum): "
           }
         }
       }
@@ -39491,6 +39771,41 @@
         }
       }
     },
+    "Select citation key: ": {
+      "comment": "Following a citation with several keys",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zitierschlüssel wählen: "
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seleccionar clave de cita: "
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisir la clé de citation : "
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "引用キーを選択："
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selecionar chave de citação: "
+          }
+        }
+      }
+    },
     "Selection (count-words-region)": {
       "localizations": {
         "de": {
@@ -41483,6 +41798,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mostrar arquivos e pastas ocultos"
+          }
+        }
+      }
+    },
+    "Show in Bibliography": {
+      "comment": "Opens the bibliography file at a citation's entry",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Bibliografie zeigen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar en la bibliografía"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher dans la bibliographie"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "参考文献ファイルで表示"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar na Bibliografia"
           }
         }
       }
@@ -43631,6 +43981,41 @@
         }
       }
     },
+    "Style (empty for default): ": {
+      "comment": "Insert Citation… asks for a citation style",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stil (leer für Standard): "
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estilo (vacío para el predeterminado): "
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Style (vide pour celui par défaut) : "
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スタイル（空欄で既定）："
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estilo (vazio para o padrão): "
+          }
+        }
+      }
+    },
     "Subscriptions renew automatically until cancelled in your Apple Account settings, at least 24 hours before the period ends.": {
       "localizations": {
         "de": {
@@ -43729,6 +44114,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Subárvore no cursor"
+          }
+        }
+      }
+    },
+    "Suffix (empty for none): ": {
+      "comment": "Insert Citation… asks for text after the key",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suffix (leer für keins): "
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sufijo (vacío para ninguno): "
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suffixe (vide pour aucun) : "
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "後置き（空欄でなし）："
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sufixo (vazio para nenhum): "
           }
         }
       }

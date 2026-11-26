@@ -12,13 +12,15 @@ public enum LinkFollow: Equatable, Sendable {
     case choose(prompt: String, paths: [String])
     /// An `elisp:` link's form, to run with `evaluateLink` once the user agrees.
     case elisp(String)
+    /// A citation's keys, to show through `CitationActions.follow`.
+    case citation([String])
 }
 
 extension DocumentSession {
     /// Follows a link as `org-link-open` does: files open as buffers (with a `::` search),
     /// `id:`, `roam:` and `denote:` links through the index, internal and radio links in the current file,
-    /// `attachment:` links in their entry's attachment folder, and web and mail links go to
-    /// their apps.
+    /// `attachment:` links in their entry's attachment folder, and web, mail and `zotero:` links
+    /// go to their apps. A citation (a `cite` link) comes back as its keys.
     public func follow(_ link: OrgLink, workspace: WorkspaceModel?, isText: (String) -> Bool) -> LinkFollow {
         switch link.type {
         case "http", "https", "ftp", "mailto", "news":
@@ -66,7 +68,11 @@ extension DocumentSession {
         case "custom-id":
             return searchCurrent("#" + link.path)
         case "fuzzy":
+            // Zotero's `zotero://select/...` links, which Org doesn't know as a type.
+            if link.path.lowercased().hasPrefix("zotero:") { return Self.url(link.path) }
             return searchCurrent(link.path)
+        case "cite":
+            return .citation(link.path.components(separatedBy: ";"))
         case "radio":
             guard let document else { return .message("No file is open") }
             return shown(Links.searchRadio(link.path, tree: document.tree))

@@ -5,12 +5,12 @@ import Foundation
 // after `[[`, workspace tags and org-tempo's `<` templates are added, and snippet triggers
 // where no org context offers anything. Headings after `[[id:`, notes after `[[denote:` and
 // property values come from the buffer at once and from the index when it answers
-// `Completion.query`.
+// `Completion.query`; keys after `@` in a citation come from the bibliography files.
 
 public struct Completion: Sendable, Equatable {
     public enum Kind: String, Sendable {
         case keyword, keywordValue, link, entity, tag, todo, heading, drawer, property, srcLanguage, srcHeader, clocktable, template, snippet
-        case idLink, denoteLink, propertyValue, word
+        case idLink, denoteLink, propertyValue, word, citationKey
     }
 
     public var kind: Kind
@@ -34,9 +34,12 @@ public struct Completion: Sendable, Equatable {
     public var templates: [StructureTemplate] = []
     /// The snippets whose triggers are the candidates, for `.snippet`; choosing one expands it.
     public var snippets: [Snippet] = []
+    /// What the list shows after a candidate: a citation key's authors, year and title.
+    public var annotations: [String: String] = [:]
 
     /// How the list shows `candidate`: a template with the block it makes.
     public func label(_ candidate: String) -> String {
+        if let annotation = annotations[candidate], !annotation.isEmpty { return candidate + "  " + annotation }
         if kind == .idLink || kind == .denoteLink, let item = item(candidate), candidate == item.title, !item.path.isEmpty {
             return candidate + "  " + (item.path as NSString).lastPathComponent
         }
@@ -186,6 +189,15 @@ public enum OrgCompletion {
             let from = start + NSMaxRange((line as NSString).range(of: "#+"))
             return make(.keyword, from: from, caseDouble(fileOptions))
         }
+        // Keys after `@` in a citation, from its bibliography files.
+        if let typed = citationKeyTyped(toHere) {
+            let directory = context.options.filePath.map { ($0 as NSString).deletingLastPathComponent }
+            let files = Bibliography.files(in: context.text, directory: directory, global: context.tree.settings.citeGlobalBibliography)
+            var completion = Completion(kind: .citationKey, range: (caret - typed.utf16.count)..<caret, candidates: [])
+            completion.typed = typed
+            completion.query = .citationKeys(files)
+            return completion
+        }
         // Headings after `[[id:`, Denote's notes after `[[denote:`.
         if let target = linkTarget(context, lineStart: start, toHere: toHere) {
             var completion = Completion(kind: target.type == "id" ? .idLink : .denoteLink, range: target.typed, candidates: [])
@@ -271,6 +283,15 @@ public enum OrgCompletion {
     }
 
     // MARK: - Sources
+
+    private static let citationKeyBefore = try! NSRegularExpression(pattern: "\\[cite(?:/[-/_\\p{L}\\p{N}]*)?:[^\\[\\]]*@([-.:?!`'/*+|(){}<>&_^$#%~\\p{L}\\p{N}]*)$")
+
+    /// What's typed of a citation key: the key characters after the last `@` of a citation
+    /// that isn't closed before the caret.
+    static func citationKeyTyped(_ toHere: String) -> String? {
+        guard toHere.contains("[cite"), let m = citationKeyBefore.firstMatch(in: toHere, range: NSRange(location: 0, length: (toHere as NSString).length)) else { return nil }
+        return (toHere as NSString).substring(with: m.range(at: 1))
+    }
 
     /// Upper and lower case of each, as `org-pcomplete-case-double`.
     static func caseDouble(_ list: [String]) -> [String] { list.flatMap { [$0.uppercased(), $0.lowercased()] } }

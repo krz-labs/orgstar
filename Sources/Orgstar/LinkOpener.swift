@@ -6,9 +6,10 @@ import OrgCore
 @MainActor
 enum LinkOpener {
     /// Returns a message when the link can't be followed.
-    /// `ask` picks among a query link's matches; `elisp` runs an `elisp:` link's form.
+    /// `ask` picks among a query link's matches; `elisp` runs an `elisp:` link's form;
+    /// `citation` shows a citation's entry.
     static func open(_ link: OrgLink, session: DocumentSession, workspace: WorkspaceModel, ask: @escaping (Prompt, @escaping (String?) -> Void) -> Void,
-                     elisp: ((String) -> Void)? = nil) -> String? {
+                     elisp: ((String) -> Void)? = nil, citation: (([String]) -> Void)? = nil) -> String? {
         #if APPSTORE
         // A file outside the sidebar's folders needs access to its folder first.
         if link.type == "file", !link.path.isEmpty,
@@ -30,6 +31,10 @@ enum LinkOpener {
         case .elisp(let form):
             guard let elisp else { return "orgstar doesn't run elisp links here" }
             elisp(form)
+            return nil
+        case .citation(let keys):
+            guard let citation else { return "orgstar doesn't follow citations here" }
+            citation(keys)
             return nil
         }
     }

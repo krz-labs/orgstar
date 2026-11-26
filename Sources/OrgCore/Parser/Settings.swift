@@ -57,6 +57,8 @@ public struct OrgSettings: Sendable, Equatable {
     /// `org-attach-id-dir` and `org-attach-use-inheritance` (nil for `selective`), for export.
     public var attachIDDir = "data/"
     public var attachUseInheritance: Bool?
+    /// `org-cite-global-bibliography`: files every document's citations are read from.
+    public var citeGlobalBibliography: [String] = []
 
     /// `org-remove-uninherited-tags` for one tag.
     public func inheritsTag(_ tag: String) -> Bool {
@@ -154,6 +156,7 @@ enum SettingsScanner {
         settings.tagsExcludedFromInheritance = defaults.tagsExcludedFromInheritance
         settings.attachIDDir = defaults.attachIDDir
         settings.attachUseInheritance = defaults.attachUseInheritance
+        settings.citeGlobalBibliography = defaults.citeGlobalBibliography
         settings.setupKeywords = defaults.setupKeywords
         settings.startup = startup
         return settings

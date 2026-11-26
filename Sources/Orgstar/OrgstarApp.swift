@@ -762,7 +762,7 @@ struct OrgMenuItems: View {
         ("Dates and Timers", ["org.schedule", "org.deadline", "org.timestamp.", "org.timer."]),
         ("Lists", ["org.item.", "org.checkbox."]),
         ("Tables", ["org.table", "app.table-", "app.plot"]),
-        ("Links and Footnotes", ["org.link.", "org.id.", "org.footnote."]),
+        ("Links and Footnotes", ["org.link.", "org.id.", "org.footnote.", "app.cite."]),
         ("Blocks", ["org.babel.", "org.structure-template", "org.edit-special", "org.dblock.", "org.clock.report", "org.denote."]),
         ("Text", ["org.emphasize", "org.fill-"]),
         ("Attachments", ["app.attach."]),

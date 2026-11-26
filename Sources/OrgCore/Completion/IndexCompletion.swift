@@ -30,16 +30,28 @@ public enum CompletionQuery: Sendable, Hashable {
     case propertyValues(String)
     /// Words starting with the abbreviation.
     case words(String)
+    /// The keys of these bibliography files, for `@` in a citation.
+    case citationKeys([String])
 }
 
 /// What the index answers.
 public struct CompletionResult: Sendable, Equatable {
     public var items: [CompletionItem] = []
     public var strings: [String] = []
+    /// Text shown after each string, by string.
+    public var annotations: [String: String] = [:]
 
-    public init(items: [CompletionItem] = [], strings: [String] = []) {
+    public init(items: [CompletionItem] = [], strings: [String] = [], annotations: [String: String] = [:]) {
         self.items = items
         self.strings = strings
+        self.annotations = annotations
+    }
+
+    /// The keys of bibliography entries, each with its authors, year and title.
+    public init(entries: [BibEntry]) {
+        self.init(strings: entries.map(\.key), annotations: Dictionary(entries.map { entry in
+            (entry.key, [entry.authors, entry.year, entry.title].compactMap { $0 }.joined(separator: "  "))
+        }) { a, _ in a })
     }
 }
 
@@ -57,6 +69,10 @@ extension OrgCompletion {
             filled.candidates = matching(filled.pool, completion.typed, fuzzy: fuzzy, ignoringCase: true, sorted: false)
         case .word:
             filled = Dabbrev.adding(result.strings, to: completion)
+        case .citationKey:
+            filled.pool = result.strings
+            filled.annotations = result.annotations
+            filled.candidates = matching(result.strings, completion.typed, fuzzy: fuzzy)
         default:
             break
         }

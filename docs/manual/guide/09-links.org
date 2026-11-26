@@ -37,7 +37,7 @@ file into a link, matched case-insensitively, as in Org.
 
 * Following links
 
-=org-open-at-point= follows the link at the caret, or opens the agenda for a timestamp.
+=org-open-at-point= follows the link at the caret, shows the entry of a citation (see /Citations/ below), or opens the agenda for a timestamp.
 
 | Preset | Key                                                                                   |
 |--------+---------------------------------------------------------------------------------------|
@@ -62,6 +62,7 @@ A message in the echo area explains a link that can't be followed.
 | Text                                         | =[[budget table]]=                   | Searches this file: a =<<budget table>>= target, then =#+NAME: budget table=, then a heading. |
 | Coderef                                      | =[[(ref)]]=                          | Moves to the label =(ref:ref)= in a src or example block; see /Code references/ below.      |
 | Regexp                                       | =[[/TODO.*soon/]]=                   | Shows a sparse tree of the regular expression's matches, as =org-occur=; iOS moves to the first match. |
+| =zotero=                                     | =[[zotero://select/items/@doe2020]]= | Opens Zotero at the item. Org has no =zotero= link type, so write it in brackets.          |
 | =shell=                                      | =[[shell:ls]]=                       | Not run. orgstar never executes these links.                                               |
 | =elisp=                                      | =[[elisp:(+ 1 2)]]=                  | Runs the form once you agree; see /Emacs Lisp links/ below.                                |
 | =attachment=                                 | =[[attachment:scan.pdf]]=            | Opens the file in the entry's attachment folder; see /Attachment links/ below.             |
@@ -212,6 +213,7 @@ When the inserted link is a =file:= link, orgstar rewrites it as
 You can also type a link by hand. With the caret right after =[[=, completion at point
 offers =attachment:=, =doi:=, =file:=, =http:=, =https:=, =id:= and =mailto:=, plus
 the file's link abbreviations. After =[[*=, it offers the headings of the current file.
+After =@= in a citation, it offers the keys of the file's bibliographies (see /Citations/).
 Completion at point is =C-M-i= in the Emacs preset and =C-SPC= in Doom's insert state;
 see [[file:02-the-editor.org][The editor]].
 
@@ -686,13 +688,86 @@ the title as its description, and is also copied to the clipboard. Insert it wit
 Insert Link. Setting up a browser bookmarklet, and =org-protocol://capture=, are in
 [[file:08-capture.org][Capture]].
 
+* Citations
+
+A citation, =[cite:@key]=, names an entry of the bibliography files the file lists with
+=#+bibliography:= lines, or of those =org-cite-global-bibliography= lists for every file
+(see [[file:13-configuration.org][Configuration]]). The citation syntax and how citations
+export are in [[file:12-export.org][Export]]. A file ending in =.json= is read as CSL-JSON;
+anything else as BibTeX or BibLaTeX, with =@string= abbreviations expanded and the fields an
+entry lacks taken from the entry its =crossref= field names (whose =title= becomes the
+=booktitle=). Bibliography files are read in the background, and read again only when they
+change. In the Mac App Store version, a bibliography outside your sidebar folders asks for
+access to its folder the first time.
+
+** Inserting citations
+
+Insert Citation… (Org ▸ Links and Footnotes on the Mac, Commands on iOS) is =org-cite-insert=
+with the basic processor.
+
+| Preset | Key                         |
+|--------+-----------------------------|
+| Emacs  | =C-c C-x @=                 |
+| Mac    | none; Org menu or palette   |
+| Doom   | =SPC m @=                   |
+
+What it does depends on where the caret is:
+
+- Outside a citation, it asks for an entry (=Key:=, each key with its authors, year and
+  title), then a prefix, a suffix and a style (=author=, =noauthor=, =nocite=, =note=,
+  =numeric=, =text= or =nil=), and inserts =[cite/style:prefix @key suffix]=. An empty answer
+  leaves out the prefix, the suffix or the style.
+- On a citation's =[cite/style= part, it asks only for a style and puts it in place of the
+  old one; an empty answer removes it.
+- On the citation's common prefix or before a reference's =@=, it adds the chosen key, with
+  the prefix and suffix around it, before that reference; on a reference's suffix or the
+  common suffix, after it. References are separated by =;=.
+- Inside a key, the chosen key replaces it; the reference's prefix and suffix stay.
+
+Without bibliography files, the echo area says =No bibliography set=. Where orgstar differs
+from Emacs:
+
+- It inserts one key at a time. Run it again inside the citation to add another; Emacs asks
+  for keys until an empty answer.
+- It always asks for a style for a new citation; Emacs asks only after =C-u=. The prefix and
+  suffix questions are orgstar's.
+- =C-u= doesn't delete the citation or reference at the caret.
+
+** Completing keys
+
+Inside a citation, completion at point after =@= offers the keys of the file's
+bibliographies, each with its authors, year and title.
+
+** Following citations
+
+=C-c C-o= (Mac =⌃⌘O=), =⌘=-click, and =RET= in Doom's normal state show a citation's entry:
+its authors, year, title and where it was published. Its buttons open the files in the
+entry's =file= field, its DOI and its URL, and Show in Bibliography opens the bibliography
+file at the entry, which is what =org-cite-basic-goto= does in Emacs. On a reference the
+entry is that key's; elsewhere in a citation with several keys, you choose a key first. A key
+no bibliography has shows =Cannot find citation key:= and the key.
+
+The =file= field may list several files, separated by =;=. Each is a path or JabRef's and
+Zotero's =description:path:type=, relative to the bibliography's folder unless absolute.
+
+** Zotero
+
+Better BibTeX for Zotero can keep a =.bib= file exported from your library up to date
+(Export Library, with Keep updated). List that file in =#+bibliography:= or
+=org-cite-global-bibliography= like any other; orgstar reads it again when Zotero rewrites
+it. =[[zotero://select/items/@key]]= links, with Better BibTeX's citation keys, open the
+item in Zotero on the Mac; on iOS the link is handed to the system, which opens the Zotero
+app if it is installed and handles the address.
+
 * On iOS
 
 The iOS app follows links: tap a link in the reader. Org files open in the app, and
 web, mail and other files go to the system. The iOS editor shows inline images as the
-Mac does, and so does the reader, except in headings. In the editor, Store Link, Store ID Link and Insert Link…
+Mac does, and so does the reader, except in headings. In the editor, Store Link, Store ID Link, Insert Link… and Insert Citation…
 are in Commands, and on a hardware keyboard the Emacs keys run them; they work as
-described above, and stored links last until the app quits. =org-protocol://store-link=
+described above, and stored links last until the app quits. Open Link in Commands shows
+the entry of the citation at the caret. The app reads only bibliography files in its
+folders. =org-protocol://store-link=
 links opened on the device are stored and copied too. Show Backlinks in Commands lists the same
 links as the Mac's backlinks pane, for the heading at the caret and the file. See
 [[file:14-ios.org][iOS]].

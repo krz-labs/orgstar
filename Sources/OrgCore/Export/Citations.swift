@@ -381,20 +381,17 @@ struct CiteProcessor {
     // MARK: - Building
 
     /// The citations of `text` (as written, nocite citations included) worked out in document
-    /// order, then the bibliography; nil when the export leaves citations alone.
-    init?(text: String, directory: URL?) {
+    /// order, then the bibliography; nil when the export leaves citations alone. `global` is
+    /// `org-cite-global-bibliography`, read after the file's own `#+bibliography:` files.
+    init?(text: String, directory: URL?, global: [String] = []) {
         guard text.containsIgnoringASCIICase("[cite") else { return nil }
         let settings = Self.exportSettings(text)
         if let settings, settings.processor != "basic" { return nil }
-        // Each `#+bibliography:` names one file.
-        for m in text.matches(of: #/(?mi)^[ \t]*#\+bibliography:[ \t]*(.*?)[ \t]*$/#) {
-            for name in [String(m.1)].map({ $0.count > 1 && $0.hasPrefix("\"") && $0.hasSuffix("\"") ? String($0.dropFirst().dropLast()) : $0 }) where !name.isEmpty {
-                let path = OrgPaths.expandingTilde(name)
-                let url = path.hasPrefix("/") ? URL(fileURLWithPath: path) : (directory ?? URL(fileURLWithPath: "/")).appendingPathComponent(path)
-                guard let data = try? Data(contentsOf: url) else { continue }
-                let parsed = url.pathExtension.lowercased() == "json" ? Self.parseJSON(data) : Self.parseBibTeX(String(decoding: data, as: UTF8.self))
-                for (key, entry) in parsed where entries[key] == nil { entries[key] = entry }
-            }
+        for path in Bibliography.files(in: text, directory: directory?.path, global: global) {
+            let url = URL(fileURLWithPath: path)
+            guard let data = try? Data(contentsOf: url) else { continue }
+            let parsed = url.pathExtension.lowercased() == "json" ? Self.parseJSON(data) : Self.parseBibTeX(String(decoding: data, as: UTF8.self))
+            for (key, entry) in parsed where entries[key] == nil { entries[key] = entry }
         }
         let tree = OrgParser.parse(text)
         // Keywords (`#+TITLE`) aren't part of the document Org processes citations in.

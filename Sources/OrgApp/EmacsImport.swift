@@ -650,6 +650,11 @@ public struct EmacsImport: Sendable {
         case "org-attach-id-dir":
             guard let dir = value.string else { return note("not a string") }
             add(name, .string(dir))
+        case "org-cite-global-bibliography":
+            guard let files = value.elements?.compactMap(\.string), files.count == value.elements?.count, !files.contains(where: { $0.contains(":") }) else {
+                return note("not a list of files without :")
+            }
+            add(name, .string(files.joined(separator: ":")))
         case "org-attach-use-inheritance":
             if value.symbol == "selective" { add(name, .string("selective")) } else { add(name, .string(truthy ? "t" : "nil")) }
         case "org-yank-image-save-method":

@@ -75,6 +75,7 @@ public enum EditorCommands {
         EditorCommand(id: "org.table.shrink", title: "Shrink Table Columns with Widths", action: .view),
         EditorCommand(id: "org.table.expand", title: "Expand Table Columns", action: .view),
         EditorCommand(id: "org.link.insert", title: "Insert Link…", action: .app),
+        EditorCommand(id: "app.cite.insert", title: "Insert Citation…", action: .app),
         EditorCommand(id: "org.link.store", title: "Store Link", action: .app),
         EditorCommand(id: "org.id.store-link", title: "Store ID Link", action: .app),
         EditorCommand(id: "org.subtree.paste", title: "Paste Subtree", action: .app),

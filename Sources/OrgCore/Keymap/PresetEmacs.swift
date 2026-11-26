@@ -118,6 +118,9 @@ extension KeymapPreset {
         keys = "C-c C-l"
         command = "org.link.insert"
         [[bind]]
+        keys = "C-c C-x @"
+        command = "app.cite.insert"
+        [[bind]]
         keys = "C-c l"
         command = "org.link.store"
         [[bind]]

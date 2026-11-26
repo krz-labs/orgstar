@@ -562,6 +562,8 @@ struct ReaderScreen: View {
         case .message(let text): message = text
         case .choose(let question, let paths): message = question + paths.map { ($0 as NSString).lastPathComponent }.joined(separator: ", ")
         case .elisp: message = "Open the file in the editor to run elisp links."
+        // `Links.link` doesn't read citations, so none come here.
+        case .citation: break
         }
         return .handled
     }

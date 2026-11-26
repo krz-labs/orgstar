@@ -215,6 +215,8 @@ public enum UserConfig {
         Setting(section: "", key: "org-attach-use-inheritance", defaultsKey: "attachUseInheritance",
                 kind: .choice([("selective", "selective"), ("t", "t"), ("nil", "nil")]), fallback: .string("selective"),
                 comment: "whether DIR and ID inherit for attachments: selective (as org-use-property-inheritance), t or nil", legacy: ""),
+        Setting(section: "", key: "org-cite-global-bibliography", defaultsKey: "citeGlobalBibliography", kind: .string, fallback: .string(""),
+                comment: "bibliography files (.bib or CSL-JSON .json) every file's citations use, separated by :", legacy: ""),
         Setting(section: "", key: "org-yank-image-save-method", defaultsKey: "yankImageSaveMethod", kind: .string, fallback: .string("attach"),
                 comment: "where pasted images go: attach (the entry's attachments) or a folder, relative to the org file's folder unless absolute", legacy: ""),
         Setting(section: "", key: "org-yank-dnd-method", defaultsKey: "yankDndMethod",

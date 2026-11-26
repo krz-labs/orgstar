@@ -140,6 +140,7 @@ enum CommandTitles {
         String(localized: "Indent Item", comment: "Command title"),
         String(localized: "Indent Item and Children", comment: "Command title"),
         String(localized: "Insert Checkbox Item", comment: "Command title"),
+        String(localized: "Insert Citation…", comment: "Command title"),
         String(localized: "Insert Column View Table", comment: "Command title"),
         String(localized: "Insert Denote Backlinks Block", comment: "Command title"),
         String(localized: "Insert Denote Files Block", comment: "Command title"),

@@ -17,7 +17,7 @@ public enum MarkdownExport {
         renderer.inTitle = true
         if options.title, !bodyOnly, let title = HTMLExport.metadata(text, settings: settings).title { out = "# " + renderer.inlineString(title) + "\n\n" }
         renderer.inTitle = false
-        renderer.citations = CiteProcessor(text: text, directory: directory)
+        renderer.citations = CiteProcessor(text: text, directory: directory, global: settings.citeGlobalBibliography)
         out += renderer.document(renderer.citations == nil ? text : renderer.citations!.inliningNotes(CiteProcessor.removingNocite(text)))
         return out.trimmingCharacters(in: .newlines) + "\n"
     }

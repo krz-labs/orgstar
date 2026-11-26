@@ -131,6 +131,8 @@ struct ContentView: View {
     @State private var showingTemplate = false
     /// Replace in Files, Rename Tag or Rename TODO Keyword, with the text to start from.
     @State private var replacing: (kind: ReplaceKind, initial: String)?
+    /// A followed citation's bibliography entry.
+    @State private var citationEntry: CitationEntry?
     @AppStorage("showTabBar") private var showTabBar = false
     /// This window's panes.
     @State private var window: WindowModel?
@@ -549,6 +551,9 @@ struct ContentView: View {
                 }
             }
         }
+        .citationAlert($citationEntry) { [session, workspace, commands] link in
+            if let message = LinkOpener.open(link, session: session, workspace: workspace, ask: commands.ask) { commands.show(message) }
+        }
         .alert(errorTitle, isPresented: errorShown) {
             Button("OK") {
                 workspace.lastError = nil
@@ -961,6 +966,19 @@ struct ContentView: View {
         return actions
     }
 
+    /// Insert Citation… and following citations.
+    private var citationActions: CitationActions {
+        var actions = CitationActions(
+            session: session, context: { [commands] in commands.editor?.context() },
+            perform: { [commands] in _ = commands.editor?.perform($0) },
+            show: { [commands] in commands.show($0) }, ask: { [commands] in commands.ask($0, reply: $1) },
+            present: { citationEntry = $0 })
+        #if APPSTORE
+        actions.reach = { [workspace] in GrantAccess.reach($0, workspace: workspace) }
+        #endif
+        return actions
+    }
+
     /// org-attach's commands for the entry at the caret.
     private var attachActions: AttachActions {
         AttachActions(
@@ -1136,7 +1154,9 @@ struct ContentView: View {
     private func runExternal(_ request: ExternalRequest) {
         switch request {
         case .openLink(let link):
-            if let message = LinkOpener.open(link, session: session, workspace: workspace, ask: commands.ask, elisp: runElispLink) { commands.show(message) }
+            if let message = LinkOpener.open(link, session: session, workspace: workspace, ask: commands.ask, elisp: runElispLink, citation: citationActions.follow) {
+                commands.show(message)
+            }
             // `org-occur` for a regexp link, once the editor shows the file.
             if let regexp = Links.regexpSearch(link) {
                 DispatchQueue.main.async { commands.editor?.perform(SparseTreeCommand(), answers: ["sparse": "/", "regexp": regexp]) }
@@ -1581,6 +1601,8 @@ struct ContentView: View {
             roamActions.follow(request)
         case let id where id.hasPrefix("app.dailies.") || id.hasPrefix("app.node."):
             roamActions.run(id)
+        case "app.cite.insert":
+            citationActions.insert()
         default:
             if let editor = commands.editor { editor.run(id) } else { commands.show(String(localized: "No file is open")) }
         }

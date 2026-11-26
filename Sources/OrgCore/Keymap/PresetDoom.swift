@@ -356,6 +356,10 @@ extension KeymapPreset {
         command = "org.link.insert"
         mode = "normal"
         [[bind]]
+        keys = "SPC m @"
+        command = "app.cite.insert"
+        mode = "normal"
+        [[bind]]
         keys = "SPC m l s"
         command = "org.link.store"
         mode = "normal"

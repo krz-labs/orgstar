@@ -72,6 +72,8 @@ struct EditorScreen: View {
     @State private var photos: [PhotosPickerItem] = []
     /// A file shown in Quick Look.
     @State private var previewed: URL?
+    /// A followed citation's bibliography entry.
+    @State private var citationEntry: CitationEntry?
     /// The project whose publishing folder the folder picker is choosing.
     @State private var publishFolder: PublishFolderRequest?
     @State private var choosingPublishFolder = false
@@ -332,6 +334,7 @@ struct EditorScreen: View {
             attachPhotos(items)
         }
         .quickLookPreview($previewed)
+        .citationAlert($citationEntry) { follow($0) }
         .fileExporter(isPresented: Binding(get: { exportedTable != nil }, set: { if !$0 { exportedTable = nil } }),
                       document: exportedTable, contentType: exportedTable?.type ?? .commaSeparatedText,
                       defaultFilename: exportedTable?.type == .tabSeparatedText ? "table.tsv" : "table.csv") { result in
@@ -579,6 +582,8 @@ struct EditorScreen: View {
                 }
             } else if id == "app.toggle-markup" {
                 model.showMarkup.toggle()
+            } else if id == "app.cite.insert" {
+                citationActions.insert()
             } else if MobileEditor.linkCommands.contains(id) {
                 link(id)
             } else if !MobileClock.run(id, model: model, workspace: workspace, show: { message = $0 }) {
@@ -606,6 +611,8 @@ extension EditorScreen {
                 guard let answer, let index = labels.firstIndex(of: answer) else { return }
                 follow(OrgLink(type: "file", path: paths[index], raw: "file:" + paths[index]))
             }
+        case .citation(let keys):
+            citationActions.follow(keys)
         case .elisp(let form):
             // Once trusted, as `org-link-elisp-confirm-function` asks.
             let go = { _ = Task { message = await session.evaluateLink(form) } }
@@ -644,6 +651,13 @@ extension EditorScreen {
             refresh: { Task { await workspace.refresh() } })
         actions.capture = { model.captureRequest = CaptureRequest(roam: $0) }
         return actions
+    }
+
+    /// Insert Citation… and following citations.
+    private var citationActions: CitationActions {
+        CitationActions(
+            session: session, context: { editor?.editContext() }, perform: { _ = editor?.perform($0) },
+            show: { message = $0 }, ask: { prompt = PromptRequest(prompt: $0, reply: $1) }, present: { citationEntry = $0 })
     }
 
     /// org-attach's commands for the entry at the caret.
@@ -1120,6 +1134,7 @@ struct CommandPalette: View {
         ("org.snippet.next-field", "Next Snippet Field"), ("org.snippet.previous-field", "Previous Snippet Field"),
         ("app.recovery", "Recovery Versions…"), ("app.sync-conflicts", "Resolve Sync Conflicts…"), ("app.lint", "Lint File"), ("app.lint-folders", "Lint All Folders"),
         ("app.working-copy.sync", "Sync with Working Copy"),
+        ("app.cite.insert", "Insert Citation…"),
         ("org.toggle-inline-images", "Show or Hide Inline Images"), ("org.toggle-inline-images-linked", "Show or Hide Inline Images, Including Described Links"), ("org.latex-preview", "Show or Hide LaTeX Previews"), ("editor.toggle-truncate-lines", "Truncate or Wrap Long Lines"), ("editor.toggle-auto-fill", "Turn Auto Fill On or Off"),
         ("editor.complete", "Complete at Point"), ("editor.dabbrev-expand", "Expand Word"), ("editor.dabbrev-completion", "Complete Word"),
         ("edit.isearch-forward", "Incremental Search"), ("edit.isearch-backward", "Incremental Search Backward"),

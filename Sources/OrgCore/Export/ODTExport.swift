@@ -64,7 +64,7 @@ public enum ODTExport {
         renderer.inTitle = false
         renderer.author = authorName
         renderer.dated = !(meta.date ?? "").isEmpty
-        renderer.citations = CiteProcessor(text: text, directory: directory)
+        renderer.citations = CiteProcessor(text: text, directory: directory, global: settings.citeGlobalBibliography)
         let body = renderer.document(renderer.citations == nil ? text : renderer.citations!.inliningNotes(CiteProcessor.removingNocite(text)))
         let date = options.date ? meta.date.flatMap { $0.isEmpty ? nil : renderer.inlineString($0) } : nil
         if let failure = renderer.failure { throw failure }

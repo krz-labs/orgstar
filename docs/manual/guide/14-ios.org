@@ -192,6 +192,8 @@ Cancel answers nothing, as =C-g= does.
 
 Show Backlinks in Commands lists the links to the heading at the caret and to the file; the daily note commands, Find Node…, Find Ref…, Insert Node Link… and Show Node Graph, all in Commands, work with org-roam-style notes, and the Folders tab's calendar menu opens today's, yesterday's and tomorrow's note. A new node and a daily-note capture open the capture sheet, whose Template picker lists the org-roam templates. See [[file:09-links.org][Links]].
 
+Insert Citation… in Commands asks for a bibliography entry in a list you can search, then the prefix, suffix and style, as on the Mac; completion offers citation keys after =@= in a citation. Open Link in Commands, on a citation, shows its entry with buttons for its file, DOI, URL and place in the bibliography file. =zotero://= links go to the system, which opens Zotero if it is installed. Only bibliography files in the app's folders can be read. See [[file:09-links.org][Links]].
+
 Incremental Search is in Commands, and on =C-s= and =C-r= with a hardware keyboard; see [[file:02-the-editor.org][The editor]]. =auto-fill-mode= works as on the Mac.
 
 The org-timer commands are in Commands; a running timer shows above the text. See [[file:06-dates-and-clocking.org][Dates and clocking]].
@@ -530,6 +532,7 @@ These settings from =config.toml= apply on iOS:
 - =org-enforce-todo-dependencies=, =org-enforce-todo-checkbox-dependencies=, =org-track-ordered-property-with-tag=, =org-agenda-dim-blocked-tasks=
 - =org-roam-directory=, =org-roam-dailies-directory=, =org-roam-dailies-file=, =org-roam-dailies-head=, =org-roam-dailies-entry=
 - =org-crypt-tag-matcher=, =org-crypt-use-before-save-magic=, =org-attach-id-dir=, =org-attach-use-inheritance=, =org-yank-image-save-method=, =org-timer-format=, =org-timer-default-timer=
+- =org-cite-global-bibliography=, for files in the app's folders
 - =org-archive-location=, =[org-structure-template-alist]=
 - =org-use-tag-inheritance=, =org-tags-exclude-from-inheritance=, =org-tag-alist=
 - =org-use-speed-commands=, with a hardware keyboard
