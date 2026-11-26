@@ -227,6 +227,11 @@ struct ExportItems: View {
             if let exportSubtree {
                 Button("Export Subtree…", systemImage: "list.bullet.indent") { exportSubtree() }
             }
+            if OrgExport.Format.pdf.locked {
+                Button("\(String(localized: "Print…")) (orgstar+)", systemImage: "printer") { ProAccess.shared.allows(.export) }
+            } else {
+                Button("Print…", systemImage: "printer") { Self.startPrinting(path: path, text: text, scope: .file, theme: model.theme, report: report) }
+            }
             if let calendars = AgendaCalendars(model: model) {
                 if dividers { Divider() }
                 if OrgExport.Format.icalendar.locked {
@@ -252,6 +257,22 @@ struct ExportItems: View {
         var settings = ExportSettings.saved(for: path)
         settings.bodyOnly = on
         settings.save(for: path)
+    }
+
+    /// Print…: the page PDF export makes of `scope` of `text`, the buffer of the file at `path`,
+    /// in the print sheet. `report` gets the reason it can't print.
+    @MainActor
+    static func startPrinting(path: String, text: String, scope: PrintScope, theme: ThemeSpec, report: @escaping (String) -> Void) {
+        let settings = OrgPreferences.orgSettings().resolvingSetupFiles(in: text, path: path, read: OrgSettings.readFile)
+        guard let html = Printing.page(text, path: path, scope: scope, settings: settings, codeStyle: HTMLCodeStyle(highlighter: MobileEditor.highlighter, theme: theme),
+                                       language: OrgPreferences.exportLanguage()) else { return report(String(localized: "Not in a subtree")) }
+        Task {
+            do {
+                try await Printing.show(html: html, directory: URL(fileURLWithPath: path).deletingLastPathComponent())
+            } catch {
+                report(String(localized: "Can't print: \(String(describing: error))"))
+            }
+        }
     }
 
     /// The file on the clipboard as HTML, RTF and plain text, to paste formatted. Returns a message.
@@ -327,14 +348,21 @@ struct SubtreeExportScreen: View {
         NavigationStack {
             let bodyOnly = ExportSettings.saved(for: path).bodyOnly
             let name = ExportScope.fileName(tree, subtreeAt: caret, settings: OrgPreferences.orgSettings())
-            List(OrgExport.Format.allCases.filter { !$0.locked }, id: \.self) { format in
-                if bodyOnly, !format.allowsBodyOnly {
-                    LabeledContent(format.name) { Text("No body-only export") }.foregroundStyle(.secondary)
-                } else {
-                    let export = OrgExport(text: tree.text, path: path, format: format, settings: OrgPreferences.orgSettings(),
-                                           codeStyle: HTMLCodeStyle(highlighter: MobileEditor.highlighter, theme: model.theme), name: name,
-                                           subtree: caret, bodyOnly: bodyOnly)
-                    ShareLink(item: export, preview: SharePreview(export.fileName)) { Text(format.name) }
+            List {
+                ForEach(OrgExport.Format.allCases.filter { !$0.locked }, id: \.self) { format in
+                    if bodyOnly, !format.allowsBodyOnly {
+                        LabeledContent(format.name) { Text("No body-only export") }.foregroundStyle(.secondary)
+                    } else {
+                        let export = OrgExport(text: tree.text, path: path, format: format, settings: OrgPreferences.orgSettings(),
+                                               codeStyle: HTMLCodeStyle(highlighter: MobileEditor.highlighter, theme: model.theme), name: name,
+                                               subtree: caret, bodyOnly: bodyOnly)
+                        ShareLink(item: export, preview: SharePreview(export.fileName)) { Text(format.name) }
+                    }
+                }
+                if !OrgExport.Format.pdf.locked {
+                    Button("Print…", systemImage: "printer") {
+                        ExportItems.startPrinting(path: path, text: tree.text, scope: .subtree(caret), theme: model.theme) { _ in }
+                    }
                 }
             }
             .navigationTitle("Export Subtree")

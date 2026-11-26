@@ -56,6 +56,17 @@ public enum ExportScope {
         return lines.joined(separator: "\n") + "\n" + body
     }
 
+    /// The text in `range` as a document of its own, as Org exports the active region: the
+    /// file's keyword lines before the first heading, then the region. Keyword lines inside the
+    /// region aren't repeated.
+    public static func region(_ text: String, _ range: Range<Int>, settings: OrgSettings = .default) -> String {
+        let ns = text as NSString
+        let start = min(max(0, range.lowerBound), ns.length)
+        let selected = ns.substring(with: NSRange(location: start, length: min(range.count, ns.length - start)))
+        let keywords = preamble(OrgParser.parse(text, defaults: settings)).filter { !selected.contains($0) }
+        return keywords.isEmpty ? selected : keywords.joined(separator: "\n") + "\n" + selected
+    }
+
     /// Keywords of the file that name it or its export, left out of a shared entry.
     static let fileOnlyKeywords: Set<String> = ["TITLE", "SUBTITLE", "EXPORT_FILE_NAME"]
 

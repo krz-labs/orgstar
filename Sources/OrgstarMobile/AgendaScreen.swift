@@ -218,6 +218,7 @@ struct AgendaScreen: View, Equatable {
                     Button("Select", systemImage: "checkmark.circle") { selecting = true }
                     Divider()
                     Button("Board", systemImage: "rectangle.split.3x1") { showingBoard = true }
+                    Button("Print…", systemImage: "printer") { printAgenda() }
                 } label: {
                     Label("Views", systemImage: "list.bullet.rectangle")
                 }
@@ -636,6 +637,7 @@ struct AgendaScreen: View, Equatable {
             CommandRow(id: "agenda.filter", title: String(localized: "Filter…")),
             CommandRow(id: "agenda.select", title: String(localized: "Select")),
             CommandRow(id: "agenda.board", title: CommandTitle.localized("Board")),
+            CommandRow(id: "agenda.print", title: CommandTitle.localized("Print…")),
             CommandRow(id: "app.capture", title: CommandTitle.localized("Capture…")),
         ]
         return rows + MobileClock.screenCommands.map { CommandRow(id: $0.id, title: CommandTitle.localized($0.title)) }
@@ -656,8 +658,23 @@ struct AgendaScreen: View, Equatable {
         case "agenda.filter": showingFilter = true
         case "agenda.select": selecting = true
         case "agenda.board": showingBoard = true
+        case "agenda.print": printAgenda()
         case "app.capture": model.captureRequest = CaptureRequest()
         default: _ = MobileClock.run(id, model: model, workspace: workspace) { message = $0 }
+        }
+    }
+
+    /// Print…: the agenda as shown, in the print sheet, on pages laid out as PDF export lays them out.
+    private func printAgenda() {
+        let parts = agenda.printParts(showAllDates: OrgPreferences.agendaShowAllDates(), filter: filter, overdueShown: overdueExpanded)
+        let subtitle = [shownFolders, filter.isEmpty ? nil : String(localized: "Filter: \(filter.description)")].compactMap { $0 }.joined(separator: " · ")
+        let html = AgendaPrint.page(title: title, subtitle: subtitle, parts: parts, today: agenda.today)
+        Task {
+            do {
+                try await Printing.show(html: html, directory: nil)
+            } catch {
+                message = String(localized: "Can't print: \(String(describing: error))")
+            }
         }
     }
 

@@ -517,6 +517,8 @@ struct EditorScreen: View {
                 sheet = .export
             } else if id == EditorScreen.exportSubtreeCommand {
                 exportSubtree()
+            } else if Printing.commands.contains(id) {
+                printFile(id)
             } else if id == "app.share-subtree" {
                 if let caret = self.editor?.editContext().caret, let refusal = session.refusesSubtreeShare(path, at: caret) {
                     message = refusal
@@ -710,6 +712,20 @@ extension EditorScreen {
         guard let context = editor?.editContext() else { return }
         guard ExportScope.subtree(context.text, at: context.caret) != nil else { return message = "Not in a subtree" }
         sheet = .exportSubtree(context.caret)
+    }
+
+    /// Print…, Print Subtree… and Print Selection…, from Commands.
+    private func printFile(_ id: String) {
+        guard let context = editor?.editContext() else { return }
+        let scope: PrintScope
+        switch id {
+        case "app.print-subtree": scope = .subtree(context.caret)
+        case "app.print-selection":
+            guard let selection = context.selection.first(where: { !$0.isEmpty }) else { return message = String(localized: "No text is selected") }
+            scope = .selection(selection)
+        default: scope = .file
+        }
+        ExportItems.startPrinting(path: path, text: context.text, scope: scope, theme: model.theme) { message = $0 }
     }
 
     /// `org-html-export-to-html` and open: the page in Quick Look, from a temporary file.
@@ -1220,7 +1236,9 @@ struct CommandPalette: View {
         switch id {
         case "app.recovery": return recoveries > 0 ? nil : String(localized: "No Recovery Versions")
         case "app.sync-conflicts": return syncCopies > 0 ? nil : String(localized: "No sync conflict copies", comment: "Why Resolve Sync Conflicts… is greyed in the Commands list")
-        case EditorScreen.exportSubtreeCommand, "app.share-subtree":
+        case "app.print-selection":
+            return context.selection.contains { !$0.isEmpty } ? nil : String(localized: "No text is selected")
+        case EditorScreen.exportSubtreeCommand, "app.share-subtree", "app.print-subtree":
             return ExportScope.subtree(context.text, at: context.caret) != nil ? nil : String(localized: "Not in a subtree", comment: "Why Export Subtree… is greyed in the Commands list")
         default: return editor.applies(id, in: context) ? nil : CommandReason.reason(for: id, in: context)
         }

@@ -34,6 +34,8 @@ final class AppCommands {
     private var jumpID = 0
     /// Days the agenda window should show, from a followed timestamp.
     var agendaRequest: (start: Int, days: Int)?
+    /// File ▸ Print… with the agenda window in front: the agenda window prints what it shows.
+    var agendaPrintRequested = false
     /// The editor with focus, for menus and the palette.
     var editor: OrgEditor?
     /// The editors and text views of every pane in every window.
@@ -513,6 +515,9 @@ struct OrgstarApp: App {
 
     init() {
         PDFExport.mathJaxURL = OrgMathJax.script
+        #if !APPSTORE
+        Printing.saveTo = DevelopmentHooks.printTo
+        #endif
         DiagramBlocks.vizURL = OrgMathJax.viz
         DiagramBlocks.mermaidURL = OrgMathJax.mermaid
         #if APPSTORE
@@ -670,6 +675,22 @@ struct OrgstarApp: App {
                 Button("Save All") { commands.run("app.save-all") }
                     .keyboardShortcut("s", modifiers: [.command, .option])
                     .disabled(session.dirtyPaths.isEmpty)
+            }
+            CommandGroup(replacing: .printItem) {
+                Button("Page Setup…") { NSPageLayout().runModal() }
+                // ⌘P is Quick Open.
+                Button("Print…") {
+                    if NSApp.keyWindow?.identifier?.rawValue.contains("agenda") == true {
+                        commands.agendaPrintRequested = true
+                    } else {
+                        commands.run("app.print")
+                    }
+                }
+                .keyboardShortcut("p", modifiers: [.command, .option])
+                Button("Print Subtree…") { commands.run("app.print-subtree") }
+                    .disabled(!session.isOrg)
+                Button("Print Selection…") { commands.run("app.print-selection") }
+                    .disabled(!session.isOrg)
             }
             CommandGroup(after: .sidebar) {
                 Button("Split Pane Below") { commands.run("app.split-below") }

@@ -15,6 +15,7 @@ import OrgEditorAppKit
 /// - `ORGSTAR_PASTEBOARD`: the name of a pasteboard to paste images and files from, instead of
 ///   the clipboard.
 /// - `ORGSTAR_APPEARANCE`: `dark` or `light`, instead of the system's.
+/// - `ORGSTAR_PRINT_TO`: print jobs are saved to this PDF path without the print panel.
 /// - `ORGSTAR_SNAPSHOT`: after `ORGSTAR_SNAPSHOT_DELAY` seconds (default 3), render the main
 ///   window to this PNG path and quit. Rendering from inside the app needs no screen-recording
 ///   permission.
@@ -27,6 +28,7 @@ enum DevelopmentHooks {
     static var urlToOpen: String? { ProcessInfo.processInfo.environment["ORGSTAR_URL"] }
     /// `ORGSTAR_SNAPSHOT` is set: the run renders a window and quits.
     static var snapshotting: Bool { ProcessInfo.processInfo.environment["ORGSTAR_SNAPSHOT"] != nil }
+    static var printTo: URL? { ProcessInfo.processInfo.environment["ORGSTAR_PRINT_TO"].map { URL(fileURLWithPath: $0) } }
     static var answers: [String] { ProcessInfo.processInfo.environment["ORGSTAR_ANSWERS"]?.split(separator: ",").map(String.init) ?? [] }
 
     @MainActor

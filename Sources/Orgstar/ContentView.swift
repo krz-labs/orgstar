@@ -646,6 +646,35 @@ struct ContentView: View {
         }
     }
 
+    /// Print…, Print Subtree… and Print Selection…: the page PDF export makes of the file, the
+    /// subtree at the caret or the selection, in the print panel.
+    private func printFile(_ id: String) {
+        guard let path = session.path, let text = session.document?.text, let editor = commands.editor else { return commands.show(String(localized: "No file is open")) }
+        guard readsIncludes(text, path: path) else { return }
+        let context = editor.context()
+        let scope: PrintScope
+        switch id {
+        case "app.print-subtree": scope = .subtree(context.caret)
+        case "app.print-selection":
+            guard let selection = context.selection.first(where: { !$0.isEmpty }) else { return commands.show(String(localized: "No text is selected")) }
+            scope = .selection(selection)
+        default: scope = .file
+        }
+        let defaults = Preferences.orgSettings.resolvingSetupFiles(in: text, path: path, read: OrgSettings.readFile)
+        guard let html = Printing.page(text, path: path, scope: scope, settings: defaults, codeStyle: HTMLCodeStyle(highlighter: PaneView.highlighter, theme: theme),
+                                       language: OrgPreferences.exportLanguage()) else { return commands.show(String(localized: "Not in a subtree")) }
+        let directory = URL(fileURLWithPath: path).deletingLastPathComponent()
+        // Images that can't be read are left out, so offer access to them first.
+        _ = reach(PDFExport.imageFiles(html, directory: directory).filter(WorkspaceModel.isThere))
+        Task {
+            do {
+                try await Printing.show(html: html, directory: directory)
+            } catch {
+                commands.show(String(localized: "Can't print: \(String(describing: error))"))
+            }
+        }
+    }
+
     /// Whether the caret is in a heading's subtree, which the export dialog can export alone.
     private var exportSubtreeAvailable: Bool {
         guard let text = session.document?.text, let caret = commands.editor?.context().caret else { return false }
@@ -1357,7 +1386,7 @@ struct ContentView: View {
             return commands.show(Self.unavailable(EditorCommands.all.first { $0.id == id }?.title ?? id))
         }
         if let feature = ProFeature.required(byCommand: id), !ProAccess.shared.allows(feature) { return }
-        let orgOnly = ["app.refile", "app.refile.copy", "app.archive", "app.clock.in", "app.clock.default", "app.copy-rich-text", "app.export-subtree", "app.export-body-only", "app.share-subtree"].contains(id) || (id.hasPrefix("app.export.") && !id.hasPrefix("app.export.icalendar-")) || id.hasPrefix("org.")
+        let orgOnly = ["app.refile", "app.refile.copy", "app.archive", "app.clock.in", "app.clock.default", "app.copy-rich-text", "app.export-subtree", "app.export-body-only", "app.share-subtree"].contains(id) || Printing.commands.contains(id) || (id.hasPrefix("app.export.") && !id.hasPrefix("app.export.icalendar-")) || id.hasPrefix("org.")
         if orgOnly, !session.isOrg {
             commands.show(String(localized: "Not an org file"))
             return
@@ -1561,6 +1590,11 @@ struct ContentView: View {
             openWindow(id: "lint-folders")
         case "app.copy-rich-text":
             copyRichText()
+        case "app.print", "app.print-subtree", "app.print-selection":
+            printFile(id)
+        case "app.print-agenda":
+            commands.agendaPrintRequested = true
+            openWindow(id: "agenda")
         case "app.share-subtree":
             guard let path = session.path else { return commands.show(String(localized: "No file is open")) }
             if let refusal = session.refusesSubtreeShare(path, at: session.caret) { return commands.show(refusal) }

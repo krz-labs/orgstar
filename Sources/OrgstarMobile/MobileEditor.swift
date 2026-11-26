@@ -512,6 +512,9 @@ final class MobileEditor: NSObject, DocumentBuffer {
         case _ where id.hasPrefix(NamedMacros.commandPrefix): return true
         case "app.refile", "app.refile.copy", "app.archive": return onAppCommand != nil && Presentation.heading(containing: context.caret, in: context.tree) != nil
         case "app.export-dialog", "app.export-subtree-dialog", "app.share-subtree", "app.copy-rich-text", "app.export.html-open", "app.export-body-only", "app.export.icalendar-agenda", "app.export.icalendar-combined": return onAppCommand != nil
+        case "app.print": return onAppCommand != nil
+        case "app.print-subtree": return onAppCommand != nil && Presentation.heading(containing: context.caret, in: context.tree) != nil
+        case "app.print-selection": return onAppCommand != nil && context.selection.contains { !$0.isEmpty }
         case _ where id.hasPrefix("app.publish"): return onAppCommand != nil
         case "app.working-copy.sync", "app.cite.insert": return onAppCommand != nil
         case _ where Self.linkCommands.contains(id): return onAppCommand != nil

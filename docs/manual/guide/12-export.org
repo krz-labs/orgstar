@@ -59,7 +59,7 @@ The Export menu offers HTML, Markdown, PDF, Word, Rich Text (RTF), Plain Text, O
 
 Body Only in the Export menu leaves out the title and the page around the text, as in the Mac's export dialog, and is kept for each file. While it is on, PDF, Word, Rich Text (RTF), Plain Text, ODT and iCalendar say "This format has no body-only export. Turn body-only export off for this file first." Turn Body-Only Export On or Off, in Commands or on =C-c C-e C-b= with a hardware keyboard, changes the same setting. Export Subtree…, in the editor's Export menu, lists the formats for the subtree at the caret, and follows Body Only too. There is no subtree setting on iOS: the menu's formats always export the whole file.
 
-The Export menu also has Export Agenda Files to iCalendar and Combine Agenda Files into iCalendar (see [[*iCalendar export][iCalendar export]]). Export to HTML and Open, in Commands or on =C-c C-e h o= with a hardware keyboard, shows the HTML export in Quick Look, with the file's images in the page; nothing is written beside the Org file; it follows Body Only. Copy as Rich Text is in Commands too.
+Print… in the Export menu prints the file; see [[*Printing][Printing]]. The Export menu also has Export Agenda Files to iCalendar and Combine Agenda Files into iCalendar (see [[*iCalendar export][iCalendar export]]). Export to HTML and Open, in Commands or on =C-c C-e h o= with a hardware keyboard, shows the HTML export in Quick Look, with the file's images in the page; nothing is written beside the Org file; it follows Body Only. Copy as Rich Text is in Commands too.
 
 * HTML export
 
@@ -231,6 +231,22 @@ Export to PDF makes the HTML export into a PDF, laid out and split into pages by
 - Each page's number is centred in its bottom margin (=pdf-page-numbers=; Page numbers in the dialog). The numbers are annotations on the pages, so the table of contents and other links keep working.
 
 For typeset output with LaTeX's classes and packages, use Export to PDF with Emacs instead (see /Exporting through Emacs/).
+
+* Printing
+
+Printing makes the same pages as Export to PDF, with its margins, font and page numbers, and hands them to the system's print panel, which shows a preview and the printer's own choices. Pages that don't fit the paper chosen there are scaled down to fit. Like PDF export, printing a file needs [[file:../install.org][orgstar+]], since the print panel can save a PDF; printing the agenda doesn't (see [[file:07-agenda.org][Agenda]]).
+
+| Command          | Prints                                                                                                   |
+|------------------+----------------------------------------------------------------------------------------------------------|
+| Print…           | The whole file.                                                                                          |
+| Print Subtree…   | The subtree at the caret, as a document of its own, as the export dialog's /Scope/ exports it. "Not in a subtree" before the first heading. |
+| Print Selection… | The selected text, under the file's title and with its =#+= keywords. "No text is selected" without a selection. |
+
+On the Mac the three are in the File menu and the command palette; Print… is =⌥⌘P=, since =⌘P= is Quick Open. File ▸ Page Setup… sets the paper size and orientation the pages are laid out for. Body Only and the file's subtree export setting don't apply to printing.
+
+On iOS, Print… is in the Export menu and prints the whole file; Export Subtree… has Print… for the subtree; all three commands are in Commands, where Print Selection… is greyed without a selection. The pages are US Letter or A4, as for PDF export, and the system's print sheet scales them to the paper.
+
+The text printed is the editor's, saved or not, as for export. An entry encrypted with =crypt= prints as its encrypted message unless it has been decrypted in the file (Decrypt Entry in File…); one only opened with Decrypt Entry… stays encrypted in the print. See [[file:04-outlines.org][Outlines]].
 
 * LaTeX export
 

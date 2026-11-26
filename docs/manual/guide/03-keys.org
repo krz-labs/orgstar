@@ -116,6 +116,7 @@ These come from the menu bar and work in every preset. In the Doom preset, keys 
 | File | Close Window | =⇧⌘W= |
 | File | Save | =⌘S= |
 | File | Save All | =⌥⌘S= |
+| File | Print… (in the agenda window, prints the agenda) | =⌥⌘P= |
 | Edit ▸ Find | Find… | =⌘F= |
 | Edit ▸ Find | Find and Replace… | =⌥⌘F= |
 | Edit ▸ Find | Find Next | =⌘G= |
@@ -1069,6 +1070,9 @@ When a key appears in several rows, it runs the command whose condition holds at
 | Export to RTF (=app.export.rtf=) | — | — | — | Exports to Rich Text Format. |
 | Export to Plain Text (=app.export.plain-text=) | — | — | — | Exports the text without styles, without Emacs. |
 | Copy as Rich Text (=app.copy-rich-text=) | — | — | — | Copies the selection, or the file, as HTML, RTF and plain text. |
+| Print… (=app.print=) | — | — | — | Prints the file, laid out as Export to PDF. File ▸ Print… (=⌥⌘P=). See [[file:12-export.org][Export]]. |
+| Print Subtree… (=app.print-subtree=) | — | — | — | Prints the subtree at the caret. |
+| Print Selection… (=app.print-selection=) | — | — | — | Prints the selected text. |
 | Export to PDF with Emacs (=app.export.pdf=) | =C-c C-e l p= | — | =SPC m e l p= (N) | Exports to PDF through Emacs (=org-latex-export-to-pdf=). |
 | Export to LaTeX (=app.export.latex=) | =C-c C-e l l= | — | — | Exports to LaTeX without Emacs, as =org-latex-export-to-latex= does. |
 | Export to ODT (=app.export.odt=) | =C-c C-e o o= | — | — | Exports to OpenDocument text without Emacs, as =org-odt-export-to-odt= does. |

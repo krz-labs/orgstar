@@ -50,7 +50,8 @@ extension ProFeature {
     /// Decrypting stays free so no one is locked out of their own text.
     public static func required(byCommand id: String) -> ProFeature? {
         switch id {
-        case "app.copy-rich-text": .export
+        // The print panel saves PDFs. The agenda prints without orgstar+.
+        case "app.copy-rich-text", "app.print", "app.print-subtree", "app.print-selection": .export
         case let id where id.hasPrefix("app.export."): required(byExport: String(id.dropFirst("app.export.".count)))
         case let id where id.hasPrefix("app.publish"): .export
         case "app.crypt.encrypt-entry", "app.crypt.encrypt-entries": .encryption

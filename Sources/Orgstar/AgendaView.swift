@@ -373,6 +373,11 @@ struct AgendaView: View {
         .onChange(of: commands.agendaRequest?.start, initial: true) { showRequestedDays() }
         .onChange(of: commands.agendaRequest?.days) { showRequestedDays() }
         .background { Refresher(base: refreshKey, session: session, workspace: workspace, refresh: refresh) }
+        .task(id: commands.agendaPrintRequested) {
+            guard commands.agendaPrintRequested else { return }
+            commands.agendaPrintRequested = false
+            await printAgenda()
+        }
         .task {
             loadViews()
             // The now line moves each minute; a new day refreshes the statuses.
@@ -382,6 +387,22 @@ struct AgendaView: View {
                 now = Date()
                 if Days.absolute(now, calendar: .current) != agenda.today { tick += 1 }
             }
+        }
+    }
+
+    /// File ▸ Print…: the agenda as it shows now, in the print panel, on pages laid out as PDF
+    /// export lays them out. A window just opened to print computes the agenda first.
+    private func printAgenda() async {
+        if agenda.days.isEmpty, agenda.list.isEmpty, agenda.blocks.isEmpty { await refresh() }
+        // A refresh started meanwhile replaces this one's days.
+        while agenda.isComputing { try? await Task.sleep(for: .milliseconds(50)) }
+        let subtitle = [isAgenda && viewName != AgendaViewLoader.builtIn[0].name ? viewName : nil, shownFolders,
+                        filter.isEmpty ? nil : String(localized: "Filter: \(filter.description)")].compactMap { $0 }.joined(separator: " · ")
+        let parts = agenda.printParts(showAllDates: showAllDates, filter: filter, overdueShown: overdueShown)
+        do {
+            try await Printing.show(html: AgendaPrint.page(title: title, subtitle: subtitle, parts: parts, today: agenda.today), directory: nil)
+        } catch {
+            message = String(localized: "Can't print: \(String(describing: error))")
         }
     }
 

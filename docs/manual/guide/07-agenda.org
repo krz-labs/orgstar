@@ -719,6 +719,12 @@ When no entry matches, the board says so in place of the table or columns.
 
 Choose Board from the Views menu in the Agenda tab. The board opens over the agenda with a List / Kanban switch at the top, a match field under it (press Search to apply it), and Done to close it. The list shows the entries sorted by keyword, then title; tap one to open it. In Kanban, columns scroll sideways; touch and hold a card, then drag it to another column to set that keyword. A card's or row's menu has Move To (a keyword, or None), Set Property… (=NAME value=) and Open. The Kanban or List choice and the match are remembered, separately from the Mac's.
 
+* Printing the agenda
+
+File ▸ Print… (=⌥⌘P=) with the agenda window in front prints the agenda as it shows: its title, the folders shown and the filter, then each day's header with today's overdue entries (only their count while Overdue is folded), the entries with their time or status, category, tags, TODO keyword and priority, and the time grid; or the entries of a TODO list, match or search; or each block of a block agenda under its title. There is no current-time line. The pages are laid out as Export to PDF lays out a file, with its margins and page numbers, in the print panel. Printing the agenda doesn't need orgstar+. On iOS, Print… is in the agenda's Views menu and in its Commands.
+
+An entry encrypted with =crypt= shows in the agenda, and so in the print, only by its heading; see [[file:04-outlines.org][Outlines]].
+
 * Desktop widgets
 
 On the Mac, orgstar's widgets go on the desktop and in Notification Center: right-click the desktop, choose Edit Widgets…, and pick orgstar in the gallery. They appear there once orgstar has run.
