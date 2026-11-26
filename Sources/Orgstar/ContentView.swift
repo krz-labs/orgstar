@@ -410,6 +410,7 @@ struct ContentView: View {
         .modifier(CryptSettings(session: session, cryptBeforeSave: cryptBeforeSave, cryptTagMatcher: cryptTagMatcher) { path in
             panel = .crypt(UUID(), CryptRequest(mode: .openFile, path: path, offset: 0))
         })
+        .modifier(DecryptQuestion())
         .onChange(of: options, initial: true) { _, options in session.options = options }
         .onAppear { TimerModel.shared.onDone = { [commands] in commands.show($0) } }
         .onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)) { _ in defaultsChanges += 1 }

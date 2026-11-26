@@ -947,13 +947,24 @@ ww0ECQMI…
 | Decrypt Entry… (=app.crypt.open-entry=) | Asks for the passphrase and shows the decrypted text in a sheet. Save encrypts the edited text again in the message's place; the file never holds the plaintext. Decrypt in File puts the text in the file instead. |
 | Decrypt Entry in File… (=app.crypt.decrypt-entry=) | Replaces the message with the decrypted text (=org-decrypt-entry=). Headings in it are moved below the entry's level when they aren't. |
 | Encrypt Tagged Entries… (=app.crypt.encrypt-entries=) | Encrypts every entry with the =crypt= tag, its own or inherited, that isn't encrypted yet (=org-encrypt-entries=). A tagged entry's tagged children go inside its message. |
-| Forget Encryption Passphrase (=app.crypt.forget-passphrase=) | Removes the current file's passphrase from the Keychain. |
+| Forget Encryption Passphrase (=app.crypt.forget-passphrase=) | Removes the current file's passphrase from the Keychain and from memory. |
 
 The commands have no keys, as in Org; run them from the command palette, or bind them in =keymap.toml=. On iOS they are in the editor's Commands.
 
-Remember in the Keychain stores the passphrase for the file. The next command on that file uses it after Touch ID, Face ID or the device password, without asking. =org-crypt-tag-matcher= in =config.toml= sets the tag; it must be a single tag, not a match expression.
+=org-crypt-tag-matcher= in =config.toml= sets the tag; it must be a single tag, not a match expression.
 
 Messages are written with AES-256 and an iterated and salted SHA-256 key, which GnuPG and Emacs read. Messages using AES-128, AES-192 or AES-256 are read, compressed or not. Messages encrypted to a public key, other ciphers, and AEAD (OpenPGP version 5 and 6) packets are not supported.
+
+** Face ID and Touch ID
+
+One setting decides whether passphrases are saved in the Keychain: Use Face ID to Decrypt on iPhone and iPad (Use Touch ID to Decrypt on the Mac and on an iPad with Touch ID). It is in Settings ▸ Encryption on the Mac and in the Settings tab on iOS. It is kept in the app's settings on the device, not in =config.toml=, so it isn't synced to other devices and can't be changed by editing a file.
+
+- Off :: No passphrase is saved in the Keychain or read from it. A passphrase is typed when it's needed: by the org-crypt commands, to open a =.org.gpg= file, and by Encrypt… for a held file. Once typed, it is kept in memory for that file until the file is closed.
+- On :: A passphrase typed for a file, once it has opened or encrypted the file, is saved in the Keychain for that file. From then on the commands, opening the file, Encrypt… and encrypting on save use it after Face ID, Touch ID or the device's passcode or password, without asking for the passphrase.
+
+Until you choose, the setting is undecided and works as Off. The first time you type a passphrase that works, orgstar explains that Face ID can then decrypt anything whose passphrase is saved in your Keychain, and asks whether to use it: Enable turns the setting on and saves that passphrase; Not Now turns it off. Either answer is kept, so the question isn't asked again; change it in Settings. If passphrases saved by an earlier version of orgstar are in the Keychain, the question is asked once at the first launch instead, and they aren't used unless you choose Enable.
+
+Turning the setting off in Settings asks first, saying how many saved passphrases will be removed, then removes them from the Keychain. Settings lists the files with a saved passphrase, by name and folder, each with Forget, which removes that file's passphrase. Forget Encryption Passphrase does the same for the current file.
 
 ** Encrypting on save
 
@@ -963,8 +974,8 @@ With =org-crypt-use-before-save-magic = true= in =config.toml=, every save, the 
 - An entry decrypted with Decrypt Entry in File… and saved unchanged gets its old message back, byte for byte, as org-crypt does, and so does an entry left unchanged between saves. Only entries that changed get a new message, so syncing and git see no other change. A new message takes GnuPG's key iterations (about 65 MB of hashing); each changed entry adds a few hundredths of a second to its save.
 - Text typed below an entry's message isn't encrypted until it goes into the message: the save opens the old message with the passphrase and encrypts it with the new text as one.
 - Turning the setting off while a file is open doesn't write what it encrypted in plaintext: the file keeps encrypting its tagged entries until it's closed. Files opened afterwards are saved as they are.
-- The passphrase comes from the Keychain when it was remembered for the file, after Touch ID, Face ID or the device password. That is asked once for each file while it's open, at the first save that needs it; another file asks again, and so does the same file after it was closed. A passphrase typed for an org-crypt command on the file is used too. Closing the file or Forget Encryption Passphrase forgets it.
-- Without the passphrase, or when Touch ID is declined, the file isn't saved at all, and no recovery version or snapshot of it is kept, until the entries can be encrypted. A notice above the mode line (on iOS, at the top of the editor) says how many tagged entries aren't encrypted, and stays while that's so; its Encrypt… button asks for the passphrase and saves. Other edits to the file wait meanwhile. An entry with no text doesn't keep the file from being saved.
+- A passphrase typed for an org-crypt command on the file is used. With Use Face ID to Decrypt on, so is one saved in the Keychain for the file, after Face ID, Touch ID or the device password; that is asked once for each file while it's open, at the first save that needs it; another file asks again, and so does the same file after it was closed. With the setting off or undecided, the Keychain isn't asked. Closing the file or Forget Encryption Passphrase forgets the passphrase.
+- Without the passphrase, or when Face ID or Touch ID is declined, the file isn't saved at all, and no recovery version or snapshot of it is kept, until the entries can be encrypted. A notice above the mode line (on iOS, at the top of the editor) says how many tagged entries aren't encrypted, and stays while that's so; its Encrypt… button asks for the passphrase and saves. Other edits to the file wait meanwhile. An entry with no text doesn't keep the file from being saved.
 - When the file has encrypted entries already, the passphrase must open them. A first passphrase is asked twice. Entries encrypted to a public key (=org-crypt-key=) are left as they are and aren't checked; text typed below one can't be encrypted, and saving says so.
 - Use Disk Version, Merge with Markers, restoring an earlier version and resolving a sync conflict keep a copy of the editor's text first; while the file is held that copy can't be kept encrypted, so they stop and ask for the passphrase first. Replace in Files on a held file that has no editor open replaces without keeping a copy; the replacement can be undone in the file.
 - Archiving, refiling or copying an entry with the tag to another file encrypts it in place first; without the passphrase it isn't moved. A heading inside an encrypted entry (in its message on disk) isn't archived, refiled or copied on its own, to another file or within its own; move the encrypted entry.
@@ -977,14 +988,14 @@ With =org-crypt-use-before-save-magic = true= in =config.toml=, every save, the 
 
 orgstar opens and saves files encrypted with a passphrase as GnuPG (=gpg --symmetric=) and Emacs's EasyPG (=epa-file=) write them, named =NAME.org.gpg=. They show in the sidebar and the file list by name.
 
-Opening one asks for its passphrase, or takes it from the Keychain after Touch ID, Face ID or the device password; Remember in the Keychain keeps it for the file. A wrong passphrase leaves the file closed and as it was. While the file is open, saves encrypt it with that passphrase; closing it forgets the passphrase. A new file named =NAME.org.gpg= is empty: it isn't saved until Set Passphrase… in its notice gives it a passphrase, typed twice.
+Opening one asks for its passphrase, or, with Use Face ID to Decrypt on, takes it from the Keychain after Face ID, Touch ID or the device password (see Face ID and Touch ID above). A wrong passphrase leaves the file closed and as it was. While the file is open, saves encrypt it with that passphrase; closing it forgets the passphrase. A new file named =NAME.org.gpg= is empty: it isn't saved until Set Passphrase… in its notice gives it a passphrase, typed twice.
 
 The decrypted text is kept in memory only:
 - Files are written with AES-256 and an iterated and salted SHA-256 key, binary, or armored when the file was armored.
 - Recovery versions and hourly snapshots are kept encrypted with the file's passphrase, and Recovery Versions… shows them decrypted. Changes made to the file elsewhere are merged in memory, and a conflict is compared in memory.
 - The index, search, Spotlight, Quick Look, the agenda, widgets and the watch don't read the file's text. iCalendar export and publishing leave it out, and Emacs isn't given a copy of it. A clocked heading shows as "Encrypted entry" outside the editor. Handoff doesn't offer the file, and Share Subtree… refuses its entries.
 - Archiving from =NAME.org.gpg= goes to =NAME_archive.org.gpg=, encrypted with the same passphrase (Org would write =NAME.org.gpg_archive=, unencrypted). Entries aren't refiled or copied from it to a file that isn't encrypted.
-- Remembered passphrases are kept by the file's path, on this device only, readable while it's unlocked and after Touch ID, Face ID or the device password; renaming the file forgets it. Passphrases remembered by earlier versions move to this kind of item the first time they're used. The version of orgstar downloaded from the website can't make such items (it has no Keychain entitlement): it keeps remembered passphrases in the login keychain, not limited to this Mac, still asking for Touch ID or the password before one is used, and says so beside Remember in the Keychain.
+- Saved passphrases are kept by the file's path, on this device only, readable while it's unlocked and after Face ID, Touch ID or the device password; renaming the file forgets it. Passphrases saved by earlier versions move to this kind of item the first time they're used with the setting on. The version of orgstar downloaded from the website can't make such items (it has no Keychain entitlement): it keeps saved passphrases in the login keychain, not limited to this Mac, still asking for Touch ID or the password before one is used, and says so under Use Touch ID to Decrypt.
 
 =age= files (=.age=) aren't supported.
 

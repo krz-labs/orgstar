@@ -22,7 +22,7 @@ struct CryptSaveTests {
         session = DocumentSession(recovery: FileRecoveryStore(directory: recoveryFolder))
         session.saveMode = .explicit
         session.encryptsTaggedEntries = true
-        session.hasStoredPassphrase = { _ in false }
+        session.passphrases = FakeKeychain.passphrases(.undecided).passphrases
     }
 
     /// Types `text` at `offset` in the open file, as the editor would.
@@ -60,9 +60,9 @@ struct CryptSaveTests {
 
     @Test func savesTaggedEntriesEncryptedWithTheRememberedPassphrase() async throws {
         try notes.write("a.org", "* Bank :crypt:\nold\n* Last\n")
-        session.hasStoredPassphrase = { _ in true }
-        var asked = 0
-        session.storedPassphrase = { _ in asked += 1; return "pw" }
+        let (keychain, passphrases) = FakeKeychain.passphrases(.on, saved: [file.path: "pw"])
+        session.passphrases = passphrases
+        var asked: Int { keychain.calls.filter { $0.hasPrefix("read ") }.count }
         var written: [String] = []
         session.fileWritten = { written.append($0) }
         session.open(file.path)

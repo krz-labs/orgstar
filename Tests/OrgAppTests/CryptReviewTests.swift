@@ -23,7 +23,7 @@ struct CryptReviewTests {
         session = DocumentSession(recovery: FileRecoveryStore(directory: recoveryFolder))
         session.saveMode = .explicit
         session.encryptsTaggedEntries = true
-        session.hasStoredPassphrase = { _ in false }
+        session.passphrases = FakeKeychain.passphrases(.undecided).passphrases
     }
 
     func replace(with text: String) throws {
@@ -142,7 +142,7 @@ struct CryptReviewTests {
         let files = InjectingFileSystem()
         let session = DocumentSession(fileSystem: files, recovery: FileRecoveryStore(directory: recoveryFolder))
         session.encryptsTaggedEntries = true
-        session.hasStoredPassphrase = { _ in false }
+        session.passphrases = FakeKeychain.passphrases(.undecided).passphrases
         let theirs = "* B\nb\n* Emacs :crypt:\nemacs secret\n* Work\nEMACSWORK\n"
         let b = try notes.write("b.org", "* B\nb\n")
         func check(_ message: String?, _ what: String) {
@@ -191,7 +191,7 @@ struct CryptReviewTests {
         let files = InjectingFileSystem()
         let session = DocumentSession(fileSystem: files, recovery: FileRecoveryStore(directory: recoveryFolder))
         session.encryptsTaggedEntries = true
-        session.hasStoredPassphrase = { _ in false }
+        session.passphrases = FakeKeychain.passphrases(.undecided).passphrases
         let b = try notes.write("b.org", "* B\nb\n")
         files.inject[b.path] = "* B\nb\n* Emacs :crypt:\nemacs secret\n"
         files.injectAfter[b.path] = "* B\nthird\n"
@@ -290,10 +290,10 @@ struct CryptReviewTests {
         let path = notes.url.appendingPathComponent("d.org.gpg")
         try OpenPGP.encryptedMessage(Data("* D\n".utf8), passphrase: "pw").write(to: path)
         session.open(path.path)
-        let context = CryptPassphrases.context(for: path.path)
+        let context = session.passphrases.context(for: path.path)
         session.cancelUnlock()
-        #expect(CryptPassphrases.context(for: path.path) !== context)
-        CryptPassphrases.endSession(for: path.path)
+        #expect(session.passphrases.context(for: path.path) !== context)
+        session.passphrases.endSession(for: path.path)
         #expect(!CryptPassphrases.protectsItems)
     }
 
@@ -390,11 +390,12 @@ struct CryptReviewTests {
 
     // Second review, 3
     @Test func eachFileHasItsOwnAuthentication() throws {
-        let a = CryptPassphrases.context(for: "/x/a.org"), b = CryptPassphrases.context(for: "/x/b.org")
-        #expect(a !== b && CryptPassphrases.context(for: "/x/a.org") === a)
+        let passphrases = session.passphrases
+        let a = passphrases.context(for: "/x/a.org"), b = passphrases.context(for: "/x/b.org")
+        #expect(a !== b && passphrases.context(for: "/x/a.org") === a)
         #expect(a.touchIDAuthenticationAllowableReuseDuration == 0)
-        CryptPassphrases.endSession(for: "/x/a.org")
-        #expect(CryptPassphrases.context(for: "/x/a.org") !== a)
+        passphrases.endSession(for: "/x/a.org")
+        #expect(passphrases.context(for: "/x/a.org") !== a)
     }
 
     // Second review, 4a
@@ -502,7 +503,7 @@ struct CryptReviewTests {
 
     // 6
     @Test func keychainItemsAreThisDeviceOnlyAfterUserPresence() throws {
-        let item = try #require(CryptPassphrases.newItem("pw", for: "/x/a.org"))
+        let item = try #require(SystemKeychain.newItem("pw", for: "/x/a.org"))
         #expect(item[kSecAttrAccessControl as String] != nil)
         #expect(item[kSecUseDataProtectionKeychain as String] as? Bool == true)
         #expect(item[kSecAttrService as String] as? String == "sh.krz.orgstar.crypt.v2")

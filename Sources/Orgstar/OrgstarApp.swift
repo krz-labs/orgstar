@@ -408,6 +408,7 @@ enum UnsavedChanges {
                 } else if let failure = session.unlock(passphrase, for: path) {
                     problem = failure
                 } else {
+                    session.passphrases.keep(passphrase, for: path)
                     return !session.dirtyPaths.contains(path)
                 }
             case .alertSecondButtonReturn: return true
@@ -977,6 +978,9 @@ struct SettingsView: View {
             Tab("Appearance", systemImage: "paintpalette", value: "appearance") { appearance }
             Tab("Agenda", systemImage: "calendar", value: "agenda") { agenda }
             Tab("Capture", systemImage: "tray.and.arrow.down", value: "capture") { capture }
+            Tab("Encryption", systemImage: "lock", value: "encryption") {
+                Form { DecryptSettings() }.formStyle(.grouped).frame(height: 330)
+            }
             #if !APPSTORE
             Tab(value: "git") { GitSettingsForm(workspace: workspace) } label: {
                 Label { Text("Git", tableName: "DeveloperID") } icon: { Image(systemName: "arrow.triangle.branch") }

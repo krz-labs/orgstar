@@ -4,16 +4,59 @@ import LocalAuthentication
 import OrgDocument
 import Security
 
-/// Passphrases for encrypted entries and files, kept in the Keychain by file path when asked.
-/// Items are readable only on this device while it's unlocked, and only after Touch ID, Face
-/// ID or the device's password (`.userPresence`), asked once per file while it's open. Items
-/// earlier versions stored without that move over at their first read. A build without a
-/// Keychain entitlement (the Developer ID Mac app) can't make such items and keeps the old kind.
+/// Where passphrases are saved: the Keychain, or a stand-in in tests.
 @MainActor
-public enum CryptPassphrases {
+public protocol PassphraseKeychain: AnyObject {
+    /// Whether a passphrase is saved for `path`, without asking for authentication.
+    func contains(_ path: String) -> Bool
+    /// The passphrase saved for `path`, once `context` has authenticated the person; nil otherwise.
+    func read(_ path: String, context: LAContext) async -> String?
+    /// Saves `passphrase` for `path`. A message to show when it wasn't kept; nil otherwise.
+    func write(_ passphrase: String, for path: String) -> String?
+    func delete(_ path: String)
+    /// The paths passphrases are saved for, without asking for authentication.
+    func paths() -> [String]
+}
+
+/// Passphrases for encrypted entries and files, saved in the Keychain by file path while "Use
+/// Face ID to Decrypt" is on. Off or undecided, the Keychain isn't read or written: a passphrase
+/// is typed and kept in memory while its file is open. Items are readable only on this device
+/// while it's unlocked, and only after Touch ID, Face ID or the device's password
+/// (`.userPresence`), asked once per file while it's open.
+@MainActor
+@Observable
+public final class CryptPassphrases {
+    public static let shared = CryptPassphrases()
+
+    /// "Use Face ID to Decrypt", kept in user defaults on this device, not in `config.toml`.
+    public enum Setting: String, Sendable {
+        case undecided, on, off
+    }
+
+    nonisolated static let settingKey = "decryptWithBiometrics"
     nonisolated static let service = "sh.krz.orgstar.crypt.v2"
     /// Where earlier versions kept passphrases, readable without authentication.
     nonisolated static let legacyService = "sh.krz.orgstar.crypt"
+
+    @ObservationIgnored private let keychain: PassphraseKeychain
+    @ObservationIgnored private let defaults: UserDefaults
+    public private(set) var setting: Setting
+    /// The question waits to be asked at launch: passphrases saved by an earlier version.
+    public var asking = false
+    /// The files with a saved passphrase, as Settings lists them.
+    public private(set) var savedPaths: [String] = []
+
+    public init(keychain: PassphraseKeychain = SystemKeychain(), defaults: UserDefaults = .standard) {
+        self.keychain = keychain
+        self.defaults = defaults
+        setting = defaults.string(forKey: Self.settingKey).flatMap(Setting.init) ?? .undecided
+    }
+
+    private func set(_ setting: Setting) {
+        self.setting = setting
+        defaults.set(setting.rawValue, forKey: Self.settingKey)
+    }
+
     /// Whether this build can keep passphrases limited to this device: the Developer ID Mac app
     /// has no Keychain entitlement and keeps them in the login keychain.
     public static var protectsItems: Bool {
@@ -24,20 +67,91 @@ public enum CryptPassphrases {
         #endif
     }
 
-    /// Said beside Remember in the Keychain where `protectsItems` is false.
+    /// Said beside the setting where `protectsItems` is false.
     public static var caveat: String {
         String(localized: "This version of orgstar keeps remembered passphrases in your login keychain without limiting them to this Mac; Touch ID or your password is still asked before one is used.")
     }
 
-    /// A Keychain query handed to the thread that waits on it; nothing else uses it meanwhile.
-    struct Request: @unchecked Sendable {
-        let query: [String: Any]
+    /// Face ID, Touch ID or Optic ID, as this device has it; the Mac's is Touch ID.
+    public static var biometryName: String {
+        #if os(macOS)
+        return "Touch ID"
+        #else
+        let context = LAContext()
+        _ = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
+        return switch context.biometryType {
+        case .touchID: "Touch ID"
+        case .opticID: "Optic ID"
+        default: "Face ID"
+        }
+        #endif
     }
 
-    /// One authentication per file while it's open; `endSession` ends it.
-    private static var contexts: [String: LAContext] = [:]
+    /// The setting's name.
+    public static var title: String { String(localized: "Use \(biometryName) to Decrypt") }
 
-    static func context(for path: String) -> LAContext {
+    /// The question asked the first time a passphrase is typed, and at launch.
+    public static var question: String { String(localized: "Use \(biometryName) to Decrypt?") }
+
+    /// What the setting does, in the question and in Settings.
+    public static var explanation: String {
+        let name = biometryName
+        #if os(macOS)
+        return String(localized: "Passphrases you type for encrypted files and entries are saved in the Keychain, and \(name) or your password unlocks them. \(name) can then decrypt anything whose passphrase is saved in your Keychain. Otherwise a passphrase is typed when it's needed and kept only while its file is open.")
+        #else
+        return String(localized: "Passphrases you type for encrypted files and entries are saved in the Keychain, and \(name) or your passcode unlocks them. \(name) can then decrypt anything whose passphrase is saved in your Keychain. Otherwise a passphrase is typed when it's needed and kept only while its file is open.")
+        #endif
+    }
+
+    /// What turning the setting off removes, for its confirmation.
+    public static func removal(_ count: Int) -> String {
+        count == 1
+            ? String(localized: "The passphrase saved for 1 file is removed from the Keychain.")
+            : String(localized: "The passphrases saved for \(count) files are removed from the Keychain.")
+    }
+
+    // MARK: - The setting
+
+    /// Whether a typed passphrase waits for the question before it can be saved.
+    public var asksFirst: Bool { setting == .undecided }
+
+    /// The answer to the question: Enable turns the setting on, Not Now off.
+    public func answer(enable: Bool) {
+        set(enable ? .on : .off)
+        asking = false
+    }
+
+    /// Turns the setting on from Settings.
+    public func turnOn() {
+        set(.on)
+    }
+
+    /// Turns the setting off and removes every saved passphrase; Settings confirms first when
+    /// there are any.
+    public func turnOff() {
+        set(.off)
+        for path in keychain.paths() { forget(path) }
+        refresh()
+    }
+
+    /// At launch: passphrases saved by an earlier version, while the setting is undecided, ask
+    /// the question.
+    public func askIfSavedBefore() {
+        guard setting == .undecided, !keychain.paths().isEmpty else { return }
+        asking = true
+    }
+
+    /// Reads the files with a saved passphrase again, for Settings.
+    public func refresh() {
+        savedPaths = keychain.paths().sorted()
+    }
+
+    // MARK: - Passphrases
+
+    /// One authentication per file while it's open; `endSession` ends it.
+    @ObservationIgnored private var contexts: [String: LAContext] = [:]
+
+    func context(for path: String) -> LAContext {
         if let context = contexts[path] { return context }
         let context = LAContext()
         contexts[path] = context
@@ -45,13 +159,56 @@ public enum CryptPassphrases {
     }
 
     /// The file closed: its authentication no longer reads its passphrase.
-    public static func endSession(for path: String) {
+    public func endSession(for path: String) {
         contexts.removeValue(forKey: path)?.invalidate()
     }
 
-    nonisolated static func query(_ path: String, service: String = service) -> [String: Any] {
-        var query: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service, kSecAttrAccount as String: path]
-        if service == Self.service { query[kSecUseDataProtectionKeychain as String] = true }
+    /// A passphrase typed for `path` that opened or encrypted it: saved while the setting is on.
+    /// A message to show when it wasn't kept; nil otherwise.
+    @discardableResult
+    public func keep(_ passphrase: String, for path: String) -> String? {
+        guard setting == .on else { return nil }
+        let note = keychain.write(passphrase, for: path)
+        refresh()
+        return note
+    }
+
+    /// Forget Encryption Passphrase, or Forget in Settings: the saved passphrase is removed.
+    public func forget(_ path: String) {
+        endSession(for: path)
+        keychain.delete(path)
+        savedPaths.removeAll { $0 == path }
+    }
+
+    /// Whether a passphrase is saved for `path` and may be used, without asking for authentication.
+    public func hasStored(_ path: String) -> Bool {
+        setting == .on && keychain.contains(path)
+    }
+
+    /// The saved passphrase, once the person has proved who they are; nil otherwise, and always
+    /// while the setting isn't on.
+    public func stored(for path: String) async -> String? {
+        guard setting == .on, keychain.contains(path) else { return nil }
+        return await keychain.read(path, context: context(for: path))
+    }
+}
+
+/// The Keychain. New items are this device only, unlocked, after user presence. Items earlier
+/// versions saved without that move over at their first read. A build without a Keychain
+/// entitlement (the Developer ID Mac app) can't make such items and keeps the old kind.
+@MainActor
+public final class SystemKeychain: PassphraseKeychain {
+    public init() {}
+
+    /// A Keychain query handed to the thread that waits on it; nothing else uses it meanwhile.
+    struct Request: @unchecked Sendable {
+        let query: [String: Any]
+    }
+
+    nonisolated static func query(_ path: String?, service: String = CryptPassphrases.service) -> [String: Any] {
+        var query: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service]
+        if let path { query[kSecAttrAccount as String] = path }
+        if service == CryptPassphrases.service { query[kSecUseDataProtectionKeychain as String] = true }
         return query
     }
 
@@ -75,53 +232,64 @@ public enum CryptPassphrases {
         return status
     }
 
-    /// Remembers `passphrase` for `path`. A message to show when it wasn't kept; nil otherwise.
-    @discardableResult
-    public static func store(_ passphrase: String, for path: String) -> String? {
-        guard let item = newItem(passphrase, for: path) else { return String(localized: "The passphrase wasn't remembered: the Keychain refused it.") }
-        let status = add(item, replacing: query(path))
+    public func write(_ passphrase: String, for path: String) -> String? {
+        let refused = String(localized: "The passphrase wasn't remembered: the Keychain refused it.")
+        guard let item = Self.newItem(passphrase, for: path) else { return refused }
+        let status = Self.add(item, replacing: Self.query(path))
         if status == errSecSuccess {
-            SecItemDelete(query(path, service: legacyService) as CFDictionary)
+            SecItemDelete(Self.query(path, service: CryptPassphrases.legacyService) as CFDictionary)
             return nil
         }
-        guard status == errSecMissingEntitlement else { return String(localized: "The passphrase wasn't remembered: the Keychain refused it.") }
-        var legacy = query(path, service: legacyService)
+        guard status == errSecMissingEntitlement else { return refused }
+        var legacy = Self.query(path, service: CryptPassphrases.legacyService)
         legacy[kSecValueData as String] = Data(passphrase.utf8)
         legacy[kSecAttrLabel as String] = item[kSecAttrLabel as String]
-        guard add(legacy, replacing: query(path, service: legacyService)) == errSecSuccess else {
-            return String(localized: "The passphrase wasn't remembered: the Keychain refused it.")
-        }
-        SecItemDelete(query(path) as CFDictionary)
+        guard Self.add(legacy, replacing: Self.query(path, service: CryptPassphrases.legacyService)) == errSecSuccess else { return refused }
+        SecItemDelete(Self.query(path) as CFDictionary)
         return nil
     }
 
-    public static func forget(_ path: String) {
-        endSession(for: path)
-        SecItemDelete(query(path) as CFDictionary)
-        SecItemDelete(query(path, service: legacyService) as CFDictionary)
+    public func delete(_ path: String) {
+        SecItemDelete(Self.query(path) as CFDictionary)
+        SecItemDelete(Self.query(path, service: CryptPassphrases.legacyService) as CFDictionary)
     }
 
-    /// Whether an item exists, without asking for authentication.
-    nonisolated static func exists(_ query: [String: Any]) -> Bool {
+    /// `query` for attributes only, without asking for authentication.
+    nonisolated static func quiet(_ query: [String: Any]) -> [String: Any] {
         var q = query
         let quiet = LAContext()
         quiet.interactionNotAllowed = true
         q[kSecUseAuthenticationContext as String] = quiet
         q[kSecReturnAttributes as String] = true
-        let status = SecItemCopyMatching(q as CFDictionary, nil)
+        return q
+    }
+
+    /// Whether an item exists, without asking for authentication.
+    nonisolated static func exists(_ query: [String: Any]) -> Bool {
+        let status = SecItemCopyMatching(quiet(query) as CFDictionary, nil)
         return status == errSecSuccess || status == errSecInteractionNotAllowed
     }
 
-    public static func hasStored(_ path: String) -> Bool {
-        exists(query(path)) || exists(query(path, service: legacyService))
+    public func contains(_ path: String) -> Bool {
+        Self.exists(Self.query(path)) || Self.exists(Self.query(path, service: CryptPassphrases.legacyService))
     }
 
-    /// The stored passphrase, once the person has proved who they are; nil otherwise.
-    public static func stored(for path: String) async -> String? {
+    public func paths() -> [String] {
+        var paths: Set<String> = []
+        for service in [CryptPassphrases.service, CryptPassphrases.legacyService] {
+            var q = Self.quiet(Self.query(nil, service: service))
+            q[kSecMatchLimit as String] = kSecMatchLimitAll
+            var result: AnyObject?
+            guard SecItemCopyMatching(q as CFDictionary, &result) == errSecSuccess, let items = result as? [[String: Any]] else { continue }
+            for item in items { if let account = item[kSecAttrAccount as String] as? String { paths.insert(account) } }
+        }
+        return Array(paths)
+    }
+
+    public func read(_ path: String, context: LAContext) async -> String? {
         let reason = "unlock the passphrase for " + (path as NSString).lastPathComponent
-        let context = context(for: path)
-        if exists(query(path)) {
-            var q = query(path)
+        if Self.exists(Self.query(path)) {
+            var q = Self.query(path)
             q[kSecReturnData as String] = true
             context.localizedReason = reason
             q[kSecUseAuthenticationContext as String] = context
@@ -133,16 +301,17 @@ public enum CryptPassphrases {
                 return String(decoding: data, as: UTF8.self)
             }.value
         }
-        guard exists(query(path, service: legacyService)) else { return nil }
+        let legacyQuery = Self.query(path, service: CryptPassphrases.legacyService)
+        guard Self.exists(legacyQuery) else { return nil }
         guard (try? await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason)) == true else { return nil }
-        var q = query(path, service: legacyService)
+        var q = legacyQuery
         q[kSecReturnData as String] = true
         var result: AnyObject?
         guard SecItemCopyMatching(q as CFDictionary, &result) == errSecSuccess, let data = result as? Data else { return nil }
         let passphrase = String(decoding: data, as: UTF8.self)
         // Moved to the protected kind of item; kept as it was where that can't be made.
-        if let item = newItem(passphrase, for: path), add(item, replacing: query(path)) == errSecSuccess {
-            SecItemDelete(query(path, service: legacyService) as CFDictionary)
+        if let item = Self.newItem(passphrase, for: path), Self.add(item, replacing: Self.query(path)) == errSecSuccess {
+            SecItemDelete(legacyQuery as CFDictionary)
         }
         return passphrase
     }

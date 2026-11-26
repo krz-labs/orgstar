@@ -204,7 +204,7 @@ Sync with Working Copy, under File in Commands, syncs the folder of the open fil
 
 Archive Subtree in Commands (or =C-c C-x C-s= with a hardware keyboard) archives the entry at the caret where =org-archive-location= says, as on the Mac.
 
-Commands has the org-crypt commands; see [[file:04-outlines.org][Outlines]]. A remembered passphrase is used after Face ID, Touch ID or the device passcode.
+Commands has the org-crypt commands; see [[file:04-outlines.org][Outlines]]. With Use Face ID to Decrypt on in Settings, a typed passphrase is saved in the Keychain and used after Face ID, Touch ID or the device passcode; with it off, a passphrase is typed each time the file is opened. The first passphrase you type asks which you want.
 
 Rename Tag… and Rename TODO Keyword… in the editor's Commands, under TODO and Tags, rename a tag or a keyword in every org file of one folder or all folders, as on the Mac: a sheet asks for the old and new name (the menu beside the first field lists the tags of your folders, or the keywords), the folder, and whether to change =config.toml= too; Find lists each line that changes, with a switch to leave it out, and Rename applies them. A change to =config.toml= goes into the synced folder's file. See [[file:05-todos-and-tags.org][TODOs and tags]].
 
@@ -511,6 +511,8 @@ The Agenda, TODO Dependencies, Calendar and Reminders sections are the only plac
 - Show reminders from Reminders :: turns on =agenda-reminders= and asks for access to your reminders; Allow Access to Reminders… shows while it is missing. Tap a list to show or hide its reminders (=agenda-reminder-lists=).
 
 These write =config.toml= in the configuration folder, as the Mac's Settings window does, so the Mac sees the change too. Without a configuration folder they are kept on the device.
+
+Use Face ID to Decrypt (Use Touch ID to Decrypt on an iPad with Touch ID), below Working Copy, is kept on the device only, never in =config.toml=. With it on, a passphrase typed for an encrypted entry or file is saved in the Keychain, and Face ID or the device passcode unlocks it from then on; with it off, nothing is saved in the Keychain or read from it. It starts undecided, which works as off, and the first passphrase that works asks whether to turn it on (Enable or Not Now). Turning it off asks first, saying how many saved passphrases it removes. Saved Passphrases, under the switch, lists the files with a saved passphrase, each with Forget. See [[file:04-outlines.org::*Face ID and Touch ID][Face ID and Touch ID]].
 
 The In Use section shows the TODO keywords, the agenda span and start (for example =10 days, starting today=), Notifications (how long before a timed entry it notifies you, or Off), the capture template keys, the light and dark themes, and the theme file's name when there is one, and the font with its size. When =font= names a family that isn't installed on the device, Font shows the system's font with a note, as =System monospaced, 13 pt (JetBrains Mono isn't installed)=.
 

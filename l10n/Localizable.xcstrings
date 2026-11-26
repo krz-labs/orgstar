@@ -16115,6 +16115,40 @@
         }
       }
     },
+    "Enable": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktivieren"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activer"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オンにする"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ativar"
+          }
+        }
+      }
+    },
     "Encrypt": {
       "localizations": {
         "de": {
@@ -19515,6 +19549,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Floresta"
+          }
+        }
+      }
+    },
+    "Forget": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vergessen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Olvidar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oublier"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "削除"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esquecer"
           }
         }
       }
@@ -32368,6 +32436,86 @@
         }
       }
     },
+    "Passphrases you type for encrypted files and entries are saved in the Keychain, and %@ or your passcode unlocks them. %@ can then decrypt anything whose passphrase is saved in your Keychain. Otherwise a passphrase is typed when it's needed and kept only while its file is open.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passwörter, die du für verschlüsselte Dateien und Einträge eingibst, werden im Schlüsselbund gesichert, und %1$@ oder dein Code gibt sie frei. %2$@ kann dann alles entschlüsseln, dessen Passwort in deinem Schlüsselbund gesichert ist. Sonst wird ein Passwort eingegeben, wenn es gebraucht wird, und nur behalten, solange seine Datei geöffnet ist."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Passphrases you type for encrypted files and entries are saved in the Keychain, and %1$@ or your passcode unlocks them. %2$@ can then decrypt anything whose passphrase is saved in your Keychain. Otherwise a passphrase is typed when it's needed and kept only while its file is open."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las frases de contraseña que escribes para archivos y entradas cifrados se guardan en el llavero, y %1$@ o tu código las desbloquea. %2$@ podrá entonces descifrar todo aquello cuya frase de contraseña esté guardada en tu llavero. Si no, la frase de contraseña se escribe cuando hace falta y se conserva solo mientras su archivo está abierto."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les phrases secrètes que vous saisissez pour les fichiers et entrées chiffrés sont enregistrées dans le trousseau, et %1$@ ou votre code les déverrouille. %2$@ peut alors déchiffrer tout ce dont la phrase secrète est enregistrée dans votre trousseau. Sinon, une phrase secrète est saisie quand elle est nécessaire et n'est gardée que tant que son fichier est ouvert."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暗号化されたファイルやエントリに入力したパスフレーズはキーチェーンに保存され、%1$@またはパスコードで解除されます。これにより、キーチェーンにパスフレーズが保存されているものはすべて%2$@で復号できます。オフの場合、パスフレーズは必要なときに入力し、そのファイルを開いている間だけ保持されます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As senhas que você digita para arquivos e entradas criptografados são salvas nas Chaves, e o %1$@ ou seu código as desbloqueia. O %2$@ poderá então descriptografar tudo cuja senha esteja salva nas suas Chaves. Caso contrário, a senha é digitada quando necessária e mantida apenas enquanto o arquivo estiver aberto."
+          }
+        }
+      }
+    },
+    "Passphrases you type for encrypted files and entries are saved in the Keychain, and %@ or your password unlocks them. %@ can then decrypt anything whose passphrase is saved in your Keychain. Otherwise a passphrase is typed when it's needed and kept only while its file is open.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passwörter, die du für verschlüsselte Dateien und Einträge eingibst, werden im Schlüsselbund gesichert, und %1$@ oder dein Passwort gibt sie frei. %2$@ kann dann alles entschlüsseln, dessen Passwort in deinem Schlüsselbund gesichert ist. Sonst wird ein Passwort eingegeben, wenn es gebraucht wird, und nur behalten, solange seine Datei geöffnet ist."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Passphrases you type for encrypted files and entries are saved in the Keychain, and %1$@ or your password unlocks them. %2$@ can then decrypt anything whose passphrase is saved in your Keychain. Otherwise a passphrase is typed when it's needed and kept only while its file is open."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las frases de contraseña que escribes para archivos y entradas cifrados se guardan en el llavero, y %1$@ o tu contraseña las desbloquea. %2$@ podrá entonces descifrar todo aquello cuya frase de contraseña esté guardada en tu llavero. Si no, la frase de contraseña se escribe cuando hace falta y se conserva solo mientras su archivo está abierto."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les phrases secrètes que vous saisissez pour les fichiers et entrées chiffrés sont enregistrées dans le trousseau, et %1$@ ou votre mot de passe les déverrouille. %2$@ peut alors déchiffrer tout ce dont la phrase secrète est enregistrée dans votre trousseau. Sinon, une phrase secrète est saisie quand elle est nécessaire et n'est gardée que tant que son fichier est ouvert."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暗号化されたファイルやエントリに入力したパスフレーズはキーチェーンに保存され、%1$@またはパスワードで解除されます。これにより、キーチェーンにパスフレーズが保存されているものはすべて%2$@で復号できます。オフの場合、パスフレーズは必要なときに入力し、そのファイルを開いている間だけ保持されます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As senhas que você digita para arquivos e entradas criptografados são salvas nas Chaves, e o %1$@ ou sua senha as desbloqueia. O %2$@ poderá então descriptografar tudo cuja senha esteja salva nas suas Chaves. Caso contrário, a senha é digitada quando necessária e mantida apenas enquanto o arquivo estiver aberto."
+          }
+        }
+      }
+    },
     "Paste Subtree": {
       "comment": "Command title",
       "localizations": {
@@ -35329,40 +35477,6 @@
         }
       }
     },
-    "Remember in the Keychain": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Im Schlüsselbund merken"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recordar en el llavero"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mémoriser dans le trousseau"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "キーチェーンに保存"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lembrar nas Chaves"
-          }
-        }
-      }
-    },
     "Reminder": {
       "localizations": {
         "de": {
@@ -35633,6 +35747,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Remover Prioridade"
+          }
+        }
+      }
+    },
+    "Remove Saved Passphrases?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gesicherte Passwörter entfernen?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Eliminar las frases de contraseña guardadas?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer les phrases secrètes enregistrées ?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存されたパスフレーズを削除しますか？"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remover Senhas Salvas?"
           }
         }
       }
@@ -37801,6 +37949,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Salvar arquivos"
+          }
+        }
+      }
+    },
+    "Saved Passphrases": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gesicherte Passwörter"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frases de contraseña guardadas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phrases secrètes enregistrées"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存されたパスフレーズ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Senhas Salvas"
           }
         }
       }
@@ -45164,6 +45346,40 @@
         }
       }
     },
+    "The passphrase saved for 1 file is removed from the Keychain.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das für 1 Datei gesicherte Passwort wird aus dem Schlüsselbund entfernt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se elimina del llavero la frase de contraseña guardada para 1 archivo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La phrase secrète enregistrée pour 1 fichier est supprimée du trousseau."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1件のファイルに保存されたパスフレーズがキーチェーンから削除されます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A senha salva para 1 arquivo é removida das Chaves."
+          }
+        }
+      }
+    },
     "The passphrase wasn't remembered: the Keychain refused it.": {
       "localizations": {
         "de": {
@@ -45228,6 +45444,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "As senhas não coincidem"
+          }
+        }
+      }
+    },
+    "The passphrases saved for %lld files are removed from the Keychain.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die für %lld Dateien gesicherten Passwörter werden aus dem Schlüsselbund entfernt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se eliminan del llavero las frases de contraseña guardadas para %lld archivos."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les phrases secrètes enregistrées pour %lld fichiers sont supprimées du trousseau."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld件のファイルに保存されたパスフレーズがキーチェーンから削除されます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As senhas salvas para %lld arquivos são removidas das Chaves."
           }
         }
       }
@@ -46926,6 +47176,40 @@
         }
       }
     },
+    "Turn Off": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausschalten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desactivar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Désactiver"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オフにする"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desativar"
+          }
+        }
+      }
+    },
     "Turn Subtree Export On or Off": {
       "comment": "Command title",
       "localizations": {
@@ -47612,6 +47896,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "Atualizar no Cursor"
+          }
+        }
+      }
+    },
+    "Use %@ to Decrypt": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ zum Entschlüsseln verwenden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usar %@ para descifrar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utiliser %@ pour déchiffrer"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@で復号"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usar %@ para Descriptografar"
+          }
+        }
+      }
+    },
+    "Use %@ to Decrypt?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ zum Entschlüsseln verwenden?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Usar %@ para descifrar?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utiliser %@ pour déchiffrer ?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@で復号しますか？"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usar %@ para Descriptografar?"
           }
         }
       }

@@ -49,7 +49,7 @@ A file that isn't valid TOML is reported with its parse error, and none of it ap
 
 * The Settings window
 
-Open it with orgstar ▸ Settings (=⌘,=). It has six panes, and a seventh, Git, in the download version. The last, orgstar+, has the plans and Restore Purchases in the Mac App Store version and the license key in the download version. Each control in the others, except Git, writes the =config.toml= key named in the tables below; the config.toml reference below gives the type and the Emacs variable.
+Open it with orgstar ▸ Settings (=⌘,=). It has seven panes, and an eighth, Git, in the download version. The last, orgstar+, has the plans and Restore Purchases in the Mac App Store version and the license key in the download version. Each control in the others, except Encryption and Git, writes the =config.toml= key named in the tables below; the config.toml reference below gives the type and the Emacs variable.
 
 ** General
 
@@ -165,6 +165,17 @@ Turning on the idle question sets =org-clock-idle-time= to 15 minutes; turning i
 | ⌃⌥Space opens Capture from any app     | On      | =global-capture-hotkey= |
 
 The footer shows the path of =capture.toml=. Templates are covered in [[file:08-capture.org][Capture]].
+
+** Encryption
+
+| Control                 | Choices               | Default                                      |
+|-------------------------+-----------------------+----------------------------------------------|
+| Use Touch ID to Decrypt | On or off             | Off, asked the first time a passphrase works |
+| Saved Passphrases       | Forget, for each file |                                              |
+
+With it on, a passphrase typed for an encrypted entry or file is saved in the Keychain, and Touch ID or your password unlocks it from then on. With it off, nothing is saved in the Keychain or read from it. Turning it off asks first, saying how many saved passphrases it removes. Saved Passphrases lists the files with a saved passphrase. In the download version, a note under the switch says passphrases are kept in the login keychain, not limited to this Mac.
+
+The choice is kept on this Mac, not in =config.toml=, so it isn't synced and can't be changed by editing a file. On iPhone and iPad the same switch, Use Face ID to Decrypt, is in the Settings tab. See [[file:04-outlines.org::*Face ID and Touch ID][Face ID and Touch ID]].
 
 ** Git
 

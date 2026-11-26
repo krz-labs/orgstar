@@ -54,10 +54,10 @@ public struct CryptRequest: Identifiable, Sendable {
     }
 }
 
-/// The passphrase for an org-crypt command, from the Keychain when it was remembered, then for
-/// `open` the decrypted entry to edit. `text` is the file's text now; `apply` puts a new text
-/// in its place; `done` closes the sheet with a message. `session` learns the passphrase, so
-/// saves encrypt with it without asking again.
+/// The passphrase for an org-crypt command, from the Keychain when one is saved and "Use Face ID
+/// to Decrypt" is on, then for `open` the decrypted entry to edit. `text` is the file's text
+/// now; `apply` puts a new text in its place; `done` closes the sheet with a message. `session`
+/// learns the passphrase, so saves encrypt with it without asking again.
 public struct CryptSheet: View {
     let request: CryptRequest
     let session: DocumentSession?
@@ -66,9 +66,11 @@ public struct CryptSheet: View {
     let done: (String?) -> Void
     @State private var passphrase = ""
     @State private var repeated = ""
-    @State private var remember = false
-    /// What the Keychain said when the passphrase was remembered, shown with the result.
+    /// What the Keychain said when the passphrase was saved, shown with the result.
     @State private var keychainNote: String?
+    /// A typed passphrase that worked, waiting for the answer to whether to use Face ID, and
+    /// what follows.
+    @State private var question: (passphrase: String, then: () -> Void)?
     @State private var problem: String?
     /// The decrypted entry being edited, and the passphrase it came with.
     @State private var editing: (original: String, passphrase: String)?
@@ -101,10 +103,6 @@ public struct CryptSheet: View {
                 if let explanation { Text(explanation).font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
                 SecureField("Passphrase", text: $passphrase).onSubmit(submit)
                 if asksTwice { SecureField("Repeat passphrase", text: $repeated).onSubmit(submit) }
-                Toggle("Remember in the Keychain", isOn: $remember)
-                if !CryptPassphrases.protectsItems {
-                    Text(CryptPassphrases.caveat).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
-                }
                 if let problem { Text(problem).foregroundStyle(.red).font(.callout) }
                 HStack {
                     Spacer()
@@ -122,8 +120,33 @@ public struct CryptSheet: View {
         .frame(maxHeight: .infinity, alignment: .top)
         #endif
         .task {
-            if let stored = await CryptPassphrases.stored(for: request.path) { run(stored, remembered: true) }
+            if let stored = await passphrases.stored(for: request.path) { run(stored, remembered: true) }
         }
+        .alert(CryptPassphrases.question, isPresented: Binding(get: { question != nil }, set: { _ in })) {
+            Button("Not Now", role: .cancel) { answer(enable: false) }
+            Button("Enable") { answer(enable: true) }
+        } message: {
+            Text(CryptPassphrases.explanation)
+        }
+    }
+
+    private var passphrases: CryptPassphrases { session?.passphrases ?? .shared }
+
+    /// A typed passphrase worked: saved while the setting is on, after the question while it's
+    /// undecided, then `then`.
+    private func keep(_ passphrase: String, remembered: Bool, then: @escaping () -> Void) {
+        guard !remembered else { return then() }
+        if passphrases.asksFirst { return question = (passphrase, then) }
+        keychainNote = passphrases.keep(passphrase, for: request.path)
+        then()
+    }
+
+    private func answer(enable: Bool) {
+        guard let question else { return }
+        self.question = nil
+        passphrases.answer(enable: enable)
+        keychainNote = passphrases.keep(question.passphrase, for: request.path)
+        question.then()
     }
 
     private var title: String {
@@ -192,11 +215,11 @@ public struct CryptSheet: View {
                 finish("Encrypted \(count) \(count == 1 ? "entry" : "entries")", passphrase: passphrase, remembered: remembered)
             case .open:
                 let plain = try OrgCrypt.decrypt(current, at: request.offset, passphrase: passphrase).plaintext
-                if remember, !remembered { keychainNote = CryptPassphrases.store(passphrase, for: request.path) }
                 session?.cryptUsed(passphrase, for: request.path)
                 plaintext = plain
                 editing = (plain, passphrase)
                 problem = nil
+                keep(passphrase, remembered: remembered) {}
             case .decryptInPlace:
                 let message = OrgCrypt.encryptedRange(current, at: request.offset).map { (current as NSString).substring(with: NSRange($0)) }
                 let decrypted = try OrgCrypt.decryptInPlace(current, at: request.offset, passphrase: passphrase)
@@ -215,10 +238,11 @@ public struct CryptSheet: View {
     }
 
     private func finish(_ message: String?, passphrase: String, remembered: Bool) {
-        if remember, !remembered { keychainNote = CryptPassphrases.store(passphrase, for: request.path) }
         if !request.unlocks { session?.cryptUsed(passphrase, for: request.path) }
-        let text = [message, keychainNote].compactMap { $0 }.joined(separator: " ")
-        done(text.isEmpty ? nil : text)
+        keep(passphrase, remembered: remembered) {
+            let text = [message, keychainNote].compactMap { $0 }.joined(separator: " ")
+            done(text.isEmpty ? nil : text)
+        }
     }
 
     /// The edited text encrypted again in the message's place; nothing changes if it wasn't edited.

@@ -335,6 +335,7 @@ struct RootView: View {
             .interactiveDismissDisabled()
         }
         .sheet(item: $whatsNew) { WhatsNewView(notes: $0) }
+        .modifier(DecryptQuestion())
         .sheet(item: Bindable(ProAccess.shared).paywall) { ProSheet(feature: $0) }
         .onChange(of: ProAccess.shared.isUnlocked) {
             // Calendar and Reminders in the agenda, the widgets and the watch follow Pro.

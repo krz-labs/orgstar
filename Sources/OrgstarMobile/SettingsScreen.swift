@@ -85,6 +85,7 @@ struct SettingsScreen: View {
                     Text("Sync folders that are git repositories in Working Copy.")
                 }
             }
+            DecryptSettings()
             Section {
                 let _ = model.settingsVersion
                 Toggle("Show days without entries", isOn: Binding {

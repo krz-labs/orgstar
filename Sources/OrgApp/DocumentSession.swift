@@ -190,10 +190,9 @@ public final class DocumentSession {
     public private(set) var unlockRequest: String?
     @ObservationIgnored private var unlockPane: EditorPane?
 
-    /// The passphrase remembered in the Keychain, after Touch ID, Face ID or the device's
-    /// password; nil when there's none or it wasn't given.
-    @ObservationIgnored public var storedPassphrase: (String) async -> String? = { await CryptPassphrases.stored(for: $0) }
-    @ObservationIgnored public var hasStoredPassphrase: (String) -> Bool = { CryptPassphrases.hasStored($0) }
+    /// Passphrases saved in the Keychain, used after Touch ID, Face ID or the device's password
+    /// while the setting is on.
+    @ObservationIgnored public var passphrases = CryptPassphrases.shared
     /// Files whose remembered passphrase is being asked for, and those where it was refused:
     /// the Keychain is asked once per file until the file closes or Encrypt is chosen.
     @ObservationIgnored private var askingKeychain: Set<String> = []
@@ -242,7 +241,7 @@ public final class DocumentSession {
 
     /// The encrypted file waiting for its passphrase stays closed.
     public func cancelUnlock() {
-        if let unlockRequest { CryptPassphrases.endSession(for: unlockRequest) }
+        if let unlockRequest { passphrases.endSession(for: unlockRequest) }
         unlockRequest = nil
         unlockPane = nil
     }
@@ -260,7 +259,7 @@ public final class DocumentSession {
 
     /// Forget Encryption Passphrase: the passphrase leaves the Keychain and the session.
     public func forgetPassphrase(for path: String) {
-        CryptPassphrases.forget(path)
+        passphrases.forget(path)
         crypt.forgetPassphrase(for: path)
     }
 
@@ -290,11 +289,11 @@ public final class DocumentSession {
     /// Asks the Keychain for `entry`'s passphrase, once, and saves with it.
     private func askKeychain(_ entry: Entry) {
         let path = entry.path
-        guard !askingKeychain.contains(path), !refusedKeychain.contains(path), hasStoredPassphrase(path) else { return }
+        guard !askingKeychain.contains(path), !refusedKeychain.contains(path), passphrases.hasStored(path) else { return }
         askingKeychain.insert(path)
         Task { [weak self, weak entry] in
             guard let self else { return }
-            let passphrase = await self.storedPassphrase(path)
+            let passphrase = await self.passphrases.stored(for: path)
             self.askingKeychain.remove(path)
             guard let entry, self.entries.contains(where: { $0 === entry }) else { return }
             if let passphrase, self.unlock(passphrase, for: path) == nil { return }
@@ -495,7 +494,7 @@ public final class DocumentSession {
         entry.autosave?.cancel()
         entries.removeAll { $0 === entry }
         crypt.close(entry.path)
-        CryptPassphrases.endSession(for: entry.path)
+        passphrases.endSession(for: entry.path)
         held[entry.path] = nil
         failedHolds[entry.path] = nil
         refusedKeychain.remove(entry.path)
