@@ -385,6 +385,8 @@ struct EditorScreen: View {
             bind(editor)
             editor.focus(view)
         }
+        // A kept editor missed settings changed while it was off screen.
+        editor.options = editorOptions
         self.editor = editor
         textView = view
         if let offset { editor.reveal(offset) }
@@ -1027,6 +1029,7 @@ struct CommandPalette: View {
         ("org.snippet.next-field", "Next Snippet Field"), ("org.snippet.previous-field", "Previous Snippet Field"),
         ("app.recovery", "Recovery Versions…"), ("app.sync-conflicts", "Resolve Sync Conflicts…"),
         ("org.toggle-inline-images", "Show or Hide Inline Images"), ("org.toggle-inline-images-linked", "Show or Hide Inline Images, Including Described Links"), ("org.latex-preview", "Show or Hide LaTeX Previews"), ("editor.toggle-truncate-lines", "Truncate or Wrap Long Lines"), ("editor.toggle-auto-fill", "Turn Auto Fill On or Off"),
+        ("editor.complete", "Complete at Point"), ("editor.dabbrev-expand", "Expand Word"), ("editor.dabbrev-completion", "Complete Word"),
         ("edit.isearch-forward", "Incremental Search"), ("edit.isearch-backward", "Incremental Search Backward"),
         ("org.table.toggle-column-width", "Shrink or Expand Table Column"), ("org.table.shrink", "Shrink Table Columns with Widths"),
         ("org.table.expand", "Expand Table Columns"),

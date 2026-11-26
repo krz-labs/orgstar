@@ -155,7 +155,7 @@ struct SettingsScreen: View {
             } header: {
                 Text("Completion")
             } footer: {
-                Text("With a hardware keyboard. Doom's keys open the list by itself and match letters in order, as Doom's corfu does; the Emacs and Mac keys do neither unless set here.")
+                Text("Doom's keys open the list by itself and match letters in order, as Doom's corfu does; the Emacs and Mac keys do neither unless set here. Expand Word completes the word before the caret from your files whatever is set.")
             }
             calendarSection
             reminderSection

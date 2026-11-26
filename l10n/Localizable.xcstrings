@@ -43958,40 +43958,6 @@
         }
       }
     },
-    "With a hardware keyboard. Doom's keys open the list by itself and match letters in order, as Doom's corfu does; the Emacs and Mac keys do neither unless set here.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mit einer Hardwaretastatur. Die Doom-Tasten öffnen die Liste von selbst und finden Buchstaben in Reihenfolge, wie Dooms corfu; die Emacs- und Mac-Tasten tun beides nicht, außer es ist hier eingestellt."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Con un teclado físico. Las teclas de Doom abren la lista solas y buscan letras en orden, como corfu en Doom; las teclas de Emacs y Mac no hacen ninguna de las dos cosas salvo que se ajuste aquí."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Avec un clavier physique. Les touches Doom ouvrent la liste d'elles-mêmes et cherchent les lettres dans l'ordre, comme corfu dans Doom ; les touches Emacs et Mac ne font ni l'un ni l'autre sauf si c'est réglé ici."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ハードウェアキーボード使用時。Doomのキーでは、Doomのcorfuのようにリストが自動で開き、文字の順序で一致します。EmacsとMacのキーでは、ここで設定しない限りどちらも行いません。"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Com um teclado físico. As teclas do Doom abrem a lista sozinhas e buscam letras em ordem, como o corfu do Doom; as teclas do Emacs e do Mac não fazem nenhum dos dois, a menos que configurado aqui."
-          }
-        }
-      }
-    },
     "Word Count": {
       "localizations": {
         "de": {

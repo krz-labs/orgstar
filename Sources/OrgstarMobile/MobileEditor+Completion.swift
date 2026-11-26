@@ -34,8 +34,9 @@ final class CompletionListView: UIView {
 
     func key(_ chord: KeyChord) -> CompletionList.Action { list.key(chord) }
 
-    /// Lays the rows out with their top left at `point`, kept inside `bounds`.
-    func show(at point: CGPoint, within bounds: CGRect, font: UIFont) {
+    /// Lays the rows out under `caret`, or above it when there isn't room below, kept inside
+    /// `bounds`: the part of the text view not under the keyboard and the key bar.
+    func show(under caret: CGRect, within bounds: CGRect, font: UIFont) {
         stack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         var width: CGFloat = 80
         for index in list.visible(rows: Self.rows) {
@@ -55,8 +56,10 @@ final class CompletionListView: UIView {
         }
         width = min(width, bounds.width - 16)
         let height = stack.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height
-        let x = min(max(bounds.minX + 8, point.x), bounds.maxX - width - 8)
-        frame = CGRect(x: x, y: point.y + 2, width: width, height: height)
+        let x = min(max(bounds.minX + 8, caret.minX), bounds.maxX - width - 8)
+        let below = caret.maxY + 2
+        let y = below + height <= bounds.maxY || caret.minY - 2 - height < bounds.minY ? below : caret.minY - 2 - height
+        frame = CGRect(x: x, y: y, width: width, height: height)
         stack.frame = CGRect(origin: .zero, size: frame.size)
     }
 
@@ -139,8 +142,10 @@ extension MobileEditor {
         }
         guard let position = textView.position(from: textView.beginningOfDocument, offset: completion.range.lowerBound) else { return }
         let caret = textView.caretRect(for: position)
-        let visible = CGRect(origin: textView.contentOffset, size: textView.bounds.size)
-        view.show(at: CGPoint(x: caret.minX, y: caret.maxY), within: visible, font: theme.font)
+        let insets = textView.adjustedContentInset
+        let visible = CGRect(x: textView.contentOffset.x, y: textView.contentOffset.y + insets.top,
+                             width: textView.bounds.width, height: textView.bounds.height - insets.top - insets.bottom)
+        view.show(under: caret, within: visible, font: theme.font)
     }
 
     func closeCompletion() {
