@@ -32576,6 +32576,40 @@
         }
       }
     },
+    "Only org and Markdown files have an outline.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur Org- und Markdown-Dateien haben eine Gliederung."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solo los archivos Org y Markdown tienen esquema."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seuls les fichiers Org et Markdown ont une structure."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アウトラインがあるのはOrgファイルとMarkdownファイルだけです。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Somente arquivos Org e Markdown têm estrutura."
+          }
+        }
+      }
+    },
     "Only org files have an outline.": {
       "localizations": {
         "de": {

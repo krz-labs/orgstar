@@ -6,6 +6,8 @@
 
 The editor holds the file's text exactly as it is on disk. Styling, hidden markup, indentation and images are display only; none of them change the file.
 
+This chapter describes org files. Markdown files get their own highlighting and heading folds, and other text files plain text or code highlighting; see /Files that aren't org/ in [[file:01-files-and-folders.org][Files and folders]].
+
 Org files open with the caret at the start of the file, as in Emacs. Buffers you had open when you quit reopen with the caret where you left it.
 
 ** Markup
@@ -136,6 +138,8 @@ In Doom's insert state, =TAB= and =S-TAB= on a heading demote and promote it, an
 Overview and contents also fold drawers before the first heading.
 
 Clicking a heading's stars cycles that heading, as =TAB= does on it.
+
+In Markdown files these commands fold =#= headings the same way, and a click on a heading's =#=s cycles it; there are no drawers or blocks to fold. Other files don't fold. See /Markdown/ in [[file:01-files-and-folders.org][Files and folders]].
 
 The caret can't rest in folded text: moving forward into a fold jumps past it, and moving back into one goes to the end of the heading line. Going to a location from the outline pane, search, a link or the agenda opens whatever folds hide it.
 

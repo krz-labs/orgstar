@@ -90,6 +90,30 @@ final class MobileEditor: NSObject, DocumentBuffer {
     static var lastSubstitute: (pattern: String, replacement: String, flags: String)?
     /// The file's path, for the `%` register.
     var fileName: String?
+    /// What the file is: org, Markdown, or plain text, which only Markdown styles and folds.
+    enum Mode { case org, markdown, plain }
+    let mode: Mode
+    var isOrg: Bool { mode == .org }
+    var isMarkdown: Bool { mode == .markdown }
+    /// A Markdown file's structure, for the revision it was read at.
+    var markdownCache: (revision: Int, document: MarkdownDocument)?
+
+    /// The Markdown file's structure now.
+    var markdown: MarkdownDocument {
+        if let markdownCache, markdownCache.revision == document.revision { return markdownCache.document }
+        let made = MarkdownDocument(document.text)
+        markdownCache = (document.revision, made)
+        return made
+    }
+
+    /// The file's structure for folding: the org tree, or for Markdown a tree of its headings.
+    var foldTree: OrgTree { isMarkdown ? markdown.foldTree : document.tree }
+
+    /// Whether `id` is refused because the file isn't org: in Markdown only the fold commands
+    /// of org's run, so none writes org into the file.
+    func refuses(_ id: String) -> Bool {
+        !isOrg && OrgOnlyCommands.refuses(id, markdown: isMarkdown)
+    }
     var onChange: (() -> Void)?
     var onMessage: ((String) -> Void)?
     var onPrompt: ((Prompt, @escaping (String?) -> Void) -> Void)?
@@ -197,9 +221,10 @@ final class MobileEditor: NSObject, DocumentBuffer {
 
     init(
         document: DocumentState, editable: Bool, options: EditingOptions = .org, theme spec: ThemeSpec = .default,
-        showMarkup: Bool = true, baseDirectory: URL? = nil
+        showMarkup: Bool = true, baseDirectory: URL? = nil, mode: Mode = .org
     ) {
         self.document = document
+        self.mode = mode
         self.options = options
         self.showMarkup = showMarkup
         self.baseDirectory = baseDirectory
@@ -211,12 +236,12 @@ final class MobileEditor: NSObject, DocumentBuffer {
         configure(keyed, editable: editable)
         textView.textStorage.delegate = self
         (textView.textLayoutManager?.textContentManager as? NSTextContentStorage)?.delegate = self
-        let startup = Presentation.startupDisplay(document.tree, options: options)
+        let startup = mode == .org ? Presentation.startupDisplay(document.tree, options: options) : Presentation.textStartupDisplay(options: options)
         indented = startup.indented
         hideStars = startup.hideStars
         showsImages = startup.inlineImages
         showsLatex = startup.latexPreview
-        shrunk = ShrunkColumns.startup(document.tree)
+        if mode == .org { shrunk = ShrunkColumns.startup(document.tree) }
         applyThemeToView()
         load(document.text)
         setFolds(startup.folds)
@@ -238,13 +263,13 @@ final class MobileEditor: NSObject, DocumentBuffer {
         view.find = find
         view.addInteraction(UIFindInteraction(sessionDelegate: find))
         view.onFiles = { [weak self, weak view] files in
-            guard let self, let onFiles else { return false }
+            guard let self, let onFiles, isOrg else { return false }
             if let view { focus(view) }
             onFiles(files)
             return true
         }
         view.onImage = { [weak self, weak view] data, ext in
-            guard let self, let onImage else { return false }
+            guard let self, let onImage, isOrg else { return false }
             if let view { focus(view) }
             onImage(data, ext)
             return true
@@ -438,6 +463,10 @@ final class MobileEditor: NSObject, DocumentBuffer {
     }
 
     func run(_ id: String) {
+        if refuses(id) {
+            fail("Not an org file")
+            return
+        }
         if let snippet = Snippets.command(id) {
             _ = perform(snippet)
             return
@@ -486,11 +515,12 @@ final class MobileEditor: NSObject, DocumentBuffer {
     static let linkCommands: Set<String> = ["org.link.store", "org.id.store-link", "org.link.insert"]
 
     func applies(_ id: String, in context: EditContext) -> Bool {
+        if refuses(id) { return false }
         if let command = Commands.command(id) ?? Snippets.command(id) { return command.applies(in: context) }
         switch id {
         case "org.snippet.next-field", "org.snippet.previous-field": return snippetSession != nil
         case "org.cycle":
-            return Presentation.heading(containing: context.caret, in: context.tree) != nil || Wrappers.toggleable(at: context.caret, in: context.tree) != nil
+            return Presentation.heading(containing: context.caret, in: foldTree) != nil || Wrappers.toggleable(at: context.caret, in: foldTree) != nil
         case _ where id.hasPrefix("org.fold."): return true
         case "org.cycle-global", "edit.undo", "edit.redo", "org.toggle-inline-images", "org.toggle-inline-images-linked", "org.latex-preview", "editor.toggle-truncate-lines",
              "editor.toggle-auto-fill", "edit.isearch-forward", "edit.isearch-backward", "editor.complete", "editor.dabbrev-expand",
@@ -672,8 +702,10 @@ final class MobileEditor: NSObject, DocumentBuffer {
         snippetEdited(edit)
         let oldTree = document.tree
         let oldText = document.text as NSString
+        let oldMarkdown = isMarkdown ? markdown : nil
         do {
             try document.apply([edit], baseRevision: document.revision)
+            if let oldMarkdown { markdownCache = (document.revision, oldMarkdown.applying(edit)) }
         } catch {
             // Out of step: the view's text wins.
             shrunk = ShrunkColumns()
@@ -682,12 +714,23 @@ final class MobileEditor: NSObject, DocumentBuffer {
         }
         let newText = textView.textStorage.string as NSString
         styled.map(through: edit, in: newText)
-        let affected = Presentation.restyleRange(for: edit, old: (oldTree, oldText), new: (document.tree, newText))
+        let newEnd = edit.range.lowerBound + (replacement as NSString).length
+        var affected = isMarkdown
+            ? Presentation.markdownRestyleRange(for: edit, oldBlocks: oldMarkdown?.structure.blocks ?? [], new: markdown, newText: newText)
+            : Presentation.restyleRange(for: edit, old: (oldTree, oldText), new: (document.tree, newText))
+        // A fence opened or closed far up restyles what follows in the background passes.
+        if isMarkdown, affected.count > Self.styleChunk {
+            let lines = newText.lineRange(for: NSRange(location: edit.range.lowerBound, length: newEnd - edit.range.lowerBound))
+            styled.unstyle(from: NSMaxRange(lines))
+            affected = affected.lowerBound..<NSMaxRange(lines)
+            scheduleStyling()
+        }
         vim.changed(edit)
         // Walking the tree for blocks costs more than typing; only an edit on a line that could
         // start or end one needs it, others move the ranges.
-        let newEnd = edit.range.lowerBound + (replacement as NSString).length
-        if Presentation.mayChangeBlocks(oldText, edit.range) || Presentation.mayChangeBlocks(newText, edit.range.lowerBound..<newEnd) {
+        if isMarkdown {
+            shaded.set(markdown.structure.blocks, folded: [])
+        } else if isOrg, Presentation.mayChangeBlocks(oldText, edit.range) || Presentation.mayChangeBlocks(newText, edit.range.lowerBound..<newEnd) {
             blocksMayChange = true
         } else {
             shaded.set(ViewState(selection: shaded.all).mapped(through: [edit]).selection, folded: [])
@@ -719,7 +762,7 @@ extension MobileEditor: UITextViewDelegate {
     /// Another view's caret moves with edits made in this one; only the focused view's
     /// selection drives the display.
     func textView(_ textView: UITextView, editMenuForTextIn range: NSRange, suggestedActions: [UIMenuElement]) -> UIMenu? {
-        let suggested = range.length > 0 && textView.isEditable ? suggestedActions + [formatMenu] : suggestedActions
+        let suggested = range.length > 0 && textView.isEditable && isOrg ? suggestedActions + [formatMenu] : suggestedActions
         if options.spellCheck, let menu = spellingMenu(for: range, in: textView, suggested: suggested) { return menu }
         return suggested.count == suggestedActions.count ? nil : UIMenu(children: suggested)
     }
@@ -752,11 +795,11 @@ extension MobileEditor: UITextViewDelegate {
             return false
         }
         if !applyingEdits { typedOutsideInsert() }
-        if autoFills, !applyingEdits, textView.markedTextRange == nil, text == " ", range == textView.selectedRange {
+        if autoFills, isOrg, !applyingEdits, textView.markedTextRange == nil, text == " ", range == textView.selectedRange {
             _ = perform(AutoFillSpace())
             return false
         }
-        guard options.electricPair, !applyingEdits, textView.markedTextRange == nil else { return true }
+        guard options.electricPair, isOrg, !applyingEdits, textView.markedTextRange == nil else { return true }
         let selected = textView.selectedRange
         let key: String
         if text.isEmpty, selected.length == 0, range.length == 1, NSMaxRange(range) == selected.location {
@@ -796,7 +839,7 @@ extension MobileEditor: UIGestureRecognizerDelegate {
     @objc fileprivate func tappedFold(_ tap: UITapGestureRecognizer) {
         if let view = tap.view as? UITextView { focus(view) }
         guard let start = foldToggle(at: tap.location(in: textView)),
-              let next = Presentation.cycle(at: start, in: document.tree, fold) else { return }
+              let next = Presentation.cycle(at: start, in: foldTree, fold) else { return }
         setFolds(next)
     }
 

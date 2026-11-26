@@ -177,11 +177,11 @@ struct ContentView: View {
     /// Whether the outline pane shows: remembered for org files, hidden by default for
     /// other files, and always shown while search results are up.
     private var outlineShown: Bool {
-        !query.isEmpty || (previewPath == nil && (session.isOrg ? orgOutlineShown : plainOutlineShown))
+        !query.isEmpty || (previewPath == nil && (session.isOrg || session.isMarkdown ? orgOutlineShown : plainOutlineShown))
     }
 
     private func toggleOutline() {
-        if session.isOrg { orgOutlineShown.toggle() } else { plainOutlineShown.toggle() }
+        if session.isOrg || session.isMarkdown { orgOutlineShown.toggle() } else { plainOutlineShown.toggle() }
     }
 
     @ViewBuilder
@@ -1390,8 +1390,7 @@ struct ContentView: View {
             return commands.show(Self.unavailable(EditorCommands.all.first { $0.id == id }?.title ?? id))
         }
         if let feature = ProFeature.required(byCommand: id), !ProAccess.shared.allows(feature) { return }
-        let orgOnly = ["app.refile", "app.refile.copy", "app.archive", "app.clock.in", "app.clock.default", "app.copy-rich-text", "app.export-subtree", "app.export-body-only", "app.share-subtree"].contains(id) || Printing.commands.contains(id) || (id.hasPrefix("app.export.") && !id.hasPrefix("app.export.icalendar-")) || id.hasPrefix("org.")
-        if orgOnly, !session.isOrg {
+        if !session.isOrg, Printing.commands.contains(id) || OrgOnlyCommands.refuses(id, markdown: session.isMarkdown) {
             commands.show(String(localized: "Not an org file"))
             return
         }

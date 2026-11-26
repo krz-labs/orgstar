@@ -73,10 +73,10 @@ extension OrgEditor {
     public func cycleAtCaret() -> Bool {
         leaveSparseTree()
         let caret = textView.selectedRange().location
-        guard let state = Presentation.cycle(at: caret, in: document.tree, foldState) else { return false }
+        guard let state = Presentation.cycle(at: caret, in: foldTree, foldState) else { return false }
         setFolds(state)
         // Off a closing line that folding hid, to the opening line, as org does.
-        if let wrapper = Wrappers.toggleable(at: caret, in: document.tree), hidden.containing(caret) != nil { setCaret(wrapper.start) }
+        if let wrapper = Wrappers.toggleable(at: caret, in: foldTree), hidden.containing(caret) != nil { setCaret(wrapper.start) }
         return true
     }
 
@@ -85,7 +85,7 @@ extension OrgEditor {
     func fold(_ id: String) {
         leaveSparseTree()
         let caret = textView.selectedRange().location
-        let tree = document.tree
+        let tree = foldTree
         let next: FoldState?
         if id == "org.fold.close" || id == "org.fold.open-subtree" {
             next = Presentation.outline(tree).last { $0.start <= caret && (caret < $0.end || $0.end == utf16Length) }
@@ -108,7 +108,7 @@ extension OrgEditor {
     /// Shift-TAB: overview, contents, show all.
     public func cycleGlobal() {
         leaveSparseTree()
-        let (visibility, state) = Presentation.cycleGlobal(from: globalVisibility, in: document.tree, wrapperFolds: view.wrapperFolds)
+        let (visibility, state) = Presentation.cycleGlobal(from: globalVisibility, in: foldTree, wrapperFolds: view.wrapperFolds)
         globalVisibility = visibility
         setFolds(state)
     }
@@ -126,11 +126,11 @@ extension OrgEditor {
     func unfold(around offset: Int) {
         leaveSparseTree()
         var state = foldState
-        for entry in Presentation.outline(document.tree) where entry.start < offset && offset < entry.end {
+        for entry in Presentation.outline(foldTree) where entry.start < offset && offset < entry.end {
             state.folds.remove(entry.start)
             state.bodyFolds.remove(entry.start)
         }
-        for start in state.wrapperFolds where Wrappers.starting(at: start, in: document.tree)?.hidden.contains(offset) == true {
+        for start in state.wrapperFolds where Wrappers.starting(at: start, in: foldTree)?.hidden.contains(offset) == true {
             state.wrapperFolds.remove(start)
         }
         guard state != foldState else { return }

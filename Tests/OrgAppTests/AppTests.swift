@@ -263,6 +263,20 @@ struct DocumentSessionTests {
         #expect(session.revealRequest?.offset == 12)
     }
 
+    /// Markdown files have an outline of their headings; plain text files have none.
+    @Test func markdownOutline() throws {
+        let notes = try Folder()
+        let markdown = try notes.write("a.md", "* list item\n# One\n```\n# code\n```\n## Two\n")
+        let text = try notes.write("b.txt", "# Not a heading\n")
+        let session = DocumentSession(recovery: FileRecoveryStore(directory: notes.url.appendingPathComponent(".r")))
+        session.open(markdown.path)
+        #expect(session.isMarkdown && !session.isOrg)
+        #expect(session.outline.map(\.title) == ["One", "Two"])
+        #expect(session.outline.map(\.level) == [1, 2])
+        session.open(text.path)
+        #expect(!session.isMarkdown && session.outline.isEmpty)
+    }
+
     /// A change that can't be read is reported, and the buffer keeps its text.
     @Test func unreadableChangeIsReported() throws {
         let notes = try Folder()

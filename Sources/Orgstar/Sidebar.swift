@@ -143,6 +143,7 @@ struct Sidebar: View {
         case .org: return "doc.text"
         case .archive: return "archivebox"
         case .conflict: return "exclamationmark.triangle"
+        case .text: return "doc.plaintext"
         case .other:
             guard let type = UTType(filenameExtension: (file.path as NSString).pathExtension) else { return "doc" }
             if type.conforms(to: .image) { return "photo" }
@@ -208,8 +209,8 @@ struct OutlineColumn: View {
         }
         .themedListBackground(theme.color("sidebar-background", in: colorScheme))
         .overlay {
-            if session.path != nil, !session.isOrg {
-                ContentUnavailableView("No Outline", systemImage: "doc.plaintext", description: Text("Only org files have an outline."))
+            if session.path != nil, !session.isOrg, !session.isMarkdown {
+                ContentUnavailableView("No Outline", systemImage: "doc.plaintext", description: Text("Only org and Markdown files have an outline."))
             } else if session.path != nil, session.outline.isEmpty {
                 ContentUnavailableView("No Headings", systemImage: "list.bullet.indent")
             }

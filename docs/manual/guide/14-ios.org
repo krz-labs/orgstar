@@ -23,7 +23,7 @@ orgstar on iOS works on folders you choose, in iCloud Drive or in another app's 
 1. Open the Folders tab and tap Add Folder (the folder icon with a plus).
 2. Choose a folder in the picker.
 
-orgstar keeps access to the folder across launches. Each folder appears as a section listing its =.org= files by their path inside the folder. To stop using a folder, tap the ⋯ button beside its name, or touch and hold the name, and choose Remove from orgstar…; orgstar asks first. The folder and its files stay where they are. An added folder that is empty also has Delete Folder…, which deletes it from disk too.
+orgstar keeps access to the folder across launches. Each folder appears as a section listing its =.org=, Markdown (=.md=, =.markdown=) and =.txt= files by their path inside the folder. To stop using a folder, tap the ⋯ button beside its name, or touch and hold the name, and choose Remove from orgstar…; orgstar asks first. The folder and its files stay where they are. An added folder that is empty also has Delete Folder…, which deletes it from disk too.
 
 Swipe left on a file, or touch and hold it, to delete it. orgstar asks first. A file in iCloud Drive goes to Recently Deleted in the Files app; elsewhere it is removed. New File… and New Folder… under + at the top right make one in the folder shown, or with several added folders, in the one you pick; a file name without an extension gets =.org=. New File from Template… there asks for a template from =snippets.toml= in the configuration folder and a name, then opens the new file in the editor with the template expanded; see [[*Snippets][Snippets]]. Empty folders are listed too and delete the same way; a folder with anything in it other than hidden files can't be deleted from orgstar.
 
@@ -35,7 +35,7 @@ There is no way to open a single file from the Files app. Add the folder that co
 
 * The reader
 
-Tap a file in Folders or Search, or Open in File in an agenda entry's sheet, to read it.
+Tap a file in Folders or Search, or Open in File in an agenda entry's sheet, to read it. Markdown and =.txt= files open in the editor instead (see /Markdown and text files/ below).
 
 - Tap a heading to fold or unfold it, as =TAB= cycles it on the Mac. A chevron marks headings with content.
 - The file opens with the visibility its =#+STARTUP= line asks for, then each heading's =VISIBILITY= property when =#+STARTUP= sets a visibility. Drawers and blocks are folded as =org-cycle-hide-drawer-startup= and =org-cycle-hide-block-startup= say, or as the file's =#+STARTUP= says (=hidedrawers=, =nohideblocks= and the like). Tap a folded drawer's first line or its =…= to open it, and the first line again to fold it.
@@ -67,6 +67,10 @@ On iPhone, Recovery Versions…, Export… and Export Subtree… are in Commands
 The key bar holds what you repeat at the caret while typing, the toolbar what acts on the whole file, and Commands everything else.
 
 Messages from commands show at the top of the editor and the column view, and at the bottom of the reader, the agenda and the board, for a few seconds; tap one to dismiss it. VoiceOver reads each message as it appears. An error opening, saving or reading a file shows what failed on its first line, such as =Couldn't Save File=.
+
+** Markdown and text files
+
+Markdown files (=.md=, =.markdown=) open straight in the editor, highlighted as on the Mac: headings, emphasis, code, links, lists, block quotes, fenced code and front matter. Fold and open headings with Cycle Visibility and Cycle Global Visibility in Commands, or =TAB= and =S-TAB= with a hardware keyboard; tap a fold's =…= to open it. =.txt= files open as plain text. In both, org's other commands report =Not an org file= and change nothing, the Format menu, Export and dropped attachments are not offered, and typing doesn't pair brackets or fill paragraphs. There is no outline for them on iOS, since the outline is the reader's. See /Markdown/ in [[file:01-files-and-folders.org][Files and folders]] for what is styled and what isn't supported.
 
 ** Panes and windows on iPad
 
@@ -256,7 +260,7 @@ Snippets come from =snippets.toml= in the configuration folder, the same file as
 
 Search finds:
 
-- Files :: up to eight org files whose path matches what you type, ranked as Quick Open ranks them on the Mac.
+- Files :: up to eight org, Markdown or =.txt= files whose path matches what you type, ranked as Quick Open ranks them on the Mac.
 - Notes :: headings whose title or text contains your words, and files whose text before the first heading does, including unsaved edits in the open file. Under each is the passage the words were found in, with them in bold.
 
 Tap a result to open it in the reader. A heading result opens at that heading.
@@ -566,6 +570,7 @@ Quick Look in the Files app shows org files as the HTML export renders them.
 - The inspector, and the buffer list and tab bar. The board and column view are there (see [[file:07-agenda.org][The agenda]] and [[file:04-outlines.org][Outlines]]).
 - The global capture hotkey and the Settings window.
 - Replace in Files; the rename commands are on iOS.
+- The outline of a Markdown file, which opens in the editor rather than the reader.
 - Explicit saving.
 
 Commands the iOS app can't carry out show a message instead: "/Command/ isn't available on iPhone and iPad. It runs on the Mac." Only tables that need Emacs say that Emacs is needed. Commands that only appear on the Mac aren't listed in Commands. Refile… in Commands (or =C-c C-w= with a hardware keyboard) refiles the entry at the caret, choosing the target as the agenda's Refile… does.

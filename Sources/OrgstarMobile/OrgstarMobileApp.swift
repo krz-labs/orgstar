@@ -115,10 +115,19 @@ extension AppTab {
 }
 
 extension View {
-    /// Readers pushed for `ReaderRoute`s.
+    /// Readers pushed for `ReaderRoute`s; Markdown and other text files open in the editor.
     func readerDestination(workspace: WorkspaceModel, session: DocumentSession) -> some View {
         navigationDestination(for: ReaderRoute.self) { route in
-            ReaderScreen(route: route, workspace: workspace, session: session)
+            switch route {
+            case .file(let path) where !DocumentSession.isOrgPath(path):
+                EditorSplitScreen(path: path, offset: nil, workspace: workspace, session: session)
+            case .offset(let path, let offset) where !DocumentSession.isOrgPath(path):
+                EditorSplitScreen(path: path, offset: offset, workspace: workspace, session: session)
+            case .heading(let location) where !DocumentSession.isOrgPath(location.path):
+                EditorSplitScreen(path: location.path, offset: location.start, workspace: workspace, session: session)
+            default:
+                ReaderScreen(route: route, workspace: workspace, session: session)
+            }
         }
         .navigationDestination(for: EditorRoute.self) { route in
             EditorSplitScreen(path: route.path, offset: route.offset, workspace: workspace, session: session)

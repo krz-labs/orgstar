@@ -7,6 +7,9 @@ public enum FileKind: String, Sendable {
     case archive
     /// A Syncthing conflict copy: listed, never indexed for search, agenda or IDs.
     case conflict
+    /// Markdown or plain text: searched, titled by its front matter or first heading;
+    /// never read for the agenda, IDs or links.
+    case text
     /// Any other file: listed and openable, never read by the index.
     case other
 }
@@ -133,11 +136,45 @@ public struct FileRecord: Sendable, Equatable {
         self.mtime = mtime
         self.hash = Self.hash(bytes)
         let source = SourceText(bytes: bytes)
+        if kind == .text {
+            settingsVersion = settings.version
+            links = []
+            fileID = nil
+            fileTags = []
+            fileRoam = RoamProperties()
+            (headings, title, preamble) = Self.textRows(source.text, path: path)
+            return
+        }
         var resolved = settings
         resolved.org = settings.org.resolvingSetupFiles(in: source.text, path: path, read: OrgSettings.readFile)
         self.settingsVersion = Self.settingsVersion(settings, text: source.text, setupKeywords: resolved.org.setupKeywords)
         (headings, links, fileID, title, preamble, fileTags, fileRoam) = kind == .conflict
             ? ([], [], nil, nil, "", [], RoamProperties()) : Self.rows(source.text, settings: resolved)
+    }
+
+    /// A Markdown file's headings, with their own text as bodies, its title and the text
+    /// before its first heading; a plain text file's text, untitled.
+    static func textRows(_ text: String, path: String) -> (headings: [HeadingRecord], title: String?, preamble: String) {
+        guard Markdown.isPath(path) else { return ([], nil, text) }
+        let u = Array(text.utf16)
+        let structure = Markdown.structure(u)
+        let headings = structure.headings
+        func slice(_ range: Range<Int>) -> String { String(decoding: u[range], as: UTF16.self) }
+        var records: [HeadingRecord] = []
+        var open: [Int] = []
+        for (index, heading) in headings.enumerated() {
+            while let last = open.last, headings[last].level >= heading.level { open.removeLast() }
+            let end = headings[(index + 1)...].first { $0.level <= heading.level }?.start ?? u.count
+            let bodyEnd = index + 1 < headings.count ? min(headings[index + 1].start, end) : end
+            records.append(HeadingRecord(
+                ordinal: index, parent: open.last, start: heading.start, end: end, level: heading.level,
+                todo: nil, isDone: false, priority: nil, title: heading.title,
+                outlinePath: open.map { headings[$0].title } + [heading.title], orgID: nil, archived: false,
+                body: slice(heading.lineEnd..<max(heading.lineEnd, bodyEnd)), tags: [], properties: [], timestamps: [], clocks: [], links: []
+            ))
+            open.append(index)
+        }
+        return (records, Markdown.title(u, structure), slice(0..<(headings.first?.start ?? u.count)))
     }
 
     /// The settings version a file's rows are built under: the index's, with the keywords of

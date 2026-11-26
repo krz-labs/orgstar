@@ -25,7 +25,7 @@ extension OrgEditor {
     /// Ranges spell-fu skips in Org, for this revision of the text.
     func spellSkipped() -> [Range<Int>] {
         if let cached = spellSkipCache, cached.text == document.text { return cached.ranges }
-        let ranges = isOrg ? SpellCheck.skipped(document.tree) : []
+        let ranges = isOrg ? SpellCheck.skipped(document.tree) : isMarkdown ? markdown.structure.blocks : []
         spellSkipCache = (document.text, ranges)
         return ranges
     }
@@ -69,6 +69,17 @@ extension OrgEditor {
 
     /// A click on a heading's stars cycles it; a click on a checkbox toggles it.
     func click(at offset: Int) -> Bool {
+        if isMarkdown {
+            // A Markdown heading's `#`s cycle it, as a heading's stars do.
+            let u = markdown.units
+            guard let heading = markdown.structure.headings.last(where: { $0.start <= offset }), offset < heading.lineEnd else { return false }
+            var hashes = heading.start
+            while hashes < u.count, u[hashes] == 32 { hashes += 1 }
+            guard offset <= hashes + heading.level else { return false }
+            setCaret(heading.start)
+            _ = cycleAtCaret()
+            return true
+        }
         guard isOrg else { return false }
         var node = document.tree.root
         while let child = node.child(containing: offset) ?? node.child(containing: offset - 1) {

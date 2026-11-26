@@ -19,6 +19,14 @@ extension OrgEditor {
         guard !range.isEmpty else { return }
         let whole = NSRange(range)
         storage.setAttributes(theme.base, range: whole)
+        if isMarkdown {
+            for run in Presentation.markdownStyles(markdown, in: range, highlighter: highlighter) {
+                guard let clipped = clip(run.range, to: range) else { continue }
+                theme.apply(run.role, to: storage, range: clipped)
+            }
+            applyHighlights(range, in: storage)
+            return
+        }
         guard isOrg else {
             for run in plainRuns() where run.range.overlaps(range) {
                 guard let clipped = clip(run.range, to: range) else { continue }

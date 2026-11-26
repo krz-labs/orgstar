@@ -1,6 +1,7 @@
 #if os(macOS)
 import AppKit
 import OrgCore
+import OrgDocument
 import OrgPresentation
 
 extension OrgEditor {
@@ -21,7 +22,7 @@ extension OrgEditor {
         sparseHidden = nil
         view.folds = state.folds
         view.bodyFolds = state.bodyFolds
-        view = view.pruned(to: document.tree, wrappers: false)
+        view = pruned(view)
         // Found one by one, or all at once when there are many.
         let found = wrappers ?? (state.wrapperFolds.count > 32
             ? Wrappers.all(document.tree).filter { state.wrapperFolds.contains($0.start) }
@@ -56,7 +57,19 @@ extension OrgEditor {
             return
         }
         folded.set(view.folds.union(view.bodyFolds).union(view.wrapperFolds))
-        hidden.set(Presentation.hiddenRanges(document.tree, folds: view.folds, bodyFolds: view.bodyFolds, wrapperRanges: Array(wrapperHidden.values)) + narrowHidden)
+        let headings = isMarkdown
+            ? Presentation.markdownHiddenRanges(markdown, folds: view.folds, bodyFolds: view.bodyFolds)
+            : Presentation.hiddenRanges(document.tree, folds: view.folds, bodyFolds: view.bodyFolds, wrapperRanges: Array(wrapperHidden.values))
+        hidden.set(headings + narrowHidden)
+    }
+
+    /// `view` without heading folds that no longer start a heading; drawer and block folds are
+    /// left for the caller. Markdown's are checked against its headings, without the fold tree.
+    func pruned(_ view: ViewState) -> ViewState {
+        guard isMarkdown else { return view.pruned(to: document.tree, wrappers: false) }
+        guard !view.folds.isEmpty || !view.bodyFolds.isEmpty else { return view }
+        let starts = Set(markdown.structure.headings.map(\.start))
+        return ViewState(selection: view.selection, folds: view.folds.filter(starts.contains), bodyFolds: view.bodyFolds.filter(starts.contains), wrapperFolds: view.wrapperFolds)
     }
 
     /// `updateHidden`, laying out again only the text that changed between hidden and shown

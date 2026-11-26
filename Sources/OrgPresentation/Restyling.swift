@@ -10,6 +10,9 @@ public struct StyledExtent: Sendable, Equatable {
 
     public mutating func reset() { end = 0 }
 
+    /// Counts the text from `offset` on as unstyled again.
+    public mutating func unstyle(from offset: Int) { end = min(end, offset) }
+
     /// The whole lines from `end`, about `size` units, now counted as styled; nil when all are.
     public mutating func next(_ size: Int, in text: NSString) -> Range<Int>? {
         guard end < text.length else { return nil }

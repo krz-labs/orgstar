@@ -14,12 +14,12 @@ struct SearchScreen: View {
         let trimmed = query.trimmingCharacters(in: .whitespaces)
         List {
             if !trimmed.isEmpty {
-                let files = FuzzyMatch.rank(trimmed, workspace.files.filter { $0.kind == .org }, limit: 8)
+                let files = FuzzyMatch.rank(trimmed, workspace.files.filter { $0.kind == .org || $0.kind == .text }, limit: 8)
                 if !files.isEmpty {
                     Section("Files") {
                         ForEach(files) { file in
                             NavigationLink(value: ReaderRoute.file(file.path)) {
-                                Label(file.relativePath, systemImage: "doc.text")
+                                Label(file.relativePath, systemImage: file.kind == .text ? "doc.plaintext" : "doc.text")
                             }
                         }
                     }

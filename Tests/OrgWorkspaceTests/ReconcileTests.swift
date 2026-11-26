@@ -67,7 +67,7 @@ struct ReconcileTests {
         let folder = try Folder()
         let index = try IndexStore()
         let reconciler = Reconciler(index: index, settings: IndexSettings())
-        let notes = try folder.write("notes.md", "* Alpha\n")
+        let notes = try folder.write("notes.html", "* Alpha\n")
         try folder.write(".git/HEAD", "ref: refs/heads/main\n")
         _ = try reconciler.reconcile(root: folder.url)
         #expect(try index.files().map(\.kind) == [.other])

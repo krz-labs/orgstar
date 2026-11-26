@@ -72,14 +72,19 @@ public final class OrgEditor: NSObject {
     /// Highlights code in src blocks; nil leaves code plain.
     public let highlighter: (any CodeHighlighter)?
 
-    /// What the file is: org, or plain text, highlighted as code when the language is known.
+    /// What the file is: org, Markdown, or plain text, highlighted as code when the language
+    /// is known.
     public enum Mode: Equatable, Sendable {
         case org
+        case markdown
         case plain(language: String?)
     }
 
     public let mode: Mode
     public var isOrg: Bool { mode == .org }
+    public var isMarkdown: Bool { mode == .markdown }
+    /// A Markdown file's structure, for the revision it was read at.
+    var markdownCache: (revision: Int, document: MarkdownDocument)?
     /// The text as shown for accessibility, and the storage generation it's for.
     var accessibleCache: (storage: Int, text: AccessibleText)?
     /// Bumped on every character or attribute change to the storage.
@@ -275,6 +280,7 @@ public final class OrgEditor: NSObject {
         isLoading = true
         textView.textStorage?.setAttributedString(NSAttributedString(string: text, attributes: theme.base))
         isLoading = false
+        if isMarkdown { shaded.set(markdown.structure.blocks) }
         lines.reset(text as NSString)
         for view in orgTextViews {
             view.lineIndex = lines
@@ -596,16 +602,33 @@ public final class OrgEditor: NSObject {
     }
 
     private func applies(_ id: String, in context: EditContext) -> Bool {
-        if !isOrg, id.hasPrefix("org.") { return false }
+        if refuses(id) { return false }
         return switch EditorCommands.command(id)?.action {
         case .text(let command): command.applies(in: context)
         case .view where id.hasPrefix("org.table."): KeyContext.holds("table", in: context)
         case .view where id.hasPrefix("org.snippet."): snippetSession != nil
-        case .view: id != "org.cycle" || Presentation.heading(containing: context.caret, in: context.tree) != nil
-            || Wrappers.toggleable(at: context.caret, in: context.tree) != nil
+        case .view: id != "org.cycle" || Presentation.heading(containing: context.caret, in: foldTree) != nil
+            || Wrappers.toggleable(at: context.caret, in: foldTree) != nil
         case .edit, .mark, .app, .find: true
         case nil: true
         }
+    }
+
+    /// Whether `id` is refused because the file isn't org: in Markdown only the fold commands
+    /// of org's run, so none writes org into the file.
+    func refuses(_ id: String) -> Bool {
+        !isOrg && OrgOnlyCommands.refuses(id, markdown: isMarkdown)
+    }
+
+    /// The file's structure for folding: the org tree, or for Markdown a tree of its headings.
+    var foldTree: OrgTree { isMarkdown ? markdown.foldTree : document.tree }
+
+    /// The Markdown file's structure now.
+    var markdown: MarkdownDocument {
+        if let markdownCache, markdownCache.revision == document.revision { return markdownCache.document }
+        let made = MarkdownDocument(document.text)
+        markdownCache = (document.revision, made)
+        return made
     }
 
     /// The last command run and the revision it left, for `last-command`.
@@ -622,7 +645,7 @@ public final class OrgEditor: NSObject {
             fail("Unknown command \(id)")
             return
         }
-        if !isOrg, id.hasPrefix("org.") {
+        if refuses(id) {
             fail("Not an org file")
             return
         }
@@ -819,8 +842,8 @@ public final class OrgEditor: NSObject {
 
     func settleBlocks() {
         blockCheck?.cancel()
-        guard isOrg else { return }
-        let blocks = Presentation.shadedBlocks(document.tree)
+        guard isOrg || isMarkdown else { return }
+        let blocks = isMarkdown ? markdown.structure.blocks : Presentation.shadedBlocks(document.tree)
         guard blocks != shaded.all else { return }
         let old = shaded.all
         shaded.set(blocks)
@@ -838,8 +861,10 @@ public final class OrgEditor: NSObject {
         let newText = storage.string as NSString
         let newEnd = edit.range.lowerBound + replacement.utf16.count
         let oldTree = document.tree
+        let oldMarkdown = isMarkdown ? markdown : nil
         do {
             try document.apply([edit], baseRevision: document.revision)
+            if let oldMarkdown { markdownCache = (document.revision, oldMarkdown.applying(edit)) }
         } catch {
             assertionFailure("text view and document disagree: \(error)")
             return
@@ -848,8 +873,17 @@ public final class OrgEditor: NSObject {
         // edited line when the edit reaches into unstyled text.
         styled.map(through: edit, in: newText)
         let oldHidden = hidden.all
-        let affected = Presentation.restyleRange(for: edit, old: (oldTree, oldText), new: (document.tree, newText))
-        view = view.mapped(through: [edit]).pruned(to: document.tree, wrappers: false)
+        var affected = isMarkdown
+            ? Presentation.markdownRestyleRange(for: edit, oldBlocks: oldMarkdown?.structure.blocks ?? [], new: markdown, newText: newText)
+            : Presentation.restyleRange(for: edit, old: (oldTree, oldText), new: (document.tree, newText))
+        // A fence opened or closed far up restyles what follows in the background passes.
+        if isMarkdown, affected.count > Self.styleChunk {
+            let lines = newText.lineRange(for: NSRange(location: edit.range.lowerBound, length: newEnd - edit.range.lowerBound))
+            styled.unstyle(from: NSMaxRange(lines))
+            affected = affected.lowerBound..<NSMaxRange(lines)
+            scheduleStyling()
+        }
+        view = pruned(view.mapped(through: [edit]))
         mapWrapperFolds(through: edit, near: affected)
         if let narrowed { self.narrowed = ViewState(selection: [narrowed]).mapped(through: [edit]).selection[0] }
         mapVimPositions(through: edit)
@@ -875,6 +909,8 @@ public final class OrgEditor: NSObject {
                 shaded.set(oldShaded.map { mapRange($0, through: edit) })
             }
             scheduleBlockCheck()
+        } else if isMarkdown {
+            shaded.set(markdown.structure.blocks)
         }
         invalidateLayout(from: oldHidden.map { mapRange($0, through: edit) }, to: hidden.all)
         invalidateLayout(from: oldShaded.map { mapRange($0, through: edit) }, to: shaded.all)

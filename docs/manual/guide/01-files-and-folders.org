@@ -95,7 +95,7 @@ show-hidden-files = true
 ignored-folders = ".git .hg node_modules build"
 #+END_SRC
 
-Only org files (=.org= and =.org_archive=) are read by the index. Other files are listed and can be opened, but their contents are not searched.
+Org files (=.org= and =.org_archive=), Markdown files (=.md=, =.markdown=) and =.txt= files are read by the index. Only org files feed the agenda, IDs and links; Markdown and text files are searched. Other files are listed and can be opened, but their contents are not searched.
 
 ** Creating, renaming and trashing files
 
@@ -128,10 +128,30 @@ orgstar has no Open Recent menu. Instead, it reopens the buffers that were open 
 How a file opens depends on what it is:
 
 - *Org files* (=.org=, =.org_archive=) open in the editor with org editing.
-- *Text files* open in the same editor as plain text. A file counts as text when macOS knows its type as text, or, for unknown types, when its first 8 KB are valid UTF-8 with no NUL bytes. Org commands report =Not an org file=, and the outline pane shows "No outline" when you turn it on. Files in these languages get syntax highlighting: shell (=.sh=, =.bash=, =.zsh=, =.zshrc=, =.bashrc=, =.profile=), Python, Emacs Lisp, C, C++, R, JavaScript, Java, Scheme, Clojure, Haskell, Rust, Go, Ruby, JSON, YAML, TOML and Lua.
+- *Markdown files* (=.md=, =.markdown=) open in the editor with Markdown highlighting, heading folds and an outline; see /Markdown/ below.
+- *Text files* open in the same editor as plain text. A file counts as text when macOS knows its type as text, or, for unknown types, when its first 8 KB are valid UTF-8 with no NUL bytes. Org commands, folding included, report =Not an org file=, and the outline pane shows "No outline" when you turn it on. Files in these languages get syntax highlighting: shell (=.sh=, =.bash=, =.zsh=, =.zshrc=, =.bashrc=, =.profile=), Python, Emacs Lisp, C, C++, R, JavaScript, Java, Scheme, Clojure, Haskell, Rust, Go, Ruby, JSON, YAML, TOML and Lua.
 - *Everything else* (images, PDFs, audio, video, archives, binary files) shows a Quick Look preview in place of the editor, with =Open with Default App= and =Show in Finder= buttons below it. The preview is not a buffer.
 
 Text files from Finder use orgstar only if you choose it with Open With, since orgstar is not their default app.
+
+** Markdown
+
+Markdown and plain text are a fallback, for notes kept in those formats next to org files, such as Denote's Markdown notes. orgstar edits them as text and doesn't convert them.
+
+In a Markdown file the editor styles:
+
+- ATX headings (=#= to =######=), in the theme's heading colours and sizes;
+- =**bold**=, =__bold__=, =*italic*=, =_italic_=, =~~strike-through~~= and =`code`=, with their markers in the markup colour;
+- links (=[text](url)=, =[text][label]=, =<url>=, bare =http://= and =https://= addresses, images and =[label]: url= definitions);
+- list bullets and numbers, task boxes (=[ ]=, =[x]=), block quotes, tables, rules (=---=, =***=, =___=) and =<!-- comments -->=;
+- fenced code (=```= or =~~~=) on the block band, highlighted when the fence names one of the languages above;
+- YAML (=---=) or TOML (=+++=) front matter at the top of the file, highlighted as YAML or TOML.
+
+Headings fold with the fold commands of /Folding/ in [[file:02-the-editor.org][The editor]]: =TAB= on a heading line, =S-TAB=, Doom's =z= keys, and a click on a heading's =#=s. A section runs to the next heading of the same or a higher level; a =#= line inside fenced code or front matter is not a heading. The outline pane lists the headings, and search finds them (see /Searching your notes/ below).
+
+Other org commands report =Not an org file= and change nothing, so none of them writes org syntax into the file. Among them: heading and list structure commands, TODO keywords, priorities, tags, properties, dates, tables, links and Insert Link, emphasis, checkbox toggling, clocking, refiling, archiving, attachments, encryption, Share Subtree, Copy as Rich Text and every export. Lint File says it works on Org files. Typing doesn't continue lists, pair brackets or fill paragraphs as it does in org files, dropped files aren't attached, and snippets don't expand. Commands that don't act on the file's own entries, such as the agenda, capture, search and Save, work as usual.
+
+Not supported in Markdown files: setext headings (a line underlined with === or ---), indented code blocks, HTML blocks, emphasis that spans lines, footnotes, a rendered preview, and Markdown versions of org's structure editing, agenda, capture and export.
 
 * Buffers
 
@@ -180,13 +200,13 @@ View ▸ Show Tab Bar shows a row of tabs above each pane, one per buffer that p
 
 * Searching your notes
 
-The search field in the toolbar searches every org file in your folders. Click it or choose Edit ▸ Search Notes (=⇧⌘F=; =SPC /= or =SPC s p= in Doom normal state) and type.
+The search field in the toolbar searches every org, Markdown and =.txt= file in your folders. Click it or choose Edit ▸ Search Notes (=⇧⌘F=; =SPC /= or =SPC s p= in Doom normal state) and type.
 
 While the field holds text, the outline pane shows the results in place of the outline. Each result is a heading, or a file when the match is in the text before its first heading, titled by its =#+TITLE= or its name. Under the title is the passage the words were found in, with them in bold, then the file's name. Click a result to open the file at that heading. Clear the field to get the outline back.
 
 How matching works:
 
-- orgstar searches heading titles, the text under each heading and the text before a file's first heading, in =.org= and =.org_archive= files. Files that aren't org are not searched. Syncthing conflict copies are not searched.
+- orgstar searches heading titles, the text under each heading and the text before a file's first heading, in =.org= and =.org_archive= files, and in Markdown files by their =#= headings. A Markdown file's result for the text before its first heading is titled by the =title= in its front matter, else its first heading. A =.txt= file is searched as a whole and titled by its name. Other files are not searched. Syncthing conflict copies are not searched.
 - Each word you type matches words that start with it, ignoring case and accents: =proj= finds =project= and =projection=.
 - Every word must match within the same heading, or within the text before the first heading.
 - Up to 50 results show, best matches first.
@@ -196,7 +216,7 @@ To find text inside the open file, use Edit ▸ Find (see [[file:02-the-editor.o
 
 * The outline pane
 
-The outline pane lists the headings of the open org file, indented by level. Headings without a title show as =(untitled)=. Click a heading to move the caret to it; folded headings around it unfold. A file without headings shows "No headings"; a file that isn't org shows "No outline".
+The outline pane lists the headings of the open org or Markdown file, indented by level. Headings without a title show as =(untitled)=. Click a heading to move the caret to it; folded headings around it unfold. A file without headings shows "No headings"; a file that is neither org nor Markdown shows "No outline".
 
 The outline follows your edits after a short pause in typing.
 
@@ -438,4 +458,4 @@ orgstar does not convert between encodings or line endings.
 
 * On iOS
 
-The iOS app adds folders from its Folders screen and lists only org files there. Conflicts, Syncthing copies and recovery versions are in the editor's menu; the iOS app doesn't list git commits, and commits, pulls and pushes a git folder through the Working Copy app. Files are watched through file presenters rather than FSEvents. See [[file:14-ios.org][iOS]].
+The iOS app adds folders from its Folders screen and lists only org, Markdown and =.txt= files there. Conflicts, Syncthing copies and recovery versions are in the editor's menu; the iOS app doesn't list git commits, and commits, pulls and pushes a git folder through the Working Copy app. Files are watched through file presenters rather than FSEvents. See [[file:14-ios.org][iOS]].

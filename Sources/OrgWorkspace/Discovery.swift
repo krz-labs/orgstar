@@ -69,7 +69,8 @@ public struct ScanRules: Sendable, Equatable {
 public enum WorkspaceScanner {
     /// What a file name means to the workspace. Syncthing temp files, our own temp and backup
     /// files, Emacs backups, auto-saves and lock files, and Finder's files are ignored, and
-    /// other dotfiles unless `rules` takes them in; files that aren't org files are `.other`.
+    /// other dotfiles unless `rules` takes them in; Markdown and `.txt` files are `.text`, other
+    /// files that aren't org files `.other`.
     public static func classify(_ name: String, rules: ScanRules = ScanRules()) -> FileClassification {
         if name.hasPrefix(".") {
             if name.hasSuffix(".icloud") {
@@ -86,6 +87,7 @@ public enum WorkspaceScanner {
         let conflict = name.contains(".sync-conflict-")
         if name.hasSuffix(".org") { return .file(conflict ? .conflict : .org) }
         if name.hasSuffix(".org_archive") { return .file(conflict ? .conflict : .archive) }
+        if Markdown.isPath(name) || Markdown.isPlainTextPath(name) { return .file(conflict ? .conflict : .text) }
         return .file(.other)
     }
 

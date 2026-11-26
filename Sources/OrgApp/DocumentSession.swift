@@ -333,6 +333,15 @@ public final class DocumentSession {
         path.hasSuffix(".org") || path.hasSuffix(".org_archive") || path.hasSuffix(".org.gpg")
     }
 
+    /// Whether the open file is Markdown, which has highlighting, heading folds and an outline.
+    public var isMarkdown: Bool { path.map(Markdown.isPath) ?? false }
+
+    /// The outline of `path`'s text: org headings, or Markdown's; none for other files.
+    static func outline(_ path: String, _ state: DocumentState) -> [OutlineEntry] {
+        if isOrgPath(path) { return Presentation.outline(state.tree) }
+        return Markdown.isPath(path) ? MarkdownDocument(state.text).outline : []
+    }
+
     /// The caret in the open file.
     public var caret: Int { buffer?.selection.first?.lowerBound ?? 0 }
     private var name: String { path.map { ($0 as NSString).lastPathComponent } ?? "" }
@@ -559,7 +568,7 @@ public final class DocumentSession {
             outlineUpdates[path] = Task { [weak self, weak entry] in
                 try? await Task.sleep(for: .milliseconds(300))
                 guard !Task.isCancelled, let self, let entry else { return }
-                let outline = Self.isOrgPath(path) ? Presentation.outline(entry.buffer.document.tree) : []
+                let outline = Self.outline(path, entry.buffer.document)
                 for pane in self.panes(showing: path) {
                     pane.outline = outline
                     pane.editVersion += 1
@@ -582,7 +591,7 @@ public final class DocumentSession {
         if pane.isReadOnly == state.isEditable { pane.isReadOnly = !state.isEditable }
         if pane.conflict != entry.conflict { pane.conflict = entry.conflict }
         if updateOutline {
-            pane.outline = Self.isOrgPath(entry.path) ? Presentation.outline(state.tree) : []
+            pane.outline = Self.outline(entry.path, state)
             pane.editVersion += 1
         }
     }

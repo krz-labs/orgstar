@@ -136,7 +136,7 @@ public final class ReplaceInFiles {
             guard scope == nil || entry.root == scope, !EncryptedText.isEncryptedFile(entry.path) else { return false }
             switch entry.kind {
             case .org, .archive: return true
-            case .other:
+            case .text, .other:
                 if case .replace = mode { return Self.textExtensions.contains((entry.path as NSString).pathExtension.lowercased()) }
                 return false
             case .conflict: return false

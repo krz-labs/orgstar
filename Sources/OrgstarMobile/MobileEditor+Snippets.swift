@@ -9,7 +9,7 @@ import UIKit
 extension MobileEditor {
     /// TAB with no binding that runs here: expands the trigger before the caret, if any.
     func snippetTab(_ chord: KeyChord) -> Bool {
-        guard chord == KeyChord("TAB"), textView.markedTextRange == nil else { return false }
+        guard isOrg, chord == KeyChord("TAB"), textView.markedTextRange == nil else { return false }
         let expand = ExpandSnippet()
         guard expand.applies(in: editContext()) else { return false }
         _ = perform(expand)

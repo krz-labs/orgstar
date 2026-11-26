@@ -65,6 +65,20 @@ struct GateTests {
         return text
     }()
 
+    /// About 1 MB of Markdown: front matter, headings, paragraphs with emphasis, code and
+    /// links, lists, block quotes and fenced code.
+    static let markdown: String = {
+        var text = "---\ntitle: Gate\n---\n"
+        var n = 0
+        while text.utf8.count < 1_000_000 {
+            text += "## Section \(n)\n\nParagraph \(n) with **bold**, *italic*, `code`, a [link](https://example.com/\(n)) and https://example.com.\n"
+            text += "It continues on a second line with ~~struck~~ and _more_.\n\n"
+            text += "- item \(n)\n  - [ ] nested task\n\n> quoted \(n)\n\n```swift\nlet n = \(n)\n```\n\n"
+            n += 1
+        }
+        return text
+    }()
+
     struct Result: CustomStringConvertible {
         var name: String
         var bytes: Int
@@ -85,13 +99,13 @@ struct GateTests {
         return Int(stats.size_in_use)
     }
 
-    func measure(_ name: String, _ text: String) -> Result {
+    func measure(_ name: String, _ text: String, mode: OrgEditor.Mode = .org) -> Result {
         let clock = ContinuousClock()
         let bytes = Array(text.utf8)
         let before = Self.heapBytes()
         var harness: Harness!
         let open = clock.measure {
-            harness = Harness(DocumentState(bytes: bytes), layout: false)
+            harness = Harness(DocumentState(bytes: bytes), layout: false, mode: mode)
         }
         harness.drainStyling()
         let memoryRatio = Double(Self.heapBytes() - before) / Double(bytes.count)
@@ -140,6 +154,12 @@ struct GateTests {
             print("GATE \(name) (\(text.utf8.count / 1000) kB): lint \(lint)")
             #expect(lint < .milliseconds(500) * max(1, Double(text.utf8.count) / 1_000_000), "\(name): lint")
         }
+        let markdown = measure("1 MB Markdown", Self.markdown, mode: .markdown)
+        print("GATE \(markdown)")
+        #expect(markdown.open < .milliseconds(100) * max(1, Double(markdown.bytes) / 1_000_000), "Markdown: open")
+        #expect(markdown.typingP95 < .milliseconds(16), "Markdown: typing")
+        #expect(markdown.newlineP95 < .milliseconds(16), "Markdown: blank line")
+        #expect(markdown.memoryRatio < 45, "Markdown: memory")
         let large = measure("10 MB mixed document", Self.tenMegabytes)
         print("GATE \(large)")
         #expect(large.open < .milliseconds(1_500), "10 MB: open")

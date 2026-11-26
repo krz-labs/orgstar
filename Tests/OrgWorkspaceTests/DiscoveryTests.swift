@@ -13,7 +13,11 @@ struct ClassificationTests {
         (".a.org.orgstar-1234", .ignored),
         ("a.org~", .ignored),
         ("#a.org#", .ignored),
-        ("a.md", .file(.other)),
+        ("a.md", .file(.text)),
+        ("a.markdown", .file(.text)),
+        ("a.txt", .file(.text)),
+        ("a.sync-conflict-20261004-120000-ABCDEFG.md", .file(.conflict)),
+        (".a.md.icloud", .placeholder("a.md")),
         ("photo.jpg", .file(.other)),
         (".hidden.org", .file(.org)),
         (".zshrc", .file(.other)),
@@ -50,7 +54,7 @@ struct ScanTests {
         try folder.write("node_modules/x/index.js", "")
         let discovery = try WorkspaceScanner.scan(folder.url)
         #expect(discovery.files.map(\.url.lastPathComponent) == ["app.toml", ".notes.org", "a.org", "notes.txt", "b.org_archive"])
-        #expect(discovery.files.map(\.kind) == [.other, .org, .org, .other, .archive])
+        #expect(discovery.files.map(\.kind) == [.other, .org, .org, .text, .archive])
         let visible = try WorkspaceScanner.scan(folder.url, rules: ScanRules(hiddenFiles: false))
         #expect(visible.files.map(\.url.lastPathComponent) == ["a.org", "notes.txt", "b.org_archive"])
         #expect(discovery.placeholders.map(\.lastPathComponent) == ["e.org"])

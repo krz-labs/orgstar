@@ -13,7 +13,7 @@ extension MobileEditor {
         loading = true
         textView.textStorage.setAttributedString(NSAttributedString(string: text, attributes: theme.base))
         loading = false
-        shaded.set(Presentation.shadedBlocks(document.tree), folded: [])
+        shaded.set(isMarkdown ? markdown.structure.blocks : isOrg ? Presentation.shadedBlocks(document.tree) : [], folded: [])
         restartStyling()
         textView.typingAttributes = theme.base
     }
@@ -37,7 +37,7 @@ extension MobileEditor {
         restyle(range)
     }
 
-    private func scheduleStyling() {
+    func scheduleStyling() {
         guard !stylingScheduled, styled.end < textView.textStorage.length else { return }
         stylingScheduled = true
         DispatchQueue.main.async { [weak self] in
@@ -195,7 +195,7 @@ extension MobileEditor {
             self.restyleScheduled = nil
             if self.blocksMayChange {
                 self.blocksMayChange = false
-                self.shaded.set(Presentation.shadedBlocks(self.document.tree), folded: [])
+                if self.isOrg { self.shaded.set(Presentation.shadedBlocks(self.document.tree), folded: []) }
             }
             self.restyle(range)
             self.updateHidden()
@@ -220,6 +220,17 @@ extension MobileEditor {
         let whole = lines.location..<NSMaxRange(lines)
         storage.beginEditing()
         storage.setAttributes(theme.base, range: lines)
+        guard isOrg else {
+            if isMarkdown {
+                for run in Presentation.markdownStyles(markdown, in: whole, highlighter: Self.highlighter) {
+                    let clipped = run.range.clamped(to: whole)
+                    if !clipped.isEmpty { theme.apply(run.role, to: storage, range: NSRange(clipped)) }
+                }
+            }
+            if options.spellCheck { markMisspellings(in: whole, storage: storage) }
+            storage.endEditing()
+            return
+        }
         let revealed = caretLine
         let (changes, scriptExclusions) = Presentation.styleChanges(
             document.tree, in: whole, highlighter: Self.highlighter, indented: indented, hideStars: hideStars,
@@ -345,7 +356,7 @@ extension MobileEditor {
     /// Moving to another line shows its markup and hides the last one's.
     func revealCaretLine() {
         // LaTeX previews and images show their source on the caret's line whether or not markup shows.
-        guard !showMarkup || showsLatex || showsImages else { return }
+        guard !showMarkup || showsLatex || showsImages, isOrg else { return }
         let line = caretLine
         guard line != revealedLine else { return }
         let text = textView.textStorage.string as NSString

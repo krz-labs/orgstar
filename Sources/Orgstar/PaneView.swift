@@ -86,7 +86,7 @@ struct PaneView: NSViewRepresentable {
     private func makeEditor(_ path: String, _ container: NSView) -> OrgEditor? {
         guard let entry = session.openDocuments.first(where: { $0.path == path }) else { return nil }
         let document = entry.document
-        let mode: OrgEditor.Mode = DocumentSession.isOrgPath(path) ? .org : .plain(language: FileTypes.language(path))
+        let mode: OrgEditor.Mode = DocumentSession.isOrgPath(path) ? .org : Markdown.isPath(path) ? .markdown : .plain(language: FileTypes.language(path))
         let editor = OrgEditor(document: document, frame: container.bounds, editable: document.isEditable, highlighter: Self.highlighter, mode: mode, options: settings.options)
         let store = commands.store
         editor.onChange = { [weak session] in session?.bufferChanged(path) }

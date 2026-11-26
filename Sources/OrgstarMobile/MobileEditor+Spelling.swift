@@ -52,7 +52,7 @@ extension MobileEditor {
     /// The skipped ranges for the buffer's current text, kept until it changes.
     func spellSkipped() -> [Range<Int>] {
         if let cached = spellSkipCache, cached.revision == document.revision { return cached.ranges }
-        let ranges = SpellCheck.skipped(document.tree)
+        let ranges = isOrg ? SpellCheck.skipped(document.tree) : isMarkdown ? markdown.structure.blocks : []
         spellSkipCache = (document.revision, ranges)
         return ranges
     }

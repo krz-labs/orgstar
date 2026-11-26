@@ -193,7 +193,7 @@ struct EditorScreen: View {
                     editor?.run("edit.undo")
                 }
                 // On iPhone, Export is in Commands, so the file name has room.
-                if sizeClass == .regular, let tree = session.document(of: path)?.tree {
+                if sizeClass == .regular, DocumentSession.isOrgPath(path), let tree = session.document(of: path)?.tree {
                     ExportMenu(path: path, tree: tree, report: { message = $0 }, exportSubtree: exportSubtree)
                 }
                 Button("Commands", systemImage: "command") { sheet = .palette }
@@ -473,7 +473,8 @@ struct EditorScreen: View {
         guard let document = session.document(of: path) else { return nil }
         let editor = MobileEditor(
             document: document, editable: document.isEditable, options: editorOptions, theme: model.theme,
-            showMarkup: model.showMarkup, baseDirectory: URL(fileURLWithPath: path).deletingLastPathComponent()
+            showMarkup: model.showMarkup, baseDirectory: URL(fileURLWithPath: path).deletingLastPathComponent(),
+            mode: DocumentSession.isOrgPath(path) ? .org : Markdown.isPath(path) ? .markdown : .plain
         )
         let path = path
         editor.fileName = path

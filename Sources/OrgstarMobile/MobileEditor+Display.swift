@@ -182,7 +182,9 @@ extension MobileEditor {
         let before = hidden.folded
         let oldHidden = hidden.all
         hidden.set(
-            Presentation.hiddenRanges(tree, folds: fold.folds, bodyFolds: fold.bodyFolds, wrapperRanges: wrappers),
+            isMarkdown
+                ? Presentation.markdownHiddenRanges(markdown, folds: fold.folds, bodyFolds: fold.bodyFolds)
+                : Presentation.hiddenRanges(tree, folds: fold.folds, bodyFolds: fold.bodyFolds, wrapperRanges: wrappers),
             folded: fold.folds.union(fold.bodyFolds).union(fold.wrapperFolds)
         )
         // Lines that gain or lose their `…` are made again: TextKit keeps a shown line's fragment.
@@ -201,14 +203,14 @@ extension MobileEditor {
     /// TAB at the caret: a heading cycles, a drawer or block opens or closes.
     @discardableResult
     func cycleAtCaret() -> Bool {
-        guard let next = Presentation.cycle(at: textView.selectedRange.location, in: document.tree, fold) else { return false }
+        guard let next = Presentation.cycle(at: textView.selectedRange.location, in: foldTree, fold) else { return false }
         setFolds(next)
         return true
     }
 
     /// Shift-TAB: overview, contents, show all.
     func cycleGlobal() {
-        let (visibility, state) = Presentation.cycleGlobal(from: globalVisibility, in: document.tree, wrapperFolds: fold.wrapperFolds)
+        let (visibility, state) = Presentation.cycleGlobal(from: globalVisibility, in: foldTree, wrapperFolds: fold.wrapperFolds)
         globalVisibility = visibility
         setFolds(state)
     }
@@ -217,7 +219,7 @@ extension MobileEditor {
     /// `zM`, `zr` and `zm` for the whole buffer.
     func foldCommand(_ id: String) {
         let caret = textView.selectedRange.location
-        let tree = document.tree
+        let tree = foldTree
         let length = (document.text as NSString).length
         let next: FoldState?
         if id == "org.fold.close" || id == "org.fold.open-subtree" {
@@ -241,11 +243,11 @@ extension MobileEditor {
     /// Opens the folds hiding `offset`.
     func unfold(around offset: Int) {
         var state = fold
-        for entry in Presentation.outline(document.tree) where entry.start < offset && offset < entry.end {
+        for entry in Presentation.outline(foldTree) where entry.start < offset && offset < entry.end {
             state.folds.remove(entry.start)
             state.bodyFolds.remove(entry.start)
         }
-        for start in state.wrapperFolds where Wrappers.starting(at: start, in: document.tree)?.hidden.contains(offset) == true {
+        for start in state.wrapperFolds where Wrappers.starting(at: start, in: foldTree)?.hidden.contains(offset) == true {
             state.wrapperFolds.remove(start)
         }
         if state != fold { setFolds(state) }
