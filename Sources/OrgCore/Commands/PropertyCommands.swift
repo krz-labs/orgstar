@@ -95,7 +95,7 @@ public enum PropertyValues {
     }
 
     /// `(read-from-string (concat "(" vals ")"))` as strings: quoted strings, numbers, symbols.
-    static func readList(_ s: String) -> [String] {
+    public static func readList(_ s: String) -> [String] {
         var values: [String] = []
         for m in s.matches(of: /"((?:[^"\\]|\\.)*)"|(\S+)/) {
             if let quoted = m.1 {

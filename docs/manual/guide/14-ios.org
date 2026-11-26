@@ -220,6 +220,10 @@ With a hardware keyboard, the editor uses the preset =keymap= sets in the folder
 
 See [[file:03-keys.org][Keys and commands]] for the Emacs bindings.
 
+** Completion
+
+With a hardware keyboard, Complete at Point (=C-M-i=, or =C-SPC= in Doom's insert state), Expand Word (=M-/=, or =F5= with the Mac keys) and Complete Word (=C-M-/=, or =C-n= and =C-p= in Doom's insert state) work as on the Mac; see [[file:02-the-editor.org][The editor]]. The list shows up to 8 rows under the caret; the keys move through it as on the Mac, and tapping a row inserts it. The settings in Settings ▸ Completion are the Mac's: whether the list opens by itself, after which pause and how many characters, prefix or fuzzy matching, and words in the list. With them on, the list also opens as you type on the on-screen keyboard, where tapping a row is the way to choose.
+
 ** Snippets
 
 Snippets come from =snippets.toml= in the configuration folder, the same file as on the Mac, and reload when it changes; problems show in red under the folder in Settings. See [[file:02-the-editor.org][The editor]] and [[file:13-configuration.org][Configuration]].

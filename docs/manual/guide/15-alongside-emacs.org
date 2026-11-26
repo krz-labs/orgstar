@@ -223,6 +223,17 @@ orgstar's snippets (see [[file:02-the-editor.org][The editor]]) read yasnippet's
 - A field inside another field's default is skipped by yasnippet once the outer field is typed over; orgstar visits it, empty, where it was.
 - Capture's escapes for dates and prompts (=%t=, =%U=, =%<…>=, =%^{…}=) work in bodies, which yasnippet doesn't have.
 
+** Completion and dabbrev, corfu and org-roam
+
+Completion follows Emacs's =completion-at-point= with corfu's list (see [[file:02-the-editor.org][The editor]]). Where it differs:
+
+- Expand Word is =dabbrev-expand= with its defaults, and is tested against it in a buffer of its own. It searches the other open files whatever their mode, rather than only buffers in the same mode, and after them the index of your folders, which Emacs doesn't have. Without a word right before the caret it reports =No possible abbreviation preceding point= instead of expanding the word before the blank, and =dabbrev-abbrev-skip-leading-regexp= and =dabbrev-case-fold-search= aren't read.
+- Complete Word (and Doom's =C-n= and =C-p=) lists words in the order Expand Word finds them; =cape-dabbrev= collects the same words, which corfu then sorts by length and history.
+- Fuzzy matching scores as the command palette does, which is close to Doom's orderless with =orderless-flex= but takes no separators: spaces in what's typed are ignored.
+- The list that opens by itself reads one pause and one length for every position (=corfu-auto-delay=, =corfu-auto-prefix=), with Doom's macOS values as defaults (0.4 seconds, two characters).
+- =[[id:= completes every heading in your folders, as =org-roam-node-insert= completes nodes, but a heading without an =ID= gets one when chosen, which org-roam leaves to =org-id-get-create=. The description is the heading's title as written. org-roam's =roam:= links aren't completed.
+- Property values come from the index as well as the buffer; Org's =org-read-property-value= offers only the buffer's.
+
 ** Known differences from Emacs Org
 
 orgstar refuses some things with a message rather than doing something different from Emacs. These are the ones found in the current version.

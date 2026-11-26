@@ -237,7 +237,7 @@ Complete at Point (=completion-at-point=) completes the word before the caret fr
 | Preset | Key                                                      |
 |--------+----------------------------------------------------------|
 | Emacs  | =C-M-i=                                                  |
-| Doom   | =C-SPC= or =C-@= in insert state; the list also opens by itself after you type two characters and pause for 0.4 seconds, as Doom's corfu does |
+| Doom   | =C-SPC= or =C-@= in insert state                         |
 | Mac    | =⌥⎋= (Option-Escape) while Option is Meta; =⌃Space= stays with macOS, which switches input sources with it |
 
 With one candidate, it is inserted. With several, a list opens under the caret, showing up to 16 rows. Nothing is selected until you pick a row.
@@ -251,7 +251,39 @@ With one candidate, it is inserted. With several, a list opens under the caret, 
 | =ESC=                       | Close the list; the key then does what it otherwise would                  |
 | =C-g=                       | Close the list                                                             |
 
-The list follows what you type and closes when nothing matches. Candidates are those that start with what you typed.
+The list follows what you type and closes when nothing matches.
+
+** Opening by itself
+
+The list can open by itself, as corfu's =corfu-auto= does: after you type at least two characters and pause for 0.4 seconds, when the position offers something. With the Doom keys it does, as Doom's corfu does; with the Emacs and Mac keys it doesn't. Settings ▸ Editing ▸ Completion (=completion-auto=, =completion-auto-delay= and =completion-auto-prefix= in =config.toml=) changes all three for any keys; see [[file:13-configuration.org][Configuration]]. With the Doom keys it opens only in insert state.
+
+** Matching
+
+Candidates start with what you typed, sorted; this is Emacs's default (=completion-styles= with =basic= and =partial-completion=). With fuzzy matching (=completion-style = "fuzzy"=), a candidate matches when it has the letters you typed in order, anywhere, as the command palette matches, and the best matches come first: letters at the start of a word and runs of letters next to each other count most, then shorter candidates. Candidates in the case you typed come first when there are any, so =#+ti= lists =title:= rather than =TITLE:=. The Doom keys match fuzzily by default, as Doom's corfu does with orderless; the Emacs and Mac keys match prefixes. =TAB= inserts the part the candidates share only when it starts with what you typed.
+
+** From your folders
+
+Some positions offer what is in your other files too. The file's own candidates show at once and the rest join the list when the index answers, which doesn't hold up typing.
+
+| Where                                        | Candidates                                                     | Inserted |
+|----------------------------------------------+----------------------------------------------------------------+----------|
+| After =[[id:=                                | Heading titles in every folder, and files with an =ID=; a title that several have shows its file's name | =[[id:ID][Title]]=, through =]]= after the caret |
+| After =[[denote:=                            | Denote's notes, by title                                       | =[[denote:IDENTIFIER][Title]]= |
+| After =:NAME: = in a property drawer         | The values the =NAME_ALL= property or =#+PROPERTY: NAME_ALL= allows at the caret, then the values headings give =NAME= in this file and in every folder, most used first | The value |
+
+A heading chosen after =[[id:= that has no =ID= gets one first, in this file or in its own, as =org-id-get-create= adds it, so the link always points at an =ID=. If the heading's file changed so that the heading isn't where the index last saw it, nothing is added and the echo area says so.
+
+** Words
+
+Expand Word (=dabbrev-expand=) completes the word before the caret from words that start with it, ignoring case: in the file, those before the caret nearest first, then those after it nearest first; then in the other open files; then in your folders through the index. Each word is offered once. The case follows what you typed: =he= expands to =hello= from =Hello=, =HE= to =HELLO=, and a word with capitals inside, such as =fooBar=, keeps its own case when you typed its start as it is. Pressing the key again right away replaces the word with the next one; past the last, what you typed comes back and the echo area says =No further dynamic expansion for `he' found=.
+
+| Preset | Expand Word | Complete Word                                                    |
+|--------+-------------+------------------------------------------------------------------|
+| Emacs  | =M-/=       | =C-M-/=                                                          |
+| Doom   | —           | =C-n= in insert state (first chosen), =C-p= (last chosen), as Doom's =+corfu/dabbrev-or-next= |
+| Mac    | =F5= (=fn-F5= on keyboards whose top row controls the Mac) | — |
+
+Complete Word lists the same words in the completion list instead, with one chosen. Word characters are Org's: letters, digits and =$=, =%=, ='=, =&=, =*=, =+=, =-=, =/=, ~=~, =\=, =_=, =|= and =~=, so =fo= expands to =fo-y= or =fo/v= but not into =fo.z=. The list that opens by itself offers words only where Org offers nothing, and only with Settings ▸ Editing ▸ Completion ▸ The list offers words from open files and folders (=completion-words=).
 
 What is completed, by position:
 
@@ -273,7 +305,7 @@ What is completed, by position:
 | =:= at the start of a line in a property drawer | property names the entry doesn't have yet                   |
 | =:= at the start of a line elsewhere         | drawer names                                                   |
 
-Where none of these offers anything, the triggers of your snippets that start with the text before the caret are offered, each with its description and marked =snippet=; choosing one expands it (see [[*Snippets][Snippets]]). Elsewhere, Complete at Point reports =No match=. Completion is for org files only.
+Where none of these offers anything, the triggers of your snippets that match the text before the caret are offered, each with its description and marked =snippet=; choosing one expands it (see [[*Snippets][Snippets]]). Elsewhere, Complete at Point reports =No match=. Completion is for org files only.
 
 * Snippets
 

@@ -132,6 +132,12 @@ struct PaneView: NSViewRepresentable {
         editor.onImage = { [weak commands] in commands?.imageHandler?($0, $1) }
         editor.knownTags = { [weak commands] in MainActor.assumeIsolated { commands?.knownTags() ?? [] } }
         editor.onPrompt = { [weak commands] prompt, reply in commands?.ask(prompt, reply: reply) }
+        editor.completionSource = { [weak commands] query in
+            guard let index = await commands?.completionIndex else { return CompletionResult() }
+            return await CompletionSources.answer(query, index: index, excluding: path)
+        }
+        editor.createID = { [weak session] item in session.flatMap { CompletionSources.createID(item, session: $0) } }
+        editor.otherBuffers = { [weak session] in session.map { CompletionSources.otherBuffers($0, excluding: path) } ?? [] }
         editor.onEffect = { [weak commands, weak session] effect in
             switch effect {
             case .storedLinkUsed(let link): commands?.storedLinks.removeAll { $0.link == link }

@@ -361,6 +361,7 @@ struct ContentView: View {
             }
             clock.remindAtEffort(session)
             commands.knownTags = { [index = workspace.index] in (try? index.tags()) ?? [] }
+            commands.completionIndex = workspace.index
             commands.mainWindowOpen = true
             commands.whatsNew = WhatsNew.pending(firstLaunch: noFolders && !welcomeShown)
             if noFolders, !welcomeShown {

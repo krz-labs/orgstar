@@ -419,6 +419,9 @@ struct EditorScreen: View {
     /// The editor's callbacks go to this screen: it's shown here, or its view here took focus.
     private func bind(_ editor: MobileEditor) {
         editor.knownTags = { [index = workspace.index] in (try? index.tags()) ?? [] }
+        editor.completionSource = { [index = workspace.index, path] query in await CompletionSources.answer(query, index: index, excluding: path) }
+        editor.createID = { [weak session] item in session.flatMap { CompletionSources.createID(item, session: $0) } }
+        editor.otherBuffers = { [weak session, path] in session.map { CompletionSources.otherBuffers($0, excluding: path) } ?? [] }
         editor.onChange = { [weak session] in session?.bufferChanged(path) }
         editor.onMessage = { message = $0 }
         editor.onPrompt = { prompt, reply in self.prompt = PromptRequest(prompt: prompt, reply: reply) }
