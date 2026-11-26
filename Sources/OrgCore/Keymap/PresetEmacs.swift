@@ -62,6 +62,12 @@ extension KeymapPreset {
         keys = "C-M-i"
         command = "editor.complete"
         [[bind]]
+        keys = "M-/"
+        command = "editor.dabbrev-expand"
+        [[bind]]
+        keys = "C-M-/"
+        command = "editor.dabbrev-completion"
+        [[bind]]
         keys = "C-x h"
         command = "edit.select-all"
         [[bind]]

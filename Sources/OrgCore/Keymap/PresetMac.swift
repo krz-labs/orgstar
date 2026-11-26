@@ -302,6 +302,9 @@ extension KeymapPreset {
         keys = "M-ESC"
         command = "editor.complete"
         [[bind]]
+        keys = "<f5>"
+        command = "editor.dabbrev-expand"
+        [[bind]]
         keys = "C-s-r"
         command = "macro.start"
         [[bind]]

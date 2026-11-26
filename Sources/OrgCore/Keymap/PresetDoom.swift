@@ -632,6 +632,15 @@ extension KeymapPreset {
         keys = "C-@"
         command = "editor.complete"
         mode = "insert"
+        # +corfu/dabbrev-or-next and +corfu/dabbrev-or-last: words, the first or last chosen.
+        [[bind]]
+        keys = "C-n"
+        command = "editor.dabbrev-completion"
+        mode = "insert"
+        [[bind]]
+        keys = "C-p"
+        command = "editor.dabbrev-completion-previous"
+        mode = "insert"
 
         # Insert state: org-cycle and org-shifttab with Doom's +org-indent-maybe-h, which
         # demotes or promotes a heading and indents or outdents an item tree.

@@ -843,6 +843,9 @@ When a key appears in several rows, it runs the command whose condition holds at
 | Find Previous (=edit.find-previous=) | — | — | — | Goes to the previous match. |
 | Use Selection for Find (=edit.use-selection-for-find=) | — | — | — | Puts the selection in the find bar. |
 | Complete at Point (=editor.complete=) | =C-M-i= | =⌥⎋= |=C-SPC= (I), =C-@= (I) | Completes what is typed at the caret: =#+= keywords and their values, link types, entities, tags, TODO keywords, headings, drawers, properties, src languages and header arguments, and =<s=-style templates (=completion-at-point=). One candidate is inserted; several open a list. |
+| Expand Word (=editor.dabbrev-expand=) | =M-/= | =F5= | — | Completes the word before the caret from the file, the other open files and your folders; again right away, the next word (=dabbrev-expand=). See Words in [[file:02-the-editor.org][The editor]]. |
+| Complete Word (=editor.dabbrev-completion=) | =C-M-/= | — | =C-n= (I) | Lists the words Expand Word would insert, the first chosen (=dabbrev-completion=; Doom's =+corfu/dabbrev-or-next=). |
+| Complete Word, Last First (=editor.dabbrev-completion-previous=) | — | — | =C-p= (I) | The same, the last chosen (Doom's =+corfu/dabbrev-or-last=). |
 | Fill Paragraph (=org.fill-paragraph=) | =M-q= | =⌃⌘P= | — | Refills the paragraph or list item to the fill column (=org-fill-paragraph=); with a selection, every paragraph it touches. In the Doom preset, =gq= and =gw= fill the lines a motion covers; see [[*Operators][Operators]]. |
 
 ** Outline: visibility and narrowing
