@@ -160,7 +160,7 @@ The lists are =[key-bar]= in the configuration folder's =config.toml= (see [[fil
 
 A button shows its command's symbol where it has one, such as the arrows for Undo and Redo or a clock for Clock In; otherwise its title, on up to two lines, in a button twice as wide. A snippet shows its trigger and a macro its name. VoiceOver reads the command's title.
 
-When the buttons don't fit the width, the bar shows as many as fit, in order, and a More button (…) at the end holds the rest as a menu. The bar never scrolls. Turning the device on its side makes room for more.
+When the buttons don't fit the width, the bar shows as many as fit, in order, and a More button (…) at the end holds the rest as a menu. The bar never scrolls. Buttons widen with their symbols up to the largest text size before the accessibility sizes, so at larger text sizes fewer fit; on iPhone the default bar then puts its last buttons under More. Turning the device on its side makes room for more.
 
 While a snippet's fields are filled in, Previous Snippet Field and Next Snippet Field take the places of Promote and Demote, so the fields work without a hardware keyboard; Promote and Demote come back when the snippet ends. A bar without Promote or Demote shows the field buttons first.
 

@@ -88,6 +88,22 @@ struct KeyBarLayoutTests {
         #expect(KeyBarLayout.fit([], available: 0, slots: slots) == ([], []))
     }
 
+    @Test func slotsWidenWithTheSymbols() {
+        // iPhone 17: 402 points less the bar's margins.
+        let width: CGFloat = 390
+        let ids = KeyBarLayout.Width.iphone.defaultIDs
+        #expect(KeyBarLayout.availableSlots(width: width, scale: 1) == 12)
+        #expect(KeyBarLayout.availableSlots(width: width, scale: 0.8) == 12)
+        #expect(KeyBarLayout.fit(ids, available: KeyBarLayout.availableSlots(width: width, scale: 1)) { _ in 1 } == (ids, []))
+        // At the largest symbol size (23 against 17 points of body text), slots are a third wider.
+        let large = KeyBarLayout.availableSlots(width: width, scale: 23.0 / 17)
+        #expect(large == 9)
+        let (shown, more) = KeyBarLayout.fit(ids, available: large) { _ in 1 }
+        #expect(shown == Array(ids.prefix(8)) && more == Array(ids.dropFirst(8)))
+        #expect(CGFloat(large) * KeyBarLayout.slotWidth * 23 / 17 <= width)
+        #expect(KeyBarLayout.availableSlots(width: 0, scale: 2) == 0)
+    }
+
     @Test func snippetFieldsTakePromoteAndDemote() {
         let next = KeyBarLayout.nextField, previous = KeyBarLayout.previousField
         #expect(KeyBarLayout.withSnippetFields(KeyBarLayout.Width.iphone.defaultIDs).prefix(4)

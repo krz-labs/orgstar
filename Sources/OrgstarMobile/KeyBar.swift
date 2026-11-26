@@ -2,6 +2,7 @@
 import OrgApp
 import OrgCore
 import SwiftUI
+import UIKit
 
 /// Org's keys for a touch keyboard: each button does what its key does at the caret, as the
 /// Emacs keymap binds it (M-→ demotes a heading, indents an item, moves a table column), or
@@ -11,6 +12,7 @@ struct KeyBar: View {
     let editor: MobileEditor
     let palette: () -> Void
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.dynamicTypeSize) private var typeSize
     @AppStorage(KeyBarLayout.Width.iphone.defaultsKey) private var iphone: String?
     @AppStorage(KeyBarLayout.Width.ipad.defaultsKey) private var ipad: String?
     @State private var width: CGFloat?
@@ -102,16 +104,15 @@ struct KeyBar: View {
     static let largestSize = DynamicTypeSize.accessibility2
     static let target: CGFloat = 44
     static let padding: CGFloat = 4
-    /// The widest a one-slot button gets where the bar has room, and the narrowest.
+    /// The widest a one-slot button gets where the bar has room.
     nonisolated static let widest: CGFloat = 64
-    static let slot: CGFloat = 32
     @ScaledMetric(relativeTo: .body) private var size = KeyBar.target
 
     var body: some View {
         let layout = sizeClass == .regular ? KeyBarLayout.Width.ipad : .iphone
         var ids = ((layout == .ipad ? ipad : iphone).map(KeyBarLayout.ids) ?? layout.defaultIDs).filter { Self.item($0) != nil }
         if editor.fields.active { ids = KeyBarLayout.withSnippetFields(ids) }
-        let available = width.map { Int(($0 - 12) / Self.slot) } ?? .max
+        let available = width.map { KeyBarLayout.availableSlots(width: $0 - 12, scale: symbolScale) } ?? .max
         let (shown, more) = KeyBarLayout.fit(ids, available: available) { Self.item($0)?.slots ?? 1 }
         return SlotRow {
             ForEach(shown, id: \.self) { id in
@@ -192,9 +193,14 @@ struct KeyBar: View {
         }
     }
 
-    /// The buttons grow taller with the text size, but their symbols stop growing here, so
-    /// that they fit the button's share of the width.
+    /// The buttons grow taller with the text size, but their symbols stop growing here.
     static let largestSymbolSize = DynamicTypeSize.xxxLarge
+
+    /// How much larger than at the default size the symbols are drawn, which the slots follow.
+    private var symbolScale: CGFloat {
+        let traits = UITraitCollection(preferredContentSizeCategory: UIContentSizeCategory(min(typeSize, Self.largestSymbolSize)))
+        return UIFontMetrics(forTextStyle: .body).scaledValue(for: 1, compatibleWith: traits)
+    }
 
     @ViewBuilder
     private func label(_ item: Item) -> some View {

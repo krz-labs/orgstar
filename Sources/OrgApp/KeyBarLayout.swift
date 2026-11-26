@@ -57,6 +57,15 @@ public enum KeyBarLayout {
         return [previousField, nextField].filter { !out.contains($0) } + out
     }
 
+    /// A slot's width at the default text size: room for a symbol and the gaps beside it.
+    public static let slotWidth: CGFloat = 32
+
+    /// The slots in a bar `width` wide when its symbols are drawn `scale` times as large as at
+    /// the default text size: slots widen with the symbols, so fewer fit.
+    public static func availableSlots(width: CGFloat, scale: CGFloat) -> Int {
+        max(Int(width / (slotWidth * max(scale, 1))), 0)
+    }
+
     /// The buttons that fit in `available` slots, in order, and the rest, which go in a More
     /// button that takes a slot. A button takes `slots(id)` slots; past the first that doesn't
     /// fit, none show, so the order stays.
