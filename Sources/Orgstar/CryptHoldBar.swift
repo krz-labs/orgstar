@@ -25,3 +25,21 @@ struct CryptHoldBar: View {
         }
     }
 }
+
+/// The session follows the org-crypt settings, and asks for the passphrase of an encrypted file
+/// it was asked to open.
+struct CryptSettings: ViewModifier {
+    let session: DocumentSession
+    let cryptBeforeSave: Bool
+    let cryptTagMatcher: String
+    let unlock: (String) -> Void
+
+    func body(content: Content) -> some View {
+        content
+            .onChange(of: cryptBeforeSave, initial: true) { _, on in session.encryptsTaggedEntries = on }
+            .onChange(of: cryptTagMatcher, initial: true) { session.cryptTag = OrgPreferences.cryptTag() }
+            .onChange(of: session.unlockRequest, initial: true) { _, path in
+                if let path { unlock(path) }
+            }
+    }
+}

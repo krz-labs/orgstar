@@ -407,11 +407,9 @@ struct ContentView: View {
             commands.editor = nil
         }
         .onChange(of: saveMode, initial: true) { _, mode in session.saveMode = mode }
-        .onChange(of: cryptBeforeSave, initial: true) { _, on in session.encryptsTaggedEntries = on }
-        .onChange(of: cryptTagMatcher, initial: true) { session.cryptTag = OrgPreferences.cryptTag() }
-        .onChange(of: session.unlockRequest, initial: true) { _, path in
-            if let path { panel = .crypt(UUID(), CryptRequest(mode: .openFile, path: path, offset: 0)) }
-        }
+        .modifier(CryptSettings(session: session, cryptBeforeSave: cryptBeforeSave, cryptTagMatcher: cryptTagMatcher) { path in
+            panel = .crypt(UUID(), CryptRequest(mode: .openFile, path: path, offset: 0))
+        })
         .onChange(of: options, initial: true) { _, options in session.options = options }
         .onAppear { TimerModel.shared.onDone = { [commands] in commands.show($0) } }
         .onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)) { _ in defaultsChanges += 1 }

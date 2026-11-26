@@ -136,6 +136,32 @@ struct CryptSaveTests {
         #expect(recoveryFiles.allSatisfy { !$0.contains(Self.secret) })
     }
 
+    @Test func replaceInFilesKeepsNoPlaintextAndIsHeld() throws {
+        try notes.write("a.org", "* Plain\nOpen text.\n")
+        session.open(file.path)
+        try replace(with: Self.file)
+        // The buffer has no editor: Replace in Files keeps a copy first, and can't keep one now.
+        let changed = (Self.file as NSString).replacingOccurrences(of: "Open text.", with: "Shut text.")
+        #expect(session.applyChanges(lineEdits(from: Self.file, to: changed), to: file.path, expecting: Self.file) == nil)
+        #expect(!session.save())
+        #expect(session.held[file.path] == .entries(1))
+        #expect(recoveryFiles.isEmpty)
+        #expect(disk == "* Plain\nOpen text.\n")
+        // With the passphrase, the copy is kept encrypted.
+        session.cryptUsed("pw", for: file.path)
+        #expect(session.applyChanges(lineEdits(from: changed, to: Self.file), to: file.path, expecting: changed) == nil)
+        #expect(session.save())
+        #expect(!recoveryFiles.isEmpty && recoveryFiles.allSatisfy { !$0.contains(Self.secret) })
+        #expect(!disk.contains(Self.secret))
+        // A file that isn't open, with an unencrypted tagged entry on disk, isn't written.
+        session.cryptUsed("other", for: "/nowhere")
+        let closed = try notes.write("b.org", Self.file)
+        let message = session.applyChanges(lineEdits(from: Self.file, to: changed), to: closed.path, expecting: Self.file)
+        #expect(message?.contains("1 tagged entry isn't encrypted") == true)
+        #expect((try String(contentsOf: closed, encoding: .utf8)) == Self.file)
+        #expect(recoveryFiles.allSatisfy { !$0.contains(Self.secret) })
+    }
+
     @Test func aHeldFileIsReleasedWhenTheEntryGoes() throws {
         session.saveMode = .automatic
         session.autosaveDelay = .seconds(60)
