@@ -268,7 +268,7 @@ struct ClockReportScreen: View {
             .navigationTitle("Clock Report")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } }
+                ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } }
                 ToolbarItem(placement: .primaryAction) {
                     ShareLink(item: report, preview: SharePreview("Clock Report")).disabled(report.isEmpty)
                 }

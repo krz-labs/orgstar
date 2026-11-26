@@ -516,7 +516,7 @@ struct ReaderScreen: View {
             }
             .navigationTitle("Outline")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { showingOutline = false } } }
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { showingOutline = false } } }
         }
     }
 }

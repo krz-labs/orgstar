@@ -1197,7 +1197,7 @@ struct CommandPalette: View {
             .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always))
             .navigationTitle("Commands")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } } }
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
         }
         .onAppear {
             guard applicable == nil else { return }

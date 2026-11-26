@@ -33,7 +33,7 @@ struct ConflictSheet: View {
                 ThemedDiff(old: versions.disk, new: versions.mine)
             }
             HStack {
-                Button("Decide Later") { dismiss() }.keyboardShortcut(.cancelAction)
+                Button("Cancel") { dismiss() }.keyboardShortcut(.cancelAction)
                 Spacer()
                 Button("Use Disk Version") { session.useDiskVersion(); dismiss() }
                 Button("Merge with Markers") { session.mergeConflictWithMarkers(); dismiss() }
@@ -70,7 +70,11 @@ struct SyncConflictSheet: View {
                 }
             }
             HStack {
-                Button("Close") { dismiss() }.keyboardShortcut(.cancelAction)
+                if copies.isEmpty {
+                    Button("Done") { dismiss() }.keyboardShortcut(.defaultAction)
+                } else {
+                    Button("Cancel") { dismiss() }.keyboardShortcut(.cancelAction)
+                }
                 Spacer()
                 if let selected {
                     Button("Keep File") { resolve(selected, .keepFile) }
@@ -114,7 +118,7 @@ struct RecoverySheet: View {
                     )
                     HStack {
                         Spacer()
-                        Button("Close") { dismiss() }.keyboardShortcut(.cancelAction)
+                        Button("Done") { dismiss() }.keyboardShortcut(.defaultAction)
                     }
                 }
                 .padding()
@@ -140,6 +144,7 @@ struct RecoverySheet: View {
             }
             .frame(minWidth: 200, idealWidth: 220)
             VStack(alignment: .leading, spacing: 10) {
+                Text("Recovery Versions").font(.headline)
                 Text("Lines marked - are in the buffer, + in the kept version.").foregroundStyle(.secondary)
                 if let selected, let kept = session.recoveryText(selected), let mine = session.document?.text {
                     ThemedDiff(old: mine, new: kept)
@@ -147,7 +152,7 @@ struct RecoverySheet: View {
                     Spacer()
                 }
                 HStack {
-                    Button("Close") { dismiss() }.keyboardShortcut(.cancelAction)
+                    Button("Cancel") { dismiss() }.keyboardShortcut(.cancelAction)
                     if let selected {
                         Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([selected]) }
                     }

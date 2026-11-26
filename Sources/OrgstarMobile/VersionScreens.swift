@@ -31,7 +31,7 @@ struct ConflictSheet: View {
             .padding()
             .navigationTitle("Conflicting Changes")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Later") { dismiss() } } }
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
         }
     }
 }
@@ -75,7 +75,7 @@ struct SyncConflictSheet: View {
             .padding()
             .navigationTitle("Sync Conflict Copies")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } } }
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button(copies.isEmpty ? "Done" : "Cancel") { dismiss() } } }
         }
         .onAppear(perform: reload)
     }
@@ -116,7 +116,7 @@ struct RecoverySheet: View {
             }
             .navigationTitle("Recovery Versions")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } } }
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button(versions.isEmpty ? "Done" : "Cancel") { dismiss() } } }
         }
         .onAppear { versions = session.recoveryVersions() }
     }

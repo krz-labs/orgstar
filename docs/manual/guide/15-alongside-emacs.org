@@ -58,7 +58,7 @@ The sheet shows what differs, with lines marked - on disk and + in your version,
 | Keep Mine          | Writes your version over the disk version. The disk version goes to the recovery folder.        |
 | Use Disk Version   | Loads the disk version. Your version goes to the recovery folder.                                |
 | Merge with Markers | Puts both sets of changes in the buffer, with conflicting lines between =<<<<<<< yours= and =>>>>>>> disk= markers, as =git merge= leaves them. Edit and save. Your version as it was goes to the recovery folder. |
-| Decide Later       | Closes the sheet. Automatic saving stops for the file until you decide; the Conflict button in the toolbar opens the sheet again. On iOS the button is Later. |
+| Cancel             | Closes the sheet. Automatic saving stops for the file until you decide; the Conflict button in the toolbar opens the sheet again. |
 
 On the Mac, File ▸ Revert to File on Disk loads the disk version at any time; unsaved changes go to the recovery folder.
 

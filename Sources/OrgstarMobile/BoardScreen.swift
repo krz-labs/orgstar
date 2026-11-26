@@ -67,7 +67,7 @@ struct BoardScreen: View {
             .navigationTitle("Board")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Done", action: done) }
+                ToolbarItem(placement: .confirmationAction) { Button("Done", action: done) }
                 ToolbarItem(placement: .principal) {
                     Picker("View", selection: $kanban) {
                         Label("List", systemImage: "list.bullet").tag(false)

@@ -254,7 +254,7 @@ When a buffer conflicts with its file, automatic saving stops for that buffer, t
 | Keep Mine          | Writes your version over the file. The disk version goes to recovery. This is the default button.               |
 | Use Disk Version   | Loads the file as it is on disk. Your version goes to recovery.                                                  |
 | Merge with Markers | Puts both sets of changes in the buffer, as =git merge= leaves a conflict: non-conflicting changes merged, conflicting lines between markers. Your version as it was goes to recovery. |
-| Decide Later       | Closes the sheet. The conflict stays; click =Conflict= in the toolbar to reopen it.                              |
+| Cancel             | Closes the sheet. The conflict stays; click =Conflict= in the toolbar to reopen it.                              |
 
 After Merge with Markers the buffer holds blocks like this, which you edit and save:
 

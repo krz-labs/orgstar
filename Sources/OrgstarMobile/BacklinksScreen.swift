@@ -32,7 +32,7 @@ struct BacklinksScreen: View {
             }
             .navigationTitle("Backlinks")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
         }
         .task { await refresh() }
     }

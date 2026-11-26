@@ -177,7 +177,7 @@ struct ProSheet: View {
     var body: some View {
         NavigationStack {
             ProScreen(feature: feature)
-                .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } } }
+                .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
         }
         .onChange(of: ProAccess.shared.isUnlocked) { _, unlocked in if unlocked { dismiss() } }
     }

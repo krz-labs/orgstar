@@ -79,7 +79,7 @@ struct EntrySheet: View {
                     .disabled(draft == nil)
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done", systemImage: "checkmark") { save() }.disabled(draft == nil)
+                    Button("Save", systemImage: "checkmark") { save() }.disabled(draft == nil)
                 }
             }
             .confirmationDialog("Discard your changes?", isPresented: $confirmingDiscard, titleVisibility: .visible) {

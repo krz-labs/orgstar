@@ -214,7 +214,7 @@ The Agenda tab shows the agenda over all your folders, with the span and start d
 - The bar at the bottom :: Earlier, Today, the span (Day, Week, Month or the configured span, and Log Mode, which adds closed entries and clocked time) and Later. At accessibility text sizes Today is in the span's menu, and each entry's time or status is on a line of its own above it.
 - Filter :: keep or leave out tags and categories of the entries shown, or type a filter as Org's =/= takes it: =+keep= and =-drop= tags or categories, =<0:30= for effort, =/regexp/=. The filter in use shows above the bar.
 - + on a day's header :: captures an entry scheduled on that day (see [[file:08-capture.org][Capture]]).
-- Tap :: an entry to open it in a sheet: its title, TODO state, priority, scheduled date, deadline, tags and notes. Changes use the same commands as the editor and are written to the file together on Done, or dropped on Cancel; Undo and Redo step through them. More ▸ Open in File saves and shows the entry in the reader.
+- Tap :: an entry to open it in a sheet: its title, TODO state, priority, scheduled date, deadline, tags and notes. Changes use the same commands as the editor and are written to the file together on Save, or dropped on Cancel; Undo and Redo step through them. More ▸ Open in File saves and shows the entry in the reader.
 - Swipe left :: on a TODO entry for Done, which sets the first done keyword of its sequence, or Next State; on any entry with a heading for Delete, which asks first.
 - Swipe right :: for Tomorrow, Next Week (next Monday) or Pick Date, which move the entry's scheduled date, or its deadline on a deadline row.
 - Touch and hold :: an entry for TODO State…, Reschedule, Schedule…, Deadline…, Tags…, Priority…, Clock In, Add to Calendar…, Refile…, Archive…, and Delete…. Delete… removes the heading and every line under it, after asking. Refile… lists each file and the headings in it down to level 3, as the Mac's prompt does; the entry goes to the end of the file, or under the heading, you choose. Search narrows the list by file and heading path.
@@ -387,7 +387,7 @@ When a file changes on disk while you have unsaved edits, orgstar merges the cha
 - Keep Mine :: write your version over the disk version.
 - Use Disk Version :: replace your edits with the disk version.
 - Merge with Markers :: put both versions in the editor, with conflicting lines between =<<<<<<<= and =>>>>>>>= markers, to fix and save.
-- Later :: decide later. The Conflict button in the toolbar opens the sheet again. Nothing is saved until you decide.
+- Cancel :: decide later. The Conflict button in the toolbar opens the sheet again. Nothing is saved until you decide.
 
 The version you don't keep goes to the recovery folder.
 
