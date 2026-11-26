@@ -7,7 +7,6 @@ import UniformTypeIdentifiers
 struct FoldersScreen: View {
     let workspace: WorkspaceModel
     let session: DocumentSession
-    @State private var importing = false
     /// The file whose deletion is being confirmed.
     @State private var deleting: String?
     /// Counts deletions and new folders, so the list reads the empty folders on disk again.
@@ -87,13 +86,13 @@ struct FoldersScreen: View {
                 } description: {
                     Text("Add the folder your org files are in, from iCloud Drive or another app's storage.")
                 } actions: {
-                    Button("Add Folder") { importing = true }
+                    Button("Add Folder") { model.addingFolder = true }
                 }
             }
         }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Button("Add Folder", systemImage: "folder.badge.plus") { importing = true }
+                Button("Add Folder", systemImage: "folder.badge.plus") { model.addingFolder = true }
             }
             if !workspace.rootPaths.isEmpty {
                 ToolbarItem(placement: .primaryAction) {
@@ -117,7 +116,7 @@ struct FoldersScreen: View {
                 }
             }
         }
-        .fileImporter(isPresented: $importing, allowedContentTypes: [.folder]) { result in
+        .fileImporter(isPresented: Bindable(model).addingFolder, allowedContentTypes: [.folder]) { result in
             guard case .success(let url) = result else { return }
             // Kept for the bookmark; WorkspaceRoot resolves it with access again at launch.
             _ = url.startAccessingSecurityScopedResource()
@@ -145,8 +144,9 @@ extension FoldersScreen {
     }
 }
 
-/// A subfolder's own list, asking about its own changes.
-private struct FolderPage: View {
+/// A subfolder's own list, asking about its own changes; an added folder's, from the iPad's
+/// sidebar.
+struct FolderPage: View {
     let workspace: WorkspaceModel
     let session: DocumentSession
     let route: FolderRoute
@@ -155,9 +155,9 @@ private struct FolderPage: View {
     @State private var creating: NewItem?
 
     var body: some View {
-        let folder = route.root + "/" + route.folder
+        let folder = route.folder.isEmpty ? route.root : route.root + "/" + route.folder
         List { FolderContents(workspace: workspace, root: route.root, folder: route.folder, deleting: $deleting, changes: changes) }
-            .navigationTitle((route.folder as NSString).lastPathComponent)
+            .navigationTitle(((route.folder.isEmpty ? route.root : route.folder) as NSString).lastPathComponent)
             .confirmDeletion($deleting, workspace: workspace, session: session) { changes += 1 }
             .createItem($creating, workspace: workspace) { changes += 1 }
             .toolbar {

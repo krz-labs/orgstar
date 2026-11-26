@@ -59,6 +59,12 @@ final class EditorSplit {
         return nil
     }
 
+    /// Sets the first side's share of the split between `before` and `after`, as dragging its
+    /// divider does.
+    func setFraction(_ fraction: Double, ofSplitBetween before: PaneID, and after: PaneID) {
+        layout = layout.settingFraction(fraction, ofSplitBetween: before, and: after)
+    }
+
     private func close(_ id: PaneID, session: DocumentSession, store: MobileEditorStore) {
         guard let rest = layout.removing(id) else { return }
         let next = layout.next(after: id)
@@ -87,6 +93,8 @@ struct EditorSplitScreen: View {
                 layoutView(split.layout, split: split)
                     .navigationTitle(split.paths[split.focused].map { session.bufferName($0) + (session.dirtyPaths.contains($0) ? " •" : "") } ?? "")
                     .navigationBarTitleDisplayMode(.inline)
+                    // The menu bar's editor commands act on the focused pane.
+                    .focusedSceneValue(\.editorActions, split.paths[split.focused].flatMap { model.editors.existing($0) }.map(EditorActions.init))
             } else {
                 ProgressView()
             }
@@ -112,20 +120,66 @@ struct EditorSplitScreen: View {
                     if split.isSplit, split.focused == id { Rectangle().fill(Color.accentColor).frame(height: 2) }
                 }
             )
-        case .split(let axis, let first, let second, _):
-            if axis == .horizontal {
-                return AnyView(HStack(spacing: 0) {
-                    layoutView(first, split: split)
-                    Divider()
-                    layoutView(second, split: split)
-                })
-            }
-            return AnyView(VStack(spacing: 0) {
-                layoutView(first, split: split)
-                Divider()
-                layoutView(second, split: split)
+        case .split(let axis, let first, let second, let fraction):
+            return AnyView(GeometryReader { geometry in
+                let total = axis == .horizontal ? geometry.size.width : geometry.size.height
+                let firstSize = max(120, min(max(120, total - 120), total * fraction))
+                let divider = PaneDivider(axis: axis, firstSize: firstSize, total: total) { size in
+                    split.setFraction(size / max(total, 1), ofSplitBetween: first.panes[first.panes.count - 1], and: second.panes[0])
+                }
+                if axis == .horizontal {
+                    HStack(spacing: 0) {
+                        layoutView(first, split: split).frame(width: firstSize)
+                        divider
+                        layoutView(second, split: split).frame(maxWidth: .infinity)
+                    }
+                } else {
+                    VStack(spacing: 0) {
+                        layoutView(first, split: split).frame(height: firstSize)
+                        divider
+                        layoutView(second, split: split).frame(maxHeight: .infinity)
+                    }
+                }
             })
         }
+    }
+}
+
+/// The line between two panes, with a wider area to drag; dragging resizes the first pane.
+private struct PaneDivider: View {
+    let axis: PaneLayout.Axis
+    let firstSize: CGFloat
+    let total: CGFloat
+    let resize: (CGFloat) -> Void
+    @State private var start: CGFloat?
+
+    var body: some View {
+        let horizontal = axis == .horizontal
+        Rectangle()
+            .fill(Color(uiColor: .separator))
+            .frame(width: horizontal ? 1 : nil, height: horizontal ? nil : 1)
+            .frame(maxWidth: horizontal ? 1 : .infinity, maxHeight: horizontal ? .infinity : 1)
+            .overlay {
+                Capsule().fill(Color(uiColor: .tertiaryLabel))
+                    .frame(width: horizontal ? 4 : 36, height: horizontal ? 36 : 4)
+            }
+            .overlay {
+                Color.clear
+                    .frame(width: horizontal ? 20 : nil, height: horizontal ? nil : 20)
+                    .contentShape(Rectangle())
+                    .gesture(DragGesture(minimumDistance: 1).onChanged { drag in
+                        let base = start ?? firstSize
+                        start = base
+                        resize(base + (horizontal ? drag.translation.width : drag.translation.height))
+                    }.onEnded { _ in start = nil })
+                    .hoverEffect(.highlight)
+            }
+            .accessibilityElement()
+            .accessibilityLabel(Text("Pane Divider"))
+            .accessibilityValue(Text(Double(firstSize / max(total, 1)), format: .percent.precision(.fractionLength(0))))
+            .accessibilityAdjustableAction { direction in
+                resize(firstSize + (direction == .increment ? 0.1 : -0.1) * total)
+            }
     }
 }
 #endif

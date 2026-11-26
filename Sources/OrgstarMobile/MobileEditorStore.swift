@@ -21,6 +21,9 @@ final class MobileEditorStore {
         return made
     }
 
+    /// The editor of `path`, when a pane shows it.
+    func existing(_ path: String) -> MobileEditor? { editors[path] }
+
     /// The text view `pane` shows `editor` in: one no other pane owns, else a new one.
     func view(for pane: PaneID, of editor: MobileEditor) -> UITextView {
         if let owned = editor.textViews.first(where: { owners[ObjectIdentifier($0)] == pane }) { return owned }

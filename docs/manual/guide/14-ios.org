@@ -12,6 +12,8 @@ On first launch, a few screens introduce the app, ask for the folder of org file
 
 The search button (the magnifying glass) at the top right of Agenda and Folders opens Search.
 
+On an iPad, and in an iPad window wide enough, a sidebar takes the place of the tabs: Agenda, Search, All Folders and each added folder on its own row, and Settings. In a narrow window, such as Slide Over or a narrow split, the tabs come back.
+
 Files open in a reader first. The Edit button in the reader opens the editor. Both use the same open file, so an edit in the editor shows in the reader when you go back.
 
 * Folders and file access
@@ -71,7 +73,7 @@ On iPad, the editor can show a file in several panes, as a Mac window does (see 
 | Close Pane        | More ▸ Panes, Commands, a hardware keyboard  | =C-x 0=    | Closes the focused pane                                      |
 | Close Other Panes | More ▸ Panes, Commands, a hardware keyboard  | =C-x 1=    | Closes every pane but the focused one                        |
 
-The focused pane has a line along its top and the toolbar acts on it; tap in a pane to focus it. Every pane shows the same buffer: text typed in one shows in the others at once, and folds, narrowing and styles are the buffer's. The caret and scroll position are each pane's own, and so is undo: Undo in a pane undoes what was typed or changed in that pane. A link to another file opens it on its own screen, leaving the panes as they are.
+The focused pane has a line along its top and the toolbar acts on it; tap in a pane to focus it. Drag the line between two panes to resize them; with VoiceOver, swipe up or down on it. Every pane shows the same buffer: text typed in one shows in the others at once, and folds, narrowing and styles are the buffer's. The caret and scroll position are each pane's own, and so is undo: Undo in a pane undoes what was typed or changed in that pane. A link to another file opens it on its own screen, leaving the panes as they are.
 
 Each iPad window (scene), opened from the app switcher or by dragging the app from the Dock, has its own tabs, screens and panes over the same open files, so a file edited in one window shows the edit in the others. The pane commands aren't offered on iPhone or in a narrow window. Close Pane with one pane says "This is the only pane."
 
@@ -167,6 +169,20 @@ More ▸ Attachments has the org-attach commands, Attach Photo or Video…, Take
 Archive Subtree in Commands (or =C-c C-x C-s= with a hardware keyboard) archives the entry at the caret where =org-archive-location= says, as on the Mac.
 
 More ▸ Encryption has the org-crypt commands; see [[file:04-outlines.org][Outlines]]. A remembered passphrase is used after Face ID, Touch ID or the device passcode.
+
+** The menu bar on iPad
+
+The iPad's menu bar, and the list of keys shown while =⌘= is held on a hardware keyboard, have these menus, after the Mac's and with the Mac's keys:
+
+| Menu | Items                                                                                                     |
+|------+-----------------------------------------------------------------------------------------------------------|
+| File | Capture… (=⇧⌘N=), Add Folder… (=⇧⌘O=), Save (=⌘S=), Save All (=⌥⌘S=)                                    |
+| Edit | Search Notes (=⇧⌘F=), with the system's Undo, Redo and Find                                              |
+| View | Split Pane Below (=⌃⌘2=), Split Pane Right (=⌃⌘3=), Close Pane (=⌃⌘0=), Close Other Panes (=⌃⌘1=), Next Pane (=⌥⌘`=), Show Markup (=⇧⌘M=), Truncate Long Lines, Auto Fill |
+| Org  | Clock, then the org commands in the Mac's submenus (Visibility, Headings, TODO and Tags, Properties and Columns, Dates and Timers, Lists, Tables, Links and Footnotes, Blocks, Text, Attachments, Notes, Encryption), each with its key in the keymap |
+| Go   | Agenda (=⇧⌘A=), Board (=⇧⌘B=), Folders, Settings (=⌘,=), Go to Clocked Entry                            |
+
+The Save, View and Org items act on the focused pane of the editor, and are dimmed when no editor is open. A command that doesn't apply at the caret says why, as it does from Commands.
 
 ** Hardware keyboard
 
@@ -457,7 +473,7 @@ Quick Look in the Files app shows org files as the HTML export renders them.
 - In the download version, LaTeX-made PDF export.
 - Idle detection from keyboard and mouse input; iOS uses the time away from the app instead.
 - In the download version, attaching by hard link or symbolic link.
-- The Columns inspector, the buffer list and tab bar, and resizing panes by dragging their divider. The board and column view are there (see [[file:07-agenda.org][The agenda]] and [[file:04-outlines.org][Outlines]]).
+- The Columns inspector, and the buffer list and tab bar. The board and column view are there (see [[file:07-agenda.org][The agenda]] and [[file:04-outlines.org][Outlines]]).
 - The global capture hotkey and the Settings window.
 - Explicit saving.
 

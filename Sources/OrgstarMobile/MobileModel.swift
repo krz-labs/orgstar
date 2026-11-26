@@ -39,6 +39,8 @@ final class MobileModel {
     var agendaRequest: AgendaDays?
     /// A capture to show, from the agenda or the capture control.
     var captureRequest: CaptureRequest?
+    /// Folders shows its folder picker, from File ▸ Add Folder… in the menu bar.
+    var addingFolder = false
     /// Calendar's events for the agenda, with `calendar-events`.
     let calendarEvents = CalendarEvents()
     /// Captures the watch sent, for the root view to pick up from the inbox.

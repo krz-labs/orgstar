@@ -45,6 +45,7 @@ struct OrgstarMobileApp: App {
         .onChange(of: scenePhase) { _, phase in
             if phase == .background { model.clock.wentAway() }
         }
+        .commands { AppMenus(model: model) }
     }
 }
 
@@ -72,10 +73,24 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
     }
 }
 
-enum AppTab: Hashable { case agenda, folders, settings }
+/// A tab on iPhone, or a row of the sidebar on a regular-width iPad, which also lists search
+/// and each added folder.
+enum AppTab: Hashable { case agenda, search, folders, folder(String), settings }
 
 /// The search screen, pushed from the Agenda and Folders tabs.
 struct SearchRoute: Hashable {}
+
+extension AppTab {
+    /// The tab that shows this on iPhone: search is pushed from Agenda and Folders, and folders
+    /// are listed in Folders.
+    var inTabBar: AppTab {
+        switch self {
+        case .search: .agenda
+        case .folder: .folders
+        default: self
+        }
+    }
+}
 
 extension View {
     /// Readers pushed for `ReaderRoute`s.
@@ -129,7 +144,9 @@ struct RootView: View {
     @State private var agendaPath = NavigationPath()
     @State private var hour = 0
     @State private var showingClockReport = false
+    @State private var showingBoard = false
     @State private var message: String?
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage(OnboardingScreen.doneKey) private var onboarded = false
     @State private var onboarding = false
@@ -188,29 +205,91 @@ struct RootView: View {
         var hour: Int
     }
 
-    var body: some View {
-        TabView(selection: $tab) {
-            Tab("Agenda", systemImage: "calendar", value: .agenda) {
-                NavigationStack(path: $agendaPath) {
-                    AgendaScreen(workspace: workspace, session: session, agenda: agenda, scheduler: model.scheduler)
-                        .equatable()
-                        .toolbar { searchButton; captureButton }
-                        .readerDestination(workspace: workspace, session: session)
-                }
-            }
-            Tab("Folders", systemImage: "folder", value: .folders) {
-                NavigationStack {
-                    FoldersScreen(workspace: workspace, session: session)
-                        .toolbar { searchButton; captureButton }
-                        .readerDestination(workspace: workspace, session: session)
-                }
-            }
-            Tab("Settings", systemImage: "gearshape", value: .settings) {
-                NavigationStack { SettingsScreen(model: model) }
-            }
+    /// Tabs on iPhone and in a narrow window; a sidebar beside the content on a wider iPad.
+    private var tabs: some View {
+        TabView(selection: Binding { tab.inTabBar } set: { tab = $0 }) {
+            Tab("Agenda", systemImage: "calendar", value: .agenda) { agendaStack }
+            Tab("Folders", systemImage: "folder", value: .folders) { foldersStack }
+            Tab("Settings", systemImage: "gearshape", value: .settings) { settingsStack }
         }
         .clockAccessory(model.clock, perform: clock)
+    }
+
+    private var split: some View {
+        NavigationSplitView {
+            AppSidebar(workspace: workspace, selection: $tab)
+        } detail: {
+            Group {
+                switch tab {
+                case .agenda: agendaStack
+                case .search:
+                    NavigationStack {
+                        SearchScreen(workspace: workspace, session: session)
+                            .toolbar { captureButton }
+                            .readerDestination(workspace: workspace, session: session)
+                    }
+                case .folders: foldersStack
+                case .folder(let root):
+                    NavigationStack {
+                        FolderPage(workspace: workspace, session: session, route: FolderRoute(root: root, folder: ""))
+                            .toolbar { searchButton; captureButton }
+                            .readerDestination(workspace: workspace, session: session)
+                            .navigationDestination(for: FolderRoute.self) { FolderPage(workspace: workspace, session: session, route: $0) }
+                    }
+                    .id(root)
+                case .settings: settingsStack
+                }
+            }
+            .safeAreaInset(edge: .bottom) {
+                if let running = model.clock.running {
+                    ClockAccessory(running: running, clock: model.clock, perform: clock).padding(.vertical, 8).background(.bar)
+                }
+            }
+        }
+    }
+
+    private var agendaStack: some View {
+        NavigationStack(path: $agendaPath) {
+            AgendaScreen(workspace: workspace, session: session, agenda: agenda, scheduler: model.scheduler)
+                .equatable()
+                .toolbar { searchButton; captureButton }
+                .readerDestination(workspace: workspace, session: session)
+        }
+    }
+
+    private var foldersStack: some View {
+        NavigationStack {
+            FoldersScreen(workspace: workspace, session: session)
+                .toolbar { searchButton; captureButton }
+                .readerDestination(workspace: workspace, session: session)
+        }
+    }
+
+    private var settingsStack: some View {
+        NavigationStack { SettingsScreen(model: model) }
+    }
+
+    var body: some View {
+        // One view around both layouts, so that what follows runs once, not again when the
+        // window's width class changes.
+        ZStack {
+            if sizeClass == .regular { split } else { tabs }
+        }
         .tint(model.theme.accentColor)
+        .focusedSceneValue(\.windowActions, WindowActions(
+            show: show, capture: { capture = CaptureRequest() },
+            addFolder: {
+                tab = .folders
+                model.addingFolder = true
+            },
+            board: { showingBoard = true }, clock: clock))
+        .fullScreenCover(isPresented: $showingBoard) {
+            BoardScreen(workspace: workspace, session: session) { showingBoard = false }
+        }
+        // A removed folder's row goes from the sidebar.
+        .onChange(of: workspace.rootPaths) {
+            if case .folder(let root) = tab, !workspace.rootPaths.contains(root) { tab = .folders }
+        }
         // Until a folder is added there is nothing for the agenda to show.
         .onAppear {
             if workspace.rootPaths.isEmpty { tab = .folders }
@@ -398,6 +477,16 @@ struct RootView: View {
             UIPasteboard.general.string = link
         } else if url.scheme == "org-protocol" {
             message = "orgstar handles org-protocol capture and store-link"
+        }
+    }
+
+    /// A tab or sidebar row; on iPhone, search is pushed on the agenda.
+    private func show(_ destination: AppTab) {
+        if destination == .search, sizeClass != .regular {
+            tab = .agenda
+            agendaPath.append(SearchRoute())
+        } else {
+            tab = destination
         }
     }
 
