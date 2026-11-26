@@ -4,10 +4,11 @@ Where the milestone work stands, so a session can pick it up at any point. Read 
 
 ## State
 
-- `main` is at `7f0c7bf`, in sync with gitbay. No worktrees, work branches or open merge requests.
+- `main` is at `3aea06b`, in sync with gitbay. No worktrees, work branches or open merge requests.
 - Milestone 1 (Reviews and cleanup) is closed: 32 issues, 30 merge requests (447–476).
 - Milestone 4 (Commands and editing speed) is closed: 12 issues (#236 added during it; #156 closed with #142), 6 merge requests (479–484), about one day.
-- On `main` with everything merged: `swift test` (about 1,315 tests), both Xcode builds and every performance gate pass (three gate runs on 2026-11-26: 1 MB open 86–97 ms, typing p95 unchanged from milestone 1).
+- Milestone 5 (Sync and files) is done apart from #87, which waits on a device test: 10 issues closed (#238 added during it), 8 merge requests (486–492), about one and a half days, most of it on #153's four review rounds.
+- On `main` with everything merged: `swift test` (about 1,475 tests), both Xcode builds and every performance gate pass (three gate runs on 2026-11-27: 1 MB open 83–89 ms, typing p95 unchanged; new gates for Lint File and Lint All Folders).
 - Not released. The code is past 1.2.0; the plan pencils milestone 1 as 1.3.0. Releasing is the owner's call.
 - Simulators: "iPhone 17", "iPad Air 11-inch (M4)" (iOS 27.0) and "Apple Watch Series 11 (46mm)" (watchOS 27.0). Reuse them; do not create others.
 
@@ -17,7 +18,7 @@ Where the milestone work stands, so a session can pick it up at any point. Read 
 | 2 Capture | 6 | 0 |
 | 3 Agenda and planning | 9 | 0 |
 | 4 Commands and editing speed | 0 | 12 |
-| 5 Sync and files | 9 | 0 |
+| 5 Sync and files | 1 | 10 |
 | 6 Formats, import and export | 6 | 0 |
 | 7 Notes and knowledge | 3 | 0 |
 | 8 Automation and extension | 3 | 0 |
@@ -65,6 +66,19 @@ gitbay milestone list
 - An agent stopped by a usage limit can be resumed; its worktree and commits survive. A worktree with no commits may be removed by the tool that created it; recreate one on the branch.
 - Ask agents for screenshots in the scratchpad, not the repository, and look at a few before merging: two defects in milestone 1 (images 80 pt wide, a clipped icon on onboarding) were found only that way.
 
+### Merging safely
+
+- Never chain branch or worktree cleanup to a merge command with `&&` alone: a refused fast-forward leaves the chain running on a different command's success. Read the merge request's state from gitbay (`gitbay mr show <n> --json`, `state: merged`) and clean up only then. A branch deleted too early can be recreated from its commit (`git branch <name> <sha>`) and pushed again; gitbay reattaches the open merge request.
+- Rebuild a conflicted string catalog as `origin/main`'s file plus the branch's added keys, written with `json.dumps(d, ensure_ascii=False, indent=2, separators=(',', ': '), sort_keys=True) + '\n'`, which reproduces the committed file byte for byte.
+
+### Security-sensitive changes
+
+- Give encryption and similar work an independent review from an agent that sees the code and the requirement but not the author's report, and repeat it after each round of fixes until it says it is ready. #153 needed four rounds; each round's fixes introduced something the next found (a save race that lost another app's edits, titles leaking through clock history and shared subtrees).
+
+### Timing tests
+
+- Timing assertions belong in the gates (`ORGSTAR_GATES`, run serially and by the release scripts), not in the parallel `swift test`, where the Emacs oracle tests starve other tests to tens of seconds of wall time. The backlinks check moved there in MR 492.
+
 ### Writing issues
 
 - Issue bodies were often wrong about what exists. Check the code first and correct the body.
@@ -101,7 +115,25 @@ gitbay milestone list
 8. iOS candidates: with the on-screen keyboard, in a suggestion row in the key bar's place; with a hardware keyboard, the floating list.
 9. Key bar configuration lives in `[key-bar]` in `config.toml` (`iphone`, `ipad` lists of command ids).
 
+## Decisions taken in milestone 5, for the owner to confirm or overrule
+
+1. #153: encrypt-on-save and `.org.gpg` are not behind orgstar+ (the existing Encrypt commands still are). Once a file is unlocked it keeps sealing until closed, whatever the setting. A heading inside an encrypted entry can't be archived or refiled on its own; Share Subtree shares it as an "Encrypted entry" placeholder. Exports and Emacs copies leave encrypted content out (Emacs copies are refused rather than asked). The Developer ID build keeps remembered passphrases in the login keychain (no data-protection entitlement), with the caveat shown beside the Remember toggle; a Developer ID provisioning profile with `keychain-access-groups` would let it use the protected item. age is not supported.
+2. #95: auto-commit per folder in Settings ▸ Git (download version), off by default; only files orgstar wrote; pull (`--ff-only`), then commit, then push.
+3. #155: File ▸ History… replaces Recovery Versions… on the Mac.
+4. #151: Replace in Files keeps a recovery version, not undo, for files that weren't open; renames change `config.toml` too while the dialog's checkbox is on (the default).
+5. #148: no sync on leaving the app (iOS can't open another app while going to the background); a Shortcuts automation is documented instead.
+6. #93: Handoff matches folders by iCloud path, then by folder name; nothing is advertised for encrypted files or buffers with decrypted entries.
+
 ## Device checks owed
+
+### From milestone 5
+
+- #87: whether OneDrive's new File Provider lets an iPhone pick a folder; close the issue if it does.
+- Encryption: App Store and iOS builds use the protected Keychain and ask once per file; the Developer ID build's caveat beside Remember; quit and close alerts on the Mac; the iOS notice and unlock screens; the clock title key across launches.
+- Git: auto-commit against a real remote over SSH or the Keychain.
+- Handoff between real devices in each direction; Working Copy installed with a real repository (its key, the sync chain, a commit with nothing changed); AirDrop, Mail and Messages from Share Subtree.
+- iOS: the rename screen, the lint lists, Lint All Folders on a large real workspace.
+
 
 ### From milestone 4
 
@@ -159,7 +191,7 @@ By the owner's rule, an issue closes on merge and its device checks are tracked 
 
 ## Open questions before the next milestones
 
-Milestone 4's questions are settled. Still open:
+Milestones 4 and 5's questions are settled. Still open:
 
 
 From the handoff, still unanswered:
@@ -167,7 +199,6 @@ From the handoff, still unanswered:
 - #115: an option on capture templates, or a separate quick-add field?
 - #122: does snooze move only the notification, or rewrite the timestamp?
 - #129: how closely to follow org-ql's syntax.
-- #152: lint the current file first, or all folders from the start?
 - #164: Beamer and reveal.js, or only the in-app presentation mode.
 - #172: which package's card format to read and write.
 
