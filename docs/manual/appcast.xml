@@ -4,6 +4,21 @@
     <title>orgstar</title>
     <link>https://gitbay.org/krz/orgstar</link>
     <item>
+      <title>orgstar 1.3.1</title>
+      <link>https://krz.sh/apps/orgstar/</link>
+      <sparkle:version>889</sparkle:version>
+      <sparkle:shortVersionString>1.3.1</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+      <pubDate>Thu, 26 Nov 2026 13:24:41 -0600</pubDate>
+      <description><![CDATA[<h2>orgstar 1.3.1</h2>
+<ul>
+<li>An encrypted entry you didn't change keeps its encrypted text when the file is saved after Decrypt Entry in File…, so sync and git see no change to it.</li>
+<li>Updating from 1.2.0 shows what's new in 1.3.0.</li>
+</ul>
+<p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
+      <enclosure url="https://files.krz.sh/orgstar/orgstar-1.3.1.dmg" type="application/octet-stream" sparkle:edSignature="cQxn5aDNo+6kUbWr8b0uGk8Po90Zzsc6vHLy6g2yByBTXc4sZqEvScpmJM4oB+oN87EoDZAH8qjTommVTXoSCw==" length="59940978"/>
+    </item>
+    <item>
       <title>orgstar 1.3.0</title>
       <link>https://krz.sh/apps/orgstar/</link>
       <sparkle:version>883</sparkle:version>
