@@ -408,7 +408,7 @@ enum UnsavedChanges {
                 } else if let failure = session.unlock(passphrase, for: path) {
                     problem = failure
                 } else {
-                    session.passphrases.keep(passphrase, for: path)
+                    session.passphrases.keep(passphrase, for: path, text: session.document(of: path)?.text ?? "")
                     return !session.dirtyPaths.contains(path)
                 }
             case .alertSecondButtonReturn: return true

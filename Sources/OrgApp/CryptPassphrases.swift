@@ -1,6 +1,7 @@
 import CryptoKit
 import Foundation
 import LocalAuthentication
+import OrgCore
 import OrgDocument
 import Security
 
@@ -14,6 +15,8 @@ public protocol PassphraseKeychain: AnyObject {
     /// Saves `passphrase` for `path`. A message to show when it wasn't kept; nil otherwise.
     func write(_ passphrase: String, for path: String) -> String?
     func delete(_ path: String)
+    /// Deletes every saved passphrase, whatever the listing finds.
+    func deleteAll()
     /// The paths passphrases are saved for, without asking for authentication.
     func paths() -> [String]
 }
@@ -26,7 +29,8 @@ public protocol PassphraseKeychain: AnyObject {
 @MainActor
 @Observable
 public final class CryptPassphrases {
-    public static let shared = CryptPassphrases()
+    /// The app's passphrases. A test process, which has XCTest loaded, gets no Keychain.
+    public static let shared = CryptPassphrases(keychain: NSClassFromString("XCTestCase") != nil ? NoKeychain() : SystemKeychain())
 
     /// "Use Face ID to Decrypt", kept in user defaults on this device, not in `config.toml`.
     public enum Setting: String, Sendable {
@@ -38,7 +42,7 @@ public final class CryptPassphrases {
     /// Where earlier versions kept passphrases, readable without authentication.
     nonisolated static let legacyService = "sh.krz.orgstar.crypt"
 
-    @ObservationIgnored private let keychain: PassphraseKeychain
+    @ObservationIgnored let keychain: PassphraseKeychain
     @ObservationIgnored private let defaults: UserDefaults
     public private(set) var setting: Setting
     /// The question waits to be asked at launch: passphrases saved by an earlier version.
@@ -115,10 +119,36 @@ public final class CryptPassphrases {
     /// Whether a typed passphrase waits for the question before it can be saved.
     public var asksFirst: Bool { setting == .undecided }
 
-    /// The answer to the question: Enable turns the setting on, Not Now off.
-    public func answer(enable: Bool) {
-        set(enable ? .on : .off)
+    /// The answer to the question: Enable turns the setting on, Not Now off. Nothing changes when
+    /// the setting was decided meanwhile (another window's question, or Settings).
+    @discardableResult
+    public func answer(enable: Bool) -> Bool {
         asking = false
+        guard setting == .undecided else { return false }
+        set(enable ? .on : .off)
+        return true
+    }
+
+    /// A passphrase typed for `path` worked, and the file's text is now `text`: saved while the
+    /// setting is on, with the Keychain's message in `note`. True when the question must be
+    /// answered first, with `answer(enable:passphrase:for:text:)`.
+    public func typed(_ passphrase: String, for path: String, text: String, note: inout String?) -> Bool {
+        if asksFirst { return true }
+        note = keep(passphrase, for: path, text: text)
+        return false
+    }
+
+    /// The answer to the question asked for a typed passphrase: the passphrase is saved when the
+    /// answer turned the setting on. The Keychain's message; nil otherwise.
+    public func answer(enable: Bool, passphrase: String, for path: String, text: String) -> String? {
+        guard answer(enable: enable) else { return nil }
+        return keep(passphrase, for: path, text: text)
+    }
+
+    /// Whether `passphrase` opens every message in `text` encrypted with a passphrase, so that
+    /// saving it can't replace the one the file's other entries need.
+    nonisolated static func opensAll(_ text: String, with passphrase: String) -> Bool {
+        OrgCrypt.messages(text).allSatisfy { OrgCrypt.opens($0, passphrase: passphrase) }
     }
 
     /// Turns the setting on from Settings.
@@ -130,7 +160,9 @@ public final class CryptPassphrases {
     /// there are any.
     public func turnOff() {
         set(.off)
-        for path in keychain.paths() { forget(path) }
+        let paths = keychain.paths()
+        keychain.deleteAll()
+        for path in paths { endSession(for: path) }
         refresh()
     }
 
@@ -163,11 +195,12 @@ public final class CryptPassphrases {
         contexts.removeValue(forKey: path)?.invalidate()
     }
 
-    /// A passphrase typed for `path` that opened or encrypted it: saved while the setting is on.
-    /// A message to show when it wasn't kept; nil otherwise.
+    /// A passphrase typed for `path` that opened or encrypted it, whose text is now `text`: saved
+    /// while the setting is on and it opens every message in `text`. A message to show when it
+    /// wasn't kept; nil otherwise.
     @discardableResult
-    public func keep(_ passphrase: String, for path: String) -> String? {
-        guard setting == .on else { return nil }
+    public func keep(_ passphrase: String, for path: String, text: String) -> String? {
+        guard setting == .on, Self.opensAll(text, with: passphrase) else { return nil }
         let note = keychain.write(passphrase, for: path)
         refresh()
         return note
@@ -254,6 +287,13 @@ public final class SystemKeychain: PassphraseKeychain {
         SecItemDelete(Self.query(path, service: CryptPassphrases.legacyService) as CFDictionary)
     }
 
+    public func deleteAll() {
+        for service in [CryptPassphrases.service, CryptPassphrases.legacyService] {
+            // The file-based keychain may delete one match per call.
+            for _ in 0..<1000 where SecItemDelete(Self.query(nil, service: service) as CFDictionary) == errSecSuccess {}
+        }
+    }
+
     /// `query` for attributes only, without asking for authentication.
     nonisolated static func quiet(_ query: [String: Any]) -> [String: Any] {
         var q = query
@@ -315,6 +355,17 @@ public final class SystemKeychain: PassphraseKeychain {
         }
         return passphrase
     }
+}
+
+/// No Keychain: nothing is saved or found. For test processes.
+@MainActor
+final class NoKeychain: PassphraseKeychain {
+    func contains(_ path: String) -> Bool { false }
+    func read(_ path: String, context: LAContext) async -> String? { nil }
+    func write(_ passphrase: String, for path: String) -> String? { nil }
+    func delete(_ path: String) {}
+    func deleteAll() {}
+    func paths() -> [String] { [] }
 }
 
 /// The key clock history hashes encrypted headings' titles with, made once and kept in the

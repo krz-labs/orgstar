@@ -45,9 +45,17 @@ final class FakeKeychain: PassphraseKeychain {
         saved[path] = nil
     }
 
+    func deleteAll() {
+        calls.append("deleteAll")
+        saved = [:]
+    }
+
+    /// The listing finds nothing, as when the Keychain refuses it.
+    var listingFails = false
+
     func paths() -> [String] {
         calls.append("paths")
-        return Array(saved.keys)
+        return listingFails ? [] : Array(saved.keys)
     }
 }
 
@@ -99,7 +107,7 @@ struct CryptPassphrasesTests {
         #expect(await passphrases.stored(for: file.path) == nil)
         #expect(await passphrases.stored(for: gpg.path) == nil)
         #expect(!passphrases.hasStored(file.path))
-        #expect(passphrases.keep("typed", for: file.path) == nil)
+        #expect(passphrases.keep("typed", for: file.path, text: "") == nil)
         #expect(session.unlock("pw", for: gpg.path) == nil)
         #expect(session.isOpen(gpg.path))
 
@@ -110,7 +118,7 @@ struct CryptPassphrasesTests {
     @Test func onSavesATypedPassphraseAndReadsItThroughTheFilesAuthentication() async throws {
         let (keychain, passphrases) = FakeKeychain.passphrases(.on)
         #expect(!passphrases.asksFirst)
-        #expect(passphrases.keep("pw", for: "/x/a.org") == nil)
+        #expect(passphrases.keep("pw", for: "/x/a.org", text: "") == nil)
         #expect(keychain.saved == ["/x/a.org": "pw"])
         #expect(passphrases.savedPaths == ["/x/a.org"])
         #expect(passphrases.hasStored("/x/a.org"))
@@ -151,11 +159,11 @@ struct CryptPassphrasesTests {
         // Undecided: the first typed passphrase asks, and isn't saved before the answer.
         let (keychain, passphrases) = FakeKeychain.passphrases(.undecided, defaults: defaults)
         #expect(passphrases.setting == .undecided && passphrases.asksFirst)
-        #expect(passphrases.keep("pw", for: "/x/a.org") == nil && keychain.saved.isEmpty)
+        #expect(passphrases.keep("pw", for: "/x/a.org", text: "") == nil && keychain.saved.isEmpty)
         // Not Now turns it off, for good.
         passphrases.answer(enable: false)
         #expect(passphrases.setting == .off && !passphrases.asksFirst)
-        #expect(passphrases.keep("pw", for: "/x/a.org") == nil && keychain.saved.isEmpty)
+        #expect(passphrases.keep("pw", for: "/x/a.org", text: "") == nil && keychain.saved.isEmpty)
         let later = CryptPassphrases(keychain: FakeKeychain(["/x/old.org": "pw"]), defaults: defaults)
         #expect(later.setting == .off && !later.asksFirst)
         later.askIfSavedBefore()
@@ -164,7 +172,7 @@ struct CryptPassphrasesTests {
         let (enabled, enabling) = FakeKeychain.passphrases(.undecided)
         enabling.answer(enable: true)
         #expect(enabling.setting == .on && !enabling.asksFirst)
-        enabling.keep("pw", for: "/x/a.org")
+        enabling.keep("pw", for: "/x/a.org", text: "")
         #expect(enabled.saved == ["/x/a.org": "pw"])
     }
 
@@ -200,7 +208,7 @@ struct CryptPassphrasesTests {
         passphrases.turnOff()
         #expect(passphrases.setting == .off)
         #expect(keychain.saved.isEmpty && passphrases.savedPaths.isEmpty)
-        #expect(Set(keychain.calls.filter { $0.hasPrefix("delete ") }) == ["delete /x/a.org", "delete /x/b.org.gpg"])
+        #expect(keychain.calls.contains("deleteAll"))
         #expect(passphrases.context(for: "/x/a.org") !== context)
         // Forget in Settings removes one.
         let (one, forgetting) = FakeKeychain.passphrases(.on, saved: ["/x/a.org": "a", "/x/b.org": "b"])
@@ -216,5 +224,108 @@ struct CryptPassphrasesTests {
         #expect(defaults.string(forKey: "decryptWithBiometrics") == "on")
         passphrases.turnOff()
         #expect(defaults.string(forKey: "decryptWithBiometrics") == "off")
+    }
+
+    // MARK: - Review of MR 494
+
+    /// Two entries, A encrypted with "pw" and B with "other".
+    static func twoPassphrases() throws -> String {
+        let text = "* A :crypt:\na\n* B :crypt:\nb\n"
+        let a = try #require(try OrgCrypt.encrypt(text, at: 0, passphrase: "pw"))
+        let b = (a as NSString).range(of: "* B").location
+        return try #require(try OrgCrypt.encrypt(a, at: b, passphrase: "other"))
+    }
+
+    /// 1: a passphrase is saved only when it opens every message in the file.
+    @Test func onlyAPassphraseThatOpensEveryMessageIsSaved() throws {
+        let mixed = try Self.twoPassphrases()
+        #expect(OrgCrypt.messages(mixed).count == 2)
+        let (keychain, passphrases) = FakeKeychain.passphrases(.on, saved: ["/x/a.org": "saved"])
+        // Encrypting an entry with "pw" beside one encrypted with "other": not saved, and the
+        // saved one stays.
+        #expect(passphrases.keep("pw", for: "/x/a.org", text: mixed) == nil)
+        #expect(keychain.saved == ["/x/a.org": "saved"])
+        #expect(!keychain.calls.contains { $0.hasPrefix("write ") })
+        // One that opens them all, or a file with no other message, is saved.
+        let one = try #require(try OrgCrypt.encrypt("* A :crypt:\na\n", at: 0, passphrase: "pw"))
+        passphrases.keep("pw", for: "/x/a.org", text: one)
+        #expect(keychain.saved == ["/x/a.org": "pw"])
+        passphrases.keep("new", for: "/x/b.org", text: "* Plain\n")
+        #expect(keychain.saved["/x/b.org"] == "new")
+    }
+
+    /// 1: the sheet's path, through the question, checks the same way.
+    @Test func theQuestionsAnswerSavesOnlyAPassphraseThatFits() throws {
+        let mixed = try Self.twoPassphrases()
+        let (keychain, passphrases) = FakeKeychain.passphrases(.undecided)
+        var note: String?
+        #expect(passphrases.typed("pw", for: "/x/a.org", text: mixed, note: &note))
+        #expect(passphrases.answer(enable: true, passphrase: "pw", for: "/x/a.org", text: mixed) == nil)
+        #expect(passphrases.setting == .on && keychain.saved.isEmpty)
+        #expect(!passphrases.typed("other", for: "/x/a.org", text: "* Plain\n", note: &note))
+        #expect(keychain.saved == ["/x/a.org": "other"])
+    }
+
+    /// 1: unlocking a file with a passphrase that opens its first message but not another.
+    @Test func unlockingWithAPassphraseThatOpensOnlySomeMessagesSavesNothing() async throws {
+        let mixed = try Self.twoPassphrases()
+        let file = try notes.write("a.org", mixed)
+        let (keychain, passphrases) = FakeKeychain.passphrases(.on, saved: [file.path: "saved"])
+        let session = DocumentSession(recovery: FileRecoveryStore(directory: notes.url.appendingPathComponent(".recovery")))
+        session.saveMode = .explicit
+        session.passphrases = passphrases
+        session.open(file.path)
+        #expect(session.unlock("pw", for: file.path) == nil)
+        passphrases.keep("pw", for: file.path, text: session.document(of: file.path)?.text ?? "")
+        #expect(keychain.saved == [file.path: "saved"])
+    }
+
+    /// 2: a question answered after the setting was decided elsewhere changes nothing.
+    @Test func aLateAnswerChangesNothing() {
+        // Two sheets asked; the first said Enable, the second Not Now.
+        let (keychain, passphrases) = FakeKeychain.passphrases(.undecided)
+        var note: String?
+        #expect(passphrases.typed("a", for: "/x/a.org", text: "", note: &note))
+        #expect(passphrases.typed("b", for: "/x/b.org", text: "", note: &note))
+        _ = passphrases.answer(enable: true, passphrase: "a", for: "/x/a.org", text: "")
+        _ = passphrases.answer(enable: false, passphrase: "b", for: "/x/b.org", text: "")
+        #expect(passphrases.setting == .on)
+        #expect(keychain.saved == ["/x/a.org": "a"])
+        // Settings turned it off while the question was open: Enable doesn't turn it on.
+        let (other, settings) = FakeKeychain.passphrases(.undecided)
+        #expect(settings.typed("a", for: "/x/a.org", text: "", note: &note))
+        settings.turnOff()
+        _ = settings.answer(enable: true, passphrase: "a", for: "/x/a.org", text: "")
+        #expect(settings.setting == .off && other.saved.isEmpty)
+        // The launch question too.
+        let (_, launch) = FakeKeychain.passphrases(.off)
+        launch.asking = true
+        #expect(!launch.answer(enable: true))
+        #expect(launch.setting == .off && !launch.asking)
+    }
+
+    /// 2: Not Now leaves earlier passphrases in place, unread, listed for Forget.
+    @Test func notNowKeepsEarlierPassphrasesListed() async {
+        let (keychain, passphrases) = FakeKeychain.passphrases(.undecided, saved: ["/x/old.org": "pw"])
+        passphrases.askIfSavedBefore()
+        passphrases.answer(enable: false)
+        #expect(keychain.saved == ["/x/old.org": "pw"])
+        #expect(await passphrases.stored(for: "/x/old.org") == nil)
+        passphrases.refresh()
+        #expect(passphrases.savedPaths == ["/x/old.org"])
+    }
+
+    /// 3: turning off deletes by service, so a listing that fails leaves nothing behind.
+    @Test func turningOffDeletesEverythingWhenTheListingFails() {
+        let (keychain, passphrases) = FakeKeychain.passphrases(.on, saved: ["/x/a.org": "a", "/x/b.org": "b"])
+        keychain.listingFails = true
+        passphrases.turnOff()
+        #expect(keychain.saved.isEmpty)
+    }
+
+    /// 4: the test process's sessions get no Keychain, whatever the setting in user defaults.
+    @Test func testSessionsDontReachTheKeychain() {
+        #expect(CryptPassphrases.shared.keychain is NoKeychain)
+        #expect(DocumentSession(recovery: FileRecoveryStore(directory: notes.url)).passphrases.keychain is NoKeychain)
     }
 }

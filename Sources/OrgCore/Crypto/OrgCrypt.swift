@@ -237,6 +237,23 @@ public enum OrgCrypt {
         }
     }
 
+    /// Every entry's message in `text` encrypted with a passphrase.
+    public static func messages(_ text: String) -> [String] {
+        let ns = text as NSString
+        var found: [String] = []
+        var search = NSRange(location: 0, length: ns.length)
+        while true {
+            let begin = ns.range(of: "-----BEGIN PGP MESSAGE-----", options: [], range: search)
+            guard begin.location != NSNotFound else { return found }
+            let lineStart = ns.lineRange(for: NSRange(location: begin.location, length: 0)).location
+            if let range = encryptedRange(text, at: lineStart), range.lowerBound == lineStart {
+                let message = ns.substring(with: NSRange(range))
+                if let data = try? OpenPGP.dearmor(message), OpenPGP.isSymmetric(data) { found.append(message) }
+            }
+            search = NSRange(location: NSMaxRange(begin), length: ns.length - NSMaxRange(begin))
+        }
+    }
+
     /// Whether `passphrase` opens `message`.
     public static func opens(_ message: String, passphrase: String) -> Bool {
         (try? OpenPGP.decrypt(OpenPGP.dearmor(message), passphrase: passphrase)) != nil

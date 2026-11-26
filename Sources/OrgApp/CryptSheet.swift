@@ -68,9 +68,9 @@ public struct CryptSheet: View {
     @State private var repeated = ""
     /// What the Keychain said when the passphrase was saved, shown with the result.
     @State private var keychainNote: String?
-    /// A typed passphrase that worked, waiting for the answer to whether to use Face ID, and
-    /// what follows.
-    @State private var question: (passphrase: String, then: () -> Void)?
+    /// A typed passphrase that worked, the file's text with it, waiting for the answer to
+    /// whether to use Face ID, and what follows.
+    @State private var question: (passphrase: String, text: String, then: () -> Void)?
     @State private var problem: String?
     /// The decrypted entry being edited, and the passphrase it came with.
     @State private var editing: (original: String, passphrase: String)?
@@ -132,22 +132,24 @@ public struct CryptSheet: View {
 
     private var passphrases: CryptPassphrases { session?.passphrases ?? .shared }
 
-    /// A typed passphrase worked: saved while the setting is on, after the question while it's
-    /// undecided, then `then`.
-    private func keep(_ passphrase: String, remembered: Bool, then: @escaping () -> Void) {
-        guard !remembered else { return then() }
-        if passphrases.asksFirst { return question = (passphrase, then) }
-        keychainNote = passphrases.keep(passphrase, for: request.path)
+    /// A typed passphrase worked, and the file's text is now `text`: saved while the setting is
+    /// on, after the question while it's undecided, then `then`. A nil `text` (nothing was
+    /// checked) saves nothing.
+    private func keep(_ passphrase: String, remembered: Bool, text: String?, then: @escaping () -> Void) {
+        guard !remembered, let text else { return then() }
+        if passphrases.typed(passphrase, for: request.path, text: text, note: &keychainNote) { return question = (passphrase, text, then) }
         then()
     }
 
     private func answer(enable: Bool) {
         guard let question else { return }
         self.question = nil
-        passphrases.answer(enable: enable)
-        keychainNote = passphrases.keep(question.passphrase, for: request.path)
+        keychainNote = passphrases.answer(enable: enable, passphrase: question.passphrase, for: request.path, text: question.text)
         question.then()
     }
+
+    /// The open file's text, after a passphrase opened or saved it.
+    private var unlockedText: String { session?.document(of: request.path)?.text ?? "" }
 
     private var title: String {
         switch request.mode {
@@ -195,9 +197,9 @@ public struct CryptSheet: View {
         if request.unlocks {
             if let failure = session?.unlock(passphrase, for: request.path) { return problem = failure }
             switch request.mode {
-            case .encryptOnSave: return finish(String(localized: "Tagged entries encrypted and saved"), passphrase: passphrase, remembered: remembered)
-            case .newFile: return finish(String(localized: "Saved encrypted"), passphrase: passphrase, remembered: remembered)
-            default: return finish(nil, passphrase: passphrase, remembered: remembered)
+            case .encryptOnSave: return finish(String(localized: "Tagged entries encrypted and saved"), passphrase: passphrase, remembered: remembered, text: unlockedText)
+            case .newFile: return finish(String(localized: "Saved encrypted"), passphrase: passphrase, remembered: remembered, text: unlockedText)
+            default: return finish(nil, passphrase: passphrase, remembered: remembered, text: unlockedText)
             }
         }
         let current = text()
@@ -205,21 +207,21 @@ public struct CryptSheet: View {
             switch request.mode {
             case .encrypt:
                 guard let encrypted = try OrgCrypt.encrypt(current, at: request.offset, passphrase: passphrase) else {
-                    return finish("The entry is encrypted already", passphrase: passphrase, remembered: remembered)
+                    return finish("The entry is encrypted already", passphrase: passphrase, remembered: remembered, text: nil)
                 }
                 apply(encrypted)
-                finish("Entry encrypted", passphrase: passphrase, remembered: remembered)
+                finish("Entry encrypted", passphrase: passphrase, remembered: remembered, text: encrypted)
             case .encryptAll(let tag):
                 let (encrypted, count) = try OrgCrypt.encryptAll(current, passphrase: passphrase, tag: tag)
                 if count > 0 { apply(encrypted) }
-                finish("Encrypted \(count) \(count == 1 ? "entry" : "entries")", passphrase: passphrase, remembered: remembered)
+                finish("Encrypted \(count) \(count == 1 ? "entry" : "entries")", passphrase: passphrase, remembered: remembered, text: count > 0 ? encrypted : nil)
             case .open:
                 let plain = try OrgCrypt.decrypt(current, at: request.offset, passphrase: passphrase).plaintext
                 session?.cryptUsed(passphrase, for: request.path)
                 plaintext = plain
                 editing = (plain, passphrase)
                 problem = nil
-                keep(passphrase, remembered: remembered) {}
+                keep(passphrase, remembered: remembered, text: current) {}
             case .decryptInPlace:
                 let message = OrgCrypt.encryptedRange(current, at: request.offset).map { (current as NSString).substring(with: NSRange($0)) }
                 let decrypted = try OrgCrypt.decryptInPlace(current, at: request.offset, passphrase: passphrase)
@@ -228,7 +230,7 @@ public struct CryptSheet: View {
                     session?.cryptDecrypted(message: message, plaintext: (decrypted as NSString).substring(with: NSRange(body)), for: request.path)
                 }
                 apply(decrypted)
-                finish("Entry decrypted", passphrase: passphrase, remembered: remembered)
+                finish("Entry decrypted", passphrase: passphrase, remembered: remembered, text: decrypted)
             case .encryptOnSave, .openFile, .newFile:
                 break
             }
@@ -237,9 +239,11 @@ public struct CryptSheet: View {
         }
     }
 
-    private func finish(_ message: String?, passphrase: String, remembered: Bool) {
+    /// Closes with `message`; `text` is the file's text the passphrase was checked against, nil
+    /// when it wasn't.
+    private func finish(_ message: String?, passphrase: String, remembered: Bool, text: String?) {
         if !request.unlocks { session?.cryptUsed(passphrase, for: request.path) }
-        keep(passphrase, remembered: remembered) {
+        keep(passphrase, remembered: remembered, text: text) {
             let text = [message, keychainNote].compactMap { $0 }.joined(separator: " ")
             done(text.isEmpty ? nil : text)
         }
