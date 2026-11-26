@@ -80,6 +80,25 @@ struct ConfigFolderTests {
         #expect(try String(contentsOf: second.appendingPathComponent("config.toml"), encoding: .utf8).contains("fill-column = 64"))
     }
 
+    @Test func readsSnippetsBesideTheFile() throws {
+        let first = try folder()
+        let second = try folder()
+        defer {
+            try? FileManager.default.removeItem(at: first)
+            try? FileManager.default.removeItem(at: second)
+        }
+        try "[[snippet]]\ntrigger = \"d\"\nbody = \"%t\"\n".write(to: first.appendingPathComponent("snippets.toml"), atomically: true, encoding: .utf8)
+        try "[[snippet]]\ntrigger = \"d\n".write(to: second.appendingPathComponent("snippets.toml"), atomically: true, encoding: .utf8)
+        let library = SnippetLibrary()
+        let sync = ConfigSync(url: first.appendingPathComponent("config.toml"), defaults: defaults(), snippets: library)
+        sync.start(watch: false)
+        #expect(library.snippets.map(\.trigger) == ["d"] && sync.problems.isEmpty)
+        // A broken file is reported, and the snippets read before stay.
+        sync.move(to: second.appendingPathComponent("config.toml"))
+        #expect(library.snippets.map(\.trigger) == ["d"])
+        #expect(sync.problems == ["snippets.toml line 2: unclosed string"])
+    }
+
     @Test func movingBeforeStartDoesNothing() throws {
         let first = try folder()
         let second = try folder()

@@ -148,9 +148,12 @@ final class MobileModel {
         modalKeys = preset.isModal
         configProblems += loaded.problems.map { "keymap.toml: " + $0 }
         configProblems += MacroFile.load().map { "\(NamedMacros.fileName): " + $0 }
+        SnippetLibrary.shared.reload(from: UserConfig.file(Snippets.fileName), read: configFolder == nil ? { try? String(contentsOf: $0, encoding: .utf8) } : Self.read)
+        configProblems += SnippetLibrary.shared.problems
         let settings = OrgPreferences.orgSettings()
         session.defaults = settings
         session.options = OrgPreferences.options()
+        session.options.snippets = SnippetLibrary.shared.snippets
         workspace?.settings = .with(todoKeywords: settings)
         if let agenda {
             agenda.span = OrgPreferences.agendaSpan()

@@ -101,6 +101,7 @@ extension OrgEditor: NSTextViewDelegate {
     }
 
     public func textDidChange(_ notification: Notification) {
+        updateSnippetMirrors()
         textTyped()
     }
 

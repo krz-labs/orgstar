@@ -22,10 +22,13 @@ public final class ConfigSync {
 
     @ObservationIgnored private var url: URL
     private let defaults: UserDefaults
+    /// Where `snippets.toml` beside the file is read into.
+    private let snippets: SnippetLibrary
     @ObservationIgnored private var text: String?
     @ObservationIgnored private var configProblems: [String] = []
     @ObservationIgnored private var themeProblems: [String] = []
     @ObservationIgnored private var macroProblems: [String] = []
+    @ObservationIgnored private var snippetProblems: [String] = []
     /// Why the file couldn't be read or written, the last time a setting was to go into it.
     @ObservationIgnored private var fileProblem: String?
     @ObservationIgnored private var applying = false
@@ -37,9 +40,10 @@ public final class ConfigSync {
     /// Where `url` leads: a symlinked config.toml is written through, not replaced by a file.
     private var target: URL { url.resolvingSymlinksInPath() }
 
-    public init(url: URL = UserConfig.configFile, defaults: UserDefaults = .standard) {
+    public init(url: URL = UserConfig.configFile, defaults: UserDefaults = .standard, snippets: SnippetLibrary = .shared) {
         self.url = url
         self.defaults = defaults
+        self.snippets = snippets
     }
 
     public func start(watch: Bool = true) {
@@ -64,6 +68,7 @@ public final class ConfigSync {
             if write(template) { text = template }
         }
         loadMacros()
+        readSnippets()
         observer = NotificationCenter.default.addObserver(forName: UserDefaults.didChangeNotification, object: defaults, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.writeBack() }
         }
@@ -89,6 +94,7 @@ public final class ConfigSync {
                     if name == self.url.lastPathComponent { self.reload() }
                     if self.isThemeFile(file) { self.readTheme() }
                     if name == NamedMacros.fileName { self.loadMacros() }
+                    if name == Snippets.fileName { self.readSnippets() }
                     self.serial += 1
                     self.changedFile = (name, self.serial)
                 }
@@ -109,6 +115,7 @@ public final class ConfigSync {
         configProblems = []
         themeProblems = []
         macroProblems = []
+        snippetProblems = []
         fileProblem = nil
         self.url = url
         start(watch: watches)
@@ -158,8 +165,16 @@ public final class ConfigSync {
         updateProblems()
     }
 
+    /// `snippets.toml` beside the file.
+    private func readSnippets() {
+        let file = url.deletingLastPathComponent().appendingPathComponent(Snippets.fileName)
+        snippets.reload(from: url == UserConfig.configFile ? SnippetLibrary.userFile : file)
+        snippetProblems = snippets.problems
+        updateProblems()
+    }
+
     private func updateProblems() {
-        let all = (fileProblem.map { [$0] } ?? []) + configProblems + themeProblems + macroProblems
+        let all = (fileProblem.map { [$0] } ?? []) + configProblems + themeProblems + macroProblems + snippetProblems
         if all != problems { problems = all }
     }
 

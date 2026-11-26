@@ -210,6 +210,19 @@ The agenda selects the same entries as Org's, but shows them its own way (see [[
 - Today's past deadlines and past scheduled entries are gathered in an Overdue group, oldest first, rather than sorted among today's entries by urgency.
 - The time grid and the now line are drawn as lines among a day's timed entries, where =org-agenda-time-grid=, =org-agenda-use-time-grid= and =org-agenda-show-current-time-in-grid= put them. orgstar draws the lines itself, so the strings in =org-agenda-time-grid= and =org-agenda-current-time-string= have no equivalent.
 
+** Snippets and yasnippet
+
+orgstar's snippets (see [[file:02-the-editor.org][The editor]]) read yasnippet's field syntax, and Import from Emacs copies your org-mode snippets into =snippets.toml= (see [[file:13-configuration.org][Configuration]]). They are tested against yasnippet's own expansion. Where they differ:
+
+- =TAB= expands a trigger only where it has no other meaning. With yasnippet's minor mode, =TAB= on a heading or in a table expands a trigger before the caret first; in orgstar it cycles or moves to the next field.
+- No Emacs Lisp: backquoted forms, =$(…)= transformations, =# condition:= and =# expand-env:= aren't run. Snippets with the first two aren't imported, and =snippets.toml= refuses =$(…)= in a field. Capture's =%(…)= runs in orgstar's own interpreter instead.
+- The default of a field is selected on entering it; typing replaces it, as yasnippet's first keystroke clears it.
+- Lines after the first take the indentation of the trigger's line, rather than being indented by the mode (=yas-indent-line=).
+- The trigger is the text back to a blank, or a part of it after a character other than a letter, digit or =_=; =yas-key-syntaxes= isn't read.
+- One set of snippets for org files. Snippets for other modes, =.yas-parents=, =# group:=, =# binding:= and =# uuid:= aren't used.
+- A field inside another field's default is skipped by yasnippet once the outer field is typed over; orgstar visits it, empty, where it was.
+- Capture's escapes for dates and prompts (=%t=, =%U=, =%<…>=, =%^{…}=) work in bodies, which yasnippet doesn't have.
+
 ** Known differences from Emacs Org
 
 orgstar refuses some things with a message rather than doing something different from Emacs. These are the ones found in the current version.

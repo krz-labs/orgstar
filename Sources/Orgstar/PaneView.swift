@@ -140,10 +140,13 @@ struct PaneView: NSViewRepresentable {
                 NSPasteboard.general.setString(text, forType: .string)
             case .refreshSetup: session?.refreshSetup()
             case .timer(let timer): TimerModel.shared.set(timer)
-            case .message, .sparseTree, .fold: break
+            case .message, .sparseTree, .fold, .snippet: break
             }
         }
         session.attach(editor, for: path)
+        if let template = SnippetLibrary.shared.takeTemplate(for: path) {
+            DispatchQueue.main.async { editor.perform(ExpandNamedSnippet(snippet: template)) }
+        }
         return editor
     }
 }

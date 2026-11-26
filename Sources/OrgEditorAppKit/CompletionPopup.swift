@@ -56,7 +56,7 @@ final class CompletionPopup {
         let first = max(0, min((selection ?? 0) - Self.rows + 1, candidates.count - Self.rows))
         var width: CGFloat = 80
         for (index, candidate) in candidates.enumerated().dropFirst(first).prefix(Self.rows) {
-            let label = NSTextField(labelWithString: " " + completion.label(candidate) + " ")
+            let label = NSTextField(labelWithString: " " + completion.label(candidate) + (completion.kind == .snippet ? "  " + String(localized: "snippet", comment: "Marks a snippet in the completion list") : "") + " ")
             label.font = font
             label.drawsBackground = index == selection
             label.backgroundColor = .selectedContentBackgroundColor
@@ -139,6 +139,7 @@ extension OrgEditor {
     }
 
     func insertCompletion(_ completion: Completion, _ candidate: String) {
+        if completion.kind == .snippet { return expandCompleted(completion, candidate) }
         let (text, caret) = completion.insertion(candidate)
         let range = NSRange(location: completion.range.lowerBound, length: completion.range.count)
         guard textView.shouldChangeText(in: range, replacementString: text) else { return }
@@ -166,7 +167,7 @@ extension OrgEditor {
                 insertCompletion(completion, completion.candidates[0])
             } else {
                 let common = completion.candidates.dropFirst().reduce(completion.candidates[0]) { $0.commonPrefix(with: $1) }
-                if common.utf16.count > completion.range.count, completion.kind != .template {
+                if common.utf16.count > completion.range.count, completion.kind != .template, completion.kind != .snippet {
                     insertCompletion(completion, common)
                     refreshCompletion()
                 }

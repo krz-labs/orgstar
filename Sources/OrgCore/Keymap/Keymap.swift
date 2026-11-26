@@ -33,7 +33,7 @@ public struct Keymap: Sendable, Equatable {
 
     /// Reads `[[bind]]` tables. Entries that can't be used are skipped and reported in
     /// `problems`; a file that isn't valid TOML throws. With `commands`, a command id outside
-    /// it (other than `none`) is such an entry.
+    /// it (other than `none` and a snippet's `org.snippet:` id) is such an entry.
     public init(toml: String, problems: inout [String], commands: Set<String>? = nil) throws {
         bindings = []
         for table in try TOML.parse(toml) where !(table.name.isEmpty && table.values.isEmpty) {
@@ -49,7 +49,7 @@ public struct Keymap: Sendable, Equatable {
                 problems.append("line \(table.line): missing command")
                 continue
             }
-            if let commands, command != "none", !commands.contains(command) {
+            if let commands, command != "none", Snippets.trigger(ofCommand: command) == nil, !commands.contains(command) {
                 problems.append("line \(table.line): unknown command \(command)")
                 continue
             }

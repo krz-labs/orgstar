@@ -166,6 +166,10 @@ final class MobileEditor: NSObject, DocumentBuffer {
     var shrunk = ShrunkColumns()
     /// A command's edits being applied, which keep shrunk columns narrow.
     private var commandEditing = false
+    /// The snippet whose fields are being filled in, and the range drawn for it last.
+    var snippetSession: SnippetSession?
+    var snippetHighlight: Range<Int>?
+    var updatingMirrors = false
 
     init(
         document: DocumentState, editable: Bool, options: EditingOptions = .org, theme spec: ThemeSpec = .default,
@@ -339,6 +343,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
                     setFolds(state)
                 case .refreshSetup: onRefreshSetup?()
                 case .timer(let timer): TimerModel.shared.set(timer)
+                case .snippet(let session): startSnippet(session)
                 default: break
                 }
             }
@@ -409,7 +414,13 @@ final class MobileEditor: NSObject, DocumentBuffer {
     }
 
     func run(_ id: String) {
+        if let snippet = Snippets.command(id) {
+            _ = perform(snippet)
+            return
+        }
         switch id {
+        case "org.snippet.next-field": nextSnippetField()
+        case "org.snippet.previous-field": previousSnippetField()
         case "org.cycle":
             if !cycleAtCaret() { onMessage?("Not on a heading, drawer or block") }
         case "org.cycle-global": cycleGlobal()
@@ -447,8 +458,9 @@ final class MobileEditor: NSObject, DocumentBuffer {
     static let linkCommands: Set<String> = ["org.link.store", "org.id.store-link", "org.link.insert"]
 
     func applies(_ id: String, in context: EditContext) -> Bool {
-        if let command = Commands.command(id) { return command.applies(in: context) }
+        if let command = Commands.command(id) ?? Snippets.command(id) { return command.applies(in: context) }
         switch id {
+        case "org.snippet.next-field", "org.snippet.previous-field": return snippetSession != nil
         case "org.cycle":
             return Presentation.heading(containing: context.caret, in: context.tree) != nil || Wrappers.toggleable(at: context.caret, in: context.tree) != nil
         case _ where id.hasPrefix("org.fold."): return true
@@ -524,6 +536,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
             }
         }
         if isearch != nil, isearchKey(chord) { return true }
+        if let handled = snippetKey(chord) { return handled }
         if modal { return handleModal(chord) }
         // Option alone types characters unless it begins a binding.
         if chord.modifiers == [.meta], dispatcher.pending.isEmpty,
@@ -539,7 +552,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
             fail("\(KeySequence.format(keys)) is undefined")
             return true
         case .unbound:
-            return false
+            return snippetTab(chord)
         case .complete(let keys, let candidates):
             let context = editContext()
             let runnable = candidates.first { binding in
@@ -547,7 +560,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
             }
             // A sequence runs its command even where it doesn't apply, which says why, as on the Mac.
             let argument = dispatcher.argument != nil
-            guard let binding = runnable ?? (keys.count > 1 || argument ? candidates.first : nil) else { return false }
+            guard let binding = runnable ?? (keys.count > 1 || argument ? candidates.first : nil) else { return keys.count == 1 && !argument && snippetTab(chord) }
             // A prefix argument (C-u, C-u 3) counts keyboard macros only.
             if argument, !binding.command.hasPrefix("macro.") {
                 fail("\(KeySequence.format(keys)) doesn't take a prefix argument")
@@ -619,6 +632,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
         let old = range.location..<(range.location + range.length - delta)
         let replacement = (textView.textStorage.string as NSString).substring(with: range)
         let edit = TextEdit(range: old, replacement: replacement)
+        snippetEdited(edit)
         let oldTree = document.tree
         let oldText = document.text as NSString
         do {

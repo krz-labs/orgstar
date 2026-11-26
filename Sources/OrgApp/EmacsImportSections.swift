@@ -11,6 +11,7 @@ extension EmacsImport {
             (String(localized: "Structure Templates", bundle: .main), items.filter { if case .structureTemplate = $0.change { true } else { false } }),
             (String(localized: "Denote Templates", bundle: .main), items.filter { if case .denoteTemplate = $0.change { true } else { false } }),
             (String(localized: "Agenda Views", bundle: .main), items.filter { if case .view = $0.change { true } else { false } }),
+            (String(localized: "Snippets", bundle: .main), items.filter { if case .snippet = $0.change { true } else { false } }),
         ].filter { !$0.1.isEmpty }
     }
 }

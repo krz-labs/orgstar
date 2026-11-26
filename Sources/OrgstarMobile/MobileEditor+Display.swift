@@ -266,6 +266,7 @@ extension MobileEditor {
     func selectionChanged() {
         let interval = Perf.begin("editor.selection")
         defer { interval.end() }
+        snippetSelectionChanged()
         redrawSelectedBlocks()
         let caret = textView.selectedRange.location
         defer {

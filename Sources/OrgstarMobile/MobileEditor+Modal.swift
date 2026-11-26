@@ -27,6 +27,7 @@ extension MobileEditor {
                 updateCursor()
                 return true
             }
+            if keys.count == 1, vim.mode == .insert, snippetTab(chord) { return true }
             return feedVim(keys)
         case .undefined(let keys):
             // The leader and Emacs prefixes mean nothing to evil, as on the Mac.
@@ -36,6 +37,7 @@ extension MobileEditor {
             }
             return feedVim(keys)
         case .unbound:
+            if vim.mode == .insert, snippetTab(chord) { return true }
             return feedVim([chord])
         }
     }

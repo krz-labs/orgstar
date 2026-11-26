@@ -23,6 +23,8 @@ public struct EmacsImport: Sendable {
         case publish(name: String, toml: String)
         /// A `[denote-templates]` entry for config.toml.
         case denoteTemplate(key: String, text: String)
+        /// A yasnippet snippet as a `[[snippet]]` table for snippets.toml.
+        case snippet(trigger: String, toml: String)
     }
 
     public struct Item: Sendable, Identifiable {
@@ -57,6 +59,8 @@ public struct EmacsImport: Sendable {
     public var isDoom = false
     /// Doom's own org defaults were found and read.
     public var doomDefaultsRead = false
+    /// yasnippet snippets left out, as they hold Emacs Lisp.
+    public var snippetsSkipped = 0
 
     // MARK: - Finding the configuration
 
@@ -155,6 +159,7 @@ public struct EmacsImport: Sendable {
             }
         }
         result.build(from: scanner)
+        result.addSnippets(from: snippetFolders(files.map { $0.deletingLastPathComponent() }))
         return result
     }
 
@@ -1227,6 +1232,19 @@ extension EmacsImport {
             capture += (capture.isEmpty ? "# Capture templates. Imported from Emacs.\n" : "\n# Imported from Emacs.\n") + addedCapture
             if !write(capture, to: captureFile) { templates = 0 }
         }
+        let snippetsFile = directory.appendingPathComponent(Snippets.fileName)
+        var snippetsText = read(snippetsFile)
+        var triggers = Set((try? TOML.parse(snippetsText))?.filter { $0.name == "snippet" }.compactMap { $0.values["trigger"]?.string } ?? [])
+        var addedSnippets = "", snippets = 0
+        for item in items {
+            guard case .snippet(let trigger, let toml) = item.change, triggers.insert(trigger).inserted else { continue }
+            addedSnippets += "\n" + toml
+            snippets += 1
+        }
+        if !addedSnippets.isEmpty {
+            snippetsText += (snippetsText.isEmpty ? "# Snippets. Imported from Emacs.\n" : "\n# Imported from Emacs.\n") + addedSnippets
+            if !write(snippetsText, to: snippetsFile) { snippets = 0 }
+        }
         let viewsFile = directory.appendingPathComponent("views.toml")
         var viewsText = read(viewsFile)
         var viewNames = Set((try? TOML.parse(viewsText))?.filter { $0.name == "view" }.compactMap { $0.values["name"]?.string } ?? [])
@@ -1305,7 +1323,7 @@ extension EmacsImport {
         }
         func count(_ n: Int, _ word: String) -> String? { n == 0 ? nil : "\(n) \(word)\(n == 1 ? "" : "s")" }
         let done = [count(settings, "setting"), count(folders, "folder"), count(templates, "capture template"), count(bindings, "key binding"),
-                    count(blocks, "structure template"), count(noteTemplates, "Denote template"), count(views, "agenda view"), count(projects, "publishing project")].compactMap { $0 }
+                    count(blocks, "structure template"), count(noteTemplates, "Denote template"), count(views, "agenda view"), count(projects, "publishing project"), count(snippets, "snippet")].compactMap { $0 }
         var summary = done.isEmpty ? "Nothing new to import." : "Imported " + done.joined(separator: ", ") + "."
         if !problems.isEmpty { summary += " " + problems.joined(separator: "; ") + "." }
         return summary

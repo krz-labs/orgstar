@@ -12,6 +12,7 @@ struct FoldersScreen: View {
     /// Counts deletions and new folders, so the list reads the empty folders on disk again.
     @State private var changes = 0
     @State private var creating: NewItem?
+    @State private var templating: TemplateFolder?
     /// The added folder whose deletion from disk is being confirmed.
     @State private var deletingRoot: String?
     /// The added folder whose removal from orgstar is being confirmed.
@@ -79,6 +80,7 @@ struct FoldersScreen: View {
         }
         .confirmDeletion($deleting, workspace: workspace, session: session) { changes += 1 }
         .createItem($creating, workspace: workspace) { changes += 1 }
+        .newFromTemplate($templating, workspace: workspace, session: session)
         .overlay {
             if workspace.rootPaths.isEmpty {
                 ContentUnavailableView {
@@ -153,6 +155,7 @@ struct FolderPage: View {
     @State private var deleting: String?
     @State private var changes = 0
     @State private var creating: NewItem?
+    @State private var templating: TemplateFolder?
 
     var body: some View {
         let folder = route.folder.isEmpty ? route.root : route.root + "/" + route.folder
@@ -160,10 +163,12 @@ struct FolderPage: View {
             .navigationTitle(((route.folder.isEmpty ? route.root : route.folder) as NSString).lastPathComponent)
             .confirmDeletion($deleting, workspace: workspace, session: session) { changes += 1 }
             .createItem($creating, workspace: workspace) { changes += 1 }
+            .newFromTemplate($templating, workspace: workspace, session: session)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Menu("New", systemImage: "plus") {
                         Button("New File…", systemImage: "doc.badge.plus") { creating = NewItem(folder: folder, isFolder: false) }
+                        Button("New File from Template…", systemImage: "doc.on.doc") { templating = TemplateFolder(path: folder) }
                         Button("New Folder…", systemImage: "folder.badge.plus") { creating = NewItem(folder: folder, isFolder: true) }
                     }
                 }
@@ -255,6 +260,7 @@ extension FoldersScreen {
     @ViewBuilder
     private func newItems(in folder: String) -> some View {
         Button("New File…", systemImage: "doc.badge.plus") { creating = NewItem(folder: folder, isFolder: false) }
+        Button("New File from Template…", systemImage: "doc.on.doc") { templating = TemplateFolder(path: folder) }
         Button("New Folder…", systemImage: "folder.badge.plus") { creating = NewItem(folder: folder, isFolder: true) }
     }
 }

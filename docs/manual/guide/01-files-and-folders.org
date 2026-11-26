@@ -108,6 +108,8 @@ Right-click a file or folder in the sidebar for:
 
 Right-click a root's header for New File…, Expand or Collapse, Show in Finder and Remove from Sidebar….
 
+File ▸ New File from Template… makes a new file from a template in =snippets.toml=, in a folder and with a name you choose; see [[file:02-the-editor.org][The editor]].
+
 * Opening files
 
 Click a file in the sidebar to open it. Other ways:

@@ -81,6 +81,7 @@ struct ContentView: View {
         options.agendaFiles = workspace.agendaFilePaths()
         options.denoteDirectories = DenoteNote.directories(roots: workspace.rootPaths)
         options.denoteSequenceScheme = OrgPreferences.denoteSequenceScheme()
+        options.snippets = SnippetLibrary.shared.snippets
         options.timer = TimerModel.shared.timer
         return options
     }
@@ -122,6 +123,7 @@ struct ContentView: View {
     /// The outline for a file that isn't org, off until asked for.
     @State private var plainOutlineShown = false
     @State private var showingImport = false
+    @State private var showingTemplate = false
     @AppStorage("showTabBar") private var showTabBar = false
     /// This window's panes.
     @State private var window: WindowModel?
@@ -394,6 +396,9 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)) { _ in defaultsChanges += 1 }
         .onChange(of: preset, initial: true) { loadKeymap() }
         .sheet(isPresented: $showingImport) { EmacsImportView(workspace: workspace) }
+        .sheet(isPresented: $showingTemplate) {
+            TemplateSheet(workspace: workspace, folder: session.path.map { ($0 as NSString).deletingLastPathComponent }) { selectedFile = $0 }
+        }
         .sheet(item: $panel) { panel in panelView(panel) }
         .sheet(item: Bindable(ProAccess.shared).paywall) { feature in
             #if APPSTORE
@@ -1333,6 +1338,7 @@ struct ContentView: View {
         case "app.toggle-markup": showMarkup.toggle()
         case "app.toggle-line-numbers": showLineNumbers.toggle()
         case "app.import-emacs": showingImport = true
+        case "app.new-file-from-template": showingTemplate = true
         case "app.edit-config": commands.jump(path: UserConfig.configFile.path, offset: 0)
         case "app.quick-open": commands.showingQuickOpen = true
         case "app.palette": commands.showingPalette = true

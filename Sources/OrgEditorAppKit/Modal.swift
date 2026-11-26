@@ -44,6 +44,7 @@ extension OrgEditor {
                 updateCursor()
                 return true
             }
+            if keys.count == 1, vim.mode == .insert, snippetTab(chord) { return true }
             return feedVim(keys)
         case .undefined(let keys):
             onKeysPending?(nil, [])
@@ -55,6 +56,7 @@ extension OrgEditor {
             }
             return feedVim(keys)
         case .unbound:
+            if vim.mode == .insert, snippetTab(chord) { return true }
             return feedVim([chord])
         }
     }

@@ -135,6 +135,7 @@ struct EmacsImportView: View {
     private func footnote(_ result: EmacsImport) -> String {
         var parts = ["\(result.skipped) variables not about org left alone"]
         if result.doomDefaultsLeftOut > 0 { parts.append("\(result.doomDefaultsLeftOut) Doom defaults orgstar has no use for") }
+        if result.snippetsSkipped > 0 { parts.append("\(result.snippetsSkipped) snippets with Emacs Lisp skipped") }
         #if APPSTORE
         if result.isDoom, !result.doomDefaultsRead { parts.append("Doom's own org defaults skipped") }
         #endif

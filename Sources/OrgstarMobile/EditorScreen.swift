@@ -444,6 +444,7 @@ struct EditorScreen: View {
         self.editor = editor
         textView = view
         if let offset { editor.reveal(offset) }
+        if let template = SnippetLibrary.shared.takeTemplate(for: path) { DispatchQueue.main.async { _ = editor.perform(ExpandNamedSnippet(snippet: template)) } }
         if pane.conflict != nil {
             sheet = .conflict
         } else if case let copies = session.syncConflictCopies().count, copies > 0 {

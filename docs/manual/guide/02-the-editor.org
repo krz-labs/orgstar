@@ -273,7 +273,57 @@ What is completed, by position:
 | =:= at the start of a line in a property drawer | property names the entry doesn't have yet                   |
 | =:= at the start of a line elsewhere         | drawer names                                                   |
 
-Elsewhere, Complete at Point reports =No match=. Completion is for org files only.
+Where none of these offers anything, the triggers of your snippets that start with the text before the caret are offered, each with its description and marked =snippet=; choosing one expands it (see [[*Snippets][Snippets]]). Elsewhere, Complete at Point reports =No match=. Completion is for org files only.
+
+* Snippets
+
+A snippet is text you insert by typing its trigger and pressing =TAB=, as with yasnippet in Emacs. Snippets are defined in =snippets.toml= in the configuration folder; orgstar ships none. See [[file:13-configuration.org][Configuration]] for the file.
+
+#+BEGIN_SRC toml
+[[snippet]]
+trigger = "meet"
+description = "Meeting notes"
+body = """
+,* Meeting with ${1:someone} %U
+- $0
+"""
+#+END_SRC
+
+** Expanding
+
+Type the trigger and press =TAB=. The trigger is the text before the caret back to a blank, or a shorter part of it that starts after a character other than a letter, digit or =_=: =(meet= expands =meet=. =TAB= expands a trigger only where it has no other meaning:
+
+| Preset | Where =TAB= keeps its own meaning                                                                    |
+|--------+------------------------------------------------------------------------------------------------------|
+| Emacs  | Headings and the first or last line of a drawer or block (=org-cycle=), tables (next field)           |
+| Mac    | The same as Emacs                                                                                    |
+| Doom   | Normal and visual state (=org-cycle=); in insert state, headings (demote), list items (indent) and tables (next field) |
+
+Your own =TAB= bindings in =keymap.toml= come first in the same way. Where =TAB= means something else, expand with Insert Snippet…, the completion list, or a key you bind to =org.snippet.expand= (Expand Snippet).
+
+A snippet that asks questions (=%^{…}= in its body) asks them in the echo area first, one after another; =Escape= cancels and inserts nothing.
+
+** Fields
+
+After expanding, the caret is in the first field, with its default text selected, so typing replaces it. The field has a band behind it, and the other fields and mirrors a fainter grey one.
+
+| Key      | While a snippet's fields are filled in                                        |
+|----------+-------------------------------------------------------------------------------|
+| =TAB=    | Next field; after the last, the caret goes to =$0= (or the end) and the snippet is done |
+| =S-TAB=  | Previous field                                                                |
+| =Escape= | The snippet is done; the caret stays. In the Doom preset, insert state ends as well. |
+
+A field used twice (=$1= … =$1=) is mirrored: typing in the field changes every copy. Moving the caret out of the snippet, or an edit outside it, also ends it. Next Snippet Field (=org.snippet.next-field=) and Previous Snippet Field (=org.snippet.previous-field=) are the same as =TAB= and =S-TAB=, for binding to other keys.
+
+** Insert Snippet…
+
+Insert Snippet… (in the command palette) lists the snippets by description and trigger, and expands the one you choose at the caret. With text selected, the snippet replaces it, and =%i= in the body inserts it: a snippet with body =#+begin_quote\n%i$0\n#+end_quote= wraps the selection in a quote block.
+
+Each snippet is also a command, =org.snippet:= and its trigger, such as =org.snippet:meet=, for a key in =keymap.toml=.
+
+** Templates for new files
+
+A snippet with =file = true= in =snippets.toml= is a template for a new file. File ▸ New File from Template… (or the command palette) asks for the template, the folder (that of the shown file to start with) and a name, as New File… does. The file is created empty and opens with the template expanded in it, its prompts asked and its fields ready to fill in.
 
 * Electric pairs
 

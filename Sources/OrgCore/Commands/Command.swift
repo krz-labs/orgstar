@@ -97,6 +97,8 @@ public struct EditingOptions: Sendable, Equatable, Codable {
     public var timerFormat = "%s "
     /// `org-timer-default-timer`.
     public var timerDefault = "0"
+    /// The snippets and file templates of `snippets.toml`.
+    public var snippets: [Snippet] = []
 
     public init(
         tagsColumn: Int = -77, insertHeadingRespectContent: Bool = false, metaReturnMaySplitLine: Bool = true,
@@ -268,6 +270,8 @@ public enum Effect: Sendable, Equatable {
     case refreshSetup
     /// The org-timer becomes this; nil stops it.
     case timer(OrgTimer?)
+    /// A snippet was expanded; its fields are filled in next.
+    case snippet(SnippetSession)
 }
 
 public struct EditResult: Sendable, Equatable {
@@ -352,6 +356,7 @@ public enum Commands {
         UpdateDynamicBlock(), ClockReportTable(), InsertDenoteBlock(.links), InsertDenoteBlock(.missingLinks), InsertDenoteBlock(.backlinks), InsertDenoteBlock(.files), InsertDenoteBlock(.filesAsHeadings), InsertDenoteBlock(.sequence), SetEffort(), CtrlCCtrlC(), EvaluateTimeRange(), FootnoteAction(), FootnoteAction(special: true), TableEvalFormula(named: false), TableEvalFormula(named: true), SortTableLines(), TransposeTable(), GotoHeading(), SparseTreeCommand(), SetPriority(), SetPriority(value: "A"), SetPriority(value: "B"), SetPriority(value: "C"), SetPriority(value: " "), ReadAndSetProperty(), DeleteProperty(), DeleteProperty(globally: true), PropertyAction(), NextAllowedValue(previous: false), NextAllowedValue(previous: true), InsertColumnView(), ShowColumnView(), ShowColumnView(global: true), ToggleArchiveTag(), ArchiveToSibling(), ToggleOrderedProperty(),
         InsertDrawer(), DragElement(forward: true), DragElement(forward: false), CycleBullet(previous: false), CycleBullet(previous: true),
         Emphasize(), Emphasize(marker: "*"), Emphasize(marker: "/"), Emphasize(marker: "_"), Emphasize(marker: "="), Emphasize(marker: "~"), Emphasize(marker: "+"),
+        ExpandSnippet(), InsertSnippet(),
     ]
 
     public static var everything: [any OrgCommand] { all + TableCommand.Action.allCases.map(TableCommand.init) }

@@ -1,8 +1,8 @@
 import Foundation
 
 /// The part of TOML keymaps use: `[table]` and `[[array-of-tables]]` headers, and
-/// `key = value` lines with basic or literal strings, booleans and integers. Comments start
-/// with `#` outside strings.
+/// `key = value` lines with basic or literal strings (multi-line ones too), booleans and
+/// integers. Comments start with `#` outside strings.
 public enum TOML {
     public enum Value: Sendable, Equatable {
         case string(String)
@@ -46,9 +46,12 @@ public enum TOML {
     /// Tables in file order.
     public static func parse(_ text: String) throws -> [Table] {
         var tables = [Table(name: "", isArrayElement: false, values: [:], line: 0)]
-        for (index, rawLine) in text.split(separator: "\n", omittingEmptySubsequences: false).enumerated() {
+        let lines = text.split(separator: "\n", omittingEmptySubsequences: false)
+        var index = 0
+        while index < lines.count {
             let number = index + 1
-            let line = rawLine.trimmingCharacters(in: [" ", "\t", "\r"])
+            let line = lines[index].trimmingCharacters(in: [" ", "\t", "\r"])
+            index += 1
             if line.isEmpty || line.hasPrefix("#") { continue }
             if line.hasPrefix("[") {
                 let isArray = line.hasPrefix("[[")
@@ -68,7 +71,21 @@ public enum TOML {
                 throw ParseError(line: number, message: "bad key")
             }
             var rest = Substring(line[line.index(after: equals)...]).drop { $0 == " " || $0 == "\t" }
-            let value = try parseValue(&rest, line: number)
+            let value: Value
+            if let delimiter = ["\"\"\"", "\'\'\'"].first(where: { rest.hasPrefix($0) }) {
+                // A multi-line string runs to the next delimiter, on this line or a later one.
+                var body = String(rest.dropFirst(3))
+                while body.range(of: delimiter) == nil {
+                    guard index < lines.count else { throw ParseError(line: number, message: "unclosed string") }
+                    body += "\n" + lines[index].replacingOccurrences(of: "\r", with: "")
+                    index += 1
+                }
+                let end = body.range(of: delimiter)!
+                value = .string(try multiline(String(body[..<end.lowerBound]), literal: delimiter == "\'\'\'", line: number))
+                rest = body[end.upperBound...]
+            } else {
+                value = try parseValue(&rest, line: number)
+            }
             rest = rest.drop { $0 == " " || $0 == "\t" }
             guard rest.isEmpty || rest.first == "#" else { throw ParseError(line: number, message: "text after value") }
             guard tables[tables.count - 1].values[key] == nil else { throw ParseError(line: number, message: "duplicate key \(key)") }
@@ -76,6 +93,45 @@ public enum TOML {
             tables[tables.count - 1].keys.append(key)
         }
         return tables
+    }
+
+    /// The body of a multi-line string: a newline right after the opening delimiter is
+    /// dropped; in a basic one escapes apply, and a backslash at the end of a line joins it to
+    /// the next non-blank text.
+    private static func multiline(_ raw: String, literal: Bool, line: Int) throws -> String {
+        let body = raw.hasPrefix("\n") ? String(raw.dropFirst()) : raw
+        if literal { return body }
+        var out = ""
+        var rest = Substring(body)
+        while let c = rest.first {
+            rest = rest.dropFirst()
+            guard c == "\\" else {
+                out.append(c)
+                continue
+            }
+            let blanks = rest.prefix { $0 == " " || $0 == "\t" }
+            if rest.dropFirst(blanks.count).first == "\n" {
+                rest = rest.drop { $0.isWhitespace }
+                continue
+            }
+            guard let escaped = rest.first else { throw ParseError(line: line, message: "bad escape") }
+            rest = rest.dropFirst()
+            switch escaped {
+            case "\"": out.append("\"")
+            case "\\": out.append("\\")
+            case "n": out.append("\n")
+            case "t": out.append("\t")
+            case "u", "U":
+                let digits = escaped == "u" ? 4 : 8
+                guard rest.count >= digits, let code = UInt32(rest.prefix(digits), radix: 16), let scalar = Unicode.Scalar(code) else {
+                    throw ParseError(line: line, message: "bad unicode escape")
+                }
+                out.unicodeScalars.append(scalar)
+                rest = rest.dropFirst(digits)
+            default: throw ParseError(line: line, message: "bad escape \\\(escaped)")
+            }
+        }
+        return out
     }
 
     private static func parseValue(_ rest: inout Substring, line: Int) throws -> Value {

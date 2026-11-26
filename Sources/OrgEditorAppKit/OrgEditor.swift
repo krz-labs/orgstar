@@ -87,6 +87,10 @@ public final class OrgEditor: NSObject {
     /// The open completion list, and the pause before one opens by itself.
     var completionPopup: CompletionPopup?
     var completionTimer: DispatchWorkItem?
+    /// The snippet whose fields are being filled in, and the range drawn for it last.
+    var snippetSession: SnippetSession?
+    var snippetHighlight: Range<Int>?
+    var updatingMirrors = false
     /// The spell checker's skipped ranges and the text they were found in.
     var spellSkipCache: (text: String, ranges: [Range<Int>])?
     /// Highlights of the whole file in plain mode, and the revision they were made for.
@@ -507,6 +511,7 @@ public final class OrgEditor: NSObject {
         }
         if isearch != nil, isearchKey(chord) { return true }
         if let handled = completionKey(chord) { return handled }
+        if let handled = snippetKey(chord) { return handled }
         if modal { return handleModal(chord) }
         switch dispatcher.feed(chord) {
         case .pending(let keys):
@@ -525,7 +530,7 @@ public final class OrgEditor: NSObject {
             fail("\(KeySequence.format(keys)) is undefined")
             return true
         case .unbound:
-            return electricPair(chord) || autoFill(chord)
+            return snippetTab(chord) || electricPair(chord) || autoFill(chord)
         case .complete(let keys, let candidates):
             let argument = dispatcher.argument != nil
             if keys.count > 1 || argument { onKeysPending?(nil, []) }
@@ -542,7 +547,7 @@ public final class OrgEditor: NSObject {
                 run(binding.command)
                 return true
             }
-            return keys.count == 1 && (electricPair(chord) || autoFill(chord))
+            return keys.count == 1 && (snippetTab(chord) || electricPair(chord) || autoFill(chord))
         }
     }
 
@@ -583,6 +588,7 @@ public final class OrgEditor: NSObject {
         return switch EditorCommands.command(id)?.action {
         case .text(let command): command.applies(in: context)
         case .view where id.hasPrefix("org.table."): KeyContext.holds("table", in: context)
+        case .view where id.hasPrefix("org.snippet."): snippetSession != nil
         case .view: id != "org.cycle" || Presentation.heading(containing: context.caret, in: context.tree) != nil
             || Wrappers.toggleable(at: context.caret, in: context.tree) != nil
         case .edit, .mark, .app, .find: true
@@ -596,6 +602,10 @@ public final class OrgEditor: NSObject {
     /// Runs a command by id, as a key, a menu item or the palette would.
     public func run(_ id: String) {
         defer { lastCommand = (id, document.revision) }
+        if let snippet = Snippets.command(id), isOrg {
+            perform(snippet)
+            return
+        }
         guard let command = EditorCommands.command(id) else {
             fail("Unknown command \(id)")
             return
@@ -624,6 +634,8 @@ public final class OrgEditor: NSObject {
             case "org.latex-preview": toggleLatex()
             case "editor.toggle-spell-check": toggleSpellCheck()
             case "editor.complete": completeAtPoint()
+            case "org.snippet.next-field": nextSnippetField()
+            case "org.snippet.previous-field": previousSnippetField()
             case "editor.toggle-truncate-lines": toggleTruncateLines()
             case "editor.toggle-auto-fill": toggleAutoFill()
             case "edit.isearch-forward": startISearch(forward: true)
@@ -691,6 +703,7 @@ public final class OrgEditor: NSObject {
                     var state = foldState
                     state.folds.insert(start)
                     setFolds(state)
+                case .snippet(let session): startSnippet(session)
                 default: onEffect?(effect)
                 }
             }
@@ -826,6 +839,7 @@ public final class OrgEditor: NSObject {
         if let narrowed { self.narrowed = ViewState(selection: [narrowed]).mapped(through: [edit]).selection[0] }
         mapVimPositions(through: edit)
         vim.changed(edit)
+        snippetEdited(edit)
         if let sparse = sparseHidden { sparseHidden = ViewState(selection: sparse).mapped(through: [edit]).selection.filter { !$0.isEmpty } }
         let oldHighlights = ViewState(selection: highlights).mapped(through: [edit]).selection
         highlights = []
@@ -893,6 +907,7 @@ public final class OrgEditor: NSObject {
         guard !isLoading else { return }
         let selection = textView.selectedRange()
         defer { previousSelection = selection.location }
+        snippetSelectionChanged()
         redrawShadedSelection(selection)
         onSelectionChange?(selection)
         revealCaretLine()

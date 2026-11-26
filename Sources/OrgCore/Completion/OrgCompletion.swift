@@ -2,11 +2,12 @@ import Foundation
 
 // Completion at point (Org 9.8.7's org-pcomplete): `org-thing-at-point` picks what the caret
 // is on, and each context offers what its `pcomplete/org-mode/…` function does. Link types
-// after `[[`, workspace tags and org-tempo's `<` templates are added.
+// after `[[`, workspace tags and org-tempo's `<` templates are added, and snippet triggers
+// where no org context offers anything.
 
 public struct Completion: Sendable, Equatable {
     public enum Kind: String, Sendable {
-        case keyword, keywordValue, link, entity, tag, todo, heading, drawer, property, srcLanguage, srcHeader, clocktable, template
+        case keyword, keywordValue, link, entity, tag, todo, heading, drawer, property, srcLanguage, srcHeader, clocktable, template, snippet
     }
 
     public var kind: Kind
@@ -16,9 +17,14 @@ public struct Completion: Sendable, Equatable {
     public var candidates: [String]
     /// The block templates `<` completes, for `.template`.
     public var templates: [StructureTemplate] = []
+    /// The snippets whose triggers are the candidates, for `.snippet`; choosing one expands it.
+    public var snippets: [Snippet] = []
 
     /// How the list shows `candidate`: a template with the block it makes.
     public func label(_ candidate: String) -> String {
+        if kind == .snippet, let snippet = snippets.first(where: { $0.trigger == candidate }), snippet.name != candidate {
+            return candidate + "  " + snippet.name
+        }
         guard kind == .template, let value = OrgCompletion.templateKeys(templates).first(where: { "<" + $0.key == candidate })?.value else { return candidate }
         return candidate + "  " + value
     }
@@ -32,6 +38,27 @@ public struct Completion: Sendable, Equatable {
 
 public enum OrgCompletion {
     public static func at(_ context: EditContext) -> Completion? {
+        let org = orgAt(context)
+        if let org, !org.candidates.isEmpty { return org }
+        return snippets(context) ?? org
+    }
+
+    /// Snippet triggers starting with the text from the last blank to the caret.
+    static func snippets(_ context: EditContext) -> Completion? {
+        let snippets = context.options.snippets.filter { !$0.file }
+        guard !snippets.isEmpty else { return nil }
+        let ns = context.text as NSString
+        let caret = min(context.caret, ns.length)
+        var start = caret
+        while start > 0, let scalar = UnicodeScalar(ns.character(at: start - 1)), !CharacterSet.whitespacesAndNewlines.contains(scalar) { start -= 1 }
+        guard start < caret else { return nil }
+        let typed = ns.substring(with: NSRange(location: start, length: caret - start))
+        let matching = snippets.filter { $0.trigger.hasPrefix(typed) }
+        guard !matching.isEmpty else { return nil }
+        return Completion(kind: .snippet, range: start..<caret, candidates: matching.map(\.trigger).sorted { $0.localizedStandardCompare($1) == .orderedAscending }, snippets: matching)
+    }
+
+    static func orgAt(_ context: EditContext) -> Completion? {
         let ns = context.text as NSString
         let caret = min(context.caret, ns.length)
         let lineRange = ns.lineRange(for: NSRange(location: caret, length: 0))

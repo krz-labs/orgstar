@@ -575,6 +575,7 @@ struct OrgstarApp: App {
             CommandGroup(after: .newItem) {
                 Button("Capture…") { commands.run("app.capture") }
                     .keyboardShortcut("n", modifiers: [.command, .shift])
+                Button("New File from Template…") { commands.run("app.new-file-from-template") }
                 Button("New Window") { commands.run("app.window-new") }
                     .keyboardShortcut("n", modifiers: [.command, .option])
             }

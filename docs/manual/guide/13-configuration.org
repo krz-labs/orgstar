@@ -22,6 +22,7 @@ The folder holds these files:
 | =capture.toml=       | Capture templates                                                | Only by Import from Emacs             |
 | =views.toml=         | Saved agenda views                                               | No                                    |
 | =macros.toml=        | Named keyboard macros                                            | Yes, when you name a macro            |
+| =snippets.toml=      | Snippets and templates for new files                             | Only by Import from Emacs             |
 | =default-theme.toml= | The default theme's colors, for reference                        | Yes, at every launch                  |
 
 =config.toml= is the source of truth. The Settings window writes each change into it, keeping your comments and the order of lines, and edits you make to the file apply while orgstar runs. If the file doesn't exist at launch, orgstar creates it with every setting at its current value and a comment after each one. A file that is there but can't be read, such as one that isn't UTF-8, is left as it is: the change isn't written and a message says why, as it does when a write fails. Import from Emacs and saving an agenda view treat =capture.toml=, =views.toml= and =keymap.toml= the same way.
@@ -44,7 +45,7 @@ If =config.toml= has a line orgstar can't use, the problem shows in the message 
 - =config.toml: org-agenda-start-day must look like "-3d" or "+0d"=
 - =config.toml: theme.light.background must be a color such as "#1f2328"=
 
-A file that isn't valid TOML is reported with its parse error, and none of it applies. =keymap.toml=, =capture.toml=, =views.toml= and =macros.toml= report their problems the same way when they are read.
+A file that isn't valid TOML is reported with its parse error, and none of it applies. =keymap.toml=, =capture.toml=, =views.toml=, =macros.toml= and =snippets.toml= report their problems the same way when they are read.
 
 * The Settings window
 
@@ -491,6 +492,83 @@ tag-review = "C-c C-q w o r k : r e v i e w RET"
 
 A name has letters, digits, =-= and =_=. A line whose keys can't be read, or a table other than =[macros]=, is reported and skipped.
 
+* snippets.toml
+
+=snippets.toml= holds snippets: text you insert by typing a short trigger and pressing =TAB=, with fields to fill in, as yasnippet's snippets work in Emacs. A snippet with =file = true= is a template for a new file instead. orgstar ships no snippets; without the file there are none. How to use them is in [[file:02-the-editor.org][The editor]].
+
+#+BEGIN_SRC toml
+[[snippet]]
+trigger = "meet"
+description = "Meeting notes"
+body = """
+,* Meeting with ${1:someone} %U
+,** Agenda
+- $0
+,** Actions
+- [ ] $1:
+"""
+
+[[snippet]]
+trigger = "wk"
+description = "Week number"
+body = "Week %<%V>"
+
+[[snippet]]
+trigger = "weekly"
+description = "Weekly review"
+file = true
+body = '''
+,#+title: Week of %t
+,#+filetags: :review:
+
+,* Done
+- $1
+,* Next
+- $0
+'''
+#+END_SRC
+
+| Key           | Value                                                                                  |
+|---------------+----------------------------------------------------------------------------------------|
+| =trigger=     | What you type before =TAB=; no spaces. Required, and once per file.                    |
+| =body=        | The text. Required.                                                                     |
+| =description= | The name Insert Snippet…, the completion list and New File from Template… show; the trigger when left out. |
+| =file=        | =true= for a template for New File from Template…; its trigger doesn't expand it.      |
+
+Bodies are usually multi-line strings: =""" … """= takes escapes such as =\n= and =\t=, and =''' … '''= takes the text exactly as written. A newline right after the opening quotes isn't part of the body. The other TOML files take multi-line strings too.
+
+A body can hold these, as yasnippet writes them:
+
+| Syntax                | Meaning                                                                                       |
+|-----------------------+-----------------------------------------------------------------------------------------------|
+| =$1=, =$2=, …         | A field, empty. =TAB= visits fields by number, whatever their order in the text.              |
+| =${1:default}=        | A field with default text, which typing replaces. A default can hold other fields.            |
+| =$0=, =${0:text}=     | Where the caret goes after the last field; =text= is selected then. Without it, the end of the snippet. |
+| A number used twice   | A mirror: it shows what you type in the field. The occurrence with a default is the field; otherwise the first. |
+| =\$=, =\\=, =\`=      | A literal =$=, =\= or =`=; in a default, =\}= is a literal =}=.                               |
+
+And the capture escapes that need no capture (see [[file:08-capture.org][Capture]]):
+
+| Escape                            | Inserts                                                                          |
+|-----------------------------------+----------------------------------------------------------------------------------|
+| =%t=, =%T=, =%u=, =%U=            | Today's date as an active or inactive timestamp, with the time for =%T= and =%U= |
+| =%<…>=                            | The date in a =format-time-string= format, such as =%<%Y-%m-%d>=                 |
+| =%^{Prompt}=                      | Asks in a prompt first, and inserts the answer                                   |
+| =%^t=, =%^T=, =%^u=, =%^U=, =%^g= | Asks for a date or tags                                                          |
+| =%\1=, =%\2=, …                   | The answer to the first, second, … =%^{…}= prompt                               |
+| =%i=                              | The selected text, when Insert Snippet… is run on a selection                    |
+| =%f=, =%F=                        | The file's name and path                                                         |
+| =%?=                              | Where the caret goes last, as =$0=                                               |
+| =%(…)=                            | An Emacs Lisp form, run in orgstar's interpreter                                 |
+
+A prompt takes a default and choices as in capture: =%^{Where}= with =|home|home|work= after the prompt's name offers =home= and =work= and inserts =home= when the answer is empty. Escapes inside a default (=${1:%t}=) are filled in too. =%a=, =%c=, =%k= and the other escapes about a capture insert nothing.
+
+Lines after the first take the indentation of the line the trigger is on.
+
+orgstar reads the file at launch and again when it changes. A file that isn't valid TOML is reported with its line, and the snippets read before stay. A snippet with a problem, such as one without a body, a trigger used twice, a =${= that isn't closed, or Emacs Lisp in a field (=${1:$(upcase yas-text)}=), is reported with the line of its =[[snippet]]= and left out; the others apply.
+
+Import from Emacs reads yasnippet's org-mode snippets into this file; see [[*yasnippet snippets][yasnippet snippets]].
+
 * In-file settings
 
 Keyword lines in a file set options for that file, as in Emacs. orgstar reads them outside blocks; for =#+STARTUP= only keyword lines count, so a =#+STARTUP= line inside a paragraph or a block changes nothing: not folding, logging or inline images.
@@ -572,7 +650,7 @@ Import from Emacs reads your Emacs or Doom Emacs configuration and offers to car
 1. Open Settings ▸ General and click Import from Emacs…, or run Import from Emacs… from the command palette (=⇧⌘P=).
 2. orgstar looks for a configuration in these places, in order, and reads the first it finds: =$DOOMDIR=, =~/.config/doom=, =~/.doom.d=, =~/.config/emacs=, =~/.emacs.d=, =~/.emacs=. A folder counts when it holds =init.el=, =config.el=, =config.org= or =custom.el=. Doom's own installation folder (one with =lisp/doom.el=) is skipped.
 3. To read another configuration, click Choose… and pick a file or a folder. For a folder, orgstar reads =init.el=, =config.el= (or =config.org= when there is no =config.el=) and =custom.el= in it.
-4. The sheet lists what it found under Settings, Folders, Capture templates, Key bindings, Structure templates and Agenda views, each with the line it came from (=config.el:27=, or =Doom default=). Everything is selected; clear what you don't want.
+4. The sheet lists what it found under Settings, Folders, Capture templates, Key bindings, Structure templates, Agenda views and Snippets, each with the line it came from (=config.el:27=, or =Doom default=). Everything is selected; clear what you don't want.
 5. Click Import. The sheet then summarizes what was imported and any problems.
 
 What Import does with each kind of item:
@@ -582,14 +660,23 @@ What Import does with each kind of item:
 - Capture templates are appended to =capture.toml=, except those whose key is already in the file.
 - Key bindings are appended to =keymap.toml=, except those already in the file with the same keys, command and state. Running the import again adds no duplicates.
 - Agenda views are appended to =views.toml=, except those whose name is already in the file.
+- Snippets are appended to =snippets.toml=, except those whose trigger is already in the file.
 
-The Not Imported section lists what orgstar read but can't use, with the reason: settings it has no equivalent for, values it can't work out without running Emacs, bindings to code rather than a command, and files it couldn't read. The footer counts variables that aren't about org, which are left alone.
+The Not Imported section lists what orgstar read but can't use, with the reason: settings it has no equivalent for, values it can't work out without running Emacs, bindings to code rather than a command, snippets with Emacs Lisp, and files it couldn't read. The footer counts variables that aren't about org, which are left alone, and snippets skipped for their Emacs Lisp.
 
 A literate configuration (=config.org=) is read as =org-babel-load-file= and Doom tangle it: its =emacs-lisp= and =elisp= blocks, except blocks whose =:tangle= is =no= (set on the block, in a =#+HEADER:= line, in a =header-args= property or in =#+PROPERTY:=) and blocks under a COMMENT or =:ARCHIVE:= heading. Items show the line of =config.org= they came from. When the folder also has a =config.el=, it is read instead, as the file =config.org= tangles to.
 
 On iOS, Settings ▸ Import from Emacs reads a configuration folder you choose; see [[file:14-ios.org][iOS]].
 
 In the [[file:../install.org][Mac App Store version]], Import from Emacs first opens a picker at the configuration it finds, since the app can read only what you choose. For a Doom configuration, Choose Doom Folder… picks Doom's installation folder, so its org defaults are read; without it the footer says Doom's own org defaults were skipped. On Import, each folder to add opens a picker at that folder, and only the folders you choose there are added.
+
+** yasnippet snippets
+
+When the folder of the configuration read has a =snippets/org-mode/= folder, as =~/.config/doom/snippets/org-mode/= or =~/.emacs.d/snippets/org-mode/= do, its snippets are listed under Snippets. Each file's =# key:= becomes the trigger (the file's name when it has none), =# name:= the description, and the text after =# --= the body.
+
+Snippets with Emacs Lisp aren't imported, and are listed under Not Imported: backquoted forms (=`(format-time-string …)`=), transformations (=$(…)=) and =# type: command=. =# condition:=, =# expand-env:=, =# binding:= and =# group:= are ignored, as are the modes an =.yas-parents= file names. Only the folder beside the configuration is read: other folders in =yas-snippet-dirs=, and Doom's own snippet library, aren't. In the Mac App Store version and on iOS, the folder is read when it is inside the folder you chose.
+
+See [[file:15-alongside-emacs.org][Alongside Emacs]] for how expanding differs from yasnippet.
 
 ** Doom Emacs
 

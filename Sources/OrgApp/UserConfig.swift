@@ -640,8 +640,8 @@ public enum UserConfig {
     private static func template(_ value: (Setting) -> TOML.Value) -> String {
         var out = """
             # orgstar settings. The Settings window writes its changes here, and edits made here
-            # apply while orgstar runs. Keys go in keymap.toml, capture templates in capture.toml
-            # and saved agenda views in views.toml, all in this folder.
+            # apply while orgstar runs. Keys go in keymap.toml, capture templates in capture.toml,
+            # saved agenda views in views.toml and snippets in snippets.toml, all in this folder.
 
             # Emacs variables, by their Emacs names.
 

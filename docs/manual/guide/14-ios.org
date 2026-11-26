@@ -25,7 +25,7 @@ orgstar on iOS works on folders you choose, in iCloud Drive or in another app's 
 
 orgstar keeps access to the folder across launches. Each folder appears as a section listing its =.org= files by their path inside the folder. To stop using a folder, tap the ⋯ button beside its name, or touch and hold the name, and choose Remove from orgstar…; orgstar asks first. The folder and its files stay where they are. An added folder that is empty also has Delete Folder…, which deletes it from disk too.
 
-Swipe left on a file, or touch and hold it, to delete it. orgstar asks first. A file in iCloud Drive goes to Recently Deleted in the Files app; elsewhere it is removed. New File… and New Folder… under + at the top right make one in the folder shown, or with several added folders, in the one you pick; a file name without an extension gets =.org=. Empty folders are listed too and delete the same way; a folder with anything in it other than hidden files can't be deleted from orgstar.
+Swipe left on a file, or touch and hold it, to delete it. orgstar asks first. A file in iCloud Drive goes to Recently Deleted in the Files app; elsewhere it is removed. New File… and New Folder… under + at the top right make one in the folder shown, or with several added folders, in the one you pick; a file name without an extension gets =.org=. New File from Template… there asks for a template from =snippets.toml= in the configuration folder and a name, then opens the new file in the editor with the template expanded; see [[*Snippets][Snippets]]. Empty folders are listed too and delete the same way; a folder with anything in it other than hidden files can't be deleted from orgstar.
 
 Files that iCloud hasn't downloaded to the device yet appear in grey with a cloud icon. orgstar asks iCloud to download them and lists them as files once they arrive; tap one to ask for it at once, and a spinner shows until it arrives.
 
@@ -199,6 +199,16 @@ With a hardware keyboard, the editor uses the preset =keymap= sets in the folder
 - A sequence bound to a command that can't run at the caret, or that the iOS app doesn't have, shows why, as on the Mac: the command's own message (such as =Not on a heading=), or that it isn't available on iPhone and iPad and runs on the Mac.
 
 See [[file:03-keys.org][Keys and commands]] for the Emacs bindings.
+
+** Snippets
+
+Snippets come from =snippets.toml= in the configuration folder, the same file as on the Mac, and reload when it changes; problems show in red under the folder in Settings. See [[file:02-the-editor.org][The editor]] and [[file:13-configuration.org][Configuration]].
+
+- Insert Snippet… in Commands lists them and expands the one you choose at the caret, replacing the selection. Questions in the snippet open the question sheet, one after another.
+- With a hardware keyboard, =TAB= after a trigger expands it where =TAB= has no other meaning, as on the Mac, and =TAB=, =S-TAB= and =Escape= move through the fields.
+- On the on-screen keyboard, which has no =TAB=, the first field is selected after expanding, so typing replaces it; tapping elsewhere ends the snippet. The key bar has no snippet buttons yet.
+- Mirrors and the band behind the active field work as on the Mac.
+- New File from Template… is under + in Folders.
 
 * Search
 
@@ -417,7 +427,7 @@ Stop Using This Folder returns every setting to its default.
 Import from Emacs reads an Emacs or Doom configuration folder, such as a synced =~/.config/doom= or =~/.emacs.d=, as the Mac's import does (see [[file:13-configuration.org][Configuration]]):
 
 1. Tap Import from Emacs, then Choose Folder…, and choose the folder holding =init.el=, =config.el= or =config.org=.
-2. The screen lists the settings, capture templates, key bindings, structure templates and agenda views it found, each with the line it came from, all selected. Clear what you don't want.
+2. The screen lists the settings, capture templates, key bindings, structure templates, agenda views and snippets it found, each with the line it came from, all selected. Clear what you don't want.
 3. Tap Import. The screen then summarizes what was imported and any problems.
 
 With a configuration folder, settings and structure templates are written to its =config.toml=, and capture templates, key bindings and agenda views to its =capture.toml=, =keymap.toml= and =views.toml=, so the Mac reads them too. Without one, settings are kept on the device.
