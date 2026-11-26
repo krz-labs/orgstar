@@ -470,6 +470,9 @@ struct OrgstarApp: App {
     @State private var session: DocumentSession = {
         let session = DocumentSession()
         session.defaults = Preferences.orgSettings
+        // Before any window: capture and agenda edits can save before the main window opens.
+        session.encryptsTaggedEntries = OrgPreferences.cryptBeforeSave()
+        session.cryptTag = OrgPreferences.cryptTag()
         return session
     }()
 

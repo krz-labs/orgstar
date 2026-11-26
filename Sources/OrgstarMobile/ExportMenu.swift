@@ -272,20 +272,25 @@ struct ExportItems: View {
 /// (`org-icalendar-combine-agenda-files`), named as `org-icalendar-combined-agenda-file` is.
 struct AgendaCalendars: Transferable {
     let paths: [String]
-    /// The open files' text, which may not be saved yet.
-    let open: [String: String]
+    /// The files' text for the export: open buffers', or what's on disk for those holding
+    /// what's encrypted there; encrypted files are left out.
+    let texts: [String: String]
+    /// Said after the export when it left something out.
+    let note: String
 
     /// Nil without agenda files.
     @MainActor init?(model: MobileModel) {
         guard let paths = model.workspace?.agendaFilePaths(), !paths.isEmpty else { return nil }
         self.paths = paths
-        open = Dictionary(model.session.openDocuments.map { ($0.path, $0.document.text) }, uniquingKeysWith: { first, _ in first })
+        let session = model.session
+        texts = Dictionary(paths.compactMap { path in session.exportText(of: path).map { (path, $0) } }, uniquingKeysWith: { first, _ in first })
+        note = paths.contains(where: session.exportLeavesOut) ? " " + DocumentSession.exportNote : ""
     }
 
     var fileName: String { (OrgPreferences.icalendarCombinedFile() as NSString).lastPathComponent }
 
     private func read(_ path: String) -> (text: String, settings: OrgSettings)? {
-        guard let text = open[path] ?? (try? String(contentsOfFile: path, encoding: .utf8)) else { return nil }
+        guard let text = texts[path] else { return nil }
         return (text, OrgPreferences.orgSettings().resolvingSetupFiles(in: text, path: path, read: OrgSettings.readFile))
     }
 
@@ -293,7 +298,7 @@ struct AgendaCalendars: Transferable {
     func exportEach() -> String {
         do {
             let written = try ICalendarFiles.exportEach(paths, options: OrgPreferences.icalendarOptions(), read: read)
-            return String(localized: "Exported \(written.count) agenda files to iCalendar")
+            return String(localized: "Exported \(written.count) agenda files to iCalendar") + note
         } catch {
             return "Can't export: \(error.localizedDescription)"
         }

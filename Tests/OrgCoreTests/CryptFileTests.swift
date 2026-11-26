@@ -29,6 +29,32 @@ struct CryptFileTests {
         #expect(try OrgCrypt.seal("* A\ntext\n", passphrase: "pw").text == "* A\ntext\n")
     }
 
+    @Test func newMessagesUseGnuPGsIterationCount() throws {
+        let clock = ContinuousClock()
+        var message = Data()
+        let time = try clock.measure { message = try OpenPGP.encryptedMessage(Data("x".utf8), passphrase: "pw") }
+        let first = try #require(try OpenPGP.packets(message).first)
+        // Version 4, AES-256, iterated and salted SHA-256, 8 bytes of salt, coded count 0xFF.
+        #expect(first.tag == 3 && Array(first.body.prefix(4)) == [4, 9, 3, 8] && first.body[12] == 0xFF)
+        #expect(OpenPGP.isSymmetric(message))
+        #expect(!OpenPGP.isSymmetric(Data([0xC1, 0x02, 0x03, 0x00])))
+        let read = try clock.measure { _ = try OpenPGP.decrypt(message, passphrase: "pw") }
+        print("S2K with coded count 0xFF: encrypt \(time), decrypt \(read)")
+    }
+
+    @Test func textBelowAMessageIsSealedWithIt() throws {
+        let bank = (OrgCryptTests.file as NSString).range(of: "* TODO Bank").location
+        let one = try #require(try OrgCrypt.encrypt(OrgCryptTests.file, at: bank, passphrase: "pw"))
+        let typed = one.replacingOccurrences(of: "\n* Diary", with: "\nTyped below.\n* Diary")
+        #expect(OrgCrypt.unencrypted(typed).count == 2)
+        let (sealed, messages) = try OrgCrypt.seal(typed, passphrase: "pw")
+        #expect(!sealed.contains("Typed below."))
+        #expect(try OrgCrypt.decrypt(sealed, at: bank, passphrase: "pw").plaintext == "Account 12345, ünïcödé.\n** Child\nChild text.\n\nTyped below.\n")
+        // What reads back for the message is the text the entry had, message and all.
+        #expect(messages.first?.plaintext.contains("-----BEGIN PGP MESSAGE-----") == true)
+        #expect(throws: OrgCrypt.Failure.self) { try OrgCrypt.seal(typed, passphrase: "wrong") }
+    }
+
     @Test func unencryptedEntriesWithText() throws {
         #expect(OrgCrypt.unencrypted(OrgCryptTests.file).count == 2)
         let bank = (OrgCryptTests.file as NSString).range(of: "* TODO Bank").location

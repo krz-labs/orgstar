@@ -760,6 +760,7 @@ struct ContentView: View {
             #if !APPSTORE
             let functions = ["pdf": "org-latex-export-to-pdf", "latex": "org-latex-export-to-latex", "text": "org-ascii-export-to-ascii"]
             guard let function = functions[format] else { return }
+            if let refusal = session.refusesEmacsCopy(path) { return commands.show(refusal) }
             commands.show(String(localized: "Exporting with Emacs…"))
             commands.runInEmacs {
                 do {
@@ -889,17 +890,18 @@ struct ContentView: View {
         let paths = workspace.agendaFilePaths()
         guard reach(paths + (combined ? [OrgPreferences.icalendarCombinedFile()] : [])) else { return }
         let read = { (path: String) -> (text: String, settings: OrgSettings)? in
-            guard let text = session.openDocuments.first(where: { $0.path == path })?.document.text ?? (try? String(contentsOfFile: path, encoding: .utf8)) else { return nil }
+            guard let text = session.exportText(of: path) else { return nil }
             return (text, Preferences.orgSettings.resolvingSetupFiles(in: text, path: path, read: OrgSettings.readFile))
         }
+        let note = paths.contains(where: session.exportLeavesOut) ? " " + DocumentSession.exportNote : ""
         do {
             let options = OrgPreferences.icalendarOptions()
             if combined {
                 let url = try ICalendarFiles.combine(paths, to: OrgPreferences.icalendarCombinedFile(), options: options, read: read)
-                commands.show(String(localized: "Exported \(paths.count) agenda files to \(url.lastPathComponent)"))
+                commands.show(String(localized: "Exported \(paths.count) agenda files to \(url.lastPathComponent)") + note)
             } else {
                 let written = try ICalendarFiles.exportEach(paths, options: options, read: read)
-                commands.show(String(localized: "Exported \(written.count) agenda files to iCalendar"))
+                commands.show(String(localized: "Exported \(written.count) agenda files to iCalendar") + note)
             }
         } catch {
             commands.show(String(localized: "Can't export: \(error.localizedDescription)"))
@@ -1092,9 +1094,8 @@ struct ContentView: View {
         let loaded = Publish.projects(fromConfig: config, root: workspace.rootPaths.first)
         if let problem = loaded.problems.first { commands.show(problem) }
         guard !loaded.projects.isEmpty else { return commands.show(String(localized: "No [[publish]] projects in config.toml")) }
-        let read = { (path: String) -> String? in
-            session.openDocuments.first { $0.path == path }?.document.text ?? (try? String(contentsOfFile: path, encoding: .utf8))
-        }
+        let read = { (path: String) -> String? in session.exportText(of: path) }
+        let note = session.openPaths.contains(where: session.exportLeavesOut) ? " " + DocumentSession.exportNote : ""
         let codeStyle = HTMLCodeStyle(highlighter: PaneView.highlighter, theme: theme)
         func run(_ chosen: [PublishProject], only: String? = nil) {
             // The chosen projects and their components read and write these folders.
@@ -1104,8 +1105,8 @@ struct ContentView: View {
                 let report = try Publish.publish(chosen, all: loaded.projects, only: only, read: read) { function, text, path, bodyOnly in
                     try Publish.export(function, text: text, path: path, bodyOnly: bodyOnly, settings: Preferences.orgSettings, codeStyle: codeStyle)
                 }
-                commands.show(report.skipped.isEmpty ? String(localized: "Published \(report.published.count) files")
-                    : String(localized: "Published \(report.published.count) files, \(report.skipped.count) up to date"))
+                commands.show((report.skipped.isEmpty ? String(localized: "Published \(report.published.count) files")
+                    : String(localized: "Published \(report.published.count) files, \(report.skipped.count) up to date")) + note)
             } catch {
                 commands.show("\(error)")
             }

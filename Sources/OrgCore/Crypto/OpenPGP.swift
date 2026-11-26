@@ -194,24 +194,78 @@ public enum OpenPGP {
         }
 
         /// RFC 4880 3.7.1: as many hashes as the key needs, each preloaded with one more zero.
+        /// The iterated input is hashed as it's made, a block at a time.
         func key(_ passphrase: String, size: Int) throws -> Data {
             let material = salt + Data(passphrase.utf8)
             var key = Data()
             var round = 0
             while key.count < size {
-                var input = Data(repeating: 0, count: round)
+                var hasher = try Hasher(hash)
+                hasher.update(Data(repeating: 0, count: round))
                 if type == 3 {
                     let total = max(count, material.count)
-                    var stream = Data(capacity: total)
-                    while stream.count < total { stream.append(material.prefix(total - stream.count)) }
-                    input.append(stream)
+                    // Whole copies of the material, about 64 KB of them, then what's left.
+                    var block = Data()
+                    let copies = max(1, 65_536 / max(1, material.count))
+                    for _ in 0..<copies { block.append(material) }
+                    var left = total
+                    while left >= block.count {
+                        hasher.update(block)
+                        left -= block.count
+                    }
+                    if left > 0 { hasher.update(block.prefix(left)) }
                 } else {
-                    input.append(material)
+                    hasher.update(material)
                 }
-                key.append(try OpenPGP.hash(hash, input))
+                key.append(hasher.finish())
                 round += 1
             }
             return key.prefix(size)
+        }
+    }
+
+    /// One of the hashes `hash` supports, fed in parts.
+    struct Hasher {
+        private var md5: Insecure.MD5?
+        private var sha1: Insecure.SHA1?
+        private var sha256: SHA256?
+        private var sha384: SHA384?
+        private var sha512: SHA512?
+        private var sha224: CC_SHA256_CTX?
+
+        init(_ algorithm: Int) throws {
+            switch algorithm {
+            case 1: md5 = Insecure.MD5()
+            case 2: sha1 = Insecure.SHA1()
+            case 8: sha256 = SHA256()
+            case 9: sha384 = SHA384()
+            case 10: sha512 = SHA512()
+            case 11:
+                var context = CC_SHA256_CTX()
+                CC_SHA224_Init(&context)
+                sha224 = context
+            default: throw Failure("Hash algorithm \(algorithm) isn't supported")
+            }
+        }
+
+        mutating func update(_ data: Data) {
+            if md5 != nil { md5!.update(data: data) }
+            if sha1 != nil { sha1!.update(data: data) }
+            if sha256 != nil { sha256!.update(data: data) }
+            if sha384 != nil { sha384!.update(data: data) }
+            if sha512 != nil { sha512!.update(data: data) }
+            if sha224 != nil { data.withUnsafeBytes { _ = CC_SHA224_Update(&sha224!, $0.baseAddress, CC_LONG(data.count)) } }
+        }
+
+        mutating func finish() -> Data {
+            if let md5 { return Data(md5.finalize()) }
+            if let sha1 { return Data(sha1.finalize()) }
+            if let sha256 { return Data(sha256.finalize()) }
+            if let sha384 { return Data(sha384.finalize()) }
+            if let sha512 { return Data(sha512.finalize()) }
+            var digest = [UInt8](repeating: 0, count: Int(CC_SHA224_DIGEST_LENGTH))
+            _ = CC_SHA224_Final(&digest, &sha224!)
+            return Data(digest)
         }
     }
 
@@ -234,10 +288,19 @@ public enum OpenPGP {
         return Data(out.prefix(moved))
     }
 
-    static func random(_ count: Int) -> Data {
+    static func random(_ count: Int) throws -> Data {
         var bytes = [UInt8](repeating: 0, count: count)
-        _ = SecRandomCopyBytes(kSecRandomDefault, count, &bytes)
+        guard SecRandomCopyBytes(kSecRandomDefault, count, &bytes) == errSecSuccess else { throw Failure("No random bytes for the salt") }
         return Data(bytes)
+    }
+
+    /// The coded iteration count new messages use: 65,011,712 bytes hashed, GnuPG's most.
+    static let codedCount: UInt8 = 0xFF
+
+    /// Whether `message` (packets) is encrypted with a passphrase: its first packet is a
+    /// symmetric-key session packet, not one for a public key.
+    public static func isSymmetric(_ message: Data) -> Bool {
+        (try? packets(message))?.first?.tag == 3
     }
 
     // MARK: - Messages
@@ -345,13 +408,14 @@ public enum OpenPGP {
 
     /// `gpg --symmetric` without `--armor`: the packets of `encrypt`.
     public static func encryptedMessage(_ data: Data, passphrase: String, now: Date = Date()) throws -> Data {
-        let salt = random(8)
-        let s2k = S2K(type: 3, hash: 8, salt: salt, count: (16 + (96 & 15)) << ((96 >> 4) + 6))
+        let salt = try random(8)
+        let c = Int(codedCount)
+        let s2k = S2K(type: 3, hash: 8, salt: salt, count: (16 + (c & 15)) << ((c >> 4) + 6))
         let key = try s2k.key(passphrase, size: 32)
-        let skesk = packet(3, Data([4, 9, 3, 8]) + salt + Data([96]))
+        let skesk = packet(3, Data([4, 9, 3, 8]) + salt + Data([codedCount]))
         let date = UInt32(max(0, now.timeIntervalSince1970))
         let literal = packet(11, Data([0x62, 0]) + Data((0..<4).reversed().map { UInt8((date >> ($0 * 8)) & 0xff) }) + data)
-        var prefix = random(16)
+        var prefix = try random(16)
         prefix.append(prefix.suffix(2))
         var plain = prefix + literal + Data([0xD3, 0x14])
         plain.append(Data(Insecure.SHA1.hash(data: plain)))

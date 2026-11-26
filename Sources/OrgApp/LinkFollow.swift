@@ -82,7 +82,7 @@ extension DocumentSession {
     /// Evaluates an `elisp:` link's form as `org-link--open-elisp` does: in Emacs, in a copy of
     /// the open file, when `programs` has it, otherwise in `Elisp`. Returns the message to show.
     public func evaluateLink(_ form: String) async -> String {
-        if let programs = Self.runner, let path, let text = document?.text {
+        if let programs = Self.runner, let path, let text = document?.text, refusesEmacsCopy(path) == nil {
             let directory = URL(fileURLWithPath: path).deletingLastPathComponent()
             do {
                 if let value = try await programs.evaluateLisp(form, text: text, point: caret(of: path) ?? 0, directory: directory) {

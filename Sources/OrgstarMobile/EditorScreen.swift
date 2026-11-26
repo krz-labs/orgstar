@@ -758,15 +758,16 @@ extension EditorScreen {
                 return message = "Can't read \(project.name)'s base-directory, \(OrgPaths.abbreviatingWithTilde(project.baseDirectory))"
             }
             let read = { (file: String) -> String? in
-                session.openDocuments.first { $0.path == file }?.document.text ?? (try? String(contentsOfFile: file, encoding: .utf8))
+                session.exportText(of: file)
             }
             let codeStyle = HTMLCodeStyle(highlighter: MobileEditor.highlighter, theme: model.theme)
             // As the Export menu: no author unless the file has #+AUTHOR:.
             let report = try Publish.publish(chosen, all: all, only: only, author: "", read: read) { function, text, file, bodyOnly in
                 try Publish.export(function, text: text, path: file, bodyOnly: bodyOnly, settings: OrgPreferences.orgSettings(), codeStyle: codeStyle, author: "")
             }
-            message = report.skipped.isEmpty ? String(localized: "Published \(report.published.count) files")
-                : String(localized: "Published \(report.published.count) files, \(report.skipped.count) up to date")
+            let note = session.openPaths.contains(where: session.exportLeavesOut) ? " " + DocumentSession.exportNote : ""
+            message = (report.skipped.isEmpty ? String(localized: "Published \(report.published.count) files")
+                : String(localized: "Published \(report.published.count) files, \(report.skipped.count) up to date")) + note
         } catch {
             message = "\(error)"
         }

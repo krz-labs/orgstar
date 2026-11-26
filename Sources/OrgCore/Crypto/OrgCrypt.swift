@@ -136,41 +136,69 @@ public enum OrgCrypt {
         return (text, count)
     }
 
-    /// The tagged entries `seal` encrypts whose text isn't blank: those a save can't write
-    /// without the passphrase. Their headings' offsets.
-    public static func unencrypted(_ text: String, tag: String = "crypt", settings: OrgSettings = .default) -> [Int] {
-        guard text.contains(tag) else { return [] }
+    /// What saving does with the tagged entry at `heading`: nil when nothing (its text is a
+    /// message, or it has no text), else its text's range, the message at its start if any,
+    /// and whether it has text that isn't blank outside a message.
+    static func pending(_ text: String, at heading: Int) -> (body: Range<Int>, message: Range<Int>?, hasText: Bool)? {
+        guard let body = bodyRange(text, at: heading) else { return nil }
         let ns = text as NSString
+        func blank(_ range: Range<Int>) -> Bool {
+            range.isEmpty || ns.substring(with: NSRange(range)).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+        if let message = encryptedRange(text, at: heading) {
+            // Text typed below the message isn't encrypted.
+            let tail = min(message.upperBound, body.upperBound)..<max(message.upperBound, body.upperBound)
+            return blank(tail) ? nil : (body, message, true)
+        }
+        return (body, nil, !blank(body))
+    }
+
+    /// The tagged entries `seal` encrypts whose text isn't blank: those a save can't write
+    /// without the passphrase, text below a message included. Their headings' offsets.
+    public static func unencrypted(_ text: String, tag: String = "crypt", settings: OrgSettings = .default, within: Range<Int>? = nil) -> [Int] {
+        guard text.contains(tag) else { return [] }
         var found: [Int] = []
         var covered = 0
-        for heading in taggedHeadings(text, tag: tag, settings: settings) where heading >= covered {
-            guard encryptedRange(text, at: heading) == nil, let range = bodyRange(text, at: heading) else { continue }
+        for heading in taggedHeadings(text, tag: tag, settings: settings) where heading >= covered && within?.contains(heading) ?? true {
+            guard let entry = pending(text, at: heading) else { continue }
             // Tagged children go inside this entry's message.
-            covered = range.upperBound
-            if !ns.substring(with: NSRange(range)).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { found.append(heading) }
+            covered = entry.body.upperBound
+            if entry.hasText { found.append(heading) }
         }
         return found
     }
 
     /// `org-encrypt-entries` as `org-crypt-use-before-save-magic` runs it before a save. An
     /// entry whose text `reuse` knows by its `checksum` gets that message again, as org-crypt
-    /// keeps an entry decrypted and left unchanged byte for byte. The text, and each message
-    /// with the text it holds.
+    /// keeps an entry decrypted and left unchanged byte for byte. Text below an entry's message
+    /// goes into one message with what the old one held. The text, and each message with the
+    /// text the entry had.
     public static func seal(
         _ text: String, passphrase: String, tag: String = "crypt", settings: OrgSettings = .default,
-        reuse: (String) -> String? = { _ in nil }, now: Date = Date()
+        reuse: (String) -> String? = { _ in nil }, within: Range<Int>? = nil, now: Date = Date()
     ) throws -> (text: String, messages: [(message: String, plaintext: String)]) {
         guard text.contains(tag) else { return (text, []) }
         var result = text as NSString
         var messages: [(String, String)] = []
         var shift = 0
         var covered = 0
-        for heading in taggedHeadings(text, tag: tag, settings: settings) where heading >= covered {
+        for heading in taggedHeadings(text, tag: tag, settings: settings) where heading >= covered && within?.contains(heading) ?? true {
             let current = result as String
-            guard encryptedRange(current, at: heading + shift) == nil, let range = bodyRange(current, at: heading + shift) else { continue }
+            guard let entry = pending(current, at: heading + shift) else { continue }
+            let range = entry.body
             covered = range.upperBound - shift
             let contents = result.substring(with: NSRange(range))
-            let message = try reuse(checksum(contents)) ?? OpenPGP.encrypt(Data(contents.utf8), passphrase: passphrase, now: now)
+            var plaintext = contents
+            if let old = entry.message {
+                let opened: String
+                do {
+                    opened = try decrypt(current, at: heading + shift, passphrase: passphrase).plaintext
+                } catch {
+                    throw Failure("An entry has text below a message that this passphrase doesn't open; entries encrypted to a public key aren't supported")
+                }
+                plaintext = opened + result.substring(with: NSRange(old.upperBound..<range.upperBound))
+            }
+            let message = try reuse(checksum(contents)) ?? OpenPGP.encrypt(Data(plaintext.utf8), passphrase: passphrase, now: now)
             result = result.replacingCharacters(in: NSRange(range), with: message) as NSString
             shift += (message as NSString).length - range.count
             messages.append((message, contents))
@@ -178,12 +206,21 @@ public enum OrgCrypt {
         return (result as String, messages)
     }
 
+    /// Whether `offset` is in the text of an entry with `tag`, which a message holds on disk.
+    public static func isInTaggedText(_ text: String, at offset: Int, tag: String = "crypt", settings: OrgSettings = .default) -> Bool {
+        guard text.contains(tag) else { return false }
+        return taggedHeadings(text, tag: tag, settings: settings).contains { heading in
+            heading < offset && (bodyRange(text, at: heading)?.contains(offset) ?? false)
+        }
+    }
+
     /// What an entry's text is known by, as `org-crypt-checksum` is.
     public static func checksum(_ contents: String) -> String {
         SHA256.hash(data: Data(contents.utf8)).map { String(format: "%02x", $0) }.joined()
     }
 
-    /// The first encrypted entry's message in `text`.
+    /// The first entry's message in `text` encrypted with a passphrase; entries encrypted to a
+    /// public key are passed over.
     public static func firstMessage(_ text: String) -> String? {
         let ns = text as NSString
         var search = NSRange(location: 0, length: ns.length)
@@ -191,7 +228,10 @@ public enum OrgCrypt {
             let begin = ns.range(of: "-----BEGIN PGP MESSAGE-----", options: [], range: search)
             guard begin.location != NSNotFound else { return nil }
             let lineStart = ns.lineRange(for: NSRange(location: begin.location, length: 0)).location
-            if let range = encryptedRange(text, at: lineStart), range.lowerBound == lineStart { return ns.substring(with: NSRange(range)) }
+            if let range = encryptedRange(text, at: lineStart), range.lowerBound == lineStart {
+                let message = ns.substring(with: NSRange(range))
+                if let data = try? OpenPGP.dearmor(message), OpenPGP.isSymmetric(data) { return message }
+            }
             search = NSRange(location: NSMaxRange(begin), length: ns.length - NSMaxRange(begin))
         }
     }

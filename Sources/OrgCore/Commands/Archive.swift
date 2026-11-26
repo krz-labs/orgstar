@@ -195,13 +195,18 @@ public enum Archive {
         let name = (sourcePath as NSString).lastPathComponent
         let fileFormat = String(spec[..<separator.lowerBound])
         let headingFormat = String(spec[separator.upperBound...])
-        let path: String
+        var path: String
         if fileFormat.contains(where: { !$0.isWhitespace }) {
             let file = fileFormat.replacingOccurrences(of: "%s", with: name)
             let directory = (sourcePath as NSString).deletingLastPathComponent
             path = ((file as NSString).isAbsolutePath ? file : (directory as NSString).appendingPathComponent(file)).replacingOccurrences(of: "~", with: OrgPaths.home, options: .anchored)
         } else {
             path = sourcePath
+        }
+        // An encrypted file archives to an encrypted file: `diary.org.gpg` to
+        // `diary_archive.org.gpg`, not Org's `diary.org.gpg_archive`.
+        if sourcePath.hasSuffix(".gpg"), !path.hasSuffix(".gpg") {
+            path = path.hasSuffix(".org.gpg_archive") ? String(path.dropLast(".org.gpg_archive".count)) + "_archive.org.gpg" : path + ".gpg"
         }
         let heading = headingFormat.replacingOccurrences(of: "%s", with: name)
         return .success(Destination(path: (path as NSString).standardizingPath, heading: heading.isEmpty ? nil : heading, isSameFile: path == sourcePath))

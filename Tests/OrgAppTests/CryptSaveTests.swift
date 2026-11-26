@@ -130,8 +130,12 @@ struct CryptSaveTests {
         session.open(file.path)
         try replace(with: Self.file)
         #expect(!session.save())
-        #expect(session.restore(text: "* Plain\nOpen text.\n* Other\n") == nil)
+        // No copy of the buffer can be kept, so the version isn't restored.
+        #expect(session.restore(text: "* Plain\nOpen text.\n* Other\n")?.contains("Encrypt…") == true)
+        #expect(session.document?.text == Self.file)
         #expect(recoveryFiles.isEmpty)
+        #expect(session.unlock("pw", for: file.path) == nil)
+        #expect(session.restore(text: "* Plain\nOpen text.\n* Other\n") == nil)
         #expect(session.save())
         #expect(recoveryFiles.allSatisfy { !$0.contains(Self.secret) })
     }

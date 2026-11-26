@@ -114,7 +114,7 @@ public final class ClockModel {
             guard let updated = Self.text(path, session), let start = ClockIn.runningStart(in: updated, near: heading) else {
                 return "The clock line wasn't found after clocking in."
             }
-            running = Running(path: path, start: start, heading: entry.title, startedAt: now)
+            running = Running(path: path, start: start, heading: session.shareableTitle(entry.title, path: path, heading: heading), startedAt: now)
             if let task = ClockTask.at(heading, in: updated, path: path) { push(task, session) }
             save()
             watched = clockedHeading(path, session)
@@ -307,6 +307,9 @@ public final class ClockModel {
     // MARK: - History
 
     private func push(_ task: ClockTask, _ session: DocumentSession) {
+        // The history is kept in the clock's file and shown by the widgets.
+        let heading = Self.text(task.path, session).flatMap(task.locate) ?? 0
+        let task = ClockTask(path: task.path, title: session.shareableTitle(task.title, path: task.path, heading: heading), ordinal: task.ordinal, id: task.id)
         history = ClockHistory.push(task, onto: history, length: OrgPreferences.clockHistoryLength(defaults)) { Self.text($0, session) }
     }
 
@@ -527,7 +530,8 @@ public final class ClockModel {
             let headings = DocumentModel(tree: OrgParser.parse(text)).headings
             for clock in open {
                 guard let startedAt = ClockResolution.date(of: clock.start) else { continue }
-                let heading = headings.last { $0.headingRange.lowerBound <= clock.offset }?.title ?? ""
+                let entry = headings.last { $0.headingRange.lowerBound <= clock.offset }
+                let heading = entry.map { session.shareableTitle($0.title, path: path, heading: $0.headingRange.lowerBound) } ?? ""
                 clocks.append(OpenClock(path: path, start: clock.start, startedAt: startedAt, heading: heading))
             }
         }

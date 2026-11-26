@@ -260,6 +260,21 @@ public final class DocumentSession {
         crypt.forgetPassphrase(for: path)
     }
 
+    /// `title`, of the heading at `heading` in `path`, as it may be shown and kept outside
+    /// the editor (the clock's file, widgets, the Live Activity, the menu bar): a placeholder
+    /// for a heading of an encrypted file or one inside an entry that's encrypted on disk.
+    public func shareableTitle(_ title: String, path: String, heading: Int) -> String {
+        let hidden = Self.isEncryptedFile(path)
+            || (crypt.sealsEntries(for: path) && document(of: path).map { OrgCrypt.isInTaggedText($0.text, at: heading, tag: cryptTag) } == true)
+        return hidden ? String(localized: "Encrypted entry") : title
+    }
+
+    /// Why a copy of the buffer can't be kept, with what to do; the buffer's notice shows.
+    private func keepFailure(_ hold: CryptHold) -> String {
+        if let current { _ = updateHold(current) }
+        return hold.localizedDescription + ". " + String(localized: "Give the passphrase with Encrypt… first, so that a copy of your edits can be kept encrypted.")
+    }
+
     /// Whether `path`'s buffer is held back from disk now.
     private func updateHold(_ entry: Entry) -> CryptHold? {
         let hold = entry.buffer.document.isDirty ? crypt.hold(entry.buffer.document.text, for: entry.path) : nil
@@ -378,6 +393,34 @@ public final class DocumentSession {
     public var openTexts: [String: String] {
         let shown = entries.filter { !crypt.isPrivate($0.buffer.document.text, for: $0.path) }
         return Dictionary(shown.map { ($0.path, $0.buffer.document.text) }, uniquingKeysWith: { a, _ in a })
+    }
+
+    /// The text of `path` for an export that writes files (iCalendar, publishing): an open
+    /// buffer's, unless it holds what's encrypted on disk, then what's on disk; nil for an
+    /// encrypted file.
+    public func exportText(of path: String) -> String? {
+        if Self.isEncryptedFile(path) { return nil }
+        if let entry = entry(path), !crypt.isPrivate(entry.buffer.document.text, for: entry.path) { return entry.buffer.document.text }
+        return (try? diskFileSystem.read(URL(fileURLWithPath: path))).flatMap { $0 }.flatMap { String(bytes: $0, encoding: .utf8) }
+    }
+
+    /// Whether `exportText` leaves `path` out or reads it from disk for what's encrypted.
+    public func exportLeavesOut(_ path: String) -> Bool {
+        Self.isEncryptedFile(path) || entry(path).map { crypt.isPrivate($0.buffer.document.text, for: $0.path) } == true
+    }
+
+    /// Why the buffer of `path` isn't copied to a temporary file for Emacs (recalculating,
+    /// exporting, `elisp:` links): it's an encrypted file, or holds entries encrypted on disk.
+    public func refusesEmacsCopy(_ path: String) -> String? {
+        let name = (path as NSString).lastPathComponent
+        if Self.isEncryptedFile(path) { return String(localized: "\(name) is encrypted, so Emacs isn't given a copy of it.") }
+        guard let entry = entry(path), crypt.isPrivate(entry.buffer.document.text, for: entry.path) else { return nil }
+        return String(localized: "\(name) has decrypted entries that are encrypted on disk, so Emacs isn't given a copy of it.")
+    }
+
+    /// Said after an export that left out encrypted files or read decrypted entries from disk.
+    public static var exportNote: String {
+        String(localized: "Encrypted files were left out, and encrypted entries were exported as they are on disk.")
     }
 
     /// Open buffers, most recently shown first.
@@ -646,6 +689,8 @@ public final class DocumentSession {
             let path = url.path
             buffer.update { $0 = loaded(bytes, path: path) }
             current?.conflict = nil
+        } catch let hold as CryptHold {
+            showError(String(localized: "Couldn't Keep a Copy", comment: "Error alert title"), keepFailure(hold))
         } catch {
             showError(String(localized: "Couldn't Read File", comment: "Error alert title"), "Can't read \(name): \(error.localizedDescription)")
         }
@@ -673,6 +718,8 @@ public final class DocumentSession {
                 try state.apply(lineEdits(from: versions.disk, to: merged), baseRevision: state.revision)
             }
             current?.conflict = nil
+        } catch let hold as CryptHold {
+            showError(String(localized: "Couldn't Keep a Copy", comment: "Error alert title"), keepFailure(hold))
         } catch {
             showError(String(localized: "Couldn't Merge", comment: "Error alert title"), "Can't merge \(name): \(error.localizedDescription)")
         }
@@ -750,6 +797,8 @@ public final class DocumentSession {
         guard let buffer, let url else { return "Can't read that version" }
         do {
             try recovery.keep(try buffer.document.encodedText(), for: url, label: "local")
+        } catch let hold as CryptHold {
+            return keepFailure(hold)
         } catch {
             return "Can't keep the current version: \(error.localizedDescription)"
         }
@@ -799,7 +848,16 @@ public final class DocumentSession {
     /// path; the subtree leaves its file only once it has. Returns a message for the echo area.
     @discardableResult
     public func refile(to target: RefileTarget, from: (path: String, offset: Int)? = nil, keep: Bool = false, now: Date = Date()) -> String? {
-        guard let (path, context) = source(from, now: now) else { return from == nil ? nil : "Can't read the entry's file." }
+        guard var (path, context) = source(from, now: now) else { return from == nil ? nil : "Can't read the entry's file." }
+        if target.path != path {
+            switch prepareMove(path, context: context, to: target.path) {
+            case .refused(let message): return message
+            case .sealed(let heading):
+                guard let again = source((path, heading), now: now) else { return "Can't read the entry's file." }
+                context = again.context
+            case .ready: break
+            }
+        }
         let done = (keep ? "Copied to " : "Refiled to ") + target.label
         if target.path == path {
             let answers = ["refile": target.start.map(String.init) ?? ""]
@@ -919,6 +977,61 @@ public final class DocumentSession {
         return (TextEdit(range: at..<at, replacement: insertion), newStart, level)
     }
 
+    private enum MovePreparation {
+        case ready
+        /// Tagged entries in the subtree were encrypted in its file; its heading starts here.
+        case sealed(Int)
+        case refused(String)
+    }
+
+    /// Before the subtree at the caret of `context`, in `path`, moves to the file `target`: an
+    /// encrypted file's entries go only to another encrypted file, which takes the same
+    /// passphrase; tagged entries with text in the subtree are encrypted where they are first,
+    /// since the tag they inherit doesn't go with them.
+    private func prepareMove(_ path: String, context: EditContext, to target: String) -> MovePreparation {
+        let from = (path as NSString).lastPathComponent, to = (target as NSString).lastPathComponent
+        if Self.isEncryptedFile(path) {
+            guard Self.isEncryptedFile(target) else {
+                return .refused(String(localized: "\(from) is encrypted, and \(to) isn't; the entry wasn't moved."))
+            }
+            if crypt.passphrase(for: target) == nil, let passphrase = crypt.passphrase(for: path) {
+                let disk = (try? diskFileSystem.read(URL(fileURLWithPath: target))).flatMap { $0 } ?? []
+                guard CryptVault.opens(disk, passphrase: passphrase) else {
+                    return .refused(String(localized: "\(to) has another passphrase; open it first."))
+                }
+                crypt.unlock(passphrase, for: target)
+            }
+        }
+        guard crypt.sealsEntries(for: path), let heading = OrgCrypt.heading(context.text, at: context.selection.first?.lowerBound ?? 0) else { return .ready }
+        let end = OrgCrypt.bodyRange(context.text, at: heading)?.upperBound ?? heading
+        let subtree = heading..<max(heading + 1, end)
+        guard !OrgCrypt.unencrypted(context.text, tag: cryptTag, within: subtree).isEmpty else { return .ready }
+        guard let passphrase = crypt.passphrase(for: path) else {
+            return .refused(String(localized: "Tagged entries in the subtree aren't encrypted; give the passphrase with Encrypt… first."))
+        }
+        let sealed: String
+        do {
+            sealed = try OrgCrypt.seal(context.text, passphrase: passphrase, tag: cryptTag, within: subtree).text
+        } catch {
+            return .refused("\(error)")
+        }
+        let edit = EditResult(baseRevision: context.revision, edits: lineEdits(from: context.text, to: sealed))
+        if let open = entry(path) {
+            if case .failed(let message) = open.buffer.perform(PrecomputedEdit(edit), now: Date(), answers: [:]) { return .refused(message) }
+            changed(open)
+        } else {
+            do {
+                guard let bytes = try fileSystem.read(URL(fileURLWithPath: path)) else { return .refused("\(from) no longer exists.") }
+                var state = loaded(bytes, path: path)
+                try state.apply(edit.edits, baseRevision: state.revision)
+                if case .conflict = try saver.save(&state, to: URL(fileURLWithPath: path)) { return .refused("\(from) changed on disk; nothing was moved.") }
+            } catch {
+                return .refused("Can't encrypt the entry: \(error.localizedDescription)")
+            }
+        }
+        return .sealed(heading)
+    }
+
     /// The file `archive(from:now:)` moves the entry to, or nil when it can't tell.
     public func archiveFile(from: (path: String, offset: Int)? = nil, now: Date = Date()) -> String? {
         guard let (path, context) = source(from, now: now), case .success(let destination) = Archive.destination(context, sourcePath: path) else { return nil }
@@ -929,11 +1042,20 @@ public final class DocumentSession {
     /// Returns a message.
     @discardableResult
     public func archive(from: (path: String, offset: Int)? = nil, now: Date = Date()) -> String? {
-        guard let (path, context) = source(from, now: now) else { return from == nil ? nil : "Can't read the entry's file." }
+        guard var (path, context) = source(from, now: now) else { return from == nil ? nil : "Can't read the entry's file." }
         let destination: Archive.Destination
         switch Archive.destination(context, sourcePath: path) {
         case .success(let value): destination = value
         case .failure(.message(let message)): return message
+        }
+        if !destination.isSameFile {
+            switch prepareMove(path, context: context, to: destination.path) {
+            case .refused(let message): return message
+            case .sealed(let heading):
+                guard let again = source((path, heading), now: now) else { return "Can't read the entry's file." }
+                context = again.context
+            case .ready: break
+            }
         }
         // An archive file open in a buffer takes the subtree there.
         if !destination.isSameFile, let open = entry(destination.path) {
@@ -1059,7 +1181,9 @@ public final class DocumentSession {
             guard state.isEditable else { return "\(name) isn't UTF-8, so it can't be changed." }
             guard state.text == expected else { return stale }
             if entry.buffer is StateBuffer {
-                do { try recovery.keep(try state.encodedText(), for: url, label: "replace") } catch {
+                // A buffer held for its passphrase keeps no copy: it can't be kept encrypted,
+                // and the replacement can be undone in the buffer.
+                do { try recovery.keep(try state.encodedText(), for: url, label: "replace") } catch is CryptHold {} catch {
                     return "Can't keep a copy of \(name): \(error.localizedDescription)"
                 }
             }
@@ -1098,6 +1222,7 @@ public final class DocumentSession {
         }
         guard let entry = current else { return "No file is open." }
         let path = entry.path
+        if let refusal = refusesEmacsCopy(path) { return refusal }
         let snapshot = entry.buffer.document.text as NSString
         guard table.upperBound <= snapshot.length else { return "The table moved; try again." }
         let old = snapshot.substring(with: NSRange(table))
