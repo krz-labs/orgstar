@@ -140,7 +140,7 @@ struct HabitCells: View {
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("Done \(cells.filter { $0.glyph == "*" }.count) of \(cells.count) days") + Text(verbatim: ", ") + todayState)
+        .accessibilityLabel(Text("\(Text("Done \(cells.filter { $0.glyph == "*" }.count) of \(cells.count) days"))\(Text(verbatim: ", "))\(todayState)"))
     }
 
     /// Today's state in words.

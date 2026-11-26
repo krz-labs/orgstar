@@ -72,7 +72,7 @@ struct NextEntryView: View {
             .accessibilityLabel(Text("\(open) open today"))
         case .accessoryCorner:
             Text("\(open)").font(.title3.weight(.semibold)).widgetLabel { Text(next?.title ?? String(localized: "Agenda clear")) }
-                .accessibilityLabel(Text("\(open) open today") + Text(verbatim: next.map { ", \($0.title)" } ?? ""))
+                .accessibilityLabel(Text("\(Text("\(open) open today"))\(Text(verbatim: next.map { ", \($0.title)" } ?? ""))"))
         default:
             VStack(alignment: .leading, spacing: 0) {
                 Text(next?.gutter ?? String(localized: "Agenda")).font(.headline).widgetAccentable().lineLimit(1)
@@ -114,7 +114,7 @@ struct ClockView: View {
                 }
             }
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(clock.map { Text("Clocked in") + Text(verbatim: ", \($0.heading), ") + Text($0.startedAt, style: .timer) } ?? Text("Not clocked in"))
+            .accessibilityLabel(clock.map { Text("\(Text("Clocked in"))\(Text(verbatim: ", \($0.heading), "))\(Text($0.startedAt, style: .timer))") } ?? Text("Not clocked in"))
         default:
             VStack(alignment: .leading, spacing: 0) {
                 if let clock {

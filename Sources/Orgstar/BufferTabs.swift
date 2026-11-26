@@ -1,5 +1,6 @@
 import AppKit
 import OrgApp
+import OrgPresentation
 import SwiftUI
 
 /// A divider that resizes the pane before it by dragging. An `HSplitView` inside the window's

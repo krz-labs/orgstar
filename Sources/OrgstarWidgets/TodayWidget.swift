@@ -165,7 +165,7 @@ struct WideRow: View {
         if let priority = row.priority { parts.append(Text("Priority \(priority)")) }
         parts.append(Text(verbatim: row.title))
         if !row.category.isEmpty { parts.append(Text(verbatim: row.category)) }
-        return parts.dropFirst().reduce(parts[0]) { $0 + Text(verbatim: ", ") + $1 }
+        return parts.dropFirst().reduce(parts[0]) { Text("\($0)\(Text(verbatim: ", "))\($1)") }
     }
 }
 

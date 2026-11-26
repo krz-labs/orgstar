@@ -368,14 +368,14 @@ struct ContentView: View {
             #endif
             // `org-clock-out-when-done`, and the notification when the Effort runs out.
             clock.notifications = SystemReminderCenter.isAvailable ? SystemReminderCenter() : nil
-            session.textChanged = { [weak session, weak clock, weak commands] path in
+            session.textChanged = { [weak session = self.session, weak clock = self.clock, weak commands = self.commands] path in
                 guard let session, let clock, let message = clock.textChanged(path, session) else { return }
                 commands?.show(message)
             }
             clock.remindAtEffort(session)
             commands.knownTags = { [index = workspace.index] in (try? index.tags()) ?? [] }
             commands.completionIndex = workspace.index
-            commands.handoff.place = { [weak session, weak workspace] in workspace.flatMap { session?.handoffPlace(roots: $0.rootPaths) } }
+            commands.handoff.place = { [weak session = self.session, weak workspace = self.workspace] in workspace.flatMap { session?.handoffPlace(roots: $0.rootPaths) } }
             commands.continueHandoff = continueHandoff
             commands.mainWindowOpen = true
             commands.whatsNew = WhatsNew.pending(firstLaunch: noFolders && !welcomeShown)
@@ -987,7 +987,7 @@ struct ContentView: View {
                 }
                 guard method == .cp || method == .mv else { return }
                 #endif
-                attachActions.attach(panel.urls, method: method)
+                self.attachActions.attach(panel.urls, method: method)
             })
     }
 

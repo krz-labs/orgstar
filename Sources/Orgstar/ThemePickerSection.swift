@@ -35,7 +35,7 @@ struct ThemePickerSection: View {
             ForEach(ThemeSpec.palettes(appearance), id: \.id) { palette in
                 Label {
                     // Below 4.5:1 for body text or coloured roles in places.
-                    palette.lowContrast ? Text(palette.displayName) + Text(verbatim: " – ") + Text("Low contrast") : Text(palette.displayName)
+                    palette.lowContrast ? Text("\(Text(palette.displayName))\(Text(verbatim: " – "))\(Text("Low contrast"))") : Text(palette.displayName)
                 } icon: { Image(nsImage: Self.swatch(palette)) }.tag(palette.id)
             }
             if ThemeSpec.palette(selection.wrappedValue, appearance) == nil {

@@ -887,7 +887,7 @@ public final class DocumentSession {
     /// path; the subtree leaves its file only once it has. Returns a message for the echo area.
     @discardableResult
     public func refile(to target: RefileTarget, from: (path: String, offset: Int)? = nil, keep: Bool = false, now: Date = Date()) -> String? {
-        guard var (path, context) = source(from, now: now) else { return from == nil ? nil : "Can't read the entry's file." }
+        guard case (let path, var context)? = source(from, now: now) else { return from == nil ? nil : "Can't read the entry's file." }
         do {
             switch prepareMove(path, context: context, to: target.path) {
             case .refused(let message): return message
@@ -1099,7 +1099,7 @@ public final class DocumentSession {
     /// Returns a message.
     @discardableResult
     public func archive(from: (path: String, offset: Int)? = nil, now: Date = Date()) -> String? {
-        guard var (path, context) = source(from, now: now) else { return from == nil ? nil : "Can't read the entry's file." }
+        guard case (let path, var context)? = source(from, now: now) else { return from == nil ? nil : "Can't read the entry's file." }
         let destination: Archive.Destination
         switch Archive.destination(context, sourcePath: path) {
         case .success(let value): destination = value

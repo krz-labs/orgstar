@@ -153,7 +153,7 @@ final class EditorFind: NSObject, @preconcurrency UITextSearching, UIFindInterac
 
     /// Where `query` is in `text`, as the find bar's options ask: case, and matching a word's
     /// start or a whole word.
-    nonisolated static func matches(of query: String, in text: NSString, options: UITextSearchOptions) -> [Range<Int>] {
+    static func matches(of query: String, in text: NSString, options: UITextSearchOptions) -> [Range<Int>] {
         func isWord(_ index: Int) -> Bool {
             guard index >= 0, index < text.length, let scalar = Unicode.Scalar(text.character(at: index)) else { return false }
             return CharacterSet.alphanumerics.contains(scalar)

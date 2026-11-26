@@ -1,5 +1,6 @@
 import OrgApp
 import OrgCore
+import OrgPresentation
 import SwiftUI
 
 /// Lint File's panel under the editor: the problems in the open file, by line. Choosing a row

@@ -621,12 +621,18 @@ final class ReaderFind: NSObject, @preconcurrency UITextSearching, UIFindInterac
         return a < b ? .orderedAscending : a > b ? .orderedDescending : .orderedSame
     }
 
-    /// May be called off the main thread; reads only `text`, an immutable string.
     nonisolated func performTextSearch(queryString: String, options: UITextSearchOptions, resultAggregator: UITextSearchAggregator<AnyHashable?>) {
-        for found in EditorFind.matches(of: queryString, in: text, options: options) {
-            resultAggregator.foundRange(TextRange(found), searchString: queryString, document: nil)
+        // The aggregator takes results from any thread; the ranges are made on the main thread.
+        nonisolated(unsafe) let aggregator = resultAggregator
+        let search = {
+            MainActor.assumeIsolated {
+                for found in EditorFind.matches(of: queryString, in: self.text, options: options) {
+                    aggregator.foundRange(TextRange(found), searchString: queryString, document: nil)
+                }
+            }
+            aggregator.finishedSearching()
         }
-        resultAggregator.finishedSearching()
+        if Thread.isMainThread { search() } else { DispatchQueue.main.sync(execute: search) }
     }
 
     func decorate(foundTextRange: UITextRange, document: AnyHashable??, usingStyle style: UITextSearchFoundTextStyle) {
