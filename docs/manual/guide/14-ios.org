@@ -42,7 +42,7 @@ Tap a file in Folders or Search, or Open in File in an agenda entry's sheet, to 
 - Text is styled as in the editor, in the theme's colours, font, size, line spacing and heading sizes, on the theme's background: TODO keywords, priorities, tags, emphasis, code, timestamps, links, and the code in src blocks. Text can be selected and copied.
 - The reader follows the editor's display settings (see Themes and display below): Show Markup, hidden emphasis markers, pretty entities, indentation, leading stars, inline images and truncated lines. Tables show at full width, without narrowed columns.
 - Tap a link to follow it. Links to headings and files in your folders open in the reader; links to other files, such as an attached PDF or image, open in Quick Look; web links open in the browser.
-- The toolbar has Find, Outline (a list of headings to jump to), Export, Edit (the pencil) and Commands: Find, Outline, Show or Hide Markup, Capture… and the clock commands that need no caret.
+- The toolbar has Find, Edit (the pencil) and Commands, which has Outline (a list of headings to jump to) and Export… as well; see Commands below.
 - Tags aligned with spaces show at the right edge of the heading's line, or on a line of their own at the right when the heading wraps (see [[file:02-the-editor.org][The editor]], Wrapping and filling).
 - Find opens the system find bar over the file's text. Results are marked, and the one shown is unfolded and scrolled to.
 
@@ -156,9 +156,9 @@ Bold, Italic and Code are in the edit menu of a selection, under Format: each pu
 
 Commands, in the key bar and in the toolbar of the editor, the reader and the agenda, lists the commands of the screen. With nothing typed, the ten you ran from Commands most recently come first under Recent, then every command by subject, in the Org menu's groups (Visibility, Headings, TODO and Tags, and so on) followed by Clock, Export, File, Edit and View. Type to search: the letters you type must appear in the title in order, as in the Mac's command palette, and commands you run often rank a little higher. The command runs once the list closes.
 
-Named keyboard macros are listed by name under Edit. In the editor, a command that doesn't apply at the caret is listed greyed, with the reason, such as =Not in a list= or =No table at point=, so a search finds everything the editor can do. With a hardware keyboard attached, each command shows its Emacs key.
+Named keyboard macros are listed by name under Edit, and Next Snippet Field and Previous Snippet Field under Text with the other snippet commands. In the editor, a command that doesn't apply at the caret is listed greyed, with the reason, such as =Not in a list= or =No table at point=, so a search finds everything the editor can do. With a hardware keyboard attached, each command shows its Emacs key.
 
-The reader's list has Find, Outline, Show or Hide Markup, Capture… and the clock commands that need no caret. The agenda's has its views, Tags and Properties…, Search…, Save as View…, Today, Earlier, Later, Go to Date…, Log Mode, Filter…, Select, Board, Capture… and the same clock commands.
+The reader's list has Find, Outline, Export…, Show or Hide Markup, Capture… and the clock commands that need no caret. The agenda's has its views, Tags and Properties…, Search…, Save as View…, Today, Earlier, Later, Go to Date…, Log Mode, Filter…, Select, Board, Capture… and the same clock commands.
 
 When a command asks a question, a sheet opens:
 
@@ -375,7 +375,7 @@ The app icon's badge counts the entries in the agenda's Overdue section that are
 
 * Export
 
-Export (in the reader's and the editor's toolbars) offers HTML, Markdown, PDF, Word, Rich Text (RTF), Plain Text, ODT, iCalendar, LaTeX and Plain Text (ASCII), and Copy as Rich Text. Each opens the share sheet with a file named after the org file, which you can send to another app or keep with Save to Files. The export reads the file's setup files and follows its export keywords, as the Mac's export does. For a file the LaTeX or ASCII export can't write as Emacs would, the share sheet stops and "Can't export to LaTeX: " or "Can't export to plain text: " and the reason show at the bottom of the screen.
+Export (in the editor's toolbar, and Export… in the reader's Commands) offers HTML, Markdown, PDF, Word, Rich Text (RTF), Plain Text, ODT, iCalendar, LaTeX and Plain Text (ASCII), and Copy as Rich Text. Each opens the share sheet with a file named after the org file, which you can send to another app or keep with Save to Files. The export reads the file's setup files and follows its export keywords, as the Mac's export does. For a file the LaTeX or ASCII export can't write as Emacs would, the share sheet stops and "Can't export to LaTeX: " or "Can't export to plain text: " and the reason show at the bottom of the screen.
 
 PDF export follows =pdf-margin=, =pdf-font= and =pdf-page-numbers= in =config.toml=, and Word files get heading styles and the file's images, as on the Mac. PDF through LaTeX isn't available on iOS.
 

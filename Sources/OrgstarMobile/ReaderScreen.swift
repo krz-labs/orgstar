@@ -41,6 +41,7 @@ struct ReaderScreen: View {
     @State private var width: CGFloat = 0
     @State private var showingOutline = false
     @State private var showingCommands = false
+    @State private var showingExport = false
     /// The command chosen in Commands, run once the list is gone.
     @State private var chosenCommand: String?
     @State private var message: String?
@@ -129,9 +130,7 @@ struct ReaderScreen: View {
                     findRequest += 1
                 }
                 .disabled(document == nil)
-                Button("Outline", systemImage: "list.bullet.indent") { showingOutline = true }.disabled(outline.isEmpty)
                 if let path = shownPath {
-                    if let tree = document?.tree { ExportMenu(path: path, tree: tree) { message = $0 } }
                     NavigationLink(value: EditorRoute(path: path, offset: nil)) { Label("Edit", systemImage: "pencil") }
                 }
                 Button("Commands", systemImage: "command") { showingCommands = true }
@@ -148,6 +147,9 @@ struct ReaderScreen: View {
         }
         .quickLookPreview($previewed)
         .sheet(isPresented: $showingOutline) { outlineSheet }
+        .sheet(isPresented: $showingExport) {
+            if let path = shownPath, let tree = document?.tree { ExportScreen(path: path, tree: tree) { message = $0 } }
+        }
         .message($message)
         .environment(\.openURL, OpenURLAction { url in follow(url) })
         .background { FindHost(find: find, request: findRequest) }
@@ -165,6 +167,7 @@ struct ReaderScreen: View {
         [
             CommandRow(id: "reader.find", title: String(localized: "Find"), reason: document == nil ? String(localized: "Nothing to do here") : nil),
             CommandRow(id: "reader.outline", title: String(localized: "Outline"), reason: outline.isEmpty ? String(localized: "Nothing to do here") : nil),
+            CommandRow(id: "reader.export", title: String(localized: "Export…"), reason: document == nil ? String(localized: "Nothing to do here") : nil),
             CommandRow(id: "app.toggle-markup", title: CommandTitle.localized("Show or Hide Markup")),
             CommandRow(id: "app.capture", title: CommandTitle.localized("Capture…")),
         ] + MobileClock.screenCommands.map { CommandRow(id: $0.id, title: CommandTitle.localized($0.title)) }
@@ -176,6 +179,7 @@ struct ReaderScreen: View {
             find.text = (document?.tree.text ?? "") as NSString
             findRequest += 1
         case "reader.outline": showingOutline = true
+        case "reader.export": showingExport = true
         case "app.toggle-markup": model.showMarkup.toggle()
         case "app.capture": model.captureRequest = CaptureRequest()
         default: _ = MobileClock.run(id, model: model, workspace: workspace) { message = $0 }

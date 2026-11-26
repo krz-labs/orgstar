@@ -443,12 +443,12 @@ struct EditorScreen: View {
             } else if id == "app.archive" {
                 if let caret = self.editor?.editContext().caret { message = session.archive(from: (path, caret)) }
             } else if id == "app.copy-rich-text" {
-                if let text = session.document(of: path)?.text { message = ExportMenu.copy(path: path, text: text, theme: model.theme) }
+                if let text = session.document(of: path)?.text { message = ExportItems.copy(path: path, text: text, theme: model.theme) }
             } else if id == "app.export.html-open" {
                 exportHTMLAndOpen()
             } else if id == "app.export-body-only" {
                 let on = !ExportSettings.saved(for: path).bodyOnly
-                ExportMenu.setBodyOnly(on, path: path)
+                ExportItems.setBodyOnly(on, path: path)
                 message = on ? "Export: body only" : "Export: whole document"
             } else if id == "app.export.icalendar-agenda" || id == "app.export.icalendar-combined" {
                 agendaCalendars(combined: id == "app.export.icalendar-combined")
@@ -1174,6 +1174,7 @@ struct CommandPalette: View {
         ("app.publish", "Publish Project…"), ("app.publish.all", "Publish All Projects"), ("app.publish.current-file", "Publish Current File"),
         ("app.publish.current-project", "Publish Current Project"),
         ("app.toggle-markup", "Show or Hide Markup"), ("app.word-count", "Word Count"),
+        ("org.snippet.next-field", "Next Snippet Field"), ("org.snippet.previous-field", "Previous Snippet Field"),
         ("app.recovery", "Recovery Versions…"), ("app.sync-conflicts", "Resolve Sync Conflicts…"),
         ("org.toggle-inline-images", "Show or Hide Inline Images"), ("org.toggle-inline-images-linked", "Show or Hide Inline Images, Including Described Links"), ("org.latex-preview", "Show or Hide LaTeX Previews"), ("editor.toggle-truncate-lines", "Truncate or Wrap Long Lines"), ("editor.toggle-auto-fill", "Turn Auto Fill On or Off"),
         ("edit.isearch-forward", "Incremental Search"), ("edit.isearch-backward", "Incremental Search Backward"),

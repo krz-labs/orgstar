@@ -84,7 +84,7 @@ public enum CommandGroups {
         Group(title: String(localized: "Tables", comment: "Org menu submenu"), prefixes: ["org.table", "app.table-", "app.plot"]),
         Group(title: String(localized: "Links and Footnotes", comment: "Org menu submenu"), prefixes: ["org.link.", "org.id.", "org.footnote."]),
         Group(title: String(localized: "Blocks", comment: "Org menu submenu"), prefixes: ["org.babel.", "org.structure-template", "org.edit-special", "org.dblock.", "org.clock.report", "org.denote."]),
-        Group(title: String(localized: "Text", comment: "Org menu submenu"), prefixes: ["org.emphasize", "org.fill-"]),
+        Group(title: String(localized: "Text", comment: "Org menu submenu"), prefixes: ["org.emphasize", "org.fill-", "org.snippet"]),
         Group(title: String(localized: "Attachments", comment: "Org menu submenu"), prefixes: ["app.attach."]),
         Group(title: String(localized: "Notes", comment: "Org menu submenu"), prefixes: ["app.dailies.", "app.node.", "app.backlinks"]),
         Group(title: String(localized: "Encryption", comment: "Org menu submenu"), prefixes: ["app.crypt."]),

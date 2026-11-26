@@ -165,6 +165,37 @@ struct OrgExport: Transferable {
 struct ExportMenu: View {
     let path: String
     let tree: OrgTree
+    var report: (String) -> Void = { _ in }
+    var exportSubtree: (() -> Void)?
+
+    var body: some View {
+        Menu("Export", systemImage: "square.and.arrow.up") {
+            ExportItems(path: path, tree: tree, report: report, exportSubtree: exportSubtree)
+        }
+    }
+}
+
+/// The export menu's items as a list, for a screen without the menu in its toolbar.
+struct ExportScreen: View {
+    let path: String
+    let tree: OrgTree
+    var report: (String) -> Void = { _ in }
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List { ExportItems(path: path, tree: tree, report: report) }
+                .navigationTitle("Export")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+        }
+    }
+}
+
+/// Export's formats, Body Only, the agenda calendars and Copy as Rich Text.
+struct ExportItems: View {
+    let path: String
+    let tree: OrgTree
     @Environment(MobileModel.self) private var model
     /// Shows what happened, as the screen's message line does.
     var report: (String) -> Void = { _ in }
@@ -178,7 +209,7 @@ struct ExportMenu: View {
         let text = tree.text
         // From the open tree: SwiftUI evaluates the menu on every edit.
         let name = ExportScope.fileName(tree, settings: OrgPreferences.orgSettings())
-        Menu("Export", systemImage: "square.and.arrow.up") {
+        Group {
             ForEach(OrgExport.Format.allCases, id: \.self) { format in
                 if format.locked {
                     Button("\(format.name) (orgstar+)") { ProAccess.shared.allows(.export) }
@@ -190,7 +221,7 @@ struct ExportMenu: View {
                     ShareLink(item: export, preview: SharePreview(export.fileName)) { Text(format.name) }
                 }
             }
-            Toggle("Body Only", isOn: Binding(get: { bodyOnly }, set: { ExportMenu.setBodyOnly($0, path: path) }))
+            Toggle("Body Only", isOn: Binding(get: { bodyOnly }, set: { ExportItems.setBodyOnly($0, path: path) }))
             if let exportSubtree {
                 Button("Export Subtree…", systemImage: "list.bullet.indent") { exportSubtree() }
             }
