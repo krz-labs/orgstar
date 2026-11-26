@@ -119,7 +119,7 @@ struct SettingsScreen: View {
             reminderSection
             Section {
                 if badges == true {
-                    LabeledContent("Overdue count on icon", value: "On")
+                    LabeledContent("Overdue count on icon", value: String(localized: "On"))
                 } else if badges == false {
                     Button("Show Overdue Count on Icon…") {
                         Task {

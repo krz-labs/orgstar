@@ -885,6 +885,7 @@
       "shouldTranslate": false
     },
     "%@, %@": {
+      "comment": "Agenda span and start in Settings ▸ In Use",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -1097,6 +1098,7 @@
       }
     },
     "%lld days": {
+      "comment": "Agenda span in Settings ▸ In Use",
       "localizations": {
         "de": {
           "variations": {
@@ -3103,7 +3105,7 @@
       }
     },
     "Act at Point": {
-      "comment": "Command title",
+      "comment": "Command title\nKey bar button",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -3133,41 +3135,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Agir no Cursor"
-          }
-        }
-      }
-    },
-    "Act at point": {
-      "comment": "Key bar button",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "An der Einfügemarke ausführen"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Actuar en el punto"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Agir au point"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ポイントで実行"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Agir no cursor"
           }
         }
       }
@@ -4322,40 +4289,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Dia inteiro"
-          }
-        }
-      }
-    },
-    "All folders hidden": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Alle Ordner ausgeblendet"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Todas las carpetas ocultas"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tous les dossiers masqués"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "すべてのフォルダが非表示"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Todas as pastas ocultas"
           }
         }
       }
@@ -5981,40 +5914,6 @@
         }
       }
     },
-    "Body Font": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Schrift für Fließtext"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tipo de letra del cuerpo"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Police du texte courant"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "本文のフォント"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fonte do Corpo"
-          }
-        }
-      }
-    },
     "Body Only": {
       "localizations": {
         "de": {
@@ -6118,7 +6017,7 @@
       }
     },
     "Bold": {
-      "comment": "Command title",
+      "comment": "Command title\nKey bar button",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -6870,74 +6769,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Não é possível abrir o banco de dados %1$@: %2$@. O orgstar só pode abrir arquivos nas pastas às quais tem acesso."
-          }
-        }
-      }
-    },
-    "Can't open the entry": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Der Eintrag kann nicht geöffnet werden"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se puede abrir la entrada"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Impossible d'ouvrir l'entrée"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "エントリを開けません"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Não é possível abrir a entrada"
-          }
-        }
-      }
-    },
-    "Can't open the index": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Der Index kann nicht geöffnet werden"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se puede abrir el índice"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Impossible d'ouvrir l'index"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "インデックスを開けません"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Não é possível abrir o índice"
           }
         }
       }
@@ -8281,40 +8112,6 @@
         }
       }
     },
-    "Choose a plan": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tarif wählen"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Elige un plan"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Choisissez une formule"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "プランを選択"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Escolha um plano"
-          }
-        }
-      }
-    },
     "Choose or make the folder for your notes in iCloud Drive.": {
       "comment": "Open panel on the welcome sheet",
       "localizations": {
@@ -9529,7 +9326,7 @@
       }
     },
     "Code": {
-      "comment": "Command title",
+      "comment": "Command title\nKey bar button",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -10109,40 +9906,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Alterações Conflitantes"
-          }
-        }
-      }
-    },
-    "Conflicting changes": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Widersprüchliche Änderungen"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cambios en conflicto"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Modifications en conflit"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "競合する変更"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Alterações conflitantes"
           }
         }
       }
@@ -11083,40 +10846,6 @@
         }
       }
     },
-    "Couldn't change the file": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Die Datei konnte nicht geändert werden"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se ha podido modificar el archivo"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Impossible de modifier le fichier"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ファイルを変更できませんでした"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Não foi possível alterar o arquivo"
-          }
-        }
-      }
-    },
     "Couldn't save this for orgstar: %@ Open orgstar once, then try again.": {
       "localizations": {
         "de": {
@@ -11840,6 +11569,7 @@
       }
     },
     "Deadline": {
+      "comment": "Key bar button",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -11971,40 +11701,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Prazo…"
-          }
-        }
-      }
-    },
-    "Decide Later": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Später entscheiden"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Decidir más tarde"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Décider plus tard"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "あとで決める"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Decidir Depois"
           }
         }
       }
@@ -14496,40 +14192,6 @@
         }
       }
     },
-    "Entries": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Einträge"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Entradas"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Entrées"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "エントリ"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Entradas"
-          }
-        }
-      }
-    },
     "Entries can't be done before their TODO children": {
       "localizations": {
         "de": {
@@ -16111,40 +15773,6 @@
         }
       }
     },
-    "File It": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ablegen"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Clasificar"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Classer"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "振り分ける"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Guardar"
-          }
-        }
-      }
-    },
     "File is not part of any known project": {
       "comment": "Echo area for Publish Current File, as org-publish says",
       "localizations": {
@@ -17069,40 +16697,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pastas Neste Dispositivo"
-          }
-        }
-      }
-    },
-    "Folders on this device": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ordner auf diesem Gerät"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Carpetas en este dispositivo"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dossiers sur cet appareil"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "このデバイス上のフォルダ"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pastas neste dispositivo"
           }
         }
       }
@@ -18281,7 +17875,6 @@
       }
     },
     "Headings": {
-      "extractionState": "stale",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -18691,40 +18284,6 @@
         }
       }
     },
-    "Hide keyboard": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tastatur ausblenden"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ocultar teclado"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Masquer le clavier"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "キーボードを隠す"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ocultar teclado"
-          }
-        }
-      }
-    },
     "Hide the columns and clocked time (⌥⌘I)": {
       "localizations": {
         "de": {
@@ -18995,40 +18554,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Em uma Semana"
-          }
-        }
-      }
-    },
-    "In use": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Verwendet"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "En uso"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "En vigueur"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "使用中"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Em uso"
           }
         }
       }
@@ -20394,7 +19919,7 @@
       }
     },
     "Italic": {
-      "comment": "Command title",
+      "comment": "Command title\nKey bar button",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -21701,40 +21226,6 @@
         }
       }
     },
-    "Links to this file": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Links auf diese Datei"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enlaces a este archivo"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Liens vers ce fichier"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "このファイルへのリンク"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Links para este arquivo"
-          }
-        }
-      }
-    },
     "Lisp %@": {
       "comment": "Why a table needs Emacs: something its Lisp formula does",
       "localizations": {
@@ -22865,6 +22356,7 @@
       }
     },
     "Move Down": {
+      "comment": "Key bar button",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -23213,6 +22705,7 @@
       }
     },
     "Move Up": {
+      "comment": "Key bar button",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -23242,41 +22735,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mover para Cima"
-          }
-        }
-      }
-    },
-    "Move down": {
-      "comment": "Key bar button",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nach unten bewegen"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bajar"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Déplacer vers le bas"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "下に移動"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mover para baixo"
           }
         }
       }
@@ -23379,41 +22837,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mover para a Lixeira…"
-          }
-        }
-      }
-    },
-    "Move up": {
-      "comment": "Key bar button",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nach oben bewegen"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Subir"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Déplacer vers le haut"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "上に移動"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mover para cima"
           }
         }
       }
@@ -24003,6 +23426,7 @@
       }
     },
     "New Heading or Item": {
+      "comment": "Key bar button",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -24207,41 +23631,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nova Janela"
-          }
-        }
-      }
-    },
-    "New heading or item": {
-      "comment": "Key bar button",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Neue Überschrift oder neuer Listenpunkt"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nuevo encabezado o elemento"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nouveau titre ou élément"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "新しい見出しまたは項目"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Novo cabeçalho ou item"
           }
         }
       }
@@ -25183,40 +24572,6 @@
         }
       }
     },
-    "No Emacs configuration found": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keine Emacs-Konfiguration gefunden"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se ha encontrado ninguna configuración de Emacs"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucune configuration Emacs trouvée"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Emacsの構成が見つかりません"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nenhuma configuração do Emacs encontrada"
-          }
-        }
-      }
-    },
     "No Entries": {
       "localizations": {
         "de": {
@@ -25315,40 +24670,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nenhum Cabeçalho"
-          }
-        }
-      }
-    },
-    "No Kept Versions": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keine aufbewahrten Versionen"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No hay versiones conservadas"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucune version conservée"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "保持されたバージョンはありません"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nenhuma Versão Mantida"
           }
         }
       }
@@ -25591,40 +24912,6 @@
         }
       }
     },
-    "No agenda files": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keine Agenda-Dateien"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No hay archivos de agenda"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucun fichier d'agenda"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アジェンダファイルなし"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nenhum arquivo da agenda"
-          }
-        }
-      }
-    },
     "No body-only export": {
       "localizations": {
         "de": {
@@ -25655,40 +24942,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sem exportação só do corpo"
-          }
-        }
-      }
-    },
-    "No buffer": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kein Puffer"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ningún búfer"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucun tampon"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "バッファなし"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nenhum buffer"
           }
         }
       }
@@ -25757,40 +25010,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nenhum calendário."
-          }
-        }
-      }
-    },
-    "No clocked time": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keine erfasste Zeit"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sin tiempo registrado"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucun temps chronométré"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "計測時間なし"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nenhum tempo registrado"
           }
         }
       }
@@ -25966,40 +25185,6 @@
         }
       }
     },
-    "No folders": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keine Ordner"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No hay carpetas"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucun dossier"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "フォルダなし"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nenhuma pasta"
-          }
-        }
-      }
-    },
     "No folders hidden": {
       "localizations": {
         "de": {
@@ -26068,40 +25253,6 @@
         }
       }
     },
-    "No headings": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keine Überschriften"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No hay encabezados"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucun titre"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "見出しなし"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nenhum cabeçalho"
-          }
-        }
-      }
-    },
     "No headings match": {
       "extractionState": "stale",
       "localizations": {
@@ -26137,40 +25288,6 @@
         }
       }
     },
-    "No keyword": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kein Schlüsselwort"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sin palabra clave"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucun mot-clé"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "キーワードなし"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nenhuma palavra-chave"
-          }
-        }
-      }
-    },
     "No lists.": {
       "localizations": {
         "de": {
@@ -26201,40 +25318,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nenhuma lista."
-          }
-        }
-      }
-    },
-    "No messages": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keine Meldungen"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No hay mensajes"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucun message"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "メッセージはありません"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nenhuma mensagem"
           }
         }
       }
@@ -26303,40 +25386,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nenhuma nota correspondente"
-          }
-        }
-      }
-    },
-    "No outline": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keine Gliederung"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sin esquema"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucune structure"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アウトラインなし"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nenhuma estrutura"
           }
         }
       }
@@ -26750,6 +25799,7 @@
       }
     },
     "Not done before TODO children": {
+      "extractionState": "stale",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -26784,6 +25834,7 @@
       }
     },
     "Not done with unchecked boxes": {
+      "extractionState": "stale",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -26847,40 +25898,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Não vence hoje"
-          }
-        }
-      }
-    },
-    "Not imported": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nicht importiert"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No importados"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Non importés"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "未読み込み"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Não importado"
           }
         }
       }
@@ -27531,6 +26548,40 @@
         }
       }
     },
+    "On": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activé"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オン"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ativado"
+          }
+        }
+      }
+    },
     "One payment, no subscription": {
       "localizations": {
         "de": {
@@ -27875,7 +26926,7 @@
       }
     },
     "Open Link": {
-      "comment": "Command title",
+      "comment": "Command title\nKey bar button",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -28042,41 +27093,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Abrir no Arquivo"
-          }
-        }
-      }
-    },
-    "Open link": {
-      "comment": "Key bar button",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Link öffnen"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Abrir enlace"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ouvrir le lien"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "リンクを開く"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Abrir link"
           }
         }
       }
@@ -28728,40 +27744,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Atrasado"
-          }
-        }
-      }
-    },
-    "Overdue Count on Icon": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Überfällige auf dem Symbol"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vencidas en el icono"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nombre d'entrées en retard sur l'icône"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アイコンに期限切れの数"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Atrasados no Ícone"
           }
         }
       }
@@ -31386,40 +30368,6 @@
         }
       }
     },
-    "Recovered Versions": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wiederhergestellte Versionen"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Versiones recuperadas"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Versions récupérées"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "復元されたバージョン"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Versões Recuperadas"
-          }
-        }
-      }
-    },
     "Recovery Versions": {
       "localizations": {
         "de": {
@@ -32134,40 +31082,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Remover Filtros"
-          }
-        }
-      }
-    },
-    "Remove Folder": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ordner entfernen"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quitar carpeta"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Retirer le dossier"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "フォルダを取り除く"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Remover Pasta"
           }
         }
       }
@@ -33992,7 +32906,7 @@
       }
     },
     "Schedule": {
-      "comment": "Command title",
+      "comment": "Command title\nKey bar button",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -34605,40 +33519,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Seleção: %@"
-          }
-        }
-      }
-    },
-    "Sent to orgstar on iPhone.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "An orgstar auf dem iPhone gesendet."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enviado a orgstar en el iPhone."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Envoyé à orgstar sur l'iPhone."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iPhoneのorgstarに送信しました。"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enviado ao orgstar no iPhone."
           }
         }
       }
@@ -35475,6 +34355,7 @@
       }
     },
     "Show Agenda or Files in Sidebar": {
+      "comment": "Command title",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -35574,40 +34455,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mostrar Backlinks"
-          }
-        }
-      }
-    },
-    "Show Calendar Events": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kalenderereignisse zeigen"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mostrar eventos del calendario"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Afficher les événements de calendrier"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "カレンダーイベントを表示"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mostrar Eventos do Calendário"
           }
         }
       }
@@ -35819,6 +34666,7 @@
       }
     },
     "Show Node Graph": {
+      "comment": "Command title",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -35985,40 +34833,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mostrar Tempo Restante da Contagem Regressiva"
-          }
-        }
-      }
-    },
-    "Show Reminders": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Erinnerungen zeigen"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mostrar recordatorios"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Afficher les rappels"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "リマインダーを表示"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mostrar Lembretes"
           }
         }
       }
@@ -38333,40 +37147,6 @@
         }
       }
     },
-    "Sync conflict copies": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Konfliktkopien der Synchronisierung"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copias en conflicto de sincronización"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copies de conflit de synchronisation"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "同期の競合コピー"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cópias de conflito de sincronização"
-          }
-        }
-      }
-    },
     "System": {
       "localizations": {
         "de": {
@@ -38815,6 +37595,7 @@
       }
     },
     "Tags": {
+      "comment": "Key bar button",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -39358,40 +38139,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Texto"
-          }
-        }
-      }
-    },
-    "Text Width": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Textbreite"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ancho del texto"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Largeur du texte"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "テキスト幅"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Largura do Texto"
           }
         }
       }
@@ -40900,40 +39647,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Horário"
-          }
-        }
-      }
-    },
-    "Time report": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zeitbericht"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Informe de tiempo"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rapport de temps"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "時間レポート"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Relatório de tempo"
           }
         }
       }
@@ -43106,40 +41819,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Quando uma entrada é concluída"
-          }
-        }
-      }
-    },
-    "Whole Screen": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ganzer Bildschirm"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Toda la pantalla"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Écran entier"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "画面全体"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tela Inteira"
           }
         }
       }
@@ -47264,6 +45943,7 @@
       }
     },
     "starting %lld days after today": {
+      "comment": "Agenda start in Settings ▸ In Use",
       "localizations": {
         "de": {
           "variations": {
@@ -47364,6 +46044,7 @@
       }
     },
     "starting %lld days before today": {
+      "comment": "Agenda start in Settings ▸ In Use",
       "localizations": {
         "de": {
           "variations": {
@@ -47464,6 +46145,7 @@
       }
     },
     "starting today": {
+      "comment": "Agenda start in Settings ▸ In Use",
       "localizations": {
         "de": {
           "stringUnit": {
