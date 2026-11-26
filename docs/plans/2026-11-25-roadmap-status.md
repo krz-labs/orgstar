@@ -130,7 +130,7 @@ gitbay milestone list
 
 ### From milestone 5
 
-- Encryption: every build uses the protected Keychain; with Use Face ID to Decrypt on, Face ID or Touch ID is asked once per file (the simulator doesn't show the prompt); the question at the first typed passphrase and at the first launch after 1.2.0 with saved passphrases; the notarised download launches with the embedded profile; quit and close alerts on the Mac; the iOS notice and unlock screens; the clock title key across launches.
+- Encryption: every build uses the protected Keychain; Touch ID on the Mac before a saved passphrase is used (Face ID on iPhone confirmed 2026-11-26); the question at the first typed passphrase and at the first launch after 1.2.0 with saved passphrases; the notarised download launches with the embedded profile; quit and close alerts on the Mac; the iOS notice and unlock screens; the clock title key across launches.
 - Git: auto-commit against a real remote over SSH or the Keychain.
 - Handoff between real devices in each direction; Working Copy installed with a real repository (its key, the sync chain, a commit with nothing changed); AirDrop, Mail and Messages from Share Subtree.
 - iOS: the rename screen, the lint lists, Lint All Folders on a large real workspace.
