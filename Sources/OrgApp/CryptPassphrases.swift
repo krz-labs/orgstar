@@ -290,7 +290,8 @@ public final class SystemKeychain: PassphraseKeychain {
     public func deleteAll() {
         for service in [CryptPassphrases.service, CryptPassphrases.legacyService] {
             // The file-based keychain may delete one match per call.
-            for _ in 0..<1000 where SecItemDelete(Self.query(nil, service: service) as CFDictionary) == errSecSuccess {}
+            var count = 0
+            while count < 1000, SecItemDelete(Self.query(nil, service: service) as CFDictionary) == errSecSuccess { count += 1 }
         }
     }
 
