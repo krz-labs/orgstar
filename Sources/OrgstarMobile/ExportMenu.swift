@@ -184,7 +184,7 @@ struct ExportScreen: View {
 
     var body: some View {
         NavigationStack {
-            List { ExportItems(path: path, tree: tree, report: report) }
+            List { ExportItems(path: path, tree: tree, report: report, dividers: false) }
                 .navigationTitle("Export")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
@@ -201,6 +201,8 @@ struct ExportItems: View {
     var report: (String) -> Void = { _ in }
     /// Offers the subtree at the caret alone, where there is a caret.
     var exportSubtree: (() -> Void)?
+    /// Dividers between the groups, as a menu draws them; a list already separates its rows.
+    var dividers = true
     /// Every file's export settings as kept, so the menu follows a change to this file's.
     @AppStorage(ExportSettings.key) private var kept = Data()
 
@@ -226,7 +228,7 @@ struct ExportItems: View {
                 Button("Export Subtree…", systemImage: "list.bullet.indent") { exportSubtree() }
             }
             if let calendars = AgendaCalendars(model: model) {
-                Divider()
+                if dividers { Divider() }
                 if OrgExport.Format.icalendar.locked {
                     Button("\(String(localized: "Export Agenda Files to iCalendar")) (orgstar+)", systemImage: "calendar") { ProAccess.shared.allows(.export) }
                 } else {
@@ -236,7 +238,7 @@ struct ExportItems: View {
                     }
                 }
             }
-            Divider()
+            if dividers { Divider() }
             if ProAccess.shared.isUnlocked {
                 Button("Copy as Rich Text", systemImage: "doc.on.doc") { report(Self.copy(path: path, text: text, theme: model.theme)) }
             } else {
