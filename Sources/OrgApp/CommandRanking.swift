@@ -95,7 +95,7 @@ public enum CommandGroups {
         Group(title: String(localized: "Clock", comment: "Commands list section"), prefixes: ["app.clock."]),
         Group(title: String(localized: "Export", comment: "Commands list section"), prefixes: ["app.export", "app.copy-rich-text", "app.publish"]),
         Group(title: String(localized: "File", comment: "Commands list section"), prefixes: ["app.save", "app.word-count", "app.recovery", "app.sync-conflicts"]),
-        Group(title: String(localized: "Edit", comment: "Commands list section"), prefixes: ["edit."]),
+        Group(title: String(localized: "Edit", comment: "Commands list section"), prefixes: ["edit.", "macro."]),
         Group(title: String(localized: "View", comment: "Commands list section"), prefixes: ["app.toggle-markup", "editor.", "app.split-", "app.pane-"]),
     ]
 

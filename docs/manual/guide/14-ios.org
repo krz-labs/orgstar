@@ -156,7 +156,7 @@ Bold, Italic and Code are in the edit menu of a selection, under Format: each pu
 
 Commands, in the key bar and in the toolbar of the editor, the reader and the agenda, lists the commands of the screen. With nothing typed, the ten you ran from Commands most recently come first under Recent, then every command by subject, in the Org menu's groups (Visibility, Headings, TODO and Tags, and so on) followed by Clock, Export, File, Edit and View. Type to search: the letters you type must appear in the title in order, as in the Mac's command palette, and commands you run often rank a little higher. The command runs once the list closes.
 
-In the editor, a command that doesn't apply at the caret is listed greyed, with the reason, such as =Not in a list= or =No table at point=, so a search finds everything the editor can do. With a hardware keyboard attached, each command shows its Emacs key.
+Named keyboard macros are listed by name under Edit. In the editor, a command that doesn't apply at the caret is listed greyed, with the reason, such as =Not in a list= or =No table at point=, so a search finds everything the editor can do. With a hardware keyboard attached, each command shows its Emacs key.
 
 The reader's list has Find, Outline, Show or Hide Markup, Capture… and the clock commands that need no caret. The agenda's has its views, Tags and Properties…, Search…, Save as View…, Today, Earlier, Later, Go to Date…, Log Mode, Filter…, Select, Board, Capture… and the same clock commands.
 

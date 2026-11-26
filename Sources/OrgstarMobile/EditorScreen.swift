@@ -1232,7 +1232,8 @@ struct CommandPalette: View {
         let paneCommands: [(id: String, title: String)] = !panes ? [] : [("app.split-right", "Split Pane Right"), ("app.split-below", "Split Pane Below")]
             + (split ? [("app.pane-next", "Next Pane"), ("app.pane-close", "Close Pane"), ("app.pane-only", "Close Other Panes")] : [])
         var seen = Set<String>()
-        return (paneCommands + Self.viewCommands + Commands.everything.map { ($0.id, $0.title) })
+        let macros = editor.namedMacros.names.map { (id: NamedMacros.commandPrefix + $0, title: $0) }
+        return (paneCommands + Self.viewCommands + Commands.everything.map { ($0.id, $0.title) } + macros)
             .filter { !AppStoreCommands.hidden.contains($0.id) && Self.offered($0.id) && seen.insert($0.id).inserted }
             .map { command in
                 CommandRow(id: command.id, title: CommandTitle.localized(command.title), keys: editor.keymap.keyLabels(for: command.id).first,
