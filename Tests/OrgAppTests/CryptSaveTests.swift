@@ -233,6 +233,23 @@ struct CryptSaveTests {
         #expect((try String(contentsOf: other, encoding: .utf8)) == "x" + encrypted)
     }
 
+    @Test func decryptInFileKeepsTheMessageInTheSheetsOrder() throws {
+        let bank = (Self.file as NSString).range(of: "* Bank").location
+        let encrypted = try #require(try OrgCrypt.encrypt(Self.file, at: bank, passphrase: "pw"))
+        try notes.write("a.org", encrypted)
+        session.open(file.path)
+        // The passphrase sheet records the message before the passphrase is known to the session.
+        let message = try #require(OrgCrypt.firstMessage(encrypted))
+        let decrypted = try OrgCrypt.decryptInPlace(encrypted, at: bank, passphrase: "pw")
+        let body = try #require(OrgCrypt.bodyRange(decrypted, at: bank))
+        session.cryptDecrypted(message: message, plaintext: (decrypted as NSString).substring(with: NSRange(body)), for: file.path)
+        session.cryptUsed("pw", for: file.path)
+        try replace(with: decrypted)
+        try type("More. ", at: offset(of: "Open text."))
+        #expect(session.save())
+        #expect(disk == (encrypted as NSString).replacingOccurrences(of: "Open text.", with: "More. Open text."))
+    }
+
     @Test func offWritesWhatTheBufferHas() throws {
         session.encryptsTaggedEntries = false
         try notes.write("a.org", "* Plain\n")

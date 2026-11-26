@@ -100,11 +100,12 @@ public final class CryptVault: @unchecked Sendable {
     }
 
     /// `passphrase` encrypts and decrypts `path` until it's forgotten. Messages kept for reuse
-    /// under another passphrase are dropped.
+    /// under another passphrase are dropped; those recorded before any passphrase was known
+    /// were opened with this one and are kept.
     public func unlock(_ passphrase: String, for path: String) {
         let key = Self.key(path)
         locked {
-            if passphrases[key] != passphrase {
+            if let known = passphrases[key], known != passphrase {
                 reuse[key] = nil
                 lastFile[key] = nil
             }
