@@ -9,7 +9,8 @@ Where the milestone work stands, so a session can pick it up at any point. Read 
 - Milestone 4 (Commands and editing speed) is closed: 12 issues (#236 added during it; #156 closed with #142), 6 merge requests (479–484), about one day.
 - Milestone 5 (Sync and files) is closed: 11 issues (#238 and #239 added during it), 10 merge requests (486–492, 494, 495), about two days, most of it on #153's four review rounds. #87 (OneDrive greyed out in the iOS folder picker) moved to the Backlog: still greyed out on 2026-11-26; re-test later, Graph API app-folder sync is the fallback.
 - On `main` with everything merged: `swift test` (about 1,475 tests), both Xcode builds and every performance gate pass (three gate runs on 2026-11-27: 1 MB open 83–89 ms, typing p95 unchanged; new gates for Lint File and Lint All Folders).
-- `v1.3.0` is tagged on the "Version 1.3.0" commit and covers milestones 1, 4 and 5. Nothing is uploaded: the App Store builds, the notarised download, the appcast and the cask are the owner's call. `scripts/release-mac.sh` tags and pushes `v<version>` itself, so for 1.3.0 skip or delete that step.
+- Released: 1.3.0 (milestones 1, 4 and 5) and 1.3.1 (an unchanged entry keeps its message after Decrypt Entry in File, the iOS passphrase sheet as a form with navigation bar buttons, What's New shows a skipped version's notes, no compiler warnings in `Sources/`). Download, appcast, cask and krz.sh are live; App Store builds 884 (1.3.0) and 890 (1.3.1) are uploaded, and submitting for review is the owner's call. The 1 MB open gate measured 92–117 ms with Plex running and was skipped for both releases at the owner's word; run releases on a quiet Mac.
+- Owed: Xcode's "Update to recommended settings" on `ios/Orgstar.xcodeproj` (Xcode only; review its list there).
 - Simulators: "iPhone 17", "iPad Air 11-inch (M4)" (iOS 27.0) and "Apple Watch Series 11 (46mm)" (watchOS 27.0). Reuse them; do not create others.
 
 | Milestone | Open | Closed |
