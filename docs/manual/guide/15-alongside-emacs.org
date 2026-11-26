@@ -234,6 +234,17 @@ Completion follows Emacs's =completion-at-point= with corfu's list (see [[file:0
 - =[[id:= completes every heading in your folders, as =org-roam-node-insert= completes nodes, but a heading without an =ID= gets one when chosen, which org-roam leaves to =org-id-get-create=. The description is the heading's title as written. org-roam's =roam:= links aren't completed.
 - Property values come from the index as well as the buffer; Org's =org-read-property-value= offers only the buffer's.
 
+** Lint File and org-lint
+
+Lint File (see [[file:02-the-editor.org][The editor]]) runs the checkers of =org-lint= that have the same meaning in orgstar, with org-lint's names, trust and messages, and finds the same lines; the tests compare the two on the same files. It differs in these ways:
+
+- It checks the current file only; there is no command to check every file yet.
+- IDs are found through orgstar's index of all your folders, not =org-id-locations=. org-lint finds an unknown ID only when =org-id-locations= is loaded and doesn't have it; Lint File always reports one.
+- orgstar's own checkers, which org-lint doesn't have: =duplicate-id= (across your folders), =unknown-todo-keyword=, =missing-attachment-folder=, =orphaned-attachment-folder= and =invalid-file-search=. =unknown-todo-keyword= reports a heading starting with a keyword common in Org configurations (=NEXT=, =WAIT=, =HOLD=, …) or one letter away from a keyword of the file (=TODOX=), when the file and the configuration don't define it.
+- Not checked: Babel header arguments and values and source block languages (=wrong-header-argument=, =wrong-header-value=, =empty-header-argument=, =deprecated-header-syntax=, =named-result=, =invalid-babel-call-block=, =suspicious-language-in-src-block=), which depend on the languages loaded in Emacs; export options, macros and =#+INCLUDE= (=unknown-options-item=, =misspelled-export-option=, =invalid-macro-argument-and-template=, =wrong-include-link-parameter=, =obsolete-include-markup=, =beamer-frame=), which depend on the export back-ends loaded; citations (=non-existent-bibliography=, =missing-print-bibliography=, =invalid-cite-export-declaration=, =incomplete-citation=); =item-number=, =LaTeX-$=, =trailing-bracket-after-link=, =unclosed-brackets-in-link-description=, =percent-encoding-link-escape=, =extraneous-element-in-footnote-section=, =invalid-image-alignment= and =combining-keywords-with-affiliated=, where orgstar's reading of lists, LaTeX fragments and links differs from Org's in details these checks depend on.
+- Timestamps are checked against English day names, as Emacs writes them with the C locale.
+- The panel lists everything; org-lint's =h= and =i= (hide or ignore a checker) and its prefix arguments (one category or one checker) aren't there.
+
 ** Known differences from Emacs Org
 
 orgstar refuses some things with a message rather than doing something different from Emacs. These are the ones found in the current version.

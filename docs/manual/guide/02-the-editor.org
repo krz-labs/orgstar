@@ -499,6 +499,58 @@ How each file changes:
 
 The echo area then says how many files changed. Org ▸ TODO and Tags has Rename Tag… and Rename TODO Keyword…, which work the same way but change only tags or keywords; see [[file:05-todos-and-tags.org][TODOs and tags]].
 
+* Lint File
+
+File ▸ Lint File (=app.lint=, also in the command palette) checks the open Org file for mistakes, as =M-x org-lint= does, and lists them in a panel under the editor: the line, the severity, the problem and the checker that found it. Choosing a row moves the caret to that line. The list follows the file: after an edit it is checked again once you pause typing. Running Lint File again checks at once; the close button hides the panel. Nothing in the file is changed.
+
+The severity is org-lint's trust in the checker. An error is almost certainly a mistake; a warning may be intended, such as a timestamp written without its day name. Messages are org-lint's own, in English.
+
+| Checker                                 | Severity | Reports                                                                                          |
+|-----------------------------------------+----------+--------------------------------------------------------------------------------------------------|
+| =invalid-fuzzy-link=                    | Error    | =[[*Heading]]= or =[[name]]= with no heading, =<<target>>= or =#+NAME= of that name in the file  |
+| =invalid-custom-id-link=                | Error    | =[[#id]]= with no heading of that =CUSTOM_ID= or =ID= in the file                                |
+| =invalid-id-link=                       | Error    | =[[id:…]]= with no entry of that =ID= in any of your folders                                     |
+| =invalid-coderef-link=                  | Error    | =[[(label)]]= with no =(ref:label)= in a block of the file                                       |
+| =link-to-local-file=                    | Warning  | =file:= and =attachment:= links to files that don't exist                                        |
+| =invalid-file-search=                   | Warning  | =file:other.org::*Heading= (or =::#id=, =::target=) that the other file doesn't have             |
+| =file-application=                      | Error    | =file+sys:= and =file+emacs:= links                                                              |
+| =missing-attachment-folder=             | Error    | entries tagged =ATTACH= whose attachment folder doesn't exist                                    |
+| =orphaned-attachment-folder=            | Warning  | folders under the attachment folder (=data/= by default) whose ID no entry in your folders has   |
+| =duplicate-id=                          | Error    | an =ID= used twice in the file or also in another file                                           |
+| =duplicate-custom-id=                   | Error    | a =CUSTOM_ID= used twice in the file                                                             |
+| =duplicate-name=                        | Error    | a =#+NAME= used twice in the file                                                                |
+| =duplicate-target=                      | Error    | a =<<target>>= used twice in the file                                                            |
+| =duplicate-footnote-definition=         | Error    | two definitions of a footnote                                                                    |
+| =incomplete-drawer=                     | Warning  | a drawer line with no =:END:=, or one inside another drawer                                      |
+| =invalid-block=                         | Warning  | a =#+BEGIN_…= with no =#+END_…=, and an end line with text after it                              |
+| =misplaced-planning-info=               | Warning  | a =SCHEDULED:=, =DEADLINE:= or =CLOSED:= line that isn't right under its heading                 |
+| =obsolete-properties-drawer=            | Error    | a =PROPERTIES= drawer away from its heading, or with lines that aren't properties                |
+| =misplaced-heading=                     | Warning  | stars that look like a heading in the middle of a line                                           |
+| =indented-diary-sexp=                   | Warning  | an indented =%%(…)= line, which isn't a diary sexp                                               |
+| =invalid-keyword-syntax=                | Warning  | =#+KEYWORD= without its colon                                                                    |
+| =orphaned-affiliated-keywords=          | Warning  | =#+NAME=, =#+CAPTION=, =#+ATTR_…= and the like with no element after them                        |
+| =obsolete-affiliated-keywords=          | Error    | =#+TBLNAME=, =#+SRCNAME=, =#+RESULT= and the other old names                                     |
+| =missing-language-in-src-block=         | Error    | =#+BEGIN_SRC= without a language                                                                 |
+| =missing-backend-in-export-block=       | Error    | =#+BEGIN_EXPORT= without a format                                                                |
+| =deprecated-export-blocks=              | Warning  | =#+BEGIN_HTML= and the other blocks =#+BEGIN_EXPORT= replaced                                    |
+| =deprecated-category-setup=             | Error    | a second =#+CATEGORY= line                                                                       |
+| =non-existent-setupfile-parameter=      | Warning  | a =#+SETUPFILE= that doesn't exist                                                               |
+| =unknown-todo-keyword=                  | Warning  | a heading starting with a word such as =NEXT= or =TODOX= that isn't one of the file's or the configuration's TODO keywords |
+| =priority=                              | Error    | priorities outside the file's range, and malformed cookies such as =[#AA]= or =[#1=              |
+| =spurious-colons=                       | Error    | tags with an empty tag, such as =:a::b:=                                                         |
+| =quote-section=                         | Warning  | a =QUOTE= heading                                                                                |
+| =special-property-in-properties-drawer= | Error    | =TODO=, =SCHEDULED= and the other special properties set in a drawer                             |
+| =invalid-effort-property=               | Error    | an =EFFORT= that isn't a duration                                                                |
+| =invalid-id-property=                   | Error    | an =ID= with =::= in it                                                                          |
+| =timestamp-syntax=                      | Warning  | a timestamp Org would write differently: no or a wrong day name, =9:00= for =09:00=, a date that doesn't exist |
+| =clock-syntax=                          | Warning  | the same for =CLOCK:= lines                                                                      |
+| =planning-inactive=                     | Error    | an inactive timestamp after =SCHEDULED:= or =DEADLINE:=, which the agenda doesn't show           |
+| =mismatched-planning-repeaters=         | Warning  | =SCHEDULED= and =DEADLINE= with different repeaters                                              |
+| =undefined-footnote-reference=          | Error    | =[fn:label]= with no definition                                                                  |
+| =unreferenced-footnote-definition=      | Error    | a footnote definition nothing refers to                                                          |
+
+IDs are looked up in the index of all your folders, so a link to an entry in another file counts, and an ID used in two files is a duplicate in each. The attachment folders checked are the ones next to the file; each file in that folder lists the same folders. Links, setup files and attachments in a file that hasn't been saved yet aren't checked. The text of an encrypted entry (=:crypt:=) isn't checked; an encrypted file is checked as it is in the editor, decrypted, and nothing is written. For the differences from =org-lint=, see [[file:15-alongside-emacs.org][Working alongside Emacs]]. On iOS, Lint File is in Commands; see [[file:14-ios.org][iPhone and iPad]].
+
 * Accessibility
 
 The editor works with VoiceOver. VoiceOver reads the text as it is shown rather than as stored: hidden link brackets and targets, hidden emphasis markers and hidden stars are skipped, entities are read as the characters drawn for them, and narrowed table columns are read as drawn. Folded text is still read, so the whole file is available. Lines, the caret position and the selection are reported in terms of the shown text.

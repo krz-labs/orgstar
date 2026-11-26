@@ -94,6 +94,7 @@ struct EditorScreen: View {
         case graph
         /// Rename Tag or Rename TODO Keyword, starting from this name.
         case rename(ReplaceKind, String)
+        case lint
         /// The subtree at this offset, to export.
         case exportSubtree(Int)
 
@@ -112,6 +113,7 @@ struct EditorScreen: View {
             case .backlinks: "backlinks"
             case .graph: "graph"
             case .rename(let kind, _): kind.rawValue
+            case .lint: "lint"
             case .exportSubtree: "exportSubtree"
             }
         }
@@ -243,6 +245,8 @@ struct EditorScreen: View {
                 }
             case .rename(let kind, let initial):
                 RenameScreen(kind: kind, workspace: workspace, session: session, initial: initial) { message = $0 }
+            case .lint:
+                LintScreen(workspace: workspace, session: session, path: path) { offset in editor?.reveal(offset) }
             }
         }
         .fileImporter(isPresented: $importingTable, allowedContentTypes: [.commaSeparatedText, .tabSeparatedText, .plainText]) { result in
@@ -511,6 +515,8 @@ struct EditorScreen: View {
             } else if let kind = ReplaceKind(command: id), kind != .replace {
                 let context = self.editor?.editContext()
                 sheet = .rename(kind, context.map { kind.initial(text: $0.text, caret: $0.caret, keywords: $0.tree.settings.todoKeywordNames) } ?? "")
+            } else if id == "app.lint" {
+                if FileLint.applies(to: path) { sheet = .lint } else { message = String(localized: "Lint File works on Org files", comment: "Lint File in a file that isn't Org") }
             } else if id == "app.toggle-markup" {
                 model.showMarkup.toggle()
             } else if MobileEditor.linkCommands.contains(id) {
@@ -1048,7 +1054,7 @@ struct CommandPalette: View {
         ("app.publish.current-project", "Publish Current Project"),
         ("app.toggle-markup", "Show or Hide Markup"), ("app.word-count", "Word Count"),
         ("org.snippet.next-field", "Next Snippet Field"), ("org.snippet.previous-field", "Previous Snippet Field"),
-        ("app.recovery", "Recovery Versions…"), ("app.sync-conflicts", "Resolve Sync Conflicts…"),
+        ("app.recovery", "Recovery Versions…"), ("app.sync-conflicts", "Resolve Sync Conflicts…"), ("app.lint", "Lint File"),
         ("org.toggle-inline-images", "Show or Hide Inline Images"), ("org.toggle-inline-images-linked", "Show or Hide Inline Images, Including Described Links"), ("org.latex-preview", "Show or Hide LaTeX Previews"), ("editor.toggle-truncate-lines", "Truncate or Wrap Long Lines"), ("editor.toggle-auto-fill", "Turn Auto Fill On or Off"),
         ("editor.complete", "Complete at Point"), ("editor.dabbrev-expand", "Expand Word"), ("editor.dabbrev-completion", "Complete Word"),
         ("edit.isearch-forward", "Incremental Search"), ("edit.isearch-backward", "Incremental Search Backward"),

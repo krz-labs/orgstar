@@ -1198,6 +1198,7 @@ No preset binds these. Run them from the palette or a menu, or bind them in =key
 | Revert to File on Disk (=app.revert=) | Replaces the buffer with the file on disk; unsaved changes go to recovery (=revert-buffer=). |
 | Run Macro… (=macro.run=) | Asks for a named keyboard macro and plays it. Edit ▸ Macros ▸ Run Macro…. |
 | History… (=app.recovery=) | Shows the file's recovery versions and, in the download version, its git commits. Recovery Versions… on iOS. |
+| Lint File (=app.lint=) | Lists the problems in the file in a panel under the editor (=org-lint=). File ▸ Lint File. See [[file:02-the-editor.org][The editor]]. |
 | Resolve Sync Conflicts… (=app.sync-conflicts=) | Shows the file's sync conflict copies to resolve them. |
 | Import Table from File… (=app.table-import=) | Asks for a CSV, TSV or space-separated file and inserts it as a table (=org-table-import=). |
 | Export Table to File… (=app.table-export=) | Writes the table at point to a CSV or TSV file (=org-table-export=). |

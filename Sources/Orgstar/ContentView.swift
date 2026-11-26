@@ -96,6 +96,9 @@ struct ContentView: View {
     @AppStorage("outlineShown") private var orgOutlineShown = true
     @AppStorage("outlineWidth") private var outlineWidth = 220.0
     @AppStorage("backlinksShown") private var backlinksShown = true
+    /// Lint File's panel is open; `lintRun` counts runs of the command.
+    @State private var lintShown = false
+    @State private var lintRun = 0
     @AppStorage("inspectorShown") private var inspectorShown = false
     @AppStorage("showMarkup") private var showMarkup = false
     @AppStorage("showLineNumbers") private var showLineNumbers = false
@@ -186,6 +189,11 @@ struct ContentView: View {
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 VStack(spacing: 0) {
+                    if lintShown {
+                        LintPane(workspace: workspace, session: session, run: lintRun) { lintShown = false }
+                            .frame(height: 190)
+                        Divider()
+                    }
                     ModeLine(session: session, commands: commands)
                     EchoArea(commands: commands)
                 }
@@ -1489,6 +1497,11 @@ struct ContentView: View {
         case "app.recovery":
             guard session.path != nil else { return commands.show(String(localized: "No file is open")) }
             panel = .recovery(UUID())
+        case "app.lint":
+            guard session.path != nil else { return commands.show(String(localized: "No file is open")) }
+            guard FileLint.applies(to: session.path) else { return commands.show(String(localized: "Lint File works on Org files", comment: "Lint File in a file that isn't Org")) }
+            lintShown = true
+            lintRun += 1
         case "app.copy-rich-text":
             copyRichText()
         case "app.export-dialog":

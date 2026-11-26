@@ -529,6 +529,8 @@ struct OrgstarApp: App {
                     .disabled(session.path == nil)
                 Button("History…") { commands.run("app.recovery") }
                     .disabled(session.path == nil)
+                Button("Lint File") { commands.run("app.lint") }
+                    .disabled(!FileLint.applies(to: session.path))
             }
             CommandGroup(replacing: .saveItem) {
                 Button("Close Buffer") {
