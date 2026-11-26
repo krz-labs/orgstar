@@ -3826,6 +3826,74 @@
         }
       }
     },
+    "A completion list opens by itself in every preset, matches loosely, and offers words from your files, id links by title, property values and Denote notes.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In jeder Belegung öffnet sich von selbst eine Vervollständigungsliste. Sie findet auch ungenaue Treffer und bietet Wörter aus deinen Dateien, id-Links nach Titel, Eigenschaftswerte und Denote-Notizen an."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En todos los esquemas se abre sola una lista de autocompletado. Encuentra coincidencias aproximadas y ofrece palabras de tus archivos, enlaces id por título, valores de propiedades y notas de Denote."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dans chaque préréglage, une liste de complétion s'ouvre d'elle-même. Elle accepte les correspondances approximatives et propose des mots de vos fichiers, des liens id par titre, des valeurs de propriétés et des notes Denote."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "どのプリセットでも補完リストが自動で開きます。あいまい一致に対応し、ファイル内の単語、タイトルによる id リンク、プロパティ値、Denote ノートを候補に出します。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Em todos os presets, uma lista de autocompletar abre sozinha. Ela aceita correspondências aproximadas e oferece palavras dos seus arquivos, links id pelo título, valores de propriedades e notas do Denote."
+          }
+        }
+      }
+    },
+    "A file's recovery versions and git commits in one list.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Wiederherstellungsversionen und Git-Commits einer Datei in einer Liste."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las versiones de recuperación y los commits de git de un archivo en una sola lista."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les versions de récupération et les commits git d'un fichier dans une seule liste."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルの復元バージョンと git のコミットを 1 つのリストで表示します。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As versões de recuperação e os commits do git de um arquivo em uma só lista."
+          }
+        }
+      }
+    },
     "A folder with config.toml and capture.toml, such as a synced copy of ~/.config/orgstar from your Mac. Changes to them apply as they sync.": {
       "localizations": {
         "de": {
@@ -3924,6 +3992,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Um nome sem extensão recebe .org. Use pasta/nome para criar pastas."
+          }
+        }
+      }
+    },
+    "A sidebar layout, the menu bar and keyboard shortcuts.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Layout mit Seitenleiste, die Menüleiste und Tastaturkurzbefehle."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un diseño con barra lateral, la barra de menús y atajos de teclado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une disposition avec barre latérale, la barre des menus et des raccourcis clavier."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サイドバーのレイアウト、メニューバー、キーボードショートカット。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um layout com barra lateral, a barra de menus e atalhos de teclado."
           }
         }
       }
@@ -11629,6 +11731,40 @@
         }
       }
     },
+    "Command palette": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Befehlspalette"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paleta de comandos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Palette de commandes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コマンドパレット"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paleta de comandos"
+          }
+        }
+      }
+    },
     "Commands": {
       "localizations": {
         "de": {
@@ -11798,6 +11934,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Completar"
+          }
+        }
+      }
+    },
+    "Completion as you type": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vervollständigung beim Tippen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autocompletado al escribir"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Complétion pendant la saisie"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "入力中の補完"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autocompletar ao digitar"
           }
         }
       }
@@ -12002,6 +12172,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Continuar Timer"
+          }
+        }
+      }
+    },
+    "Continue the open file at the same place on your Mac, iPhone or iPad.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mach mit der geöffneten Datei an derselben Stelle auf deinem Mac, iPhone oder iPad weiter."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continúa con el archivo abierto en el mismo punto en tu Mac, iPhone o iPad."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reprenez le fichier ouvert au même endroit sur votre Mac, iPhone ou iPad."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開いているファイルを、Mac、iPhone、iPad で同じ位置から続けられます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue o arquivo aberto no mesmo ponto no seu Mac, iPhone ou iPad."
           }
         }
       }
@@ -16389,6 +16593,40 @@
         }
       }
     },
+    "Encrypted files": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verschlüsselte Dateien"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archivos cifrados"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fichiers chiffrés"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暗号化ファイル"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arquivos criptografados"
+          }
+        }
+      }
+    },
     "Encrypted files were left out, and encrypted entries were exported as they are on disk.": {
       "localizations": {
         "de": {
@@ -16865,6 +17103,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Os eventos aparecem na agenda; clique duas vezes em um para abri-lo no Calendário ou escolha Editar Evento… no menu de contexto. Novos calendários aparecem enquanto todos os calendários estiverem marcados."
+          }
+        }
+      }
+    },
+    "Every screen has the same Commands list, and you can choose the keys on the bar above the keyboard.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jeder Bildschirm hat dieselbe Befehlsliste, und du kannst die Tasten in der Leiste über der Tastatur selbst wählen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todas las pantallas tienen la misma lista de comandos, y puedes elegir las teclas de la barra sobre el teclado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chaque écran a la même liste de commandes, et vous pouvez choisir les touches de la barre au-dessus du clavier."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "どの画面にも同じコマンドリストがあり、キーボード上のバーのキーを自分で選べます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todas as telas têm a mesma lista de comandos, e você pode escolher as teclas da barra acima do teclado."
           }
         }
       }
@@ -18315,6 +18587,40 @@
         }
       }
     },
+    "Faster": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schneller"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más rápido"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plus rapide"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "高速化"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mais rápido"
+          }
+        }
+      }
+    },
     "File": {
       "localizations": {
         "de": {
@@ -18345,6 +18651,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Arquivo"
+          }
+        }
+      }
+    },
+    "File history": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dateiverlauf"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Historial del archivo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Historique du fichier"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルの履歴"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Histórico do arquivo"
           }
         }
       }
@@ -18551,6 +18891,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Arquivos alterados: %lld"
+          }
+        }
+      }
+    },
+    "Files open, parse and are styled faster, and typing in long files stays smooth.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dateien öffnen sich schneller und werden schneller gelesen und formatiert, und das Tippen in langen Dateien bleibt flüssig."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los archivos se abren, se analizan y se les da estilo más rápido, y escribir en archivos largos sigue siendo fluido."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les fichiers s'ouvrent, sont analysés et mis en forme plus vite, et la saisie dans les longs fichiers reste fluide."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルを開く、解析する、表示を整える処理が速くなり、長いファイルでも入力が滑らかです。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Os arquivos abrem, são analisados e formatados mais rápido, e digitar em arquivos longos continua fluido."
           }
         }
       }
@@ -20619,6 +20993,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hábitos só hoje"
+          }
+        }
+      }
+    },
+    "Handoff": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Handoff"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Handoff"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Handoff"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Handoff"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Handoff"
           }
         }
       }
@@ -23389,6 +23797,40 @@
         }
       }
     },
+    "Keyboard macros": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tastaturmakros"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macros de teclado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macros clavier"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キーボードマクロ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macros de teclado"
+          }
+        }
+      }
+    },
     "Keymap reloaded": {
       "localizations": {
         "de": {
@@ -24666,6 +25108,40 @@
         }
       }
     },
+    "Lint": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lint"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lint"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lint"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lint"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lint"
+          }
+        }
+      }
+    },
     "Lint All Folders": {
       "comment": "Command title",
       "localizations": {
@@ -24732,6 +25208,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Verificar Arquivo"
+          }
+        }
+      }
+    },
+    "Lint File and Lint All Folders check your files with org-lint's rules.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„Lint File“ und „Lint All Folders“ prüfen deine Dateien nach den Regeln von org-lint."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lint File y Lint All Folders revisan tus archivos con las reglas de org-lint."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lint File et Lint All Folders vérifient vos fichiers avec les règles d'org-lint."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lint File と Lint All Folders が org-lint のルールでファイルをチェックします。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lint File e Lint All Folders verificam seus arquivos com as regras do org-lint."
           }
         }
       }
@@ -30891,6 +31401,40 @@
         }
       }
     },
+    "One Commands list": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Befehlsliste"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una sola lista de comandos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une seule liste de commandes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 つのコマンドリスト"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uma só lista de comandos"
+          }
+        }
+      }
+    },
     "One payment, no subscription": {
       "localizations": {
         "de": {
@@ -31368,6 +31912,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Abrir após exportar"
+          }
+        }
+      }
+    },
+    "Open and save .org.gpg files, encrypt entries tagged crypt whenever the file is saved, and, if you turn it on, unlock saved passphrases with Face ID or Touch ID.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffne und speichere .org.gpg-Dateien, verschlüssle mit crypt markierte Einträge bei jedem Speichern und entsperre gespeicherte Passphrasen auf Wunsch mit Face ID oder Touch ID."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abre y guarda archivos .org.gpg, cifra las entradas etiquetadas con crypt cada vez que se guarda el archivo y, si lo activas, desbloquea las frases de contraseña guardadas con Face ID o Touch ID."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrez et enregistrez des fichiers .org.gpg, chiffrez les entrées étiquetées crypt à chaque enregistrement du fichier et, si vous l'activez, déverrouillez les phrases secrètes enregistrées avec Face ID ou Touch ID."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ".org.gpg ファイルを開いて保存でき、crypt タグの付いたエントリはファイルを保存するたびに暗号化されます。オンにすると、保存したパスフレーズを Face ID または Touch ID で解除できます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abra e salve arquivos .org.gpg, criptografe as entradas com a tag crypt sempre que o arquivo for salvo e, se você ativar, desbloqueie as senhas salvas com Face ID ou Touch ID."
           }
         }
       }
@@ -34826,6 +35404,40 @@
         }
       }
     },
+    "Recent commands come first, and the ones you use most rank higher.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zuletzt benutzte Befehle stehen oben, und die am häufigsten benutzten werden weiter oben einsortiert."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los comandos recientes aparecen primero, y los que más usas suben en la lista."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les commandes récentes apparaissent en premier, et celles que vous utilisez le plus remontent."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近使ったコマンドが先頭に表示され、よく使うコマンドほど上位に並びます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Os comandos recentes aparecem primeiro, e os que você mais usa ficam mais acima."
+          }
+        }
+      }
+    },
     "Recenter": {
       "comment": "Command title",
       "localizations": {
@@ -34857,6 +35469,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Recentralizar"
+          }
+        }
+      }
+    },
+    "Record and replay keyboard macros in the Emacs and Mac presets; named ones are kept across restarts.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeichne Tastaturmakros in den Belegungen Emacs und Mac auf und spiele sie ab; benannte bleiben über Neustarts erhalten."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Graba y reproduce macros de teclado en los esquemas Emacs y Mac; las que tienen nombre se conservan al reiniciar."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrez et rejouez des macros clavier dans les préréglages Emacs et Mac ; celles qui ont un nom sont conservées entre les redémarrages."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Emacs と Mac のプリセットでキーボードマクロを記録・再生できます。名前を付けたマクロは再起動後も残ります。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grave e reproduza macros de teclado nos presets Emacs e Mac; as que têm nome são mantidas entre reinicializações."
           }
         }
       }
@@ -36613,6 +37259,40 @@
         }
       }
     },
+    "Replace across files": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In allen Dateien ersetzen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reemplazar en todos los archivos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remplacer dans tous les fichiers"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルをまたいだ置換"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Substituir em todos os arquivos"
+          }
+        }
+      }
+    },
     "Replace in Files": {
       "comment": "Window title",
       "localizations": {
@@ -36679,6 +37359,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Substituir em Arquivos…"
+          }
+        }
+      }
+    },
+    "Replace text in every file of your folders, or rename a tag or TODO keyword everywhere at once.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ersetze Text in allen Dateien deiner Ordner oder benenne ein Schlagwort oder TODO-Schlüsselwort überall auf einmal um."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reemplaza texto en todos los archivos de tus carpetas o cambia el nombre de una etiqueta o palabra clave TODO en todas partes a la vez."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remplacez du texte dans tous les fichiers de vos dossiers, ou renommez une étiquette ou un mot-clé TODO partout à la fois."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フォルダ内のすべてのファイルでテキストを置換したり、タグや TODO キーワードの名前を一度にまとめて変更したりできます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Substitua texto em todos os arquivos das suas pastas ou renomeie uma tag ou palavra-chave TODO em todos os lugares de uma vez."
           }
         }
       }
@@ -41530,6 +42244,74 @@
         }
       }
     },
+    "Snippets and templates": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Snippets und Vorlagen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fragmentos y plantillas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Extraits et modèles"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スニペットとテンプレート"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Snippets e modelos"
+          }
+        }
+      }
+    },
+    "Snippets with tab stops, and templates for new files.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Snippets mit Tabstopps und Vorlagen für neue Dateien."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fragmentos con tabulaciones y plantillas para archivos nuevos."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Des extraits avec des tabulations, et des modèles pour les nouveaux fichiers."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "タブストップ付きのスニペットと、新規ファイル用のテンプレート。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Snippets com paradas de tabulação e modelos para arquivos novos."
+          }
+        }
+      }
+    },
     "Some plans aren't available from the App Store right now.": {
       "localizations": {
         "de": {
@@ -43084,6 +43866,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cópias de Conflito de Sincronização"
+          }
+        }
+      }
+    },
+    "Sync a folder that is a git repository through Working Copy.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisiere einen Ordner, der ein Git-Repository ist, über Working Copy."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincroniza una carpeta que es un repositorio de git a través de Working Copy."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisez un dossier qui est un dépôt git via Working Copy."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "git リポジトリのフォルダを Working Copy 経由で同期できます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronize uma pasta que é um repositório git pelo Working Copy."
           }
         }
       }
@@ -51393,6 +52209,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "argumentos de cabeçalho com sintaxe de shell"
+          }
+        }
+      }
+    },
+    "iPad": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPad"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPad"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPad"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPad"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPad"
           }
         }
       }

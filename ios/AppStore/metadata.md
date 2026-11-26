@@ -52,16 +52,17 @@ Everyone who downloaded orgstar before orgstar+ keeps all of it.
 
 ## What's New
 
-- LaTeX, OpenDocument (ODT) and plain text export, done on the device.
-- Emacs Lisp, JavaScript, calc, sqlite, dot and mermaid code blocks run on the device.
-- More table formulas are worked out on the device: more Calc and Lisp formulas, date arithmetic and org-sbe.
-- Radar plots and more of gnuplot's options in table plots.
-- A graph of your org-roam or Denote notes and the links between them.
-- Scan a document into an attachment.
-- Archive subtrees, publish projects, show calendars in the agenda, copy rich text and resolve idle clock time.
-- Save a tag match or a search in the agenda as a named view.
-- Math in PDF export no longer needs a network connection.
-- Fixes: attachment links stay with the entry they belong to and open from the reader, and attached images show in HTML and PDF export.
+- A completion list that opens as you type, with words from your files, id links by title, property values and Denote notes.
+- Snippets with tab stops, and templates for new files.
+- One Commands list on every screen, and a key bar above the keyboard you can arrange yourself.
+- iPad: a sidebar layout, the menu bar and keyboard shortcuts.
+- Replace text across your folders, or rename a tag or TODO keyword everywhere.
+- File history: recovery versions and git commits of a file in one list.
+- Lint a file or all your folders with org-lint's rules.
+- Open and save encrypted .org.gpg files, encrypt entries tagged crypt when the file is saved, and unlock saved passphrases with Face ID if you turn it on.
+- Handoff of the open file between iPhone, iPad and Mac; Share Subtree by AirDrop, Mail or Messages.
+- Sync a git folder through Working Copy.
+- Faster opening and styling of large files, and many fixes to layout, wording and accessibility.
 
 ## Keywords
 
@@ -132,16 +133,16 @@ org-mode,emacs,outline,todo,agenda,plain text,notes,tasks,gtd,planner,kanban,org
 
 ### What's New
 
-- The agenda in the sidebar, beside the editor: the calendar button under the sidebar switches between your files and the agenda or one of your saved views.
-- A graph of your org-roam or Denote notes and the links between them.
-- dot and mermaid code blocks draw SVG and PNG pictures; calc and sqlite blocks run too.
-- LaTeX, OpenDocument (ODT) and plain text export.
-- More table formulas are worked out: more Calc and Lisp formulas, date arithmetic and org-sbe.
-- Radar plots and more of gnuplot's options in table plots.
-- Save a tag match or a search in the agenda as a named view.
-- orgstar can stay in the menu bar, with capture and today's agenda.
-- Math in PDF export no longer needs a network connection.
-- Fixes: attachment links stay with the entry they belong to, and attached images show in HTML and PDF export.
+- A completion list that opens as you type, in every preset, with words from your files, id links by title, property values and Denote notes.
+- Keyboard macros in the Emacs and Mac presets, and snippets with tab stops and templates for new files.
+- The command palette lists recent commands first and ranks the ones you use most higher.
+- Replace text across your folders, or rename a tag or TODO keyword everywhere.
+- File ▸ History…: recovery versions and git commits of a file in one list.
+- Lint a file or all your folders with org-lint's rules.
+- Open and save encrypted .org.gpg files, encrypt entries tagged crypt when the file is saved, and unlock saved passphrases with Touch ID if you turn it on.
+- Handoff of the open file between Mac, iPhone and iPad; Share Subtree by AirDrop, Mail or Messages.
+- A customisable toolbar, a grouped Org menu and Help ▸ Manual.
+- Faster opening and styling of large files, and many fixes to layout, wording and accessibility.
 
 ### App Review notes
 

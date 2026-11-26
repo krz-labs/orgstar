@@ -38,6 +38,25 @@ public enum WhatsNew {
 
     /// Newest first. A version without an entry shows nothing.
     public static let releases: [ReleaseNotes] = [
+        ReleaseNotes(version: "1.3.0", items: [
+            .init("text.cursor", "Completion as you type",
+                  "A completion list opens by itself in every preset, matches loosely, and offers words from your files, id links by title, property values and Denote notes."),
+            .init("text.badge.plus", "Snippets and templates",
+                  "Snippets with tab stops, and templates for new files."),
+            .init("magnifyingglass", "Replace across files",
+                  "Replace text in every file of your folders, or rename a tag or TODO keyword everywhere at once."),
+            .init("clock.arrow.circlepath", "File history",
+                  "A file's recovery versions and git commits in one list."),
+            .init("checklist", "Lint",
+                  "Lint File and Lint All Folders check your files with org-lint's rules."),
+            .init("lock.doc", "Encrypted files",
+                  "Open and save .org.gpg files, encrypt entries tagged crypt whenever the file is saved, and, if you turn it on, unlock saved passphrases with Face ID or Touch ID."),
+            .init("laptopcomputer.and.iphone", "Handoff",
+                  "Continue the open file at the same place on your Mac, iPhone or iPad."),
+        ] + ios13 + mac13 + [
+            .init("speedometer", "Faster",
+                  "Files open, parse and are styled faster, and typing in long files stays smooth."),
+        ]),
         ReleaseNotes(version: "1.2.0", items: ios + [
             .init("square.and.arrow.up", "LaTeX, OpenDocument and plain text export",
                   "Export and publish to LaTeX, ODT and ASCII without Emacs."),
@@ -64,8 +83,21 @@ public enum WhatsNew {
                           "More ▸ Attachments ▸ Scan Document… saves the pages as a PDF and links it at the caret."),
     ]
     private static let mac: [ReleaseNotes.Item] = []
+    private static let ios13 = [
+        ReleaseNotes.Item("command", "One Commands list",
+                          "Every screen has the same Commands list, and you can choose the keys on the bar above the keyboard."),
+        ReleaseNotes.Item("ipad", "iPad", "A sidebar layout, the menu bar and keyboard shortcuts."),
+        ReleaseNotes.Item("arrow.triangle.branch", "Working Copy", "Sync a folder that is a git repository through Working Copy."),
+    ]
+    private static let mac13: [ReleaseNotes.Item] = []
     #else
     private static let ios: [ReleaseNotes.Item] = []
+    private static let ios13: [ReleaseNotes.Item] = []
+    private static let mac13 = [
+        ReleaseNotes.Item("record.circle", "Keyboard macros",
+                          "Record and replay keyboard macros in the Emacs and Mac presets; named ones are kept across restarts."),
+        ReleaseNotes.Item("command", "Command palette", "Recent commands come first, and the ones you use most rank higher."),
+    ]
     private static let mac = [
         ReleaseNotes.Item("sidebar.left", "Agenda in the sidebar",
                           "The calendar button under the sidebar shows your agenda, or a view from views.toml, beside the editor."),
