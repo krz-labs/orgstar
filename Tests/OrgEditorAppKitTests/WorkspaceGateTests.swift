@@ -3,8 +3,9 @@ import OrgApp
 import OrgCore
 import Testing
 
-/// Gates for a large workspace: the first index build, the agenda refresh and the backlinks of
-/// a file and a heading. In `GateTests` so they run one at a time with the editor gates.
+/// Gates for a large workspace: the first index build, the agenda refresh, the backlinks of a
+/// file and a heading, and Lint All Folders. In `GateTests` so they run one at a time with the
+/// editor gates.
 extension GateTests {
     /// Writes `count` notes of eight headings each, about 2 kB a note. Every heading has an ID
     /// and a paragraph; the first `fiveLinks` notes have five links and the rest four. A third of
@@ -44,6 +45,17 @@ extension GateTests {
         return (model, ContinuousClock.now - start)
     }
 
+    /// One run of Lint All Folders over the workspace, and how many files had findings.
+    static func lintAll(_ model: WorkspaceModel) async throws -> (files: Int, time: Duration) {
+        let paths = FileLint.folderPaths(model.files)
+        let environment = FileLint.environment(index: model.index)
+        var files = 0
+        let time = try await ContinuousClock().measure {
+            files = try await FileLint.lint(paths: paths, texts: [:], environment: environment).count
+        }
+        return (files, time)
+    }
+
     static func scratch() throws -> URL {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("orgstar-gates-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
@@ -80,11 +92,13 @@ extension GateTests {
 
         let (found, backlinks) = try Self.backlinks(model)
         #expect(found > 0)
-        print("GATE 10,000 notes: index build \(build), agenda refresh cold \(cold) / warm \(warm) (\(items) items), backlinks over 49,400 links \(backlinks)")
+        let lint = try await Self.lintAll(model)
+        print("GATE 10,000 notes: index build \(build), agenda refresh cold \(cold) / warm \(warm) (\(items) items), backlinks over 49,400 links \(backlinks), lint all folders \(lint.time) (\(lint.files) files with findings)")
         #expect(build < .seconds(15), "index build")
         #expect(cold < .seconds(10), "agenda refresh, cold")
         #expect(warm < .seconds(2), "agenda refresh, warm")
         #expect(backlinks < .milliseconds(1_500), "backlinks, 49,400 links")
+        #expect(lint.time < .seconds(15), "lint all folders, 10,000 notes")
     }
 
     /// 1,000 notes, 5,000 links.
@@ -94,7 +108,9 @@ extension GateTests {
         let (model, _) = try await Self.workspace(1_000, fiveLinks: 1_000, in: scratch)
         let (found, time) = try Self.backlinks(model)
         #expect(found > 0)
-        print("GATE 1,000 notes: backlinks over 5,000 links \(time)")
+        let lint = try await Self.lintAll(model)
+        print("GATE 1,000 notes: backlinks over 5,000 links \(time), lint all folders \(lint.time) (\(lint.files) files with findings)")
         #expect(time < .milliseconds(150), "backlinks, 5,000 links")
+        #expect(lint.time < .seconds(2), "lint all folders, 1,000 notes")
     }
 }

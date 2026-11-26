@@ -225,7 +225,8 @@ extension Linter {
             let shown = root.hasPrefix(folder + "/") ? String(root.dropFirst(folder.count + 1)) : root
             for candidate in candidates where !ids.contains(candidate.id) && idFiles(candidate.id).filter({ $0 != path }).isEmpty {
                 let folderName = (shown as NSString).appendingPathComponent(candidate.relative)
-                report(.orphanedAttachmentFolder, at: 0, "Attachment folder \"\(folderName)\" belongs to no entry")
+                report(.orphanedAttachmentFolder, at: 0, "Attachment folder \"\(folderName)\" belongs to no entry",
+                       folder: (root as NSString).appendingPathComponent(candidate.relative))
             }
         }
     }

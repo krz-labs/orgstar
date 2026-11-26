@@ -86,12 +86,15 @@ public struct LintFinding: Sendable, Equatable, Hashable, Identifiable {
     public let line: Int
     public let checker: LintChecker
     public let message: String
+    /// For an orphaned attachment folder, its path, which every file beside it reports.
+    public let folder: String?
 
-    public init(offset: Int, line: Int, checker: LintChecker, message: String) {
+    public init(offset: Int, line: Int, checker: LintChecker, message: String, folder: String? = nil) {
         self.offset = offset
         self.line = line
         self.checker = checker
         self.message = message
+        self.folder = folder
     }
 
     public var trust: LintTrust { checker.trust }

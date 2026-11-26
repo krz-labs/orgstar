@@ -1199,6 +1199,7 @@ No preset binds these. Run them from the palette or a menu, or bind them in =key
 | Run Macro… (=macro.run=) | Asks for a named keyboard macro and plays it. Edit ▸ Macros ▸ Run Macro…. |
 | History… (=app.recovery=) | Shows the file's recovery versions and, in the download version, its git commits. Recovery Versions… on iOS. |
 | Lint File (=app.lint=) | Lists the problems in the file in a panel under the editor (=org-lint=). File ▸ Lint File. See [[file:02-the-editor.org][The editor]]. |
+| Lint All Folders (=app.lint-folders=) | Lists the problems in every Org file in your folders, grouped by file. File ▸ Lint All Folders. See [[file:02-the-editor.org][The editor]]. |
 | Resolve Sync Conflicts… (=app.sync-conflicts=) | Shows the file's sync conflict copies to resolve them. |
 | Share Subtree… (=app.share-subtree=) | Shares the entry at the caret as an org file, with its attachments if chosen, or as text. File ▸ Share Subtree…. See [[file:01-files-and-folders.org][Files and folders]]. |
 | Import Table from File… (=app.table-import=) | Asks for a CSV, TSV or space-separated file and inserts it as a table (=org-table-import=). |

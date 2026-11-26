@@ -190,6 +190,7 @@ public enum EditorCommands {
         EditorCommand(id: "app.revert", title: "Revert to File on Disk", action: .app),
         EditorCommand(id: "app.recovery", title: "History…", action: .app),
         EditorCommand(id: "app.lint", title: "Lint File", action: .app),
+        EditorCommand(id: "app.lint-folders", title: "Lint All Folders", action: .app),
         EditorCommand(id: "app.export.html", title: "Export to HTML", action: .app),
         EditorCommand(id: "app.export.html-open", title: "Export to HTML and Open", action: .app),
         EditorCommand(id: "app.export.markdown", title: "Export to Markdown", action: .app),

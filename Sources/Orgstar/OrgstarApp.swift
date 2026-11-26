@@ -27,6 +27,8 @@ final class AppCommands {
     var showingMessages = false
     /// The main window's outline pane is shown, for View ▸ Show Outline.
     var outlineShown = false
+    /// Lint All Folders' last run, which its window shows.
+    let folderLint = FolderLint()
     /// A location another window asked the main window to show.
     private(set) var jumpRequest: (path: String, offset: Int, id: Int)?
     private var jumpID = 0
@@ -566,6 +568,13 @@ struct OrgstarApp: App {
             }
         }
         .defaultSize(width: 900, height: 700)
+        Window("Lint All Folders", id: "lint-folders") {
+            if case .success(let model) = workspace {
+                FolderLintWindow(workspace: model, session: session, commands: commands)
+                    .tint(ConfigSync.shared.theme.color("accent"))
+            }
+        }
+        .defaultSize(width: 760, height: 520)
         Window("Clock Report", id: "clock-report") {
             if case .success(let model) = workspace {
                 ClockReportView(workspace: model, session: session)
@@ -615,6 +624,7 @@ struct OrgstarApp: App {
                     .disabled(session.path == nil)
                 Button("Lint File") { commands.run("app.lint") }
                     .disabled(!FileLint.applies(to: session.path))
+                Button("Lint All Folders") { commands.run("app.lint-folders") }
             }
             CommandGroup(replacing: .saveItem) {
                 Button("Close Buffer") {

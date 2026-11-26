@@ -1534,6 +1534,9 @@ struct ContentView: View {
             guard FileLint.applies(to: session.path) else { return commands.show(String(localized: "Lint File works on Org files", comment: "Lint File in a file that isn't Org")) }
             lintShown = true
             lintRun += 1
+        case "app.lint-folders":
+            commands.folderLint.run(workspace: workspace, session: session)
+            openWindow(id: "lint-folders")
         case "app.copy-rich-text":
             copyRichText()
         case "app.share-subtree":

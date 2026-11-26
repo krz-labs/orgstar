@@ -573,6 +573,41 @@
         }
       }
     },
+    "%@ in %lld of %lld files": {
+      "comment": "Lint All Folders: the number of problems, files with problems, files checked",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ in %lld von %lld Dateien"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ en %lld de %lld archivos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dans %lld fichiers sur %lld"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@（%lld / %lld ファイル）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ em %lld de %lld arquivos"
+          }
+        }
+      }
+    },
     "%@ in a buffer": {
       "localizations": {
         "de": {
@@ -9280,6 +9315,41 @@
         }
       }
     },
+    "Check Again": {
+      "comment": "Lint All Folders: runs the checks again",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erneut prüfen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisar de nuevo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vérifier à nouveau"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "再チェック"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verificar Novamente"
+          }
+        }
+      }
+    },
     "Check Spelling While Typing": {
       "comment": "Command title",
       "localizations": {
@@ -9345,6 +9415,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Verificar ortografia ao digitar"
+          }
+        }
+      }
+    },
+    "Checked %lld of %lld files": {
+      "comment": "Lint All Folders: progress",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld von %lld Dateien geprüft"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld de %lld archivos revisados"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld fichiers sur %lld vérifiés"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld / %lld ファイルをチェック済み"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld de %lld arquivos verificados"
           }
         }
       }
@@ -24493,6 +24598,41 @@
         }
       }
     },
+    "Lint All Folders": {
+      "comment": "Command title",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle Ordner prüfen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisar todas las carpetas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vérifier tous les dossiers"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "すべてのフォルダをチェック"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verificar Todas as Pastas"
+          }
+        }
+      }
+    },
     "Lint File": {
       "comment": "Command title",
       "localizations": {
@@ -29104,6 +29244,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nenhum problema encontrado"
+          }
+        }
+      }
+    },
+    "No problems found in %lld files": {
+      "comment": "Lint All Folders",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Probleme in %lld Dateien gefunden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se encontraron problemas en %lld archivos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun problème trouvé dans %lld fichiers"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld ファイルに問題はありません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum problema encontrado em %lld arquivos"
           }
         }
       }
@@ -42210,6 +42385,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Interrompida"
+          }
+        }
+      }
+    },
+    "Stopped after %lld of %lld files": {
+      "comment": "Lint All Folders: stopped before the end",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach %lld von %lld Dateien angehalten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detenido tras %lld de %lld archivos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arrêté après %lld fichiers sur %lld"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld / %lld ファイルで停止"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interrompido após %lld de %lld arquivos"
           }
         }
       }

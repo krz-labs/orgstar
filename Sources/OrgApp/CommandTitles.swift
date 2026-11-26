@@ -172,6 +172,7 @@ enum CommandTitles {
         String(localized: "Kill Word Backward", comment: "Command title"),
         String(localized: "Last Buffer", comment: "Command title"),
         String(localized: "Leave Block", comment: "Command title"),
+        String(localized: "Lint All Folders", comment: "Command title"),
         String(localized: "Lint File", comment: "Command title"),
         String(localized: "Lower Priority", comment: "Command title"),
         String(localized: "Mark Subtree", comment: "Command title"),

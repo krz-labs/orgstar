@@ -97,9 +97,9 @@ struct Linter {
         return s
     }
 
-    mutating func report(_ checker: LintChecker, at offset: Int, _ message: String) {
+    mutating func report(_ checker: LintChecker, at offset: Int, _ message: String, folder: String? = nil) {
         guard !excluded.contains(where: { $0.contains(offset) }) else { return }
-        findings.append(LintFinding(offset: offset, line: lineIndex(offset) + 1, checker: checker, message: message))
+        findings.append(LintFinding(offset: offset, line: lineIndex(offset) + 1, checker: checker, message: message, folder: folder))
     }
 
     func matches(_ pattern: String, caseInsensitive: Bool = false, anchorsMatchLines: Bool = true) -> [NSTextCheckingResult] {
