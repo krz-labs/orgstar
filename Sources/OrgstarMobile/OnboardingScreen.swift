@@ -17,6 +17,7 @@ struct OnboardingScreen: View {
     @State private var importing = false
     @State private var problem: String?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private enum Step: Int, CaseIterable {
         case welcome, folder, notifications, calendar, reminders
@@ -179,10 +180,20 @@ struct OnboardingScreen: View {
                         Text(text).font(.body).foregroundStyle(.secondary).multilineTextAlignment(.center)
                         content
                     }
-                    .padding(.vertical, 24)
+                    .padding(.vertical, 40)
                     .frame(maxWidth: .infinity, minHeight: geometry.size.height)
                 }
                 .scrollBounceBehavior(.basedOnSize)
+                .scrollIndicatorsFlash(onAppear: true)
+                // Text cut off at an edge fades out rather than showing as a sliver; the fades
+                // cover only the padding when the page fits.
+                .mask {
+                    VStack(spacing: 0) {
+                        LinearGradient(colors: [.clear, .black], startPoint: .top, endPoint: .bottom).frame(height: 40)
+                        Color.black
+                        LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom).frame(height: 40)
+                    }
+                }
             }
             VStack(spacing: 12) { actions() }
         }
@@ -190,7 +201,10 @@ struct OnboardingScreen: View {
 
     private func feature(_ symbol: String, _ title: LocalizedStringKey, _ text: LocalizedStringKey) -> some View {
         HStack(alignment: .top, spacing: 14) {
-            Image(systemName: symbol).font(.title2).foregroundStyle(Color.accentColor).frame(width: 32)
+            // At accessibility sizes the text takes the whole width.
+            if !dynamicTypeSize.isAccessibilitySize {
+                Image(systemName: symbol).font(.title2).foregroundStyle(Color.accentColor).frame(width: 32)
+            }
             VStack(alignment: .leading, spacing: 2) {
                 Text(title).font(.headline)
                 Text(text).font(.subheadline).foregroundStyle(.secondary)
