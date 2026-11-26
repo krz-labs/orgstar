@@ -119,6 +119,7 @@ final class MobileModel {
             ConfigFolder.clear()
             // What the folder set no longer applies.
             for setting in UserConfig.settings { UserDefaults.standard.removeObject(forKey: setting.defaultsKey) }
+            for width in KeyBarLayout.Width.allCases { KeyBarLayout.store(nil, width, in: .standard) }
         }
         configFolder = url
         _ = reloadConfig(after: problem)
@@ -150,6 +151,7 @@ final class MobileModel {
         configProblems += MacroFile.load().map { "\(NamedMacros.fileName): " + $0 }
         SnippetLibrary.shared.reload(from: UserConfig.file(Snippets.fileName), read: configFolder == nil ? { try? String(contentsOf: $0, encoding: .utf8) } : Self.read)
         configProblems += SnippetLibrary.shared.problems
+        configProblems += KeyBar.problems()
         let settings = OrgPreferences.orgSettings()
         session.defaults = settings
         session.options = OrgPreferences.options()
@@ -213,7 +215,22 @@ final class MobileModel {
             case .bool(let b): UserDefaults.standard.set(b, forKey: defaultsKey)
             case .string(let s): UserDefaults.standard.set(s, forKey: defaultsKey)
             case .integer(let i): UserDefaults.standard.set(i, forKey: defaultsKey)
+            case .array: break
             }
+        }
+        _ = reloadConfig(after: problem)
+    }
+
+    /// Sets the key bar's buttons for `width`, or with nil its default, as `set` does.
+    func setKeyBar(_ ids: [String]?, _ width: KeyBarLayout.Width) {
+        var problem: String?
+        if let configFolder {
+            problem = Self.updateConfig(in: configFolder) { text in
+                guard let ids else { return UserConfig.removingSetting(text, section: KeyBarLayout.table, key: width.rawValue) }
+                return UserConfig.setting(text, section: KeyBarLayout.table, key: width.rawValue, to: .array(ids.map(TOML.Value.string)))
+            }
+        } else {
+            KeyBarLayout.store(ids, width, in: .standard)
         }
         _ = reloadConfig(after: problem)
     }

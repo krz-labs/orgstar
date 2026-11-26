@@ -3275,6 +3275,75 @@
         }
       }
     },
+    "Add Button": {
+      "comment": "Title of the list a key bar button is chosen from",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taste hinzufügen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Añadir botón"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajouter un bouton"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ボタンを追加"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adicionar botão"
+          }
+        }
+      }
+    },
+    "Add Button…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taste hinzufügen …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Añadir botón…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajouter un bouton…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ボタンを追加…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adicionar botão…"
+          }
+        }
+      }
+    },
     "Add Folder": {
       "localizations": {
         "de": {
@@ -6285,6 +6354,75 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ação em lote em %lld: [$] arquivar [r] realocar [t] estado TODO [+] adicionar etiqueta [-] remover etiqueta [s] agendar [d] prazo"
+          }
+        }
+      }
+    },
+    "Buttons": {
+      "comment": "Key bar settings section",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tasten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Botones"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boutons"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ボタン"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Botões"
+          }
+        }
+      }
+    },
+    "Buttons that don't fit go under More. While a snippet's fields are filled in, Previous Snippet Field and Next Snippet Field take the places of Promote and Demote.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tasten, die nicht passen, stehen unter „Mehr“. Während die Felder eines Textbausteins ausgefüllt werden, ersetzen „Vorheriges Feld im Textbaustein“ und „Nächstes Feld im Textbaustein“ die Tasten „Höherstufen“ und „Tieferstufen“."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los botones que no caben van en Más. Mientras se rellenan los campos de un fragmento, Campo anterior del fragmento y Siguiente campo del fragmento ocupan el lugar de Subir nivel y Bajar nivel."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les boutons qui ne tiennent pas vont dans Plus. Pendant qu'on remplit les champs d'un extrait, Champ précédent de l'extrait et Champ suivant de l'extrait prennent la place de Remonter et Abaisser."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "収まらないボタンは「その他」に入ります。スニペットのフィールドを入力している間は、「レベルを上げる」と「レベルを下げる」の位置に「スニペットの前のフィールド」と「スニペットの次のフィールド」が表示されます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Os botões que não cabem ficam em Mais. Enquanto os campos de um trecho são preenchidos, Campo Anterior do Trecho e Próximo Campo do Trecho ocupam o lugar de Promover e Rebaixar."
           }
         }
       }
@@ -20364,6 +20502,41 @@
         }
       }
     },
+    "Key Bar": {
+      "comment": "Settings section",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tastenleiste"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barra de teclas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barre de touches"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キーバー"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barra de teclas"
+          }
+        }
+      }
+    },
     "Key Bindings": {
       "localizations": {
         "de": {
@@ -20773,6 +20946,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mais Tarde"
+          }
+        }
+      }
+    },
+    "Layout": {
+      "comment": "Key bar settings: which list of buttons, iPhone or iPad",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Layout"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disposición"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disposition"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "レイアウト"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Layout"
           }
         }
       }
@@ -26140,6 +26348,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Agora Não"
+          }
+        }
+      }
+    },
+    "Not a command here; the key bar skips it.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hier kein Befehl; die Tastenleiste lässt ihn aus."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aquí no es un comando; la barra de teclas lo omite."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pas une commande ici ; la barre de touches l'ignore."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ここではコマンドではないため、キーバーでは省略されます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é um comando aqui; a barra de teclas o ignora."
           }
         }
       }
@@ -32599,6 +32841,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Reagendar"
+          }
+        }
+      }
+    },
+    "Reset to Default": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf Standard zurücksetzen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restablecer valores por omisión"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rétablir les valeurs par défaut"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "デフォルトに戻す"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restaurar padrão"
           }
         }
       }
@@ -39454,6 +39730,40 @@
         }
       }
     },
+    "The buttons above the on-screen keyboard.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Tasten über der Bildschirmtastatur."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los botones sobre el teclado en pantalla."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les boutons au-dessus du clavier à l'écran."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画面キーボードの上のボタン。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Os botões acima do teclado na tela."
+          }
+        }
+      }
+    },
     "The calendar button under the sidebar shows your agenda, or a view from views.toml, beside the editor.": {
       "localizations": {
         "de": {
@@ -39790,6 +40100,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "As pastas que a agenda mostra"
+          }
+        }
+      }
+    },
+    "The iPhone buttons show where the editor is narrow, the iPad buttons where it is wide.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die iPhone-Tasten erscheinen, wo der Editor schmal ist, die iPad-Tasten, wo er breit ist."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los botones de iPhone aparecen donde el editor es estrecho; los de iPad, donde es ancho."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les boutons iPhone s'affichent quand l'éditeur est étroit, les boutons iPad quand il est large."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "エディタの幅が狭いときは iPhone のボタン、広いときは iPad のボタンが表示されます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Os botões do iPhone aparecem onde o editor é estreito; os do iPad, onde é largo."
           }
         }
       }

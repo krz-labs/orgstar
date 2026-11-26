@@ -39,6 +39,24 @@ struct TOMLTests {
         #expect(tables[2].values["name"] == .string("aé"))
     }
 
+    @Test func parsesArrays() throws {
+        let tables = try TOML.parse("""
+            one = ["a", 'b', 3, true, ["c"]]  # comment
+            empty = []
+            many = [
+              "x",  # first
+              "y]",
+            ]
+            after = 1
+            """)
+        #expect(tables[0].values["one"] == .array([.string("a"), .string("b"), .integer(3), .bool(true), .array([.string("c")])]))
+        #expect(tables[0].values["empty"] == .array([]))
+        #expect(tables[0].values["many"] == .array([.string("x"), .string("y]")]))
+        #expect(tables[0].values["after"] == .integer(1))
+        #expect(throws: TOML.ParseError(line: 1, message: "unclosed array")) { try TOML.parse("a = [\"x\",\nb = 1") }
+        #expect(throws: TOML.ParseError(line: 1, message: "expected , or ] in array")) { try TOML.parse("a = [\"x\" \"y\"]") }
+    }
+
     @Test func reportsErrorsWithLines() {
         #expect(throws: TOML.ParseError(line: 2, message: "unclosed string")) { try TOML.parse("[[bind]]\nkeys = \"C-c") }
         #expect(throws: TOML.ParseError(line: 1, message: "expected key = value")) { try TOML.parse("keys") }

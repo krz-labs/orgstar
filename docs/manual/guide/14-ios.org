@@ -128,7 +128,7 @@ Table columns with width cookies narrow as on the Mac: =#+STARTUP: shrink= narro
 
 ** The key bar
 
-A bar above the on-screen keyboard has buttons for Org's keys. Each does what its Emacs key does at the caret, so the arrows promote and demote headings, indent list items, or move table columns, depending on where the caret is. The buttons share the bar's width, so all of them show without scrolling. They are at least 44 points high and grow with the text size up to the second accessibility size.
+A bar above the on-screen keyboard has buttons for Org's keys. Each does what its Emacs key does at the caret, so the arrows promote and demote headings, indent list items, or move table columns, depending on where the caret is. The buttons share the bar's width, without scrolling. They are at least 44 points high and grow with the text size up to the second accessibility size.
 
 #+CAPTION: The iPhone editor with the key bar above the keyboard.
 #+ATTR_HTML: :width 368
@@ -151,6 +151,18 @@ A bar above the on-screen keyboard has buttons for Org's keys. Each does what it
 On iPad, where the bar is wider, Schedule, Deadline and Tags are buttons of their own in place of Plan.
 
 Bold, Italic and Code are in the edit menu of a selection, under Format: each puts =*=, =/= or =~= around the selection. With no selection, the commands of the same names in Commands insert a pair of markers with the caret between. Overview (=S-TAB=, Cycle Global Visibility) and Open Link (=C-c C-o=, or a tap on the link) are in Commands.
+
+*** Choosing the buttons
+
+Settings ▸ Key Bar lists the bar's buttons in order. Drag a row by its handle to move it, tap the red minus to remove it, and tap Add Button… to add one from the Commands list, grouped as Commands groups it, with the bar's own buttons (Overview, Open Link, Bold, Italic, Code and the rest) first. Any command can be a button, as can a snippet and a named keyboard macro. Reset to Default brings back the buttons above. The iPhone and iPad tabs at the top choose the list: the iPhone buttons show where the editor is narrow, which includes iPad in Slide Over or a narrow split, and the iPad buttons where it is wide.
+
+The lists are =[key-bar]= in the configuration folder's =config.toml= (see [[file:13-configuration.org][Configuration]]), so edits there apply too, and other devices using the folder share them. Without a configuration folder, they are kept on the device. An id the app doesn't know is reported in red under the folder in Settings, and skipped.
+
+A button shows its command's symbol where it has one, such as the arrows for Undo and Redo or a clock for Clock In; otherwise its title, on up to two lines, in a button twice as wide. A snippet shows its trigger and a macro its name. VoiceOver reads the command's title.
+
+When the buttons don't fit the width, the bar shows as many as fit, in order, and a More button (…) at the end holds the rest as a menu. The bar never scrolls. Turning the device on its side makes room for more.
+
+While a snippet's fields are filled in, Previous Snippet Field and Next Snippet Field take the places of Promote and Demote, so the fields work without a hardware keyboard; Promote and Demote come back when the snippet ends. A bar without Promote or Demote shows the field buttons first.
 
 ** Commands
 
@@ -214,7 +226,7 @@ Snippets come from =snippets.toml= in the configuration folder, the same file as
 
 - Insert Snippet… in Commands lists them and expands the one you choose at the caret, replacing the selection. Questions in the snippet open the question sheet, one after another.
 - With a hardware keyboard, =TAB= after a trigger expands it where =TAB= has no other meaning, as on the Mac, and =TAB=, =S-TAB= and =Escape= move through the fields.
-- On the on-screen keyboard, which has no =TAB=, the first field is selected after expanding, so typing replaces it; tapping elsewhere ends the snippet. The key bar has no snippet buttons yet.
+- On the on-screen keyboard, which has no =TAB=, the first field is selected after expanding, so typing replaces it. Previous Snippet Field and Next Snippet Field in the key bar move between the fields; leaving the last field or tapping elsewhere ends the snippet. A snippet can be a key bar button of its own, showing its trigger.
 - Mirrors and the band behind the active field work as on the Mac.
 - New File from Template… is under + in Folders.
 

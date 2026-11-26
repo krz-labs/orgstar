@@ -805,159 +805,6 @@ struct EditorTextView: UIViewRepresentable {
     }
 }
 
-/// Org's keys for a touch keyboard: each button does what its key does at the caret, as the
-/// Emacs keymap binds it (M-→ demotes a heading, indents an item, moves a table column). It holds
-/// what is repeated at the caret while typing; the rest is in Commands. Its buttons share the
-/// width, without scrolling.
-struct KeyBar: View {
-    let editor: MobileEditor
-    let palette: () -> Void
-    @Environment(\.horizontalSizeClass) private var sizeClass
-
-    /// A button the bar can hold.
-    struct Item {
-        enum Action {
-            /// What the keys are bound to at the caret.
-            case keys(String)
-            case command(String)
-            case palette
-            /// Schedule, Deadline and Tags in a menu.
-            case plan
-            case hideKeyboard
-        }
-
-        let label: String
-        /// Nil shows the label as text.
-        let symbol: String?
-        let action: Action
-    }
-
-    /// Every button the bar can hold, by id.
-    static let items: [String: Item] = [
-        "commands": Item(label: String(localized: "Commands"), symbol: "command", action: .palette),
-        "fold": Item(label: String(localized: "Fold", comment: "Key bar button"), symbol: "arrow.right.to.line", action: .keys("TAB")),
-        "overview": Item(label: String(localized: "Overview", comment: "Key bar button"), symbol: "arrow.left.to.line", action: .keys("S-TAB")),
-        "promote": Item(label: String(localized: "Promote", comment: "Key bar button"), symbol: "decrease.indent", action: .keys("M-<left>")),
-        "demote": Item(label: String(localized: "Demote", comment: "Key bar button"), symbol: "increase.indent", action: .keys("M-<right>")),
-        "move-up": Item(label: String(localized: "Move Up", comment: "Key bar button"), symbol: "arrow.up.square", action: .keys("M-<up>")),
-        "move-down": Item(label: String(localized: "Move Down", comment: "Key bar button"), symbol: "arrow.down.square", action: .keys("M-<down>")),
-        "new-heading": Item(label: String(localized: "New Heading or Item", comment: "Key bar button"), symbol: "plus", action: .keys("M-RET")),
-        "todo": Item(label: "TODO", symbol: nil, action: .keys("C-c C-t")),
-        "act": Item(label: String(localized: "Act at Point", comment: "Key bar button"), symbol: "checkmark.square", action: .keys("C-c C-c")),
-        "plan": Item(label: String(localized: "Plan", comment: "Key bar button: a menu of Schedule, Deadline and Tags"), symbol: "calendar.badge.clock", action: .plan),
-        "schedule": Item(label: String(localized: "Schedule", comment: "Key bar button"), symbol: "calendar", action: .keys("C-c C-s")),
-        "deadline": Item(label: String(localized: "Deadline", comment: "Key bar button"), symbol: "calendar.badge.exclamationmark", action: .keys("C-c C-d")),
-        "tags": Item(label: String(localized: "Tags", comment: "Key bar button"), symbol: "tag", action: .keys("C-c C-q")),
-        "open-link": Item(label: String(localized: "Open Link", comment: "Key bar button"), symbol: "link", action: .keys("C-c C-o")),
-        "bold": Item(label: String(localized: "Bold", comment: "Key bar button"), symbol: "bold", action: .command("org.emphasize.bold")),
-        "italic": Item(label: String(localized: "Italic", comment: "Key bar button"), symbol: "italic", action: .command("org.emphasize.italic")),
-        "code": Item(label: String(localized: "Code", comment: "Key bar button"), symbol: "chevron.left.forwardslash.chevron.right", action: .command("org.emphasize.code")),
-        "hide-keyboard": Item(label: String(localized: "Hide Keyboard"), symbol: "keyboard.chevron.compact.down", action: .hideKeyboard),
-    ]
-
-    /// The bar's buttons in order. On iPad, where it is wider, Plan's three are buttons.
-    static func layout(regular: Bool) -> [String] {
-        ["commands", "fold", "promote", "demote", "move-up", "move-down", "new-heading", "todo", "act"]
-            + (regular ? ["schedule", "deadline", "tags"] : ["plan"]) + ["hide-keyboard"]
-    }
-
-    /// The bar's buttons are at least 44 points tall, scaled with the text size up to here.
-    static let largestSize = DynamicTypeSize.accessibility2
-    static let target: CGFloat = 44
-    static let padding: CGFloat = 4
-    /// The widest a button gets where the bar has room.
-    static let widest: CGFloat = 64
-    @ScaledMetric(relativeTo: .body) private var size = KeyBar.target
-
-    var body: some View {
-        HStack(spacing: 0) {
-            ForEach(Self.layout(regular: sizeClass == .regular), id: \.self) { id in
-                if let item = Self.items[id] { button(item) }
-            }
-        }
-        .labelStyle(.iconOnly)
-        .padding(.horizontal, 6)
-        .padding(.vertical, Self.padding)
-        .frame(maxWidth: .infinity)
-        .background(.bar)
-    }
-
-    @ViewBuilder
-    private func button(_ item: Item) -> some View {
-        switch item.action {
-        case .plan:
-            Menu {
-                ForEach(["schedule", "deadline", "tags"], id: \.self) { id in
-                    if let entry = Self.items[id], case .keys(let keys) = entry.action {
-                        Button(entry.label, systemImage: entry.symbol ?? "") { editor.run(keys: keys) }
-                    }
-                }
-            } label: {
-                label(item).modifier(KeyShape(size: size))
-            }
-            .accessibilityLabel(item.label)
-        default:
-            Button {
-                switch item.action {
-                case .keys(let keys): editor.run(keys: keys)
-                case .command(let id): editor.run(id)
-                case .palette: palette()
-                case .hideKeyboard: editor.textView.resignFirstResponder()
-                case .plan: break
-                }
-            } label: {
-                label(item)
-            }
-            .buttonStyle(KeyStyle(size: size))
-            .accessibilityLabel(item.label)
-        }
-    }
-
-    /// The buttons grow taller with the text size, but their symbols stop growing here, so
-    /// that they fit the button's share of the width.
-    static let largestSymbolSize = DynamicTypeSize.xxxLarge
-
-    @ViewBuilder
-    private func label(_ item: Item) -> some View {
-        Group {
-            if let symbol = item.symbol {
-                Label(item.label, systemImage: symbol)
-            } else {
-                // A word is wider than a symbol, so it stays at the default size.
-                Text(item.label).font(.callout.weight(.semibold)).lineLimit(1).minimumScaleFactor(0.5)
-                    .dynamicTypeSize(...DynamicTypeSize.large)
-            }
-        }
-        .dynamicTypeSize(...Self.largestSymbolSize)
-    }
-}
-
-/// A key bar button's look: a tinted label on a rounded tile, `size` tall, sharing the bar's
-/// width with the others. The whole share is the touch target.
-private struct KeyShape: ViewModifier {
-    let size: CGFloat
-    var pressed = false
-
-    func body(content: Content) -> some View {
-        content
-            .foregroundStyle(.tint)
-            .frame(maxWidth: KeyBar.widest, minHeight: size)
-            .background(.fill.tertiary, in: .rect(cornerRadius: 10))
-            .opacity(pressed ? 0.5 : 1)
-            .padding(.horizontal, 2)
-            .frame(maxWidth: .infinity)
-            .contentShape(.rect)
-    }
-}
-
-private struct KeyStyle: ButtonStyle {
-    let size: CGFloat
-
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label.modifier(KeyShape(size: size, pressed: configuration.isPressed))
-    }
-}
-
 /// A command's question: text with choices, a date, or fast selection by keys.
 struct PromptSheet: View {
     let prompt: Prompt
@@ -1232,14 +1079,18 @@ struct CommandPalette: View {
         let context = editor.editContext()
         let paneCommands: [(id: String, title: String)] = !panes ? [] : [("app.split-right", "Split Pane Right"), ("app.split-below", "Split Pane Below")]
             + (split ? [("app.pane-next", "Next Pane"), ("app.pane-close", "Close Pane"), ("app.pane-only", "Close Other Panes")] : [])
-        var seen = Set<String>()
-        let macros = editor.namedMacros.names.map { (id: NamedMacros.commandPrefix + $0, title: $0) }
-        return (paneCommands + Self.viewCommands + Commands.everything.map { ($0.id, $0.title) } + macros)
-            .filter { !AppStoreCommands.hidden.contains($0.id) && Self.offered($0.id) && seen.insert($0.id).inserted }
+        return Self.commands(macros: editor.namedMacros, panes: paneCommands)
             .map { command in
                 CommandRow(id: command.id, title: CommandTitle.localized(command.title), keys: editor.keymap.keyLabels(for: command.id).first,
                            reason: reason(command.id, context))
             }
+    }
+
+    /// The commands listed, with English titles: `panes`, the editor's, and the named macros.
+    static func commands(macros: NamedMacros, panes: [(id: String, title: String)] = []) -> [(id: String, title: String)] {
+        var seen = Set<String>()
+        return (panes + viewCommands + Commands.everything.map { ($0.id, $0.title) } + macros.names.map { (NamedMacros.commandPrefix + $0, $0) })
+            .filter { !AppStoreCommands.hidden.contains($0.id) && offered($0.id) && seen.insert($0.id).inserted }
     }
 
     /// Commands for a camera or scanner this device lacks aren't listed.

@@ -474,7 +474,28 @@ public enum UserConfig {
         if !tables.contains(where: { $0.name == denoteTemplateTable }), defaults.object(forKey: denoteTemplatesKey) != nil {
             defaults.removeObject(forKey: denoteTemplatesKey)
         }
+        let keyBar = tables.first { $0.name == KeyBarLayout.table }
+        for width in KeyBarLayout.Width.allCases where keyBar?.values[width.rawValue] == nil {
+            if defaults.object(forKey: width.defaultsKey) != nil { defaults.removeObject(forKey: width.defaultsKey) }
+        }
         for table in tables {
+            if table.name == KeyBarLayout.table {
+                for key in table.keys {
+                    guard let width = KeyBarLayout.Width(rawValue: key) else {
+                        problems.append("config.toml: unknown setting \(path(table.name, key))")
+                        continue
+                    }
+                    let values = table.values[key]?.array
+                    let ids = values?.compactMap(\.string) ?? []
+                    guard let values, ids.count == values.count else {
+                        problems.append("config.toml: \(path(table.name, key)) must be a list of command ids, such as [\"commands\", \"fold\"]")
+                        if defaults.object(forKey: width.defaultsKey) != nil { defaults.removeObject(forKey: width.defaultsKey) }
+                        continue
+                    }
+                    KeyBarLayout.store(ids, width, in: defaults)
+                }
+                continue
+            }
             if table.name == denoteTemplateTable {
                 var rows: [String] = []
                 for key in table.keys {
@@ -626,6 +647,7 @@ public enum UserConfig {
         case .string(let s):
             "\"" + s.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"")
                 .replacingOccurrences(of: "\n", with: "\\n").replacingOccurrences(of: "\t", with: "\\t") + "\""
+        case .array(let values): "[" + values.map(format).joined(separator: ", ") + "]"
         }
     }
 
@@ -694,8 +716,9 @@ public enum UserConfig {
             if !trimmed.isEmpty { lastInSection = index }
             guard let equals = line.firstIndex(of: "="),
                   line[..<equals].trimmingCharacters(in: .whitespaces) == key else { continue }
-            let comment = commentStart(line, after: equals).map { "  " + line[$0...] } ?? ""
-            lines[index] = line[..<equals] + "= " + format(value) + comment
+            let last = lastLine(of: lines, at: index, equals: equals)
+            let comment = last == index ? commentStart(line, after: equals).map { "  " + line[$0...] } ?? "" : ""
+            lines.replaceSubrange(index...last, with: [line[..<equals] + "= " + format(value) + comment])
             return lines.joined(separator: "\n")
         }
         if let lastInSection {
@@ -708,6 +731,52 @@ public enum UserConfig {
             lines += ["", "[\(section)]", "\(key) = \(format(value))", ""]
         }
         return lines.joined(separator: "\n")
+    }
+
+    /// `text` without `section.key`, as `setting` finds it; unchanged when it isn't there.
+    public static func removingSetting(_ text: String, section: String, key: String) -> String {
+        var lines = text.components(separatedBy: "\n")
+        var current = ""
+        for (index, line) in lines.enumerated() {
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            if trimmed.hasPrefix("[") {
+                current = trimmed.hasPrefix("[[") ? trimmed : String(trimmed.dropFirst().prefix { $0 != "]" }).trimmingCharacters(in: .whitespaces)
+                continue
+            }
+            guard current == section, let equals = line.firstIndex(of: "="),
+                  line[..<equals].trimmingCharacters(in: .whitespaces) == key else { continue }
+            lines.removeSubrange(index...lastLine(of: lines, at: index, equals: equals))
+            return lines.joined(separator: "\n")
+        }
+        return text
+    }
+
+    /// The last line of the value on line `index`: a later one for an array whose closing
+    /// bracket is on another line.
+    private static func lastLine(of lines: [String], at index: Int, equals: String.Index) -> Int {
+        let line = lines[index]
+        guard line[line.index(after: equals)...].trimmingCharacters(in: .whitespaces).hasPrefix("[") else { return index }
+        var depth = 0
+        var quote: Character?
+        for number in index..<lines.count {
+            var escaped = false
+            for c in number == index ? line[line.index(after: equals)...] : Substring(lines[number]) {
+                if let q = quote {
+                    if escaped { escaped = false } else if c == "\\" && q == "\"" { escaped = true } else if c == q { quote = nil }
+                    continue
+                }
+                if c == "#" { break }
+                if c == "\"" || c == "'" {
+                    quote = c
+                } else if c == "[" {
+                    depth += 1
+                } else if c == "]" {
+                    depth -= 1
+                    if depth == 0 { return number }
+                }
+            }
+        }
+        return index
     }
 
     /// Where a `#` comment starts after the value, outside quotes.

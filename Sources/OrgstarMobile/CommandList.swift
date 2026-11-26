@@ -17,6 +17,9 @@ struct CommandRow: Identifiable {
 /// subject; a query matches as the Mac's palette does.
 struct CommandList: View {
     let rows: [CommandRow]
+    var title = String(localized: "Commands")
+    /// Choosing a command counts as running it, for Recent and the ranking.
+    var recordsUse = true
     /// Called with the chosen command before the list closes.
     let choose: (String) -> Void
     @State private var query = ""
@@ -47,7 +50,7 @@ struct CommandList: View {
                 if !query.allSatisfy(\.isWhitespace), ranked.rest.isEmpty { ContentUnavailableView.search(text: query) }
             }
             .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always))
-            .navigationTitle("Commands")
+            .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
         }
@@ -65,7 +68,7 @@ struct CommandList: View {
 
     private func row(_ command: CommandRow) -> some View {
         Button {
-            CommandUsage.shared.record(command.id)
+            if recordsUse { CommandUsage.shared.record(command.id) }
             choose(command.id)
             dismiss()
         } label: {

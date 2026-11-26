@@ -3,6 +3,7 @@ import OrgApp
 import OrgCore
 import OrgDocument
 import OrgHighlight
+import Observation
 import OrgPresentation
 import UIKit
 
@@ -167,7 +168,11 @@ final class MobileEditor: NSObject, DocumentBuffer {
     /// A command's edits being applied, which keep shrunk columns narrow.
     private var commandEditing = false
     /// The snippet whose fields are being filled in, and the range drawn for it last.
-    var snippetSession: SnippetSession?
+    var snippetSession: SnippetSession? {
+        didSet { if fields.active != (snippetSession != nil) { fields.active = snippetSession != nil } }
+    }
+    /// Whether a snippet's fields are being filled in, for the key bar to watch.
+    let fields = SnippetFields()
     var snippetHighlight: Range<Int>?
     var updatingMirrors = false
 
@@ -820,5 +825,11 @@ extension MobileEditor: NSTextLayoutManagerDelegate {
         }
         return fragment
     }
+}
+
+/// Whether a snippet's fields are being filled in.
+@Observable
+final class SnippetFields {
+    var active = false
 }
 #endif

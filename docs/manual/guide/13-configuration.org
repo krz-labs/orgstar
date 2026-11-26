@@ -387,6 +387,40 @@ memo = "* To\n\n* From\n"
 
 Keys are letters, digits, =_= and =-=. Emacs import adds entries here; remove one by deleting its line.
 
+** [key-bar]
+
+The buttons of the key bar above the on-screen keyboard on iPhone and iPad, in order: =iphone= where the editor is narrow (iPhone, and iPad in Slide Over or a narrow split), =ipad= where it is wide. Each is a list of ids: the key bar's own buttons, or any command id from the Commands list, =org.snippet:<trigger>= for a snippet and =macro.named.<name>= for a named keyboard macro. A list may run over several lines.
+
+#+BEGIN_SRC toml
+[key-bar]
+iphone = ["commands", "fold", "promote", "demote", "new-heading", "todo",
+          "org.snippet:td", "macro.named.tidy", "edit.undo", "plan", "hide-keyboard"]
+ipad = ["commands", "fold", "overview", "promote", "demote", "move-up", "move-down",
+        "new-heading", "todo", "act", "schedule", "deadline", "tags", "open-link", "hide-keyboard"]
+#+END_SRC
+
+| Id              | Button                                                         |
+|-----------------+----------------------------------------------------------------|
+| =commands=      | the Commands list                                              |
+| =fold=          | =TAB=                                                          |
+| =overview=      | =S-TAB=                                                        |
+| =promote=       | =M-<left>=                                                     |
+| =demote=        | =M-<right>=                                                    |
+| =move-up=       | =M-<up>=                                                       |
+| =move-down=     | =M-<down>=                                                     |
+| =new-heading=   | =M-RET=                                                        |
+| =todo=          | =C-c C-t=                                                      |
+| =act=           | =C-c C-c=                                                      |
+| =plan=          | a menu of Schedule, Deadline and Tags                          |
+| =schedule=      | =C-c C-s=                                                      |
+| =deadline=      | =C-c C-d=                                                      |
+| =tags=          | =C-c C-q=                                                      |
+| =open-link=     | =C-c C-o=                                                      |
+| =bold=, =italic=, =code= | Bold, Italic and Code                                 |
+| =hide-keyboard= | hides the keyboard                                             |
+
+Without a list, its default applies: =commands=, =fold=, =promote=, =demote=, =move-up=, =move-down=, =new-heading=, =todo= and =act=, then =plan= on iPhone or =schedule=, =deadline= and =tags= on iPad, then =hide-keyboard=. An empty list, =[]=, leaves the bar empty. An id that is no command on iPhone and iPad, such as a Mac-only command or a snippet that =snippets.toml= no longer has, is reported under the folder in Settings and skipped. Settings ▸ Key Bar on iOS writes this table, each list on one line, and Reset to Default removes the list; the Mac reads the table and has no key bar.
+
 ** [[publish]]
 
 Publishing projects, one table each, as =org-publish-project-alist= has them. They're read when you publish; see [[file:12-export.org::*Publishing][Publishing]] for the keys. The Settings window leaves them as they are.

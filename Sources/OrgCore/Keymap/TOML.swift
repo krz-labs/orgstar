@@ -1,13 +1,15 @@
 import Foundation
 
 /// The part of TOML keymaps use: `[table]` and `[[array-of-tables]]` headers, and
-/// `key = value` lines with basic or literal strings (multi-line ones too), booleans and
-/// integers. Comments start with `#` outside strings.
+/// `key = value` lines with basic or literal strings (multi-line ones too), booleans,
+/// integers and arrays of these, which may run over several lines. Comments start with `#`
+/// outside strings.
 public enum TOML {
     public enum Value: Sendable, Equatable {
         case string(String)
         case bool(Bool)
         case integer(Int)
+        case array([Value])
 
         public var string: String? {
             if case .string(let value) = self { return value }
@@ -21,6 +23,11 @@ public enum TOML {
 
         public var integer: Int? {
             if case .integer(let value) = self { return value }
+            return nil
+        }
+
+        public var array: [Value]? {
+            if case .array(let value) = self { return value }
             return nil
         }
     }
@@ -83,6 +90,17 @@ public enum TOML {
                 let end = body.range(of: delimiter)!
                 value = .string(try multiline(String(body[..<end.lowerBound]), literal: delimiter == "\'\'\'", line: number))
                 rest = body[end.upperBound...]
+            } else if rest.first == "[" {
+                // An array runs to its closing bracket, on this line or a later one.
+                var body = String(rest)
+                while !closesArray(body) {
+                    guard index < lines.count else { throw ParseError(line: number, message: "unclosed array") }
+                    body += "\n" + lines[index].replacingOccurrences(of: "\r", with: "")
+                    index += 1
+                }
+                var array = Substring(body)
+                value = try parseValue(&array, line: number)
+                rest = array
             } else {
                 value = try parseValue(&rest, line: number)
             }
@@ -134,8 +152,64 @@ public enum TOML {
         return out
     }
 
+    /// Whether `text`, starting with `[`, has the bracket that closes it, outside strings and
+    /// comments.
+    private static func closesArray(_ text: String) -> Bool {
+        var depth = 0
+        var quote: Character?
+        var comment = false
+        var escaped = false
+        for c in text {
+            if comment {
+                if c == "\n" { comment = false }
+            } else if let q = quote {
+                if escaped { escaped = false } else if c == "\\" && q == "\"" { escaped = true } else if c == q { quote = nil }
+            } else {
+                switch c {
+                case "\"", "'": quote = c
+                case "#": comment = true
+                case "[": depth += 1
+                case "]":
+                    depth -= 1
+                    if depth == 0 { return true }
+                default: break
+                }
+            }
+        }
+        return false
+    }
+
+    /// Spaces, line ends and comments between an array's values.
+    private static func skipBlanks(_ rest: inout Substring) {
+        while let c = rest.first {
+            if c.isWhitespace {
+                rest = rest.dropFirst()
+            } else if c == "#" {
+                rest = rest.drop { $0 != "\n" }
+            } else {
+                return
+            }
+        }
+    }
+
     private static func parseValue(_ rest: inout Substring, line: Int) throws -> Value {
         switch rest.first {
+        case "[":
+            rest = rest.dropFirst()
+            var values: [Value] = []
+            while true {
+                skipBlanks(&rest)
+                if rest.first == "]" { break }
+                values.append(try parseValue(&rest, line: line))
+                skipBlanks(&rest)
+                if rest.first == "," {
+                    rest = rest.dropFirst()
+                } else if rest.first != "]" {
+                    throw ParseError(line: line, message: rest.isEmpty ? "unclosed array" : "expected , or ] in array")
+                }
+            }
+            rest = rest.dropFirst()
+            return .array(values)
         case "\"":
             rest = rest.dropFirst()
             var value = ""
@@ -171,7 +245,7 @@ public enum TOML {
             rest = rest[rest.index(after: end)...]
             return .string(value)
         default:
-            let word = rest.prefix { !$0.isWhitespace && $0 != "#" }
+            let word = rest.prefix { !$0.isWhitespace && $0 != "#" && $0 != "," && $0 != "]" }
             rest = rest.dropFirst(word.count)
             if word == "true" { return .bool(true) }
             if word == "false" { return .bool(false) }

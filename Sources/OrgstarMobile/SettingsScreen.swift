@@ -74,6 +74,11 @@ struct SettingsScreen: View {
                 Text("With a body font, prose uses it while tables, code, dates, tags and drawers keep the monospaced font. Text width keeps lines to that many columns, centred, on a screen wider than that.")
             }
             Section {
+                NavigationLink("Key Bar") { KeyBarSettings(model: model) }
+            } footer: {
+                Text("The buttons above the on-screen keyboard.")
+            }
+            Section {
                 let _ = model.settingsVersion
                 Toggle("Show days without entries", isOn: Binding {
                     OrgPreferences.agendaShowAllDates()
