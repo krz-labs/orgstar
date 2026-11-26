@@ -511,7 +511,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
              "app.rename-tag", "app.rename-todo-keyword": return onAppCommand != nil
         case _ where id.hasPrefix(NamedMacros.commandPrefix): return true
         case "app.refile", "app.refile.copy", "app.archive": return onAppCommand != nil && Presentation.heading(containing: context.caret, in: context.tree) != nil
-        case "app.export-dialog", "app.export-subtree-dialog", "app.copy-rich-text", "app.export.html-open", "app.export-body-only", "app.export.icalendar-agenda", "app.export.icalendar-combined": return onAppCommand != nil
+        case "app.export-dialog", "app.export-subtree-dialog", "app.share-subtree", "app.copy-rich-text", "app.export.html-open", "app.export-body-only", "app.export.icalendar-agenda", "app.export.icalendar-combined": return onAppCommand != nil
         case _ where id.hasPrefix("app.publish"): return onAppCommand != nil
         case "app.working-copy.sync": return onAppCommand != nil
         case _ where Self.linkCommands.contains(id): return onAppCommand != nil

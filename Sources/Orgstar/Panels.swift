@@ -12,10 +12,11 @@ enum Panel: Identifiable {
     case plot(UUID, TablePlot.Plot)
     case plotImage(UUID, URL)
     case crypt(UUID, CryptRequest)
+    case shareSubtree(UUID, SubtreeShare)
 
     var id: UUID {
         switch self {
-        case .columns(let id, _), .export(let id, _), .conflict(let id), .syncCopies(let id), .recovery(let id), .plot(let id, _), .plotImage(let id, _), .crypt(let id, _): id
+        case .columns(let id, _), .export(let id, _), .conflict(let id), .syncCopies(let id), .recovery(let id), .plot(let id, _), .plotImage(let id, _), .crypt(let id, _), .shareSubtree(let id, _): id
         }
     }
 }

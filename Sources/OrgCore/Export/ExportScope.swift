@@ -56,6 +56,30 @@ public enum ExportScope {
         return lines.joined(separator: "\n") + "\n" + body
     }
 
+    /// Keywords of the file that name it or its export, left out of a shared entry.
+    static let fileOnlyKeywords: Set<String> = ["TITLE", "SUBTITLE", "EXPORT_FILE_NAME"]
+
+    /// The subtree containing `offset` as it is in the file, to share as an org file of its own:
+    /// the file's keyword lines (but its title and export name), then the heading and
+    /// everything under it, promoted so the heading is level 1. Its range in `text` and the
+    /// heading's title, links as their descriptions, come with it. Nil before the first heading.
+    public static func entry(_ text: String, at offset: Int, settings: OrgSettings = .default) -> (text: String, range: Range<Int>, title: String)? {
+        let tree = OrgParser.parse(text, defaults: settings)
+        let model = DocumentModel(tree: tree)
+        guard let index = model.headings.lastIndex(where: { $0.headingRange.lowerBound <= offset }) else { return nil }
+        let heading = model.headings[index]
+        let ns = text as NSString
+        let start = heading.headingRange.lowerBound
+        let end = model.headings[(index + 1)...].first { $0.level <= heading.level }?.headingRange.lowerBound ?? ns.length
+        let subtree = ExportPreprocess.shift(ns.substring(with: NSRange(location: start, length: end - start)), to: 1)
+        let lines = preamble(tree).filter { line in
+            guard let m = line.firstMatch(of: #/^#\+([^:\s]+):/#) else { return true }
+            return !fileOnlyKeywords.contains(m.1.uppercased())
+        }
+        let body = subtree.replacing(#/\s+$/#, with: "") + "\n"
+        return ((lines.isEmpty ? "" : lines.joined(separator: "\n") + "\n\n") + body, start..<end, Links.displayFormat(heading.title).trimmingCharacters(in: .whitespaces))
+    }
+
     /// The export's name: the subtree's `EXPORT_FILE_NAME` property when exporting the subtree
     /// at `offset`, else the file's last `#+EXPORT_FILE_NAME`; nil when neither is set.
     public static func fileName(_ text: String, subtreeAt offset: Int? = nil, settings: OrgSettings = .default) -> String? {

@@ -541,6 +541,8 @@ struct OrgstarApp: App {
                     }
                 }
                 .disabled(session.path == nil)
+                Button("Share Subtree…") { commands.run("app.share-subtree") }
+                    .disabled(!session.isOrg)
                 Menu("Publish") {
                     ForEach(EditorCommands.all.filter { $0.id.hasPrefix("app.publish") }, id: \.id) { command in
                         Button(command.localizedTitle) { commands.run(command.id) }

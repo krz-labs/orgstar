@@ -345,6 +345,17 @@ The other device looks for the file in its own added folders. A folder in iCloud
 
 Only files in an added folder are offered, and never an encrypted =.org.gpg= file. On iPhone and iPad, the editor offers its file; the reader and the agenda don't.
 
+* Sharing a subtree
+
+File ▸ Share Subtree… (also in the command palette, and in Commands on iPhone and iPad, under Export) sends the entry at the caret through AirDrop, Mail, Messages or another app:
+
+- Org file :: the entry as an =.org= file named after its heading. The file holds the keyword lines at the top of your file (such as =#+TODO= and =#+STARTUP=, but not =#+TITLE=) and the entry with everything under it, as it is in the file, promoted so the entry is a level-1 heading.
+- Text :: the same text, for an app that takes text.
+
+When the entry or an entry under it has attachments, Include attachments sends each attached file as an item of its own beside the =.org= file. =attachment:= links in the shared file don't reach them on the other side, since the attachment folder isn't sent.
+
+An encrypted entry (=:crypt:=) is shared as the file holds it, still encrypted.
+
 * Encodings and line endings
 
 orgstar edits UTF-8 files, with or without a byte order mark.

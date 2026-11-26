@@ -185,6 +185,7 @@ public enum EditorCommands {
         EditorCommand(id: "app.export-dialog", title: "Export…", action: .app),
         EditorCommand(id: "app.export-subtree", title: "Turn Subtree Export On or Off", action: .app),
         EditorCommand(id: "app.export-body-only", title: "Turn Body-Only Export On or Off", action: .app),
+        EditorCommand(id: "app.share-subtree", title: "Share Subtree…", action: .app),
         EditorCommand(id: "app.sync-conflicts", title: "Resolve Sync Conflicts…", action: .app),
         EditorCommand(id: "app.revert", title: "Revert to File on Disk", action: .app),
         EditorCommand(id: "app.recovery", title: "History…", action: .app),

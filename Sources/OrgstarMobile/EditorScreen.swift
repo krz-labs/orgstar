@@ -95,6 +95,7 @@ struct EditorScreen: View {
         /// Rename Tag or Rename TODO Keyword, starting from this name.
         case rename(ReplaceKind, String)
         case lint
+        case shareSubtree(SubtreeShare)
         /// The subtree at this offset, to export.
         case exportSubtree(Int)
 
@@ -114,6 +115,7 @@ struct EditorScreen: View {
             case .graph: "graph"
             case .rename(let kind, _): kind.rawValue
             case .lint: "lint"
+            case .shareSubtree(let share): share.id.uuidString
             case .exportSubtree: "exportSubtree"
             }
         }
@@ -247,6 +249,8 @@ struct EditorScreen: View {
                 RenameScreen(kind: kind, workspace: workspace, session: session, initial: initial) { message = $0 }
             case .lint:
                 LintScreen(workspace: workspace, session: session, path: path) { offset in editor?.reveal(offset) }
+            case .shareSubtree(let share):
+                SubtreeShareScreen(share: share) { message = $0 }
             }
         }
         .fileImporter(isPresented: $importingTable, allowedContentTypes: [.commaSeparatedText, .tabSeparatedText, .plainText]) { result in
@@ -474,6 +478,12 @@ struct EditorScreen: View {
                 sheet = .export
             } else if id == EditorScreen.exportSubtreeCommand {
                 exportSubtree()
+            } else if id == "app.share-subtree" {
+                if let caret = self.editor?.editContext().caret, let share = session.subtreeShare(path, at: caret) {
+                    sheet = .shareSubtree(share)
+                } else {
+                    message = String(localized: "Not in a subtree")
+                }
             } else if id == "app.export.html-open" {
                 exportHTMLAndOpen()
             } else if id == "app.export-body-only" {
@@ -1057,6 +1067,7 @@ struct CommandPalette: View {
         ("app.clock.default", "Mark as Default Clock Task"), ("app.clock.resolve", "Resolve Open Clocks…"),
         ("app.refile", "Refile…"), ("app.refile.copy", "Copy to Refile Target…"), ("app.refile.goto", "Go to Refile Target…"),
         ("app.archive", "Archive Subtree"), ("app.export-dialog", "Export…"), ("app.export-subtree-dialog", "Export Subtree…"),
+        ("app.share-subtree", "Share Subtree…"),
         ("app.copy-rich-text", "Copy as Rich Text"), ("app.export.html-open", "Export to HTML and Open"),
         ("app.export-body-only", "Turn Body-Only Export On or Off"),
         ("app.export.icalendar-agenda", "Export Agenda Files to iCalendar"), ("app.export.icalendar-combined", "Combine Agenda Files into iCalendar"),
@@ -1151,7 +1162,7 @@ struct CommandPalette: View {
         switch id {
         case "app.recovery": return recoveries > 0 ? nil : String(localized: "No Recovery Versions")
         case "app.sync-conflicts": return syncCopies > 0 ? nil : String(localized: "No sync conflict copies", comment: "Why Resolve Sync Conflicts… is greyed in the Commands list")
-        case EditorScreen.exportSubtreeCommand:
+        case EditorScreen.exportSubtreeCommand, "app.share-subtree":
             return ExportScope.subtree(context.text, at: context.caret) != nil ? nil : String(localized: "Not in a subtree", comment: "Why Export Subtree… is greyed in the Commands list")
         default: return editor.applies(id, in: context) ? nil : CommandReason.reason(for: id, in: context)
         }

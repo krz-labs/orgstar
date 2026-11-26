@@ -993,6 +993,8 @@ struct ContentView: View {
             PlotSheet(content: .chart(plot))
         case .plotImage(_, let url):
             PlotSheet(content: .image(url))
+        case .shareSubtree(_, let share):
+            ShareSubtreeSheet(share: share) { commands.show($0) }
         case .crypt(_, let request):
             CryptSheet(request: request, text: { session.document?.text ?? "" }, apply: { applyText($0) }) { message in
                 self.panel = nil
@@ -1319,7 +1321,7 @@ struct ContentView: View {
             return commands.show(Self.unavailable(EditorCommands.all.first { $0.id == id }?.title ?? id))
         }
         if let feature = ProFeature.required(byCommand: id), !ProAccess.shared.allows(feature) { return }
-        let orgOnly = ["app.refile", "app.refile.copy", "app.archive", "app.clock.in", "app.clock.default", "app.copy-rich-text", "app.export-subtree", "app.export-body-only"].contains(id) || (id.hasPrefix("app.export.") && !id.hasPrefix("app.export.icalendar-")) || id.hasPrefix("org.")
+        let orgOnly = ["app.refile", "app.refile.copy", "app.archive", "app.clock.in", "app.clock.default", "app.copy-rich-text", "app.export-subtree", "app.export-body-only", "app.share-subtree"].contains(id) || (id.hasPrefix("app.export.") && !id.hasPrefix("app.export.icalendar-")) || id.hasPrefix("org.")
         if orgOnly, !session.isOrg {
             commands.show(String(localized: "Not an org file"))
             return
@@ -1520,6 +1522,10 @@ struct ContentView: View {
             lintRun += 1
         case "app.copy-rich-text":
             copyRichText()
+        case "app.share-subtree":
+            guard let path = session.path else { return commands.show(String(localized: "No file is open")) }
+            guard let share = session.subtreeShare(path, at: session.caret) else { return commands.show(String(localized: "Not in a subtree")) }
+            panel = .shareSubtree(UUID(), share)
         case "app.export-dialog":
             guard let path = session.path else { return commands.show(String(localized: "No file is open")) }
             panel = .export(UUID(), URL(fileURLWithPath: path))

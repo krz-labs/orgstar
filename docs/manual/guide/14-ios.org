@@ -411,6 +411,8 @@ PDF export follows =pdf-margin=, =pdf-font= and =pdf-page-numbers= in =config.to
 
 Body Only in the Export menu leaves out the title and the page around the text in HTML, Markdown, LaTeX and Plain Text (ASCII), and is kept for each file; the other formats say they have no body-only export while it is on. Export Subtree…, in the editor's Commands and its Export menu on iPad, shares the subtree at the caret in any of the formats.
 
+Share Subtree…, in the editor's Commands under Export, shares the entry at the caret as it is in the file: Share as Org File sends an =.org= file named after its heading, with Include attachments sending the entry's attached files beside it, and Share as Text sends the text. See [[file:01-files-and-folders.org][Files and folders]], Sharing a subtree.
+
 The Export menu also has Export Agenda Files to iCalendar, which writes an =.ics= beside each agenda file, and Combine Agenda Files into iCalendar, which shares one calendar of them all. Commands has these, Copy as Rich Text, and Export to HTML and Open, which shows the HTML export in Quick Look. Without orgstar+, the Export menu's items that need it end in "(orgstar+)" and open the orgstar+ screen.
 
 Publishing works from Commands as on the Mac, with the =[[publish]]= projects in =config.toml=. A project that publishes outside your folders asks for a folder the first time, and uses it from then on. See [[file:12-export.org][Export]].

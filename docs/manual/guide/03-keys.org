@@ -1200,6 +1200,7 @@ No preset binds these. Run them from the palette or a menu, or bind them in =key
 | History… (=app.recovery=) | Shows the file's recovery versions and, in the download version, its git commits. Recovery Versions… on iOS. |
 | Lint File (=app.lint=) | Lists the problems in the file in a panel under the editor (=org-lint=). File ▸ Lint File. See [[file:02-the-editor.org][The editor]]. |
 | Resolve Sync Conflicts… (=app.sync-conflicts=) | Shows the file's sync conflict copies to resolve them. |
+| Share Subtree… (=app.share-subtree=) | Shares the entry at the caret as an org file, with its attachments if chosen, or as text. File ▸ Share Subtree…. See [[file:01-files-and-folders.org][Files and folders]]. |
 | Import Table from File… (=app.table-import=) | Asks for a CSV, TSV or space-separated file and inserts it as a table (=org-table-import=). |
 | Export Table to File… (=app.table-export=) | Writes the table at point to a CSV or TSV file (=org-table-export=). |
 | Plot Table (=app.plot=) | Plots the table at point as its =#+PLOT:= lines say (=org-plot/gnuplot=, =C-c " g= in the Emacs and Doom presets). |

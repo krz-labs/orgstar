@@ -338,4 +338,49 @@ struct SubtreeExportScreen: View {
         }
     }
 }
+
+/// Share Subtree…: the entry at the caret as an org file, with its attachments as separate items
+/// if chosen, or as text.
+struct SubtreeShareScreen: View {
+    let share: SubtreeShare
+    var report: (String) -> Void = { _ in }
+    @State private var file: URL?
+    @State private var withAttachments = false
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    if let file {
+                        ShareLink(items: share.files(file: file, withAttachments: withAttachments)) {
+                            Label("Share as Org File", systemImage: "doc")
+                        }
+                    }
+                    if !share.attachments.isEmpty {
+                        Toggle("Include \(share.attachments.count) attachments", isOn: $withAttachments)
+                    }
+                } footer: {
+                    Text(verbatim: share.fileName)
+                }
+                Section {
+                    ShareLink(item: share.text, preview: SharePreview(share.fileName)) {
+                        Label("Share as Text", systemImage: "text.alignleft")
+                    }
+                }
+            }
+            .navigationTitle("Share Subtree")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+            .onAppear {
+                guard file == nil else { return }
+                do {
+                    file = try share.writeFile()
+                } catch {
+                    report(String(localized: "Can't share \(share.fileName): \(error.localizedDescription)"))
+                }
+            }
+        }
+    }
+}
 #endif
