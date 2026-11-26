@@ -5,6 +5,8 @@
 #   ORGSTAR_SIGN   signing identity; ad hoc ("-") for local use by default. Any other
 #                  identity also turns on the hardened runtime and a secure timestamp.
 #   ORGSTAR_ARCHS  architectures, e.g. "arm64 x86_64" for a universal app; this Mac's by default.
+#   ORGSTAR_PROFILE  a Developer ID provisioning profile to embed, with its Keychain access group,
+#                  so passphrases can be kept in the data protection keychain. Needs ORGSTAR_SIGN.
 set -eu
 
 cd "$(dirname "$0")/.."
@@ -248,13 +250,27 @@ for item in "$fw/XPCServices/Installer.xpc" "$fw/XPCServices/Downloader.xpc" "$f
 done
 
 # The hardened runtime needs Calendar access declared for the agenda's events.
+keychain=""
+if [ -n "${ORGSTAR_PROFILE:-}" ]; then
+    [ "$sign" != "-" ] || { echo "ORGSTAR_PROFILE needs ORGSTAR_SIGN." >&2; exit 1; }
+    cp "$ORGSTAR_PROFILE" "$app/Contents/embedded.provisionprofile"
+    security cms -D -i "$ORGSTAR_PROFILE" -o "$work/profile.plist"
+    team="$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:com.apple.developer.team-identifier' "$work/profile.plist")"
+    keychain="
+    <key>com.apple.application-identifier</key>
+    <string>$team.sh.krz.orgstar</string>
+    <key>com.apple.developer.team-identifier</key>
+    <string>$team</string>
+    <key>keychain-access-groups</key>
+    <array><string>$team.sh.krz.orgstar</string></array>"
+fi
 cat > "$work/app.entitlements" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
     <key>com.apple.security.personal-information.calendars</key>
-    <true/>
+    <true/>$keychain
 </dict>
 </plist>
 PLIST

@@ -28,6 +28,8 @@ files="${ORGSTAR_FILES:-homelab:/var/www/files/orgstar}"
 publish="${ORGSTAR_PUBLISH:-1}"
 sign="${ORGSTAR_SIGN:-$(security find-identity -v -p codesigning | sed -n 's/.*"\(Developer ID Application: .*\)"/\1/p' | head -1)}"
 [ -n "$sign" ] || { echo "No Developer ID Application identity in the keychain." >&2; exit 1; }
+profile="${ORGSTAR_PROFILE:-$HOME/Library/MobileDevice/Provisioning Profiles/orgstar_dev_id.provisionprofile}"
+[ -f "$profile" ] || { echo "No Developer ID provisioning profile at $profile." >&2; exit 1; }
 ! grep -q 'publicKey = .*// placeholder' Sources/OrgApp/LicenseKey.swift ||
     { echo "Run packaging/license-issuer/keygen.sh first: the license public key is a placeholder." >&2; exit 1; }
 # The Sparkle public key; its private half is in the release Mac's login keychain (generate_keys).
@@ -46,7 +48,7 @@ ORGSTAR_GATES=1 swift test -c release --filter GateTests || { echo "A performanc
 
 # The build number counts commits, so each release's is higher than the last's.
 build="$(git rev-list --count HEAD)"
-ORGSTAR_SIGN="$sign" ORGSTAR_ARCHS="arm64 x86_64" sh scripts/build-app.sh "$version" "$build" > /dev/null
+ORGSTAR_SIGN="$sign" ORGSTAR_PROFILE="$profile" ORGSTAR_ARCHS="arm64 x86_64" sh scripts/build-app.sh "$version" "$build" > /dev/null
 app=".build/app/orgstar.app"
 codesign --verify --strict --deep "$app"
 
