@@ -855,15 +855,15 @@ struct KeyBar: View {
         (String(localized: "Overview", comment: "Key bar button"), "arrow.left.to.line", "S-TAB"),
         (String(localized: "Promote", comment: "Key bar button"), "decrease.indent", "M-<left>"),
         (String(localized: "Demote", comment: "Key bar button"), "increase.indent", "M-<right>"),
-        (String(localized: "Move up", comment: "Key bar button"), "arrow.up.square", "M-<up>"),
-        (String(localized: "Move down", comment: "Key bar button"), "arrow.down.square", "M-<down>"),
-        (String(localized: "New heading or item", comment: "Key bar button"), "plus", "M-RET"),
+        (String(localized: "Move Up", comment: "Key bar button"), "arrow.up.square", "M-<up>"),
+        (String(localized: "Move Down", comment: "Key bar button"), "arrow.down.square", "M-<down>"),
+        (String(localized: "New Heading or Item", comment: "Key bar button"), "plus", "M-RET"),
         ("TODO", nil, "C-c C-t"),
-        (String(localized: "Act at point", comment: "Key bar button"), "checkmark.square", "C-c C-c"),
+        (String(localized: "Act at Point", comment: "Key bar button"), "checkmark.square", "C-c C-c"),
         (String(localized: "Schedule", comment: "Key bar button"), "calendar", "C-c C-s"),
         (String(localized: "Deadline", comment: "Key bar button"), "calendar.badge.exclamationmark", "C-c C-d"),
         (String(localized: "Tags", comment: "Key bar button"), "tag", "C-c C-q"),
-        (String(localized: "Open link", comment: "Key bar button"), "link", "C-c C-o"),
+        (String(localized: "Open Link", comment: "Key bar button"), "link", "C-c C-o"),
     ]
 
     /// Emphasis for the selection, or a pair of markers with the caret between.
@@ -894,7 +894,7 @@ struct KeyBar: View {
                 ForEach(Self.emphasis, id: \.command) { item in
                     Button(item.label, systemImage: item.symbol) { editor.run(item.command) }
                 }
-                Button("Hide keyboard", systemImage: "keyboard.chevron.compact.down") { editor.textView.resignFirstResponder() }
+                Button("Hide Keyboard", systemImage: "keyboard.chevron.compact.down") { editor.textView.resignFirstResponder() }
             }
             .labelStyle(.iconOnly)
             .buttonStyle(KeyStyle(size: size))
@@ -1017,7 +1017,7 @@ struct PromptSheet: View {
                 }
             }
             if !fast.multiple {
-                Button("No keyword") { answer(" ") }
+                Button("No Keyword") { answer(" ") }
             }
         } footer: {
             if fast.multiple, !fast.inherited.isEmpty { Text("Inherited: :" + fast.inherited.joined(separator: ":") + ":") }

@@ -87,7 +87,7 @@ Files that aren't valid UTF-8 open read-only; commands that would change them sa
 
 The editor and the reader use the theme set in the configuration folder's =config.toml=, stacked as on the Mac: the themes chosen with =light-theme= and =dark-theme=, then the theme file named by =theme-file=, then the colours in =[theme]=, =[theme.light]=, =[theme.dark]=, =[theme.todo]= and =[theme.category]=. A TODO keyword without a colour in =[theme.todo]= takes its class's colour: =todo-next= for =NEXT= and =STRT=, =todo-waiting= for =WAIT= and =HOLD=, =todo-cancelled= for =KILL= and =CANCELLED=, and so on (see [[file:13-configuration.org][Configuration]] for the lists). Colours follow the system's light or dark appearance. Problems in the theme show in the Settings tab with the other problems. A change to =config.toml= or the theme file applies as it syncs, to open editors too. See [[file:13-configuration.org][Configuration]] for the colour keys.
 
-Settings ▸ Light Theme and Dark Theme choose the built-in themes, shown as a few lines of Org in each theme's colours; with a configuration folder the choice is written to its =config.toml=, so the Mac uses it too. Settings ▸ App Icon chooses the home screen icon from the same thirteen as the Mac; iOS confirms the change. The icon is chosen per device. Settings ▸ Body Font (=body-font=: Same as Font, System or an installed proportional family) and Text Width (=text-width=: Whole Screen or 60 to 120 columns) are written the same way.
+Settings ▸ Light theme and Dark theme choose the built-in themes, shown as a few lines of Org in each theme's colours; with a configuration folder the choice is written to its =config.toml=, so the Mac uses it too. Settings ▸ App icon chooses the home screen icon from the same thirteen as the Mac; iOS confirms the change. The icon is chosen per device. Settings ▸ Body font (=body-font=: Same as Font, System or an installed proportional family) and Text width (=text-width=: Whole screen or 60 to 120 columns) are written the same way.
 
 - Font :: =font= when that family is installed on the device, otherwise the system's monospaced font. =body-font=, when set, is used for prose as on the Mac.
 - Size :: =font-size= is the size at the default Dynamic Type setting, 13 pt by default. Text grows and shrinks with the text size chosen in the system Settings app.
@@ -132,17 +132,17 @@ A bar above the on-screen keyboard has buttons for Org's keys. Each does what it
 | Overview             | =S-TAB=     |
 | Promote              | =M-<left>=  |
 | Demote               | =M-<right>= |
-| Move up              | =M-<up>=    |
-| Move down            | =M-<down>=  |
-| New heading or item  | =M-RET=     |
+| Move Up              | =M-<up>=    |
+| Move Down            | =M-<down>=  |
+| New Heading or Item  | =M-RET=     |
 | TODO                 | =C-c C-t=   |
-| Act at point         | =C-c C-c=   |
+| Act at Point         | =C-c C-c=   |
 | Schedule             | =C-c C-s=   |
 | Deadline             | =C-c C-d=   |
 | Tags                 | =C-c C-q=   |
-| Open link            | =C-c C-o=   |
+| Open Link            | =C-c C-o=   |
 | Bold, Italic, Code   | Emphasize with =*=, =/= or =~=: the selection, or a pair of markers with the caret between |
-| Hide keyboard        |             |
+| Hide Keyboard        |             |
 
 ** Commands
 
@@ -418,7 +418,7 @@ Import from Emacs reads an Emacs or Doom configuration folder, such as a synced 
 
 With a configuration folder, settings and structure templates are written to its =config.toml=, and capture templates, key bindings and agenda views to its =capture.toml=, =keymap.toml= and =views.toml=, so the Mac reads them too. Without one, settings are kept on the device.
 
-Folders from =org-directory= and =org-agenda-files= name the Mac's paths, so the screen lists them under Folders on this device. Tap each one and choose the folder on this device that holds the same files, such as its synced copy in iCloud Drive. Import adds the chosen folders to the Folders tab; folders not chosen aren't added, and the summary says so. =org-agenda-files= entries in a chosen folder point to the same files in the folder chosen for it, and entries in folders not chosen are left out. Relative entries are kept as written and count from the first folder, as Emacs counts them from =org-directory=; they add no folder of their own. With a configuration folder, =config.toml= keeps the Mac's entries as well, beside the device's; each device skips the files it doesn't have.
+Folders from =org-directory= and =org-agenda-files= name the Mac's paths, so the screen lists them under Folders on This Device. Tap each one and choose the folder on this device that holds the same files, such as its synced copy in iCloud Drive. Import adds the chosen folders to the Folders tab; folders not chosen aren't added, and the summary says so. =org-agenda-files= entries in a chosen folder point to the same files in the folder chosen for it, and entries in folders not chosen are left out. Relative entries are kept as written and count from the first folder, as Emacs counts them from =org-directory=; they add no folder of their own. With a configuration folder, =config.toml= keeps the Mac's entries as well, beside the device's; each device skips the files it doesn't have.
 
 The Agenda, TODO Dependencies, Calendar and Reminders sections are the only places the app changes a setting itself, besides Import from Emacs:
 
@@ -433,7 +433,7 @@ The Agenda, TODO Dependencies, Calendar and Reminders sections are the only plac
 
 These write =config.toml= in the configuration folder, as the Mac's Settings window does, so the Mac sees the change too. Without a configuration folder they are kept on the device.
 
-The In use section shows the TODO keywords, the agenda span and start (for example =10 days, starting today=), Notifications (how long before a timed entry it notifies you, or Off), the capture template keys, the light and dark themes, and the theme file's name when there is one, and the font with its size. When =font= names a family that isn't installed on the device, Font shows the system's font with a note, as =System monospaced, 13 pt (JetBrains Mono isn't installed)=.
+The In Use section shows the TODO keywords, the agenda span and start (for example =10 days, starting today=), Notifications (how long before a timed entry it notifies you, or Off), the capture template keys, the light and dark themes, and the theme file's name when there is one, and the font with its size. When =font= names a family that isn't installed on the device, Font shows the system's font with a note, as =System monospaced, 13 pt (JetBrains Mono isn't installed)=.
 
 About orgstar, at the bottom, shows the version, What's New (the sheet that opens once after an update with what changed) and links to the manual, the release notes, the website, the issue tracker (which needs a gitbay account), support by email at =help@krz.sh= with the version and device filled in, the App Store review page, the source code, the license, third-party notices and the privacy policy.
 

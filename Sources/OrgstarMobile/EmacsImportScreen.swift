@@ -46,7 +46,7 @@ struct EmacsImportScreen: View {
                             }
                         }
                     } header: {
-                        Text("Folders on this device")
+                        Text("Folders on This Device")
                     } footer: {
                         Text("Choose the folder on this device for each one. Folders not chosen aren't added.")
                     }

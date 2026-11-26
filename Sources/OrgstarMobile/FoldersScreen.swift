@@ -82,7 +82,7 @@ struct FoldersScreen: View {
         .overlay {
             if workspace.rootPaths.isEmpty {
                 ContentUnavailableView {
-                    Label("No folders", systemImage: "folder")
+                    Label("No Folders", systemImage: "folder")
                 } description: {
                     Text("Add the folder your org files are in, from iCloud Drive or another app's storage.")
                 } actions: {

@@ -430,7 +430,7 @@ struct OrgstarApp: App {
                         CaptureIntent.environment = (model, session, clock, commands)
                     }
             case .failure(let error):
-                ContentUnavailableView("Can't open the index", systemImage: "exclamationmark.triangle", description: Text(error.localizedDescription))
+                ContentUnavailableView("Can't Open the Index", systemImage: "exclamationmark.triangle", description: Text(error.localizedDescription))
             }
         }
         .defaultSize(width: 1280, height: 860)

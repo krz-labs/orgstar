@@ -38,7 +38,7 @@ struct OrgstarMobileApp: App {
                     .environment(model.clock)
                     .onAppear { delegate.model = model }
             } else {
-                ContentUnavailableView("Can't open the index", systemImage: "exclamationmark.triangle", description: Text(model.failure ?? ""))
+                ContentUnavailableView("Can't Open the Index", systemImage: "exclamationmark.triangle", description: Text(model.failure ?? ""))
             }
         }
         // For the clock's idle time: time working in another window isn't time away.

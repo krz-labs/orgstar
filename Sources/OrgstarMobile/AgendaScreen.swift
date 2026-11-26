@@ -162,7 +162,7 @@ struct AgendaScreen: View, Equatable {
         }
         .overlay {
             if workspace.rootPaths.isEmpty {
-                ContentUnavailableView("No folders", systemImage: "folder", description: Text("Add a folder of org files under Folders."))
+                ContentUnavailableView("No Folders", systemImage: "folder", description: Text("Add a folder of org files under Folders."))
             }
         }
         .message($message)

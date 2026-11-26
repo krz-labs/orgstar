@@ -47,7 +47,7 @@ struct SearchScreen: View {
         }
         .overlay {
             if trimmed.isEmpty {
-                ContentUnavailableView("Search notes", systemImage: "magnifyingglass", description: Text("File names and the words of headings and their text."))
+                ContentUnavailableView("Search Notes", systemImage: "magnifyingglass", description: Text("File names and the words of headings and their text."))
             }
         }
         .navigationTitle("Search")

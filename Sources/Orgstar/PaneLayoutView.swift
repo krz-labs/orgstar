@@ -77,7 +77,7 @@ struct PaneCell: View {
             if pane.path != nil {
                 PaneView(pane: pane, session: session, commands: commands, settings: commands.editorSettings, onAppCommand: onAppCommand)
             } else {
-                ContentUnavailableView("No buffer", systemImage: "rectangle.dashed", description: Text("Choose a file, or press ⌘P."))
+                ContentUnavailableView("No Buffer", systemImage: "rectangle.dashed", description: Text("Choose a file, or press ⌘P."))
                     .contentShape(Rectangle())
                     .onTapGesture {
                         window.focus(pane.id)

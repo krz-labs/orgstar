@@ -348,12 +348,12 @@ struct AgendaView: View {
         .toolbar { toolbar }
         .overlay {
             if agenda.files.isEmpty, !hidesFolders {
-                ContentUnavailableView("No agenda files", systemImage: "calendar", description: Text("The agenda reads the org files at the top of each folder you add."))
+                ContentUnavailableView("No Agenda Files", systemImage: "calendar", description: Text("The agenda reads the org files at the top of each folder you add."))
             } else if agenda.files.isEmpty {
-                ContentUnavailableView("All folders hidden", systemImage: "folder", description: Text("Show a folder from the Folders menu."))
+                ContentUnavailableView("All Folders Hidden", systemImage: "folder", description: Text("Show a folder from the Folders menu."))
             } else if !isAgenda, !isBlocks, listRows.isEmpty {
                 ContentUnavailableView(
-                    "No entries", systemImage: "checklist",
+                    "No Entries", systemImage: "checklist",
                     description: Text(filter.isEmpty ? "Nothing in the agenda files matches this view." : "Nothing matches the filter.")
                 )
             }

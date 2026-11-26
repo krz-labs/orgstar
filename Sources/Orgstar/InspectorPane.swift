@@ -105,7 +105,7 @@ struct InspectorPane: View {
                 if let start = starts.first { session.reveal(start) }
             }
         } else {
-            ContentUnavailableView("No entries", systemImage: "tablecells")
+            ContentUnavailableView("No Entries", systemImage: "tablecells")
         }
     }
 
@@ -118,7 +118,7 @@ struct InspectorPane: View {
         .padding(.horizontal, 8)
         .padding(.bottom, 6)
         if clocked.isEmpty {
-            ContentUnavailableView("No clocked time", systemImage: "clock")
+            ContentUnavailableView("No Clocked Time", systemImage: "clock")
         } else {
             // A selectable list, so the arrow keys move through the headings; selecting one goes to it.
             List(selection: $selectedClock) {

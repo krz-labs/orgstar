@@ -208,9 +208,9 @@ struct OutlineColumn: View {
         .themedListBackground(theme.color("sidebar-background", in: colorScheme))
         .overlay {
             if session.path != nil, !session.isOrg {
-                ContentUnavailableView("No outline", systemImage: "doc.plaintext", description: Text("Only org files have an outline."))
+                ContentUnavailableView("No Outline", systemImage: "doc.plaintext", description: Text("Only org files have an outline."))
             } else if session.path != nil, session.outline.isEmpty {
-                ContentUnavailableView("No headings", systemImage: "list.bullet.indent")
+                ContentUnavailableView("No Headings", systemImage: "list.bullet.indent")
             }
         }
     }

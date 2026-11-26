@@ -38,19 +38,19 @@ struct SettingsScreen: View {
                 NavigationLink {
                     ThemePickerScreen(model: model, appearance: .light)
                 } label: {
-                    LabeledContent("Light Theme", value: ThemePickerScreen.current(.light).displayName)
+                    LabeledContent("Light theme", value: ThemePickerScreen.current(.light).displayName)
                 }
                 NavigationLink {
                     ThemePickerScreen(model: model, appearance: .dark)
                 } label: {
-                    LabeledContent("Dark Theme", value: ThemePickerScreen.current(.dark).displayName)
+                    LabeledContent("Dark theme", value: ThemePickerScreen.current(.dark).displayName)
                 }
                 NavigationLink {
                     AppIconScreen(current: $appIcon)
                 } label: {
-                    LabeledContent("App Icon", value: AppIcons.name(appIcon))
+                    LabeledContent("App icon", value: AppIcons.name(appIcon))
                 }
-                Picker("Body Font", selection: Binding {
+                Picker("Body font", selection: Binding {
                     UserDefaults.standard.string(forKey: "themeBodyFont") ?? ""
                 } set: { model.set("themeBodyFont", to: .string($0)) }) {
                     let body = UserDefaults.standard.string(forKey: "themeBodyFont") ?? ""
@@ -60,18 +60,18 @@ struct SettingsScreen: View {
                     if !["", "system"].contains(body), !Self.proportionalFamilies.contains(body) { Text(body).tag(body) }
                 }
                 .pickerStyle(.navigationLink)
-                Picker("Text Width", selection: Binding {
+                Picker("Text width", selection: Binding {
                     UserDefaults.standard.integer(forKey: "themeTextWidth")
                 } set: { model.set("themeTextWidth", to: .integer($0)) }) {
                     let width = UserDefaults.standard.integer(forKey: "themeTextWidth")
-                    Text("Whole Screen").tag(0)
+                    Text("Whole screen").tag(0)
                     ForEach([60, 70, 80, 90, 100, 120], id: \.self) { Text("\($0) columns").tag($0) }
                     if ![0, 60, 70, 80, 90, 100, 120].contains(width) { Text("\(width) columns").tag(width) }
                 }
             } header: {
                 Text("Appearance")
             } footer: {
-                Text("With a Body Font, prose uses it while tables, code, dates, tags and drawers keep the monospaced font. Text Width keeps lines to that many columns, centred, on a screen wider than that.")
+                Text("With a body font, prose uses it while tables, code, dates, tags and drawers keep the monospaced font. Text width keeps lines to that many columns, centred, on a screen wider than that.")
             }
             Section {
                 let _ = model.settingsVersion
@@ -119,7 +119,7 @@ struct SettingsScreen: View {
             reminderSection
             Section {
                 if badges == true {
-                    LabeledContent("Overdue Count on Icon", value: "On")
+                    LabeledContent("Overdue count on icon", value: "On")
                 } else if badges == false {
                     Button("Show Overdue Count on Icon…") {
                         Task {
@@ -153,7 +153,7 @@ struct SettingsScreen: View {
             } footer: {
                 Text("A folder with config.toml and capture.toml, such as a synced copy of ~/.config/orgstar from your Mac. Changes to them apply as they sync.")
             }
-            Section("In use") {
+            Section("In Use") {
                 let _ = model.settingsVersion
                 LabeledContent("TODO keywords", value: todoKeywords)
                 LabeledContent("Agenda", value: agenda)

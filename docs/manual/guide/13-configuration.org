@@ -570,7 +570,7 @@ What Import does with each kind of item:
 - Key bindings are appended to =keymap.toml=, except those already in the file with the same keys, command and state. Running the import again adds no duplicates.
 - Agenda views are appended to =views.toml=, except those whose name is already in the file.
 
-The Not imported section lists what orgstar read but can't use, with the reason: settings it has no equivalent for, values it can't work out without running Emacs, bindings to code rather than a command, and files it couldn't read. The footer counts variables that aren't about org, which are left alone.
+The Not Imported section lists what orgstar read but can't use, with the reason: settings it has no equivalent for, values it can't work out without running Emacs, bindings to code rather than a command, and files it couldn't read. The footer counts variables that aren't about org, which are left alone.
 
 A literate configuration (=config.org=) is read as =org-babel-load-file= and Doom tangle it: its =emacs-lisp= and =elisp= blocks, except blocks whose =:tangle= is =no= (set on the block, in a =#+HEADER:= line, in a =header-args= property or in =#+PROPERTY:=) and blocks under a COMMENT or =:ARCHIVE:= heading. Items show the line of =config.org= they came from. When the folder also has a =config.el=, it is read instead, as the file =config.org= tangles to.
 
@@ -682,7 +682,7 @@ Key bindings are imported when the command is one orgstar has a counterpart for,
 
 - Comments (=;=) are skipped. Strings understand =\n=, =\t=, =\"= and line continuations; other escapes give the character itself.
 - =#'= reads as =function=. Other =#= syntax is read as a symbol, so forms using it aren't understood.
-- A syntax error anywhere in a file, such as an unclosed parenthesis, stops that file from being read at all. The error and its line show under Not imported.
+- A syntax error anywhere in a file, such as an unclosed parenthesis, stops that file from being read at all. The error and its line show under Not Imported.
 - Macros other than those in the table above are not expanded, and functions are not called. Settings made by code you wrote (a =defun= that calls =setq=, a hook) aren't found.
 
 * Themes

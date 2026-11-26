@@ -56,7 +56,7 @@ struct StoreForm: View {
                         Button("Try Again") { Task { await store.loadProducts() } }
                     }
                 } header: {
-                    Text("Choose a plan")
+                    Text("Choose a Plan")
                 } footer: {
                     Text("Subscriptions renew automatically until cancelled in your Apple Account settings, at least 24 hours before the period ends.")
                         .settingsFooter()

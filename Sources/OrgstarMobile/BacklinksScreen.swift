@@ -27,7 +27,7 @@ struct BacklinksScreen: View {
                     if let heading {
                         Section("Links to \(heading.title.isEmpty ? "(untitled)" : heading.title)") { rows(heading.links) }
                     }
-                    Section("Links to this file") { rows(toFile) }
+                    Section("Links to This File") { rows(toFile) }
                 }
             }
             .navigationTitle("Backlinks")

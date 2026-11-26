@@ -66,7 +66,7 @@ struct BoardView: View {
         .overlay {
             if loaded, entries.isEmpty {
                 ContentUnavailableView(
-                    "No entries", systemImage: "rectangle.split.3x1",
+                    "No Entries", systemImage: "rectangle.split.3x1",
                     description: Text(match.isEmpty ? "Headings with a TODO keyword in the agenda files show here." : "Nothing in the agenda files matches this.")
                 )
             }

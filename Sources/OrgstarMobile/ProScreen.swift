@@ -80,7 +80,7 @@ struct ProScreen: View {
                             .disabled(store.busy || product.id == store.activeProductID)
                     }
                 } header: {
-                    Text("Choose a plan")
+                    Text("Choose a Plan")
                 } footer: {
                     Text("Subscriptions renew automatically until cancelled in your Apple Account settings, at least 24 hours before the period ends.")
                 }

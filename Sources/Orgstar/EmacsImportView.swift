@@ -24,7 +24,7 @@ struct EmacsImportView: View {
             } else if let result {
                 list(result)
             } else {
-                ContentUnavailableView("No Emacs configuration found", systemImage: "doc.questionmark",
+                ContentUnavailableView("No Emacs Configuration Found", systemImage: "doc.questionmark",
                                        description: Text("Choose your init.el, or the folder holding it (~/.emacs.d, ~/.config/doom)."))
             }
             Divider()

@@ -25,7 +25,7 @@ struct ConflictSheet: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Conflicting changes").font(.headline)
+            Text("Conflicting Changes").font(.headline)
             Text((session.conflict ?? "") + " Lines marked - are on disk, + in your version. The version you don't keep is saved in the recovery folder.")
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -56,7 +56,7 @@ struct SyncConflictSheet: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Sync conflict copies").font(.headline)
+            Text("Sync Conflict Copies").font(.headline)
             if copies.isEmpty {
                 Text("No conflict copies of this file.").foregroundStyle(.secondary)
             } else {

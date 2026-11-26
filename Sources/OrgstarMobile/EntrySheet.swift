@@ -58,7 +58,7 @@ struct EntrySheet: View {
                 if let fields, let draft {
                     form(fields, settings: draft.tree.settings)
                 } else if let problem {
-                    ContentUnavailableView("Can't open the entry", systemImage: "exclamationmark.triangle", description: Text(problem))
+                    ContentUnavailableView("Can't Open the Entry", systemImage: "exclamationmark.triangle", description: Text(problem))
                 } else {
                     ProgressView()
                 }

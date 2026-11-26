@@ -96,7 +96,7 @@ extension View {
                     Text("You can put it back from the Trash in Finder.")
                 }
             }
-            .alert("Couldn't change the file", isPresented: Binding { sidebar.failure != nil } set: { if !$0 { sidebar.failure = nil } }) {
+            .alert("Couldn't Change the File", isPresented: Binding { sidebar.failure != nil } set: { if !$0 { sidebar.failure = nil } }) {
                 Button("OK") { sidebar.failure = nil }
             } message: {
                 Text(sidebar.failure ?? "")

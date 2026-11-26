@@ -197,7 +197,7 @@ The outline follows your edits after a short pause in typing.
 
 ** Backlinks
 
-Under the outline, the backlinks pane lists headings in your folders that link to the current file (a link before a file's first heading is listed under the file's name) (=Links to this file=) and to the heading at the caret (=Links to= followed by the heading's title). It updates as you move the caret. Click an entry to open it. Turn the pane off with View ▸ Show Backlinks. Which links count is covered in [[file:09-links.org][Links]].
+Under the outline, the backlinks pane lists headings in your folders that link to the current file (a link before a file's first heading is listed under the file's name) (=Links to This File=) and to the heading at the caret (=Links to= followed by the heading's title). It updates as you move the caret. Click an entry to open it. Turn the pane off with View ▸ Show Backlinks. Which links count is covered in [[file:09-links.org][Links]].
 
 ** Inspector
 

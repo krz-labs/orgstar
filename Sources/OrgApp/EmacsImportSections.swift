@@ -47,7 +47,7 @@ public struct EmacsImportSections: View {
         }
         let notes = result.unsupported.map { ($0.id, $0.name, $0.reason, $0.source) } + result.unreadable.map { ($0.id, $0.name, $0.reason, $0.source) }
         if !notes.isEmpty || !result.problems.isEmpty {
-            Section("Not imported") {
+            Section("Not Imported") {
                 ForEach(result.problems, id: \.self) { Text($0).foregroundStyle(.red) }
                 ForEach(notes, id: \.0) { note in
                     VStack(alignment: .leading, spacing: 1) {

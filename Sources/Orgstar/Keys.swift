@@ -274,7 +274,7 @@ struct MessagesView: View {
             Text("Messages").font(.headline).padding(12)
             Divider()
             if messages.isEmpty {
-                ContentUnavailableView("No messages", systemImage: "text.bubble")
+                ContentUnavailableView("No Messages", systemImage: "text.bubble")
             } else {
                 ScrollView {
                     Text(messages.joined(separator: "\n"))

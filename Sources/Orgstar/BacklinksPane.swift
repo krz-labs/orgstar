@@ -32,7 +32,7 @@ struct BacklinksPane: View {
             if failure == nil, toHeading.isEmpty, toFile.isEmpty {
                 // Nothing links here: a single line, leaving the column to the outline.
                 HStack {
-                    Text("Links to this file").font(.subheadline.weight(.semibold)).foregroundStyle(.secondary)
+                    Text("Links to This File").font(.subheadline.weight(.semibold)).foregroundStyle(.secondary)
                     Spacer()
                     Text("None").foregroundStyle(.secondary)
                 }
@@ -48,7 +48,7 @@ struct BacklinksPane: View {
                         if let heading {
                             Section("Links to \(heading.title.isEmpty ? "(untitled)" : heading.title)") { rows(toHeading) }
                         }
-                        Section("Links to this file") { rows(toFile) }
+                        Section("Links to This File") { rows(toFile) }
                     }
                 }
                 .themedListBackground(theme.color("sidebar-background", in: colorScheme))
