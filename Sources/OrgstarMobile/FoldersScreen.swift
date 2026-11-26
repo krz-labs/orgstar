@@ -332,7 +332,7 @@ private struct FolderContents: View {
     }
 
     var body: some View {
-        let files = workspace.files.filter { $0.root == root && $0.kind == .org && $0.relativePath.hasPrefix(prefix) }
+        let files = workspace.files.filter { $0.root == root && ($0.kind == .org || DocumentSession.isEncryptedOrgFile($0.path)) && $0.relativePath.hasPrefix(prefix) }
         let pending = below(workspace.downloading.filter { $0.hasPrefix(root + "/") }.map { String($0.dropFirst(root.count + 1)) })
         let empty = Set(emptySubfolders())
         let subfolders = Set((below(files.map(\.relativePath)) + pending).compactMap { path in

@@ -45,6 +45,8 @@ struct ReaderScreen: View {
     /// The command chosen in Commands, run once the list is gone.
     @State private var chosenCommand: String?
     @State private var message: String?
+    /// The passphrase sheet for an encrypted file.
+    @State private var unlocking: CryptRequest?
     /// A file a link opened, shown in Quick Look.
     @State private var previewed: URL?
     /// The pane the reader shows its file in, closed with the reader.
@@ -151,6 +153,27 @@ struct ReaderScreen: View {
             if let path = shownPath, let tree = document?.tree { ExportScreen(path: path, tree: tree) { message = $0 } }
         }
         .message($message)
+        .overlay {
+            if DocumentSession.isEncryptedFile(path), !session.isOpen(path), unlocking == nil {
+                ContentUnavailableView {
+                    Label("\((path as NSString).lastPathComponent) is encrypted", systemImage: "lock")
+                } actions: {
+                    Button("Decrypt…") { unlocking = CryptRequest(mode: .openFile, path: path, offset: 0) }
+                }
+            }
+        }
+        .onChange(of: session.unlockRequest, initial: true) { _, request in
+            if request == path { unlocking = CryptRequest(mode: .openFile, path: path, offset: 0) }
+        }
+        .sheet(item: $unlocking) { request in
+            NavigationStack {
+                CryptSheet(request: request, session: session, text: { "" }, apply: { _ in }) { text in
+                    unlocking = nil
+                    if let text { message = text }
+                }
+                .navigationBarTitleDisplayMode(.inline)
+            }
+        }
         .environment(\.openURL, OpenURLAction { url in follow(url) })
         .background { FindHost(find: find, request: findRequest) }
         .onAppear(perform: open)
