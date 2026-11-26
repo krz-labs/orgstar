@@ -47,6 +47,12 @@ final class MobileModel {
     var watchCaptures = 0
     /// Reminders for the agenda, with `agenda-reminders`.
     let reminderLists = ReminderLists()
+    /// The file and caret of the editor on screen, advertised for Handoff.
+    @ObservationIgnored let handoff = HandoffAdvertiser()
+    /// The file of the editor on screen; nil when none is.
+    @ObservationIgnored var handoffPath: String? {
+        didSet { if handoffPath != oldValue { handoff.changed() } }
+    }
 
     struct AgendaDays: Equatable {
         let start: Int
@@ -99,6 +105,10 @@ final class MobileModel {
         watchConfig()
         // `org-clock-out-when-done`, and the reminder when the Effort runs out.
         clock.notifications = SystemReminderCenter()
+        handoff.place = { [weak self] in
+            guard let self, let path = self.handoffPath, let workspace = self.workspace else { return nil }
+            return self.session.handoffPlace(path, roots: workspace.rootPaths)
+        }
         session.textChanged = { [weak self] path in
             guard let self else { return }
             _ = self.clock.textChanged(path, self.session)

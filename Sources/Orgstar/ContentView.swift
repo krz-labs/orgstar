@@ -372,6 +372,8 @@ struct ContentView: View {
             clock.remindAtEffort(session)
             commands.knownTags = { [index = workspace.index] in (try? index.tags()) ?? [] }
             commands.completionIndex = workspace.index
+            commands.handoff.place = { [weak session, weak workspace] in workspace.flatMap { session?.handoffPlace(roots: $0.rootPaths) } }
+            commands.continueHandoff = continueHandoff
             commands.mainWindowOpen = true
             commands.whatsNew = WhatsNew.pending(firstLaunch: noFolders && !welcomeShown)
             if noFolders, !welcomeShown {
@@ -512,6 +514,10 @@ struct ContentView: View {
             }
             session.reveal(request.offset)
         }
+        // Handoff follows the focused file and its caret, and takes over again when the app does.
+        .onChange(of: session.path, initial: true) { commands.handoff.changed() }
+        .onChange(of: commands.selection) { commands.handoff.changed() }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in commands.handoff.update() }
         .onChange(of: commands.focusSearch) { _, focus in
             if focus {
                 searchFocused = true
@@ -580,6 +586,8 @@ struct ContentView: View {
             // Files handed over at launch open after the restored buffers, and show.
             for path in AppDelegate.pendingOpens { session.open(path) }
             AppDelegate.pendingOpens = []
+            for place in AppDelegate.pendingHandoffs { continueHandoff(place) }
+            AppDelegate.pendingHandoffs = []
             #if APPSTORE
             for link in AppDelegate.pendingLinks { commands.handle(protocolURL: link) }
             AppDelegate.pendingLinks = []
@@ -1294,6 +1302,14 @@ struct ContentView: View {
             guard let answer, let index = labels.firstIndex(of: answer) else { return }
             session.open(Array(paths)[index])
         }
+    }
+
+    /// A file continued from another device, at the caret's heading or line there.
+    private func continueHandoff(_ place: HandoffPlace) {
+        let match = place.resolve(roots: workspace.rootPaths)
+        guard case .file(let path) = match else { return commands.show(place.problem(match) ?? "") }
+        let offset = session.text(of: path).map { place.offset(in: $0, settings: session.defaults) } ?? 0
+        commands.jump(path: path, offset: offset)
     }
 
     /// Runs a command from a key, the palette or the Org menu.

@@ -110,6 +110,8 @@ final class MobileEditor: NSObject, DocumentBuffer {
     var onColumnView: ((ColumnView.View) -> Void)?
     /// Commands the app runs, as `app.clock.in`.
     var onAppCommand: ((String) -> Void)?
+    /// The caret or selection moved.
+    var onSelect: (() -> Void)?
     /// Where paste looks for an image; scripts checking the app set another.
     static var pasteboard = UIPasteboard.general
     /// Files dropped at the caret; nil leaves them to the text view.
@@ -734,6 +736,7 @@ extension MobileEditor: UITextViewDelegate {
         if textView.isFirstResponder { focus(textView) }
         guard textView === self.textView else { return }
         selectionChanged()
+        onSelect?()
         if let open = completionList, textView.selectedRange.location != open.completion.range.upperBound { refreshCompletion() }
     }
 

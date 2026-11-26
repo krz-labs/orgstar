@@ -332,6 +332,19 @@ The Mac App Store version can't run git and has no Git pane.
 
 Files in iCloud Drive that aren't downloaded to the Mac show in the sidebar with a cloud icon and grey text, with the tooltip "Downloading from iCloud". orgstar asks iCloud to download them, and indexes them and lets you open them when they arrive. Files iCloud removes from the Mac to save space keep their index entries until they are back, so search and the agenda still find them.
 
+* Handoff
+
+A file open in the editor can be continued on another Mac, iPhone or iPad signed in to the same Apple Account, with Handoff turned on in each device's settings. The other device shows orgstar's icon in the Dock or the app switcher; choosing it opens the same file in its editor, at the same place.
+
+What is passed is where the file is and where the caret is, never the file's text:
+
+- the name of the added folder the file is in, the file's path inside iCloud when it is in iCloud Drive, and its path inside the folder;
+- the caret's heading (its =ID= when it has one, and the titles of it and the headings above it) and line.
+
+The other device looks for the file in its own added folders. A folder in iCloud Drive is matched by its path in iCloud Drive, which is the same on every device, so it is found even when another folder has the same name; an added folder higher up in iCloud Drive holds the file too. Any other folder, such as one kept by Dropbox, Syncthing or Working Copy, is at a different path on each device and is matched by its name: add it with the same name on both. The caret goes to the heading with that =ID=, or else the heading at that outline path, on the same line within it as on the other device; when neither is found, to the same line of the file. When the device has no folder of that name, or the folder doesn't have the file yet, orgstar says so and opens nothing.
+
+Only files in an added folder are offered, and never an encrypted =.org.gpg= file. On iPhone and iPad, the editor offers its file; the reader and the agenda don't.
+
 * Encodings and line endings
 
 orgstar edits UTF-8 files, with or without a byte order mark.

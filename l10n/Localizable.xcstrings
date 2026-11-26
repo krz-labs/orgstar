@@ -7390,6 +7390,76 @@
         }
       }
     },
+    "Can't continue %@: it isn't in “%@” on this device yet.": {
+      "comment": "Handoff from another device",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ kann nicht fortgesetzt werden: Die Datei ist auf diesem Gerät noch nicht in „%2$@“."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede continuar %1$@: todavía no está en «%2$@» en este dispositivo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de continuer %1$@ : le fichier n’est pas encore dans « %2$@ » sur cet appareil."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@を続けられません：このデバイスの「%2$@」にはまだありません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível continuar %1$@: ele ainda não está em “%2$@” neste dispositivo."
+          }
+        }
+      }
+    },
+    "Can't continue %@: no folder named “%@” is added on this device.": {
+      "comment": "Handoff from another device",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ kann nicht fortgesetzt werden: Auf diesem Gerät ist kein Ordner namens „%2$@“ hinzugefügt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede continuar %1$@: no hay ninguna carpeta llamada «%2$@» añadida en este dispositivo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de continuer %1$@ : aucun dossier nommé « %2$@ » n’est ajouté sur cet appareil."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@を続けられません：このデバイスには「%2$@」という名前のフォルダが追加されていません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível continuar %1$@: nenhuma pasta chamada “%2$@” foi adicionada neste dispositivo."
+          }
+        }
+      }
+    },
     "Can't export %@: %@": {
       "comment": "Echo area: file name, then the reason",
       "localizations": {

@@ -110,6 +110,8 @@ cat > "$app/Info.plist" <<PLIST
             <array><string>org-protocol</string></array>
         </dict>
     </array>
+    <key>NSUserActivityTypes</key>
+    <array><string>sh.krz.orgstar.editing</string></array>
 </dict>
 </plist>
 PLIST

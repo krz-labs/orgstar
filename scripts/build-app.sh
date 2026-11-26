@@ -159,6 +159,8 @@ ${feed_keys}
     <true/>
     <key>NSPrincipalClass</key>
     <string>NSApplication</string>
+    <key>NSUserActivityTypes</key>
+    <array><string>sh.krz.orgstar.editing</string></array>
 </dict>
 </plist>
 EOF

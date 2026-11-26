@@ -77,6 +77,10 @@ final class AppCommands {
 
     /// The editor's selection, for the modeline.
     var selection = NSRange(location: 0, length: 0)
+    /// The focused file and caret, advertised for Handoff.
+    @ObservationIgnored let handoff = HandoffAdvertiser()
+    /// Opens a file continued from another device; the main window sets it.
+    @ObservationIgnored var continueHandoff: ((HandoffPlace) -> Void)?
     var keyHints: [KeyHint] = []
     /// A question a command asked, answered in the echo area.
     private(set) var prompt: PromptRequest?
@@ -269,6 +273,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     /// org-protocol and orgstar:// links that arrive before the window is ready.
     static var pendingLinks: [String] = []
+
+    /// Files continued from another device before the window is ready.
+    static var pendingHandoffs: [HandoffPlace] = []
+
+    func application(_ application: NSApplication, willContinueUserActivityWithType userActivityType: String) -> Bool {
+        userActivityType == HandoffPlace.activityType
+    }
+
+    /// Handoff from an iPhone, iPad or another Mac.
+    func application(_ application: NSApplication, continue userActivity: NSUserActivity,
+                     restorationHandler: @escaping ([any NSUserActivityRestoring]) -> Void) -> Bool {
+        guard userActivity.activityType == HandoffPlace.activityType, let place = HandoffPlace(userInfo: userActivity.userInfo) else { return false }
+        if let handler = commands?.continueHandoff {
+            NSApp.activate()
+            handler(place)
+        } else {
+            Self.pendingHandoffs.append(place)
+        }
+        return true
+    }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
 

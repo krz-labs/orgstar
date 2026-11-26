@@ -82,6 +82,10 @@
 	<string>NSApplication</string>
 	<key>NSRemindersFullAccessUsageDescription</key>
 	<string>The agenda shows your reminders alongside your Org entries. orgstar only reads them.</string>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>sh.krz.orgstar.editing</string>
+	</array>
 	<key>UTImportedTypeDeclarations</key>
 	<array>
 		<dict>

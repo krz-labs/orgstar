@@ -409,6 +409,9 @@ struct RootView: View {
         .onContinueUserActivity(CSSearchableItemActionType) { activity in
             if let path = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String { model.openRequest = .file(path) }
         }
+        .onContinueUserActivity(HandoffPlace.activityType) { activity in
+            if let place = HandoffPlace(userInfo: activity.userInfo) { continueHandoff(place) }
+        }
         .onChange(of: scenePhase) { _, phase in
             // Unsaved edits are written before the app may be stopped.
             if phase == .background {
@@ -422,6 +425,7 @@ struct RootView: View {
             }
             takeShared()
             model.reloadConfig()
+            model.handoff.update()
             Task { await workspace.refresh() }
         }
         .onOpenURL(perform: handle)
@@ -478,6 +482,15 @@ struct RootView: View {
         } else if url.scheme == "org-protocol" {
             message = "orgstar handles org-protocol capture and store-link"
         }
+    }
+
+    /// A file continued from another device, in the editor at the caret's heading or line there.
+    private func continueHandoff(_ place: HandoffPlace) {
+        let match = place.resolve(roots: workspace.rootPaths)
+        guard case .file(let path) = match else { return message = place.problem(match) }
+        let offset = session.text(of: path).map { place.offset(in: $0, settings: session.defaults) } ?? 0
+        tab = .agenda
+        agendaPath.append(EditorRoute(path: path, offset: offset))
     }
 
     /// A tab or sidebar row; on iPhone, search is pushed on the agenda.

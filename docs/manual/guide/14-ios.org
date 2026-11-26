@@ -512,6 +512,10 @@ These settings from =config.toml= apply on iOS:
 
 =capture.toml= and =views.toml= in the folder apply too. =keymap= and =keymap.toml= apply with a hardware keyboard. Other settings, including =save=, don't apply on iOS. See [[file:13-configuration.org][Configuration]].
 
+* Handoff
+
+The file open in the editor is offered to your other devices through Handoff, and a file offered by a Mac, iPhone or iPad opens here in the editor at the same heading or line, when an added folder holds it. See [[file:01-files-and-folders.org][Files and folders]], Handoff, for how folders are matched.
+
 * Spotlight and Quick Look
 
 orgstar adds the org files in your folders to Spotlight with their title (=#+TITLE=, else the file name), author, description, tags, headings and text. A file is indexed again when it changes. Tap a Spotlight result to open the file in orgstar's reader.

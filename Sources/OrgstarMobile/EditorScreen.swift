@@ -316,6 +316,7 @@ struct EditorScreen: View {
         // A pane command moved focus here.
         .onChange(of: isFocused) {
             countVersions()
+            if isFocused { model.handoffPath = path }
             guard isFocused, let textView, !textView.isFirstResponder else { return }
             editor?.focus(textView)
             textView.becomeFirstResponder()
@@ -334,6 +335,7 @@ struct EditorScreen: View {
         .onDisappear {
             // Typing the reader shows next, and a save, don't wait for the autosave delay.
             if session.dirtyPaths.contains(path) { _ = session.save(path) }
+            if model.handoffPath == path { model.handoffPath = nil }
         }
     }
 
@@ -401,6 +403,7 @@ struct EditorScreen: View {
             session.focused = pane
             bind(editor)
             editor.focus(view)
+            model.handoffPath = path
         }
         // A kept editor missed settings changed while it was off screen.
         editor.options = editorOptions
@@ -442,6 +445,7 @@ struct EditorScreen: View {
         editor.createID = { [weak session] item in session.flatMap { CompletionSources.createID(item, session: $0) } }
         editor.otherBuffers = { [weak session, path] in session.map { CompletionSources.otherBuffers($0, excluding: path) } ?? [] }
         editor.onChange = { [weak session] in session?.bufferChanged(path) }
+        editor.onSelect = { [weak model] in model?.handoff.changed() }
         editor.onMessage = { message = $0 }
         editor.onPrompt = { prompt, reply in self.prompt = PromptRequest(prompt: prompt, reply: reply) }
         editor.onLink = { link in follow(link) }

@@ -60,6 +60,10 @@
 	<string>The agenda shows your reminders alongside your Org entries. orgstar only reads them.</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>sh.krz.orgstar.editing</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
