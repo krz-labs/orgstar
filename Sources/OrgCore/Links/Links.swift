@@ -60,6 +60,7 @@ public enum Links {
 
     /// `org-link-expand-abbrev` for templates with `%s`, `%h`, or a plain prefix.
     static func expandAbbreviation(_ link: String, _ abbreviations: [String: String]) -> String {
+        guard !abbreviations.isEmpty else { return link }
         let regex = try! NSRegularExpression(pattern: "^([^:]*)(::?(.*))?$")
         let ns = link as NSString
         guard let m = regex.firstMatch(in: link, range: NSRange(location: 0, length: ns.length)),
@@ -77,7 +78,7 @@ public enum Links {
 
     /// A bracket link's inside (`[[` to `]]` or `][`), as `org-element-link-parser` reads it.
     public static func parse(bracket inside: String, abbreviations: [String: String] = [:]) -> OrgLink {
-        let joined = inside.replacingOccurrences(of: "[ \\t]*\\n[ \\t]*", with: " ", options: .regularExpression)
+        let joined = inside.contains("\n") ? inside.replacingOccurrences(of: "[ \\t]*\\n[ \\t]*", with: " ", options: .regularExpression) : inside
         let raw = expandAbbreviation(unescape(joined), abbreviations)
         let ns = raw as NSString
         var type: String

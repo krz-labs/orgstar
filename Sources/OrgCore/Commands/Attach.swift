@@ -56,7 +56,11 @@ public enum OrgAttach {
     /// `noFSCheck`, when the folder doesn't exist.
     public static func directory(tree: OrgTree, at offset: Int, path: String, idDir: String = "data/", inherit: Bool? = nil, noFSCheck: Bool = false, isDirectory: (String) -> Bool) -> String? {
         let model = DocumentModel(tree: tree)
-        let heading = entry(model, at: offset)
+        return directory(model: model, heading: entry(model, at: offset), path: path, idDir: idDir, inherit: inherit, noFSCheck: noFSCheck, isDirectory: isDirectory)
+    }
+
+    /// `directory(tree:at:…)` for heading `heading` of `model`, nil for the file's preamble.
+    static func directory(model: DocumentModel, heading: Int?, path: String, idDir: String, inherit: Bool?, noFSCheck: Bool, isDirectory: (String) -> Bool) -> String? {
         let folder = (path as NSString).deletingLastPathComponent
         func own(_ key: String, _ index: Int) -> String? {
             model.headings[index].properties.last { $0.key.uppercased() == key && !$0.additive }?.value

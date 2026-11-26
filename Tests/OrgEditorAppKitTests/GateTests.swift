@@ -1,5 +1,6 @@
 import AppKit
 import Foundation
+import OrgCore
 import OrgDocument
 import Testing
 @testable import OrgEditorAppKit
@@ -130,6 +131,14 @@ struct GateTests {
             #expect(result.typingP95 < .milliseconds(16), "\(name): typing")
             #expect(result.newlineP95 < .milliseconds(16), "\(name): blank line")
             #expect(result.memoryRatio < memoryLimit, "\(name): memory")
+        }
+        // Lint File, which runs off the main thread: the fastest of three runs on a parsed file.
+        for (name, text, _) in inputs {
+            let tree = OrgParser.parse(text)
+            let clock = ContinuousClock()
+            let lint = (0..<3).map { _ in clock.measure { _ = OrgLint.lint(text, tree: tree, path: nil) } }.min()!
+            print("GATE \(name) (\(text.utf8.count / 1000) kB): lint \(lint)")
+            #expect(lint < .milliseconds(500) * max(1, Double(text.utf8.count) / 1_000_000), "\(name): lint")
         }
         let large = measure("10 MB mixed document", Self.tenMegabytes)
         print("GATE \(large)")
