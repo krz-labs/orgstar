@@ -12,7 +12,7 @@ struct CryptHoldBar: View {
         if let path = session.path, let hold = session.held[path] {
             HStack(spacing: 8) {
                 Image(systemName: "lock.trianglebadge.exclamationmark").foregroundStyle(.orange)
-                Text(hold.notice(for: path)).lineLimit(2)
+                Text(hold.notice(for: path)).lineLimit(3)
                 Spacer(minLength: 8)
                 Button(hold == .file ? "Set Passphrase…" : "Encrypt…", action: encrypt)
             }
