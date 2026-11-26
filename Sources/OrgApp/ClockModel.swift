@@ -314,7 +314,7 @@ public final class ClockModel {
 
     /// `task` with a placeholder title when its heading is encrypted on disk.
     static func shareable(_ task: ClockTask, _ session: DocumentSession) -> ClockTask {
-        guard task.titleHidden != true, let heading = text(task.path, session).flatMap(task.locate) else { return task }
+        guard task.titleHash == nil, let heading = text(task.path, session).flatMap(task.locate) else { return task }
         let shown = session.shareableTitle(task.title, path: task.path, heading: heading)
         return shown == task.title ? task : task.hiding(shown)
     }

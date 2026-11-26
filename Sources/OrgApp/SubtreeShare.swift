@@ -62,38 +62,56 @@ public struct SubtreeShare: Sendable, Identifiable {
 }
 
 extension DocumentSession {
-    /// Share Subtree… for the entry at `offset` in the open file at `path`, its tagged entries
-    /// encrypted as they are on disk. Nil when there's no entry there, or `refusesSubtreeShare`.
+    /// Share Subtree… for the entry at `offset` in the open file at `path`, as it is on disk:
+    /// its tagged entries encrypted; a heading inside an encrypted entry as an entry of its own,
+    /// "Encrypted entry" with the tag, whose one message holds the whole subtree. Nil when
+    /// there's no entry there, or `refusesSubtreeShare`.
     public func subtreeShare(_ path: String, at offset: Int) -> SubtreeShare? {
-        guard refusesSubtreeShare(path, at: offset) == nil, var text = document(of: path)?.text else { return nil }
-        var offset = offset
-        if let (sealed, heading) = sealedSubtree(path, text: text, at: offset) {
-            text = sealed
-            offset = heading
-        }
-        return SubtreeShare(text: text, at: offset, path: path, settings: defaults)
+        guard case .success(let source) = shareSource(path, at: offset) else { return nil }
+        return SubtreeShare(text: source.text, at: source.offset, path: path, settings: defaults)
     }
 
-    /// Why the entry at `offset` in `path` isn't shared: its file is encrypted, or it has tagged
-    /// entries the file encrypts on disk and their passphrase isn't known.
+    /// Why the entry at `offset` in `path` isn't shared: its file is encrypted, or what's
+    /// encrypted on disk can't be encrypted in the copy (no passphrase, or one that fails).
     public func refusesSubtreeShare(_ path: String, at offset: Int) -> String? {
+        if case .failure(let refusal) = shareSource(path, at: offset) { return refusal.message }
+        return nil
+    }
+
+    struct ShareRefusal: Error {
+        let message: String
+    }
+
+    /// The text to share the entry at `offset` from, and where in it.
+    private func shareSource(_ path: String, at offset: Int) -> Result<(text: String, offset: Int), ShareRefusal> {
         let name = (path as NSString).lastPathComponent
-        if Self.isEncryptedFile(path) { return String(localized: "\(name) is encrypted; its entries aren't shared.") }
-        guard let text = document(of: path)?.text, crypt.sealsEntries(for: path), crypt.passphrase(for: path) == nil,
-              let range = subtreeRange(text, at: offset), !OrgCrypt.unencrypted(text, tag: cryptTag, within: range).isEmpty else { return nil }
-        return String(localized: "Tagged entries in the subtree aren't encrypted; give the passphrase with Encrypt… first.")
+        if Self.isEncryptedFile(path) { return .failure(ShareRefusal(message: String(localized: "\(name) is encrypted; its entries aren't shared."))) }
+        guard let text = document(of: path)?.text else { return .success((text: "", offset: offset)) }
+        guard crypt.sealsEntries(for: path), let heading = OrgCrypt.heading(text, at: offset), let range = subtreeRange(text, at: offset) else {
+            return .success((text, offset))
+        }
+        let needsPassphrase = ShareRefusal(message: String(localized: "Tagged entries in the subtree aren't encrypted; give the passphrase with Encrypt… first."))
+        if OrgCrypt.isInTaggedText(text, at: heading, tag: cryptTag) {
+            guard let passphrase = crypt.passphrase(for: path) else { return .failure(needsPassphrase) }
+            let subtree = (text as NSString).substring(with: NSRange(range))
+            do {
+                let message = try OpenPGP.encrypt(Data((subtree.hasSuffix("\n") ? subtree : subtree + "\n").utf8), passphrase: passphrase)
+                return .success(("* " + String(localized: "Encrypted entry") + " :" + cryptTag + ":\n" + message, 0))
+            } catch {
+                return .failure(ShareRefusal(message: error.localizedDescription))
+            }
+        }
+        guard !OrgCrypt.unencrypted(text, tag: cryptTag, within: range).isEmpty else { return .success((text, offset)) }
+        guard let passphrase = crypt.passphrase(for: path) else { return .failure(needsPassphrase) }
+        do {
+            return .success((try OrgCrypt.seal(text, passphrase: passphrase, tag: cryptTag, within: range).text, heading))
+        } catch {
+            return .failure(ShareRefusal(message: error.localizedDescription))
+        }
     }
 
     private func subtreeRange(_ text: String, at offset: Int) -> Range<Int>? {
         guard let heading = OrgCrypt.heading(text, at: offset) else { return nil }
         return heading..<max(heading + 1, OrgCrypt.bodyRange(text, at: heading)?.upperBound ?? heading)
-    }
-
-    /// `text` with the subtree's tagged entries encrypted, and where its heading starts.
-    private func sealedSubtree(_ path: String, text: String, at offset: Int) -> (String, Int)? {
-        guard crypt.sealsEntries(for: path), let passphrase = crypt.passphrase(for: path), let range = subtreeRange(text, at: offset),
-              !OrgCrypt.unencrypted(text, tag: cryptTag, within: range).isEmpty,
-              let sealed = try? OrgCrypt.seal(text, passphrase: passphrase, tag: cryptTag, within: range).text else { return nil }
-        return (sealed, range.lowerBound)
     }
 }

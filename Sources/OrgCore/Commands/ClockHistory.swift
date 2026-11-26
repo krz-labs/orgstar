@@ -12,16 +12,16 @@ public struct ClockTask: Codable, Equatable, Hashable, Sendable {
     /// The heading's index among the file's headings.
     public let ordinal: Int
     public let id: String?
-    /// The title is a placeholder for one that isn't kept (an encrypted heading's): the task
-    /// is found by its ID or position.
-    public let titleHidden: Bool?
+    /// For a task whose title is a placeholder for one that isn't kept (an encrypted
+    /// heading's): a checksum of the real title, which finds it with its ID or position.
+    public let titleHash: String?
 
-    public init(path: String, title: String, ordinal: Int, id: String?, titleHidden: Bool? = nil) {
+    public init(path: String, title: String, ordinal: Int, id: String?, titleHash: String? = nil) {
         self.path = path
         self.title = title
         self.ordinal = ordinal
         self.id = id
-        self.titleHidden = titleHidden
+        self.titleHash = titleHash
     }
 
     /// The entry containing `offset`; nil before the first heading.
@@ -36,7 +36,11 @@ public struct ClockTask: Codable, Equatable, Hashable, Sendable {
     /// and title, or by title; a task kept without its title by position alone.
     public func index(in model: DocumentModel) -> Int? {
         if let id, let index = model.headings.firstIndex(where: { $0.id == id }) { return index }
-        if titleHidden == true { return ordinal < model.headings.count ? ordinal : nil }
+        if let titleHash {
+            func matches(_ index: Int) -> Bool { OrgCrypt.checksum(model.headings[index].title) == titleHash }
+            if ordinal < model.headings.count, matches(ordinal) { return ordinal }
+            return model.headings.indices.first(where: matches)
+        }
         if ordinal < model.headings.count, model.headings[ordinal].title == title { return ordinal }
         return model.headings.firstIndex { $0.title == title }
     }
@@ -52,13 +56,13 @@ public struct ClockTask: Codable, Equatable, Hashable, Sendable {
         let model = DocumentModel(tree: OrgParser.parse(text))
         guard let index = index(in: model) else { return nil }
         return ClockTask(path: path, title: model.headings[index].title, ordinal: index, id: model.headings[index].id)
-            .hiding(titleHidden == true ? title : nil)
+            .hiding(titleHash == nil ? nil : title)
     }
 
     /// The task with `placeholder` for its title, or as it is with nil.
     public func hiding(_ placeholder: String?) -> ClockTask {
         guard let placeholder else { return self }
-        return ClockTask(path: path, title: placeholder, ordinal: ordinal, id: id, titleHidden: true)
+        return ClockTask(path: path, title: placeholder, ordinal: ordinal, id: id, titleHash: titleHash ?? OrgCrypt.checksum(title))
     }
 }
 

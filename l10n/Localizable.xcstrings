@@ -430,6 +430,40 @@
         }
       }
     },
+    "%@ changed on disk while saving, and the changes conflict with yours; both are in the editor between conflict markers.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ wurde beim Sichern auf dem Datenträger geändert, und die Änderungen widersprechen deinen; beide stehen im Editor zwischen Konfliktmarkierungen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» cambió en el disco mientras se guardaba y los cambios entran en conflicto con los tuyos; ambos están en el editor entre marcas de conflicto."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« %@ » a changé sur le disque pendant l'enregistrement, et les modifications sont en conflit avec les vôtres ; les deux sont dans l'éditeur entre des marqueurs de conflit."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存中に“%@”がディスク上で変更され、あなたの変更と競合しています。両方がコンフリクトマーカーで囲まれてエディタにあります。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"%@\" mudou no disco durante o salvamento, e as alterações conflitam com as suas; ambas estão no editor entre marcadores de conflito."
+          }
+        }
+      }
+    },
     "%@ doesn't contain %@.": {
       "comment": "Alert when the folder chosen to grant access doesn't contain the one needed",
       "localizations": {
@@ -45466,6 +45500,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Esta pasta é um repositório git."
+          }
+        }
+      }
+    },
+    "This heading is inside an encrypted entry, so it isn't moved on its own; move the encrypted entry.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Überschrift liegt in einem verschlüsselten Eintrag und wird daher nicht einzeln verschoben; verschiebe den verschlüsselten Eintrag."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este encabezado está dentro de una entrada cifrada, así que no se mueve por separado; mueve la entrada cifrada."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce titre est dans une entrée chiffrée, il n'est donc pas déplacé seul ; déplacez l'entrée chiffrée."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この見出しは暗号化されたエントリの中にあるため、単独では移動しません。暗号化されたエントリを移動してください。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este título está dentro de uma entrada criptografada, então não é movido sozinho; mova a entrada criptografada."
           }
         }
       }

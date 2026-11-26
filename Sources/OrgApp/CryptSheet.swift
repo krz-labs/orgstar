@@ -102,6 +102,9 @@ public struct CryptSheet: View {
                 SecureField("Passphrase", text: $passphrase).onSubmit(submit)
                 if asksTwice { SecureField("Repeat passphrase", text: $repeated).onSubmit(submit) }
                 Toggle("Remember in the Keychain", isOn: $remember)
+                if !CryptPassphrases.protectsItems {
+                    Text(CryptPassphrases.caveat).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                }
                 if let problem { Text(problem).foregroundStyle(.red).font(.callout) }
                 HStack {
                     Spacer()

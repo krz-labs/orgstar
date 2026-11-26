@@ -13,8 +13,20 @@ public enum CryptPassphrases {
     nonisolated static let service = "sh.krz.orgstar.crypt.v2"
     /// Where earlier versions kept passphrases, readable without authentication.
     nonisolated static let legacyService = "sh.krz.orgstar.crypt"
-    /// Set once the person was told this build keeps passphrases the old way.
-    static let toldLegacyKey = "cryptKeychainLegacyTold"
+    /// Whether this build can keep passphrases limited to this device: the Developer ID Mac app
+    /// has no Keychain entitlement and keeps them in the login keychain.
+    public static var protectsItems: Bool {
+        #if os(macOS) && !APPSTORE
+        false
+        #else
+        true
+        #endif
+    }
+
+    /// Said beside Remember in the Keychain where `protectsItems` is false.
+    public static var caveat: String {
+        String(localized: "This version of orgstar keeps remembered passphrases in your login keychain without limiting them to this Mac; Touch ID or your password is still asked before one is used.")
+    }
 
     /// A Keychain query handed to the thread that waits on it; nothing else uses it meanwhile.
     struct Request: @unchecked Sendable {
@@ -62,10 +74,9 @@ public enum CryptPassphrases {
         return status
     }
 
-    /// Remembers `passphrase` for `path`. A message to show when it wasn't kept, or (once) when
-    /// this build keeps it without device-only protection; nil otherwise.
+    /// Remembers `passphrase` for `path`. A message to show when it wasn't kept; nil otherwise.
     @discardableResult
-    public static func store(_ passphrase: String, for path: String, defaults: UserDefaults = .standard) -> String? {
+    public static func store(_ passphrase: String, for path: String) -> String? {
         guard let item = newItem(passphrase, for: path) else { return String(localized: "The passphrase wasn't remembered: the Keychain refused it.") }
         let status = add(item, replacing: query(path))
         if status == errSecSuccess {
@@ -80,9 +91,7 @@ public enum CryptPassphrases {
             return String(localized: "The passphrase wasn't remembered: the Keychain refused it.")
         }
         SecItemDelete(query(path) as CFDictionary)
-        guard !defaults.bool(forKey: toldLegacyKey) else { return nil }
-        defaults.set(true, forKey: toldLegacyKey)
-        return String(localized: "This version of orgstar keeps remembered passphrases in your login keychain without limiting them to this Mac; Touch ID or your password is still asked before one is used.")
+        return nil
     }
 
     public static func forget(_ path: String) {

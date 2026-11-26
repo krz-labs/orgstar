@@ -84,18 +84,88 @@ struct CryptReviewTests {
 
     // 3a
     @Test func archivingAChildOfATaggedEntryEncryptsItFirst() throws {
-        let text = "* Parent :crypt:\nparent text\n** Child\nchild secret\n* Last\n"
+        let text = "* Parent :crypt:\nparent text\n** SECRETTITLE child\nchild secret\n* Other :crypt:\nother secret\n* Last\n"
         try notes.write("a.org", text)
         session.open(file.path)
-        let child = (text as NSString).range(of: "** Child").location
+        let child = (text as NSString).range(of: "** SECRETTITLE").location
         let archive = notes.url.appendingPathComponent("a.org_archive")
-        #expect(session.archive(from: (file.path, child))?.contains("Encrypt…") == true)
-        #expect(!FileManager.default.fileExists(atPath: archive.path))
+        // A heading inside an encrypted entry isn't moved on its own, passphrase or not.
+        #expect(session.archive(from: (file.path, child))?.contains("inside an encrypted entry") == true)
         session.cryptUsed("pw", for: file.path)
-        #expect(session.archive(from: (file.path, child)) == "Archived to a.org_archive")
-        #expect(!read(archive).contains("child secret") && read(archive).contains("-----BEGIN PGP MESSAGE-----"))
+        #expect(session.archive(from: (file.path, child))?.contains("inside an encrypted entry") == true)
+        let target = RefileTarget(label: "b.org", path: try notes.write("b.org", "* B\n").path, start: nil, title: "", level: 0, contentHash: "")
+        #expect(session.refile(to: target, from: (file.path, child))?.contains("inside an encrypted entry") == true)
+        #expect(!FileManager.default.fileExists(atPath: archive.path) && !read(notes.url.appendingPathComponent("b.org")).contains("SECRETTITLE"))
+        // A tagged entry is encrypted where it is, then archived.
+        let other = (session.document!.text as NSString).range(of: "* Other").location
+        #expect(session.archive(from: (file.path, other)) == "Archived to a.org_archive")
+        #expect(!read(archive).contains("other secret") && read(archive).contains("-----BEGIN PGP MESSAGE-----"))
         #expect(session.save())
-        #expect(!disk.contains("child secret") && !disk.contains("parent text"))
+        #expect(!disk.contains("child secret") && !disk.contains("SECRETTITLE"))
+    }
+
+    // Third review, A and B
+    @Test func shareSubtreeOfAHeadingInsideAnEncryptedEntry() throws {
+        let text = "* Parent :crypt:\nparent text\n** SECRETTITLE child\nchild secret\n* Last\n"
+        try notes.write("a.org", text)
+        session.open(file.path)
+        session.cryptUsed("pw", for: file.path)
+        let child = (text as NSString).range(of: "** SECRETTITLE").location
+        let share = try #require(session.subtreeShare(file.path, at: child))
+        #expect(share.fileName == "Encrypted entry.org")
+        #expect(!share.text.contains("SECRETTITLE") && !share.text.contains("child secret") && share.text.hasPrefix("* Encrypted entry :crypt:\n"))
+        let opened = try OrgCrypt.decryptInPlace(share.text, at: 0, passphrase: "pw")
+        #expect(opened.contains("** SECRETTITLE child\nchild secret\n"))
+        // Capture under that heading, into the file closed, isn't written.
+        session.kill(file.path)
+        let template = CaptureTemplate(key: "s", name: "Secret", target: .headline(file: file.path, headline: "SECRETTITLE child"), template: "* %?")
+        if case .success = session.capture("** Captured\n", template: template, root: nil) { Issue.record("captured into plaintext") }
+        #expect(disk == text)
+    }
+
+    @Test func shareSubtreeRefusesWhatCantBeEncrypted() throws {
+        let text = "* A :crypt:\na secret\n* B :crypt:\nb secret\n* End\n"
+        var both = try #require(try OrgCrypt.encrypt(text, at: 0, passphrase: "one"))
+        both = try #require(try OrgCrypt.encrypt(both, at: (both as NSString).range(of: "* B").location, passphrase: "two"))
+        try notes.write("a.org", both)
+        session.open(file.path)
+        session.cryptUsed("one", for: file.path)
+        try type("typed below b\n", at: offset(of: "* End"))
+        let b = offset(of: "* B")
+        #expect(session.refusesSubtreeShare(file.path, at: b)?.contains("public key") == true)
+        #expect(session.subtreeShare(file.path, at: b) == nil)
+    }
+
+    // Third review, C
+    @Test func hiddenClockTasksNeedTheirTitle() throws {
+        let hidden = ClockTask(path: "/x", title: "Real", ordinal: 1, id: nil).hiding("Encrypted entry")
+        #expect(hidden.title == "Encrypted entry" && hidden.titleHash != nil)
+        #expect(hidden.locate(in: "* A\n* Real\n") == 4)
+        #expect(hidden.locate(in: "* New\n* A\n* Real\n") == 10)
+        #expect(hidden.locate(in: "* A\n* Renamed\n") == nil)
+        #expect(hidden.refreshed(in: "* New\n* A\n* Real\n")?.title == "Encrypted entry")
+    }
+
+    // Third review, D2
+    @Test func keepMineHoldsWhenTheDiskVersionCantBeKept() throws {
+        session.open(file.path)
+        try type("x", at: 0)
+        try notes.write("a.org", "* Plain\n* Theirs :crypt:\ntheir secret\n")
+        session.keepMine()
+        #expect(session.held[file.path] == .entries(1) && session.lastError == nil)
+        #expect(disk.contains("their secret") && recoveryFiles.isEmpty)
+    }
+
+    // Third review, 3
+    @Test func aCancelledOpenEndsItsAuthentication() throws {
+        let path = notes.url.appendingPathComponent("d.org.gpg")
+        try OpenPGP.encryptedMessage(Data("* D\n".utf8), passphrase: "pw").write(to: path)
+        session.open(path.path)
+        let context = CryptPassphrases.context(for: path.path)
+        session.cancelUnlock()
+        #expect(CryptPassphrases.context(for: path.path) !== context)
+        CryptPassphrases.endSession(for: path.path)
+        #expect(!CryptPassphrases.protectsItems)
     }
 
     // 3b

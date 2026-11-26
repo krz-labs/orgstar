@@ -117,7 +117,8 @@ public struct Saver: Sendable {
             let both = mergeWithMarkers(base: SourceText(bytes: base).text, ours: state.text, theirs: theirs, oursLabel: "yours", theirsLabel: "disk")
             let edits = lineEdits(from: state.text, to: both)
             guard (try? state.apply(edits, baseRevision: state.revision)) != nil else { return change }
-            return .merged(edits)
+            // A conflict with none listed: both versions are in the buffer between markers.
+            return .conflict([])
         }
     }
 }

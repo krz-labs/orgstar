@@ -242,6 +242,7 @@ public final class DocumentSession {
 
     /// The encrypted file waiting for its passphrase stays closed.
     public func cancelUnlock() {
+        if let unlockRequest { CryptPassphrases.endSession(for: unlockRequest) }
         unlockRequest = nil
         unlockPane = nil
     }
@@ -666,8 +667,11 @@ public final class DocumentSession {
             case .conflict:
                 entry.conflict = "\(name) changed on disk, and the changes conflict with yours."
             case .overwroteExternalChange(let change), .changedAfterWrite(let change):
-                if case .conflict = change {
-                    entry.conflict = "\(name) changed on disk while saving, and the changes conflict with yours."
+                if case .conflict(let conflicts) = change {
+                    // No conflicts listed: both versions went into the buffer between markers.
+                    entry.conflict = conflicts.isEmpty
+                        ? String(localized: "\(name) changed on disk while saving, and the changes conflict with yours; both are in the editor between conflict markers.")
+                        : "\(name) changed on disk while saving, and the changes conflict with yours."
                 }
             }
         } catch let hold as CryptHold {
@@ -690,6 +694,13 @@ public final class DocumentSession {
         do {
             try buffer.update { try saver.overwrite(&$0, to: url) }
             current?.conflict = nil
+        } catch let hold as CryptHold {
+            // The version on disk can be kept only encrypted: the passphrase first.
+            if let current {
+                failedHolds[current.path] = hold
+                _ = updateHold(current)
+                askKeychain(current)
+            }
         } catch {
             showError(String(localized: "Couldn't Save File", comment: "Error alert title"), "Can't save \(name): \(error.localizedDescription)")
         }
@@ -1026,6 +1037,11 @@ public final class DocumentSession {
             }
         }
         guard crypt.sealsEntries(for: path), let heading = OrgCrypt.heading(context.text, at: context.selection.first?.lowerBound ?? 0) else { return .ready }
+        // A heading inside an encrypted entry is in that entry's message on disk; moved on its
+        // own, its title would be in plaintext.
+        if OrgCrypt.isInTaggedText(context.text, at: heading, tag: cryptTag) {
+            return .refused(String(localized: "This heading is inside an encrypted entry, so it isn't moved on its own; move the encrypted entry."))
+        }
         let end = OrgCrypt.bodyRange(context.text, at: heading)?.upperBound ?? heading
         let subtree = heading..<max(heading + 1, end)
         guard !OrgCrypt.unencrypted(context.text, tag: cryptTag, within: subtree).isEmpty else { return .ready }

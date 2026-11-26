@@ -30,7 +30,8 @@ struct CryptSaverTests {
         files.beforeReplace = Array("Z\nb\nc\n* Theirs :crypt:\ntheir secret\n".utf8)
         let recovery = MemoryRecovery()
         var doc = try editedState()
-        _ = try saver(files, recovery).0.save(&doc, to: url)
+        let outcome = try saver(files, recovery).0.save(&doc, to: url)
+        #expect(outcome == .overwroteExternalChange(.conflict([])))
         #expect(doc.text.contains("their secret") && doc.text.contains("Z") && doc.text.contains("A"))
         #expect(recovery.kept.allSatisfy { !$0.text.contains("their secret") })
     }
