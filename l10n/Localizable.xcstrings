@@ -25378,6 +25378,41 @@
         }
       }
     },
+    "It imports %@.": {
+      "comment": "The modules a user command's file imports, in the question before it runs",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Datei importiert %@."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El archivo importa %@."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le fichier importe %@."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ をインポートしています。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O arquivo importa %@."
+          }
+        }
+      }
+    },
     "It isn't in one of your folders. Grant access to it to continue.": {
       "comment": "Alert for a folder outside the sidebar's folders",
       "localizations": {
@@ -51041,6 +51076,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "Já existe uma visualização chamada %@."
+          }
+        }
+      }
+    },
+    "They can read and change the file you run them in, and nothing else: no other files and no network.": {
+      "comment": "What user commands can do, in the question before they run",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Befehle können die Datei lesen und ändern, in der du sie ausführst, und sonst nichts: keine anderen Dateien und kein Netzwerk."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pueden leer y modificar el archivo en el que los ejecutas, y nada más: ni otros archivos ni la red."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elles peuvent lire et modifier le fichier dans lequel vous les exécutez, et rien d'autre : ni autres fichiers, ni réseau."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コマンドは実行したファイルを読み取って変更できますが、それ以外はできません。ほかのファイルやネットワークは使えません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eles podem ler e alterar o arquivo em que você os executa, e nada mais: nenhum outro arquivo e nenhuma rede."
+          }
+        }
+      }
+    },
+    "They can read and change the file you run them in, read every file in your folders and capture to them, but not use the network.": {
+      "comment": "What user commands with access to the folders can do, in the question before they run",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Befehle können die Datei lesen und ändern, in der du sie ausführst, jede Datei in deinen Ordnern lesen und darin erfassen, aber nicht das Netzwerk nutzen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pueden leer y modificar el archivo en el que los ejecutas, leer todos los archivos de tus carpetas y capturar en ellos, pero no usar la red."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elles peuvent lire et modifier le fichier dans lequel vous les exécutez, lire tous les fichiers de vos dossiers et y capturer, mais pas utiliser le réseau."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コマンドは実行したファイルの読み取りと変更、フォルダ内のすべてのファイルの読み取りとキャプチャができますが、ネットワークは使えません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eles podem ler e alterar o arquivo em que você os executa, ler todos os arquivos das suas pastas e capturar neles, mas não usar a rede."
           }
         }
       }

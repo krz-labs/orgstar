@@ -1299,7 +1299,15 @@ struct ContentView: View {
     private func runUserCommand(_ request: UserCommandRequest) {
         guard let path = session.path, let modules = session.userCommands.folder else { return }
         if let refusal = session.refusesUserCommand(path) { return commands.show(refusal) }
-        UserCommandTrust.check(request.command, modules: modules, trust: trust, ask: commands.ask, run: {
+        let ask: @MainActor (UserCommandTrust.Question, @escaping (UserCommandTrust.Answer?) -> Void) -> Void = { question, reply in
+            let answers = UserCommandTrust.Answer.allCases
+            // The echo area's line can cut the path short, so the detail above it repeats it whole.
+            commands.ask(Prompt(key: "confirm", message: question.title, choices: answers.map(\.title)),
+                         detail: question.title + "\n" + question.message) { answer in
+                reply(answers.first { $0.title == answer })
+            }
+        }
+        UserCommandTrust.check(request.command, modules: modules, trust: trust, ask: ask, run: {
             guard let context = commands.editor?.context() else { return }
             commands.show(String(localized: "Running \(request.command.title)… (⌘. to cancel)", comment: "A user command started"))
             session.startUserCommand(request, context: context, file: UserCommandFile.relativePath(path, roots: workspace.rootPaths), ask: commands.ask) { commands.show($0) }

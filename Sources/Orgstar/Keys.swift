@@ -136,6 +136,14 @@ struct PromptView: View {
         } else {
             let matches = filteredChoices(prompt.choices)
             let current = min(selected, matches.count - 1)
+            if let detail = request.detail {
+                Divider()
+                Text(detail)
+                    .font(.system(.callout, design: .monospaced))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+            }
             if !prompt.choices.isEmpty {
                 Divider()
                 ScrollViewReader { proxy in

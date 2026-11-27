@@ -99,6 +99,11 @@ final class AppCommands {
         self.prompt = PromptRequest(prompt: prompt, reply: reply)
     }
 
+    /// Asks with `detail` shown in full above the question.
+    func ask(_ prompt: Prompt, detail: String, reply: @escaping (String?) -> Void) {
+        self.prompt = PromptRequest(prompt: prompt, detail: detail, reply: reply)
+    }
+
     /// Clock questions in the echo area.
     var askClock: ClockModel.Ask {
         { [self] prompt in
@@ -282,6 +287,8 @@ final class AppCommands {
 struct PromptRequest: Identifiable {
     let id = UUID()
     let prompt: Prompt
+    /// Lines shown in full above the question.
+    var detail: String? = nil
     let reply: (String?) -> Void
 }
 

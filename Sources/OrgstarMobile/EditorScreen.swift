@@ -59,6 +59,28 @@ struct EditorScreen: View {
         let reply: (String?) -> Void
     }
 
+    /// The question before a user command from a file not yet trusted here runs, as an alert.
+    struct TrustRequest {
+        let question: UserCommandTrust.Question
+        let reply: (UserCommandTrust.Answer?) -> Void
+    }
+    @State private var trustRequest: TrustRequest?
+
+    struct TrustAlert: ViewModifier {
+        @Binding var request: TrustRequest?
+
+        func body(content: Content) -> some View {
+            content.alert(request?.question.title ?? "", isPresented: Binding(get: { request != nil }, set: { if !$0 { request = nil } }),
+                          presenting: request) { request in
+                ForEach(UserCommandTrust.Answer.allCases, id: \.self) { answer in
+                    Button(answer.title, role: answer == .dontRun ? .cancel : nil) { request.reply(answer) }
+                }
+            } message: { request in
+                Text(request.question.message)
+            }
+        }
+    }
+
     /// One sheet at a time: two presenters on this screen interfere.
     /// `org-table-import`'s file picker is up.
     @State private var importingTable = false
@@ -219,6 +241,7 @@ struct EditorScreen: View {
                 request.reply(answer)
             }
         }
+        .modifier(TrustAlert(request: $trustRequest))
         .sheet(item: $sheet, onDismiss: {
             // An encrypted file opened with its passphrase.
             if editor == nil, session.isOpen(path) { start() }
@@ -425,7 +448,7 @@ struct EditorScreen: View {
         guard let modules = session.userCommands.folder else { return }
         if let refusal = session.refusesUserCommand(path) { return message = refusal }
         let ask: @MainActor (Prompt, @escaping (String?) -> Void) -> Void = { prompt = PromptRequest(prompt: $0, reply: $1) }
-        UserCommandTrust.check(request.command, modules: modules, trust: trust, ask: ask, run: {
+        UserCommandTrust.check(request.command, modules: modules, trust: trust, ask: { trustRequest = TrustRequest(question: $0, reply: $1) }, run: {
             guard let context = editor?.editContext() else { return }
             message = String(localized: "Running \(request.command.title)…", comment: "A user command started on iPhone and iPad")
             session.startUserCommand(request, context: context, file: UserCommandFile.relativePath(path, roots: workspace.rootPaths), ask: ask) { message = $0 }

@@ -175,9 +175,11 @@ The first time you run a command from a file, orgstar asks:
 
 #+BEGIN_EXAMPLE
 Run commands from commands/review.js?
+It imports commands/lib/dates.js.
+They can read and change the file you run them in, and nothing else: no other files and no network.
 #+END_EXAMPLE
 
-A command can read and change the file you run it in, and nothing else (see [[*Limits][Limits]]). The answers are Run Once, Always and Don't Run:
+The question names the file's full path under =commands/= and every module it imports, directly or through another module; the line about imports is left out when there are none. On the Mac the question is in the echo area, with the answers listed above it; on iPhone and iPad it is an alert. [[*Limits][Limits]] has the details of what a command can't reach. The answers are Run Once, Always and Don't Run:
 
 - Run Once runs it this time and asks again next time.
 - Always runs it and doesn't ask again while the file and every module it imports stay as they are.

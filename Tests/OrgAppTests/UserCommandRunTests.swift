@@ -233,26 +233,26 @@ struct UserCommandFileTests {
         let modules = config.url.appendingPathComponent("commands")
         let trust = TrustStore(file: config.url.appendingPathComponent("trusted.json"))
         let command = UserCommand(name: "go", title: "Go", file: "main.js", function: "go")
-        var asked: [String] = []
+        var asked: [UserCommandTrust.Question] = []
         var runs = 0
         var refusals: [String] = []
-        func check(_ answer: String?) {
-            UserCommandTrust.check(command, modules: modules, trust: trust, ask: { prompt, reply in
-                asked.append(prompt.message)
+        func check(_ answer: UserCommandTrust.Answer?) {
+            UserCommandTrust.check(command, modules: modules, trust: trust, ask: { question, reply in
+                asked.append(question)
                 reply(answer)
             }, run: { runs += 1 }, refuse: { refusals.append($0) })
         }
-        check(UserCommandTrust.dontRun)
+        check(.dontRun)
         #expect(runs == 0 && refusals == ["Not run"])
-        #expect(asked == ["Run commands from commands/main.js?"])
-        check(UserCommandTrust.runOnce)
-        check(UserCommandTrust.runOnce)
+        #expect(asked == [UserCommandTrust.Question(file: "commands/main.js", imports: ["commands/lib.js"])])
+        check(.runOnce)
+        check(.runOnce)
         #expect(runs == 2 && asked.count == 3)
-        check(UserCommandTrust.always)
+        check(.always)
         check(nil)
         #expect(runs == 4 && asked.count == 4)
         try config.write("commands/lib.js", "export const x = 1;\n")
-        check(UserCommandTrust.always)
+        check(.always)
         #expect(runs == 5 && asked.count == 5)
         try config.write("commands/main.js", "import { x } from \"./lib.js\";\nexport function go() { return 2; }\n")
         check(nil)
@@ -262,6 +262,34 @@ struct UserCommandFileTests {
         check(nil)
         #expect(runs == 6)
         #expect(UserCommandFile.trustedText("gone.js", modules: modules) == nil)
+        #expect(UserCommandFile.trustedText("main.js", modules: modules)
+            == "// lib.js\nexport const x = 1;\n\n// main.js\nimport { x } from \"./lib.js\";\nexport function go() { return x; }\n")
+    }
+
+    /// The question names the file and every module it imports, through other modules too;
+    /// one that can't be read isn't listed.
+    @Test func theTrustQuestionListsTheImportedModules() throws {
+        let config = try Folder()
+        try config.write("commands/tools/main.js", "import { a } from \"../lib/a.js\";\nimport \"./gone.js\";\nexport function go() {}\n")
+        try config.write("commands/lib/a.js", "export { b } from \"./b.js\";\nexport const a = 1;\n")
+        try config.write("commands/lib/b.js", "export const b = 2;\n")
+        let modules = config.url.appendingPathComponent("commands")
+        let trust = TrustStore(file: config.url.appendingPathComponent("trusted.json"))
+        var asked: [UserCommandTrust.Question] = []
+        UserCommandTrust.check(UserCommand(name: "go", title: "Go", file: "tools/main.js", function: "go"), modules: modules, trust: trust,
+                               ask: { question, _ in asked.append(question) }, run: {}, refuse: { _ in })
+        #expect(asked == [UserCommandTrust.Question(file: "commands/tools/main.js", imports: ["commands/lib/a.js", "commands/lib/b.js"])])
+        #expect(asked.first?.title == "Run commands from commands/tools/main.js?")
+
+        let question = UserCommandTrust.Question(file: "commands/review.js", imports: ["commands/lib/dates.js"])
+        #expect(question.message == """
+            It imports commands/lib/dates.js.
+            They can read and change the file you run them in, and nothing else: no other files and no network.
+            """)
+        #expect(UserCommandTrust.Question(file: "commands/review.js").message
+            == "They can read and change the file you run them in, and nothing else: no other files and no network.")
+        #expect(UserCommandTrust.Question(file: "commands/review.js", workspace: true).message
+            == "They can read and change the file you run them in, read every file in your folders and capture to them, but not use the network.")
     }
 
     @Test func emacsImportNotesBindingsToTheUsersFunctions() throws {
