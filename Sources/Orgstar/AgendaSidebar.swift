@@ -24,6 +24,7 @@ struct AgendaSidebar: View {
     @Environment(\.orgTheme) private var theme
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.textScale) private var scale
 
     init(workspace: WorkspaceModel, session: DocumentSession, commands: AppCommands, hour: Int, showsAgenda: Binding<Bool>) {
         self.workspace = workspace
@@ -84,14 +85,14 @@ struct AgendaSidebar: View {
         let groups = groups
         List {
             if groups.allSatisfy(\.rows.isEmpty) {
-                Text("Nothing scheduled").foregroundStyle(.secondary)
+                Text("Nothing scheduled").font(.scaled(.body, scale)).foregroundStyle(.secondary)
             }
             ForEach(groups) { group in
                 if !group.rows.isEmpty {
                     Section {
                         ForEach(Array(group.rows.enumerated()), id: \.offset) { _, row in line(row) }
                     } header: {
-                        Text(group.header).foregroundStyle((group.isToday ? theme.color("agenda-today") : theme.color("sidebar-header")) ?? .secondary)
+                        Text(group.header).font(.scaled(.subheadline, scale).weight(.semibold)).foregroundStyle((group.isToday ? theme.color("agenda-today") : theme.color("sidebar-header")) ?? .secondary)
                     }
                 }
             }
@@ -122,10 +123,10 @@ struct AgendaSidebar: View {
         let label = HStack(alignment: .firstTextBaseline, spacing: 6) {
             if !row.gutter.isEmpty {
                 Text(row.gutter)
-                    .font(.caption)
+                    .font(.scaled(.caption, scale))
                     .monospacedDigit()
                     .foregroundStyle(theme.dynamic(.secondaryLabelColor) { [theme] in theme.statusColor(row.status, dark: $0) })
-                    .frame(width: 52, alignment: .trailing)
+                    .frame(width: 52 * scale, alignment: .trailing)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
             }
@@ -133,16 +134,17 @@ struct AgendaSidebar: View {
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
                     if let todo = row.todo {
                         Text(todo)
-                            .font(.caption.bold())
+                            .font(.scaled(.caption, scale).bold())
                             .foregroundStyle(theme.dynamic(row.isDone ? .systemGreen : .systemRed) { [theme] in theme.todoColor(todo, isDone: row.isDone, dark: $0) })
                     }
                     Text(row.title.isEmpty ? "(untitled)" : row.title)
+                        .font(.scaled(.body, scale))
                         .lineLimit(2)
                         .strikethrough(row.isDone)
                         .foregroundStyle(row.isDone ? .secondary : theme.color("sidebar-foreground") ?? .primary)
                 }
                 if !row.category.isEmpty {
-                    Text(row.category).font(.caption2).foregroundStyle(.secondary).lineLimit(1)
+                    Text(row.category).font(.scaled(.caption2, scale)).foregroundStyle(.secondary).lineLimit(1)
                 }
             }
         }

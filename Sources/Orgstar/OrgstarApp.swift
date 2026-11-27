@@ -546,6 +546,7 @@ struct OrgstarApp: App {
             case .success(let model):
                 ContentView(workspace: model, session: session, commands: commands, scheduler: scheduler, clock: clock)
                     .environment(\.orgTheme, ConfigSync.shared.theme)
+                    .textScaled()
                     .tint(ConfigSync.shared.theme.color("accent"))
                     .onAppear {
                         delegate.session = session
@@ -577,6 +578,7 @@ struct OrgstarApp: App {
             if case .success(let model) = workspace {
                 AgendaView(workspace: model, session: session, commands: commands, scheduler: scheduler, clock: clock)
                     .environment(\.orgTheme, ConfigSync.shared.theme)
+                    .textScaled()
                     .tint(ConfigSync.shared.theme.color("accent"))
             }
         }

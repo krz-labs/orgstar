@@ -20,6 +20,7 @@ struct Sidebar: View {
     /// A file operation waiting for a name or a confirmation.
     @Environment(\.orgTheme) private var theme
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.textScale) private var scale
     @State var pending: FileOperation?
     @State var name = ""
     @State var failure: String?
@@ -41,7 +42,7 @@ struct Sidebar: View {
             ForEach(workspace.rootPaths, id: \.self) { root in
                 Section(isExpanded: expanded(root)) {
                     OutlineGroup(workspace.tree(forRoot: root).children ?? [], children: \.children) { node in
-                        Label(node.name, systemImage: icon(node))
+                        Label { Text(node.name).font(.scaled(.body, scale)) } icon: { Image(systemName: icon(node)) }
                             .foregroundStyle(node.file?.kind == .conflict ? .orange : node.isDownloading ? .secondary : theme.color("sidebar-foreground") ?? .primary)
                             .help(node.isDownloading ? "Downloading from iCloud" : "")
                             .tag(node.file?.path)
@@ -49,6 +50,7 @@ struct Sidebar: View {
                     }
                 } header: {
                     Text((root as NSString).lastPathComponent)
+                        .font(.scaled(.subheadline, scale).weight(.semibold))
                         .foregroundStyle(theme.color("sidebar-header") ?? .secondary)
                         .help(root)
                         .contextMenu { folderMenu(root) }
@@ -193,6 +195,7 @@ struct SidebarBar<Content: View>: View {
 struct OutlineColumn: View {
     let session: DocumentSession
     @Environment(\.orgTheme) private var theme
+    @Environment(\.textScale) private var scale
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
@@ -201,9 +204,10 @@ struct OutlineColumn: View {
                 session.reveal(entry.start)
             } label: {
                 Text(entry.title.isEmpty ? "(untitled)" : entry.title)
+                    .font(.scaled(.body, scale))
                     .foregroundStyle(theme.color("sidebar-foreground") ?? .primary)
                     .lineLimit(1)
-                    .padding(.leading, CGFloat(entry.level - 1) * 12)
+                    .padding(.leading, CGFloat(entry.level - 1) * 12 * scale)
             }
             .buttonStyle(.plain)
         }
