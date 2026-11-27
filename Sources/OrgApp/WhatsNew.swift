@@ -39,6 +39,10 @@ public enum WhatsNew {
     /// Newest first. A version without an entry shows nothing.
     public static let releases: [ReleaseNotes] = [
         ReleaseNotes(version: "1.4.0", items: [
+            .init("rectangle.on.rectangle.angled", "Presentations",
+                  "Present a file one heading at a time, full screen, or export it as a reveal.js deck."),
+            .init("rectangle.stack", "Flashcards",
+                  "Make and review flashcards in org-fc's format; a widget counts the cards that are due."),
             .init("printer", "Printing", "Print the file, a subtree, the selection or the agenda."),
             .init("doc.plaintext", "Markdown and plain text",
                   "Markdown and text files open with highlighting, heading folds and an outline, and search finds them."),
@@ -48,7 +52,7 @@ public enum WhatsNew {
                   "Insert citations from your bibliography, complete keys after @, follow a citation to its entry, and open Zotero links."),
             .init("point.3.connected.trianglepath.dotted", "More org-roam",
                   "Aliases, refs, excluded nodes, tags in the node chooser, and capture templates for new nodes and daily notes."),
-        ] + mac14),
+        ] + python14 + mac14),
         ReleaseNotes(version: "1.3.0", items: [
             .init("text.cursor", "Completion as you type",
                   "A completion list opens by itself in every preset, matches loosely, and offers words from your files, id links by title, property values and Denote notes."),
@@ -85,6 +89,17 @@ public enum WhatsNew {
                   "PDF export typesets math without a network connection."),
         ] + mac),
     ]
+
+    /// Only the App Store builds run python blocks in Pyodide.
+    private static var python14: [ReleaseNotes.Item] {
+        #if canImport(WebKit)
+        guard PythonBlocks.folder != nil else { return [] }
+        return [.init("chevron.left.forwardslash.chevron.right", "Python built in",
+                      "python blocks run in orgstar itself, with Python's standard library and no python3 to install.")]
+        #else
+        return []
+        #endif
+    }
 
     #if os(iOS)
     private static let ios = [

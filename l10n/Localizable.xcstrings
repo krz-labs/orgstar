@@ -27450,6 +27450,40 @@
         }
       }
     },
+    "Make and review flashcards in org-fc's format; a widget counts the cards that are due.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erstelle und wiederhole Lernkarten im Format von org-fc; ein Widget zählt die fälligen Karten."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crea y repasa tarjetas en el formato de org-fc; un widget cuenta las tarjetas pendientes."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Créez et révisez des fiches au format d'org-fc ; un widget compte les fiches à réviser."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "org-fc 形式のフラッシュカードを作成・復習できます。ウィジェットで復習期限のカード数がわかります。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crie e revise flashcards no formato do org-fc; um widget conta os cartões pendentes."
+          }
+        }
+      }
+    },
     "Makes notes.org in a folder you choose or make in iCloud Drive and adds the folder": {
       "localizations": {
         "de": {
@@ -36325,6 +36359,74 @@
         }
       }
     },
+    "Present a file one heading at a time, full screen, or export it as a reveal.js deck.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Präsentiere eine Datei Überschrift für Überschrift im Vollbild, oder exportiere sie als reveal.js-Präsentation."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Presenta un archivo encabezado por encabezado a pantalla completa, o expórtalo como presentación de reveal.js."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Présentez un fichier titre par titre en plein écran, ou exportez-le en présentation reveal.js."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルを見出しごとにフルスクリーンでプレゼンテーションしたり、reveal.js のスライドとして書き出したりできます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apresente um arquivo um título por vez, em tela cheia, ou exporte-o como uma apresentação reveal.js."
+          }
+        }
+      }
+    },
+    "Presentations": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Präsentationen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Presentaciones"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Présentations"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プレゼンテーション"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apresentações"
+          }
+        }
+      }
+    },
     "Previous": {
       "localizations": {
         "de": {
@@ -37908,6 +38010,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Blocos de Python não podem desenhar gráficos nesta versão do orgstar: o matplotlib não está incluído."
+          }
+        }
+      }
+    },
+    "Python built in": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Python eingebaut"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Python integrado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Python intégré"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Python を内蔵"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Python integrado"
           }
         }
       }
@@ -57333,6 +57469,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "padrão de pcase %@"
+          }
+        }
+      }
+    },
+    "python blocks run in orgstar itself, with Python's standard library and no python3 to install.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "python-Blöcke laufen in orgstar selbst, mit der Standardbibliothek von Python und ohne python3 zu installieren."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los bloques python se ejecutan en el propio orgstar, con la biblioteca estándar de Python y sin instalar python3."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les blocs python s'exécutent dans orgstar même, avec la bibliothèque standard de Python et sans installer python3."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "python ブロックは orgstar 内で実行されます。Python の標準ライブラリを使え、python3 のインストールは不要です。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blocos python rodam no próprio orgstar, com a biblioteca padrão do Python e sem instalar o python3."
           }
         }
       }
