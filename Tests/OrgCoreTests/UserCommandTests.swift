@@ -119,6 +119,83 @@ struct UserCommandManifestTests {
         #expect(problems == ["command bad: workspace must be true or false"])
     }
 
+    @Test func readsHooksAndTheirProblems() throws {
+        var problems: [String] = []
+        let manifest = try UserCommands.manifest("""
+            api = 1
+
+            [[hook]]
+            event = "after-todo-state-change"
+            file = "review.js"
+            function = "logState"
+
+            [[hook]]
+            event = "capture-before-finalize"
+            file = "lib/dates.mjs"
+            function = "check"
+            timeout = 5
+            workspace = true
+
+            [[hook]]
+            event = "post-command"
+            file = "review.js"
+            function = "f"
+
+            [[hook]]
+            file = "review.js"
+            function = "f"
+
+            [[hook]]
+            event = "after-todo-state-change"
+            file = "gone.js"
+            function = "f"
+            name = "x"
+
+            [[hook]]
+            event = "capture-before-finalize"
+            file = "review.js"
+            function = "f"
+            timeout = 0
+            """, problems: &problems) { ["review.js", "lib/dates.mjs"].contains($0) }
+        #expect(manifest.commands == [])
+        #expect(manifest.hooks == [
+            UserHook(event: .afterTodoStateChange, file: "review.js", function: "logState"),
+            UserHook(event: .captureBeforeFinalize, file: "lib/dates.mjs", function: "check", timeout: 5, workspace: true),
+        ])
+        #expect(problems == [
+            "hook at line 15: unknown event post-command; the events are after-todo-state-change and capture-before-finalize",
+            "hook at line 20: missing event",
+            "hook at line 24: unknown key name",
+            "hook at line 24: no file commands/gone.js",
+            "hook at line 30: timeout must be 1 to 30 seconds",
+        ])
+        #expect(manifest.hooks[0].title == "logState in commands/review.js")
+        let store = UserCommands()
+        store.replace([], hooks: manifest.hooks, folder: nil)
+        #expect(store.hooks(.captureBeforeFinalize) == [manifest.hooks[1]])
+        // Hooks need the api line as commands do.
+        problems = []
+        _ = try UserCommands.manifest("[[hook]]\nevent = \"after-todo-state-change\"\nfile = \"review.js\"\nfunction = \"f\"\n", problems: &problems) { _ in true }
+        #expect(problems == ["missing api = 1"])
+    }
+
+    /// Every route `org-todo` takes reports the change, with the heading where it starts after
+    /// the edits; a repeating entry reports the done keyword it was given.
+    @Test func todoChangesAreEffects() {
+        func changes(_ text: String, at caret: Int, _ command: any OrgCommand) -> [TodoStateChange] {
+            let context = EditContext(revision: 0, text: text, tree: OrgParser.parse(text), selection: [caret..<caret])
+            guard case .commit(let result) = command.run(in: context) else { return [] }
+            return result.effects.compactMap { if case .todoStateChanged(let change) = $0 { change } else { nil } }
+        }
+        let text = "* Parent [0/1]\n** Child\n"
+        #expect(changes(text, at: 17, TodoCycle()) == [TodoStateChange(heading: 15, from: nil, to: "TODO")])
+        #expect(changes("* TODO Task\n", at: 3, SetTodo(keyword: "DONE")) == [TodoStateChange(heading: 0, from: "TODO", to: "DONE")])
+        #expect(changes("* TODO Task\n", at: 3, SetTodo(keyword: "TODO")) == [])
+        let repeating = "* TODO Water\nSCHEDULED: <2026-11-27 Fri +1w>\n"
+        #expect(changes(repeating, at: 3, TodoShift(right: true)) == [TodoStateChange(heading: 0, from: "TODO", to: "DONE")])
+        #expect(changes("* Plan\n", at: 0, PromoteHeading()) == [])
+    }
+
     @Test func needsAKnownAPI() throws {
         let command = "\n[[command]]\nname = \"a\"\nfile = \"review.js\"\nfunction = \"a\"\n"
         #expect(try parse(command) == ([], ["missing api = 1"]))

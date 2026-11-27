@@ -37,6 +37,8 @@ struct CaptureScreen: View {
     /// The entry's date or tags sheet: on the form, not its section, which may not be in the window.
     @State private var planning: EntryPlanning?
     @State private var choosingTags = false
+    /// The capture's hooks are running.
+    @State private var finishing = false
     @FocusState private var focused: Bool
 
     private var template: CaptureTemplate? { templates.first { $0.key == key } }
@@ -94,11 +96,11 @@ struct CaptureScreen: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 if editing, template?.kind == .entry, request.roam == nil {
-                    ToolbarItem(placement: .bottomBar) { Button("Refile…") { file(refile: true) } }
+                    ToolbarItem(placement: .bottomBar) { Button("Refile…") { finish(refile: true) } }
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     if editing {
-                        Button("Capture") { file() }.disabled(template == nil)
+                        Button("Capture") { finish() }.disabled(template == nil)
                     } else {
                         Button("Continue", action: fill)
                     }
@@ -173,7 +175,7 @@ struct CaptureScreen: View {
             problem = nil
             editing = true
             focused = true
-            if template.options.immediateFinish { file() }
+            if template.options.immediateFinish { finish() }
         case .failure(.message(let message)):
             problem = message
         }
@@ -200,7 +202,27 @@ struct CaptureScreen: View {
         return calendar.date(from: parts) ?? Date()
     }
 
-    private func file(refile: Bool = false) {
+    /// Files the capture once the `capture-before-finalize` hooks have run on it; a hook that
+    /// fails cancels it, with the sheet left open.
+    private func finish(refile: Bool = false) {
+        guard let template, !finishing else { return }
+        guard session.hasHooks(.captureBeforeFinalize) else { return file(refile: refile) }
+        finishing = true
+        Task {
+            let hooked = await session.runCaptureHooks(text, template: template.key, interactive: true)
+            finishing = false
+            switch hooked {
+            case .failure(let error):
+                problem = error.message
+                editing = true
+            case .success(let changed):
+                text = changed
+                file(refile: refile)
+            }
+        }
+    }
+
+    private func file(refile: Bool) {
         guard let template else { return }
         let now = Date()
         let placed: Result<(path: String, offset: Int), CaptureError>

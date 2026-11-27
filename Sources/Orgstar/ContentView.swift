@@ -365,6 +365,18 @@ struct ContentView: View {
         .onAppear {
             commands.externalHandler = runExternal
             commands.userCommandHandler = runUserCommand
+            var hookAccess = UserCommandWorkspace(workspace: workspace, clock: clock)
+            hookAccess.userName = NSFullUserName()
+            // Hooks run from the agenda and the capture window too, so the question is an alert.
+            session.hooks = UserHookHost(trust: trust, ask: { question, reply in
+                let alert = NSAlert()
+                alert.messageText = question.title
+                alert.informativeText = question.message
+                let answers: [UserCommandTrust.Answer] = [.dontRun, .runOnce, .always]
+                for answer in answers { alert.addButton(withTitle: answer.title) }
+                let index = alert.runModal().rawValue - NSApplication.ModalResponse.alertFirstButtonReturn.rawValue
+                reply(answers.indices.contains(index) ? answers[index] : nil)
+            }, report: { commands.show($0) }, workspace: hookAccess)
             commands.filesHandler = { attachActions.drop($0) }
             commands.imageHandler = { attachActions.yankImage($0, ext: $1) }
             #if APPSTORE

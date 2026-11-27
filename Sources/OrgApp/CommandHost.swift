@@ -70,9 +70,11 @@ public final class CommandHost {
 
     /// Calls `function` exported by `module`, a path in `commands/`, with the JSON `context` and a
     /// function the command calls the app with, and returns its result as JSON. With `api`, the
-    /// function gets that version's `org` object instead, whose calls reach `calls`. `timeout`
-    /// is at most `maximumTimeout`.
-    public func run(module: String, function: String, context: String, timeout: Duration = defaultTimeout, api: Int? = nil) async throws -> String {
+    /// function gets that version's `org` object instead, whose calls reach `calls`, and then
+    /// `context` unless it is `null`. `timeout` is at most `maximumTimeout`. `answer`, when
+    /// given, answers this run's calls in place of `calls`.
+    public func run(module: String, function: String, context: String, timeout: Duration = defaultTimeout, api: Int? = nil,
+                    answer: (@MainActor (String, Any) async throws -> Any)? = nil) async throws -> String {
         guard Files.relative(module) != nil else { throw Failure.script("No module \(module) in commands/.") }
         let limit = min(timeout, Self.maximumTimeout)
         idleTask?.cancel()
@@ -87,7 +89,7 @@ public final class CommandHost {
             throw Failure.stopped
         }
         try Task.checkCancellation()
-        let run = Run(limit: limit)
+        let run = Run(limit: limit, answer: answer)
         engine.runs[id] = run
         defer { engine.runs[id] = nil }
         let reply: String
@@ -141,8 +143,8 @@ public final class CommandHost {
         if self.engine === engine { unload() } else { engine.close() }
     }
 
-    func call(_ name: String, _ value: Any) async throws -> Any {
-        try await calls(name, value)
+    func call(_ name: String, _ value: Any, run: Run) async throws -> Any {
+        try await (run.answer ?? calls)(name, value)
     }
 
     /// A run, which ends once: with the worker's reply, a cancel, the timeout or the end of the
@@ -150,6 +152,8 @@ public final class CommandHost {
     @MainActor
     final class Run {
         let limit: Duration
+        /// Answers this run's calls in place of the host's `calls`.
+        let answer: (@MainActor (String, Any) async throws -> Any)?
         private var remaining: Duration
         private var since = ContinuousClock.now
         private var timer: Task<Void, Never>?
@@ -157,8 +161,9 @@ public final class CommandHost {
         private(set) var ended = false
         private var continuation: CheckedContinuation<String, Error>?
 
-        init(limit: Duration) {
+        init(limit: Duration, answer: (@MainActor (String, Any) async throws -> Any)? = nil) {
             self.limit = limit
+            self.answer = answer
             remaining = limit
         }
 
@@ -286,7 +291,7 @@ public final class CommandHost {
             run.pause()
             defer { run.resume() }
             do {
-                return (try await host.call(name, body["value"] ?? NSNull()), nil)
+                return (try await host.call(name, body["value"] ?? NSNull(), run: run), nil)
             } catch let Failure.script(message) {
                 return (nil, message)
             } catch {
@@ -392,8 +397,8 @@ public final class CommandHost {
             """
 
         /// Removes the ways out of the worker, then waits for a command: imports its module, calls
-        /// the function with the context and `call`, or with `org` for API version 1, and posts the
-        /// result as JSON.
+        /// the function with the context and `call`, or for API version 1 with `org` and the
+        /// context unless it is null, and posts the result as JSON.
         static let worker = """
             const post = self.postMessage.bind(self);
             for (const name of ["fetch", "XMLHttpRequest", "WebSocket", "EventSource", "importScripts", "indexedDB", "caches", "Worker", "SharedWorker"]) {
@@ -442,7 +447,8 @@ public final class CommandHost {
               try {
                 const module = await import("./commands/" + m.module);
                 if (typeof module[m.name] !== "function") throw new Error(`${m.module} exports no function ${m.name}.`);
-                const value = await module[m.name](...(m.api === 1 ? [api1()] : [JSON.parse(m.context), call]));
+                const context = JSON.parse(m.context);
+                const value = await module[m.name](...(m.api === 1 ? [api1(), ...(context === null ? [] : [context])] : [context, call]));
                 post({ result: JSON.stringify(value) ?? "null" });
               } catch (error) {
                 post({ error: String(error && error.message || error) });

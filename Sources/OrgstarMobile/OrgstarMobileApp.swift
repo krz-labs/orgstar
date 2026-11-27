@@ -461,6 +461,8 @@ struct RootView: View {
         }
         .task {
             TimerModel.shared.onDone = { message = $0 }
+            session.hooks = UserHookHost(trust: TrustStore(), ask: askHookTrust, report: { message = $0 },
+                                        workspace: UserCommandWorkspace(workspace: workspace, clock: model.clock))
             if let lost = UnsavedHeldFiles.atLaunch { message = lost }
             takeShared()
             // Development: `ORGSTAR_ROOT` adds a folder at launch, as on the Mac.
@@ -670,6 +672,22 @@ struct RootView: View {
             Button("Capture", systemImage: "square.and.pencil") { capture = CaptureRequest() }
         }
     }
+}
+
+/// Asks whether a hook from a file not yet trusted here may run, as an alert over whatever is on
+/// screen: hooks run from the editor, the agenda, the board and the capture sheet.
+@MainActor
+private func askHookTrust(_ question: UserCommandTrust.Question, reply: @escaping (UserCommandTrust.Answer?) -> Void) {
+    let windows = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.flatMap(\.windows)
+    guard var top = windows.first(where: \.isKeyWindow)?.rootViewController else { return reply(nil) }
+    while let presented = top.presentedViewController, !presented.isBeingDismissed { top = presented }
+    let alert = UIAlertController(title: question.title, message: question.message, preferredStyle: .alert)
+    for answer in UserCommandTrust.Answer.allCases {
+        alert.addAction(UIAlertAction(title: answer.title, style: answer == .dontRun ? .cancel : .default) { _ in reply(answer) })
+    }
+    top.present(alert, animated: true)
+    // Nothing on screen could show it.
+    if alert.presentingViewController == nil { reply(nil) }
 }
 #else
 /// The iOS app has nothing to run elsewhere.

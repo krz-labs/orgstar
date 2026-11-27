@@ -142,6 +142,31 @@ struct XCallbackRunnerTests {
         #expect(todo.contains(" :shop:\nfor the weekend\n* Project\n"))
     }
 
+    /// `capture-before-finalize` hooks run on captures without the sheet; one from a file not
+    /// trusted here is skipped, since nothing can ask.
+    @Test func captureHooksRunWithoutTheSheet() async throws {
+        let config = try Folder()
+        try config.write("commands.toml", "api = 1\n[[hook]]\nevent = \"capture-before-finalize\"\nfile = \"check.js\"\nfunction = \"check\"\n")
+        try config.write("commands/check.js", """
+            export function check(org, { text, template }) {
+              if (text.includes("cancel")) throw new Error(`not with ${template}`);
+              return { edits: [{ from: 0, to: text.length, text: text.replace("TODO", "NEXT") }] };
+            }
+            """)
+        session.userCommands = UserCommands()
+        #expect(UserCommandFile.load(into: session.userCommands, folder: config.url) == [])
+        var reported: [String] = []
+        let trust = TrustStore(file: config.url.appendingPathComponent("trusted.json"))
+        session.hooks = UserHookHost(trust: trust, ask: { _, _ in Issue.record("asked") }, report: { reported.append($0) })
+        #expect(await runner.run(allowed("capture?template=t&text=Skipped")) == .reply(.success(["template": "t", "file": "todo.org"])))
+        #expect(reported == ["check in commands/check.js: commands/check.js isn't trusted on this device yet, and orgstar can't ask here."])
+        let modules = config.url.appendingPathComponent("commands")
+        trust.trust(path: modules.appendingPathComponent("check.js").path, content: try #require(UserCommandFile.trustedText("check.js", modules: modules)))
+        #expect(await runner.run(allowed("capture?template=t&text=Read")) == .reply(.success(["template": "t", "file": "todo.org"])))
+        #expect(await runner.run(allowed("capture?template=t&text=cancel")) == .reply(.failure(.captureFailed, "check in commands/check.js: not with t")))
+        #expect(todo.hasPrefix("* Inbox\n** TODO Skipped\n** NEXT Read\n* Project\n"))
+    }
+
     @Test func capturesALinkAsOrgProtocolDoes() async {
         let step = await runner.run(allowed("capture?template=t&text=Read&url=https%3A%2F%2Fexample.com&title=Example"))
         #expect(step == .reply(.success(["template": "t", "file": "todo.org"])))

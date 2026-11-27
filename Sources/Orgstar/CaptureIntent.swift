@@ -29,14 +29,14 @@ struct CaptureIntent: AppIntent {
         guard ProAccess.shared.isUnlocked else { throw Failure(message: "Shortcuts actions need orgstar+") }
         for _ in 0..<50 where Self.environment == nil { try? await Task.sleep(for: .milliseconds(100)) }
         guard let (workspace, session, clock, commands) = Self.environment else { throw Failure(message: "orgstar isn't ready") }
-        let placed = session.capture(
+        let placed = await session.captureRunningHooks(
             text, templateKey: template, templates: CaptureTemplates.load().templates, workspace: workspace, clock: clock,
             clipboard: NSPasteboard.general.string(forType: .string) ?? "", userName: NSFullUserName()
         )
         switch placed {
         case .failure(let error):
             throw Failure(message: error.message)
-        case .success(let chosen):
+        case .success(let (chosen, _, _)):
             let message = "Captured to \(CaptureView.target(chosen))"
             commands.show(message)
             return .result(value: message, dialog: "\(message)")

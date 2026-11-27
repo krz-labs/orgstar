@@ -95,6 +95,13 @@ enum CaptureCommand {
                 throw Failure(.failure, "Can't create \(path): \(error.localizedDescription)")
             }
         }
+        // Hooks run in the app's WebKit worker, which the command-line tool doesn't have.
+        var ignored: [String] = []
+        if let manifest = try? String(contentsOf: workspace.configFile(UserCommands.fileName), encoding: .utf8),
+           let hooks = try? UserCommands.manifest(manifest, problems: &ignored, exists: { _ in true }).hooks,
+           hooks.contains(where: { $0.event == .captureBeforeFinalize }) {
+            workspace.host.error("orgstar: \(UserHook.Event.captureBeforeFinalize.rawValue) hooks in \(UserCommands.fileName) run only in the app; captured without them\n")
+        }
         let (result, text) = try workspace.perform(CapturePlacement(text: filled.text, template: chosen), path: path, at: 0)
         let offset = result.selection?.first?.lowerBound ?? 0
         workspace.host.print("Captured to \(path):\(Workspace.line(of: offset, in: text))")

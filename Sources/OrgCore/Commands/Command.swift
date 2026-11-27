@@ -274,6 +274,26 @@ public enum Effect: Sendable, Equatable {
     case timer(OrgTimer?)
     /// A snippet was expanded; its fields are filled in next.
     case snippet(SnippetSession)
+    /// An entry's TODO keyword changed, as `org-todo` changes it; the app runs the
+    /// `after-todo-state-change` hooks.
+    case todoStateChanged(TodoStateChange)
+}
+
+/// A change of an entry's TODO keyword.
+public struct TodoStateChange: Sendable, Equatable {
+    /// Where the entry's heading starts, in the new text.
+    public let heading: Int
+    /// The keyword before, nil for none.
+    public let from: String?
+    /// The keyword set, nil for none. For a repeating entry marked done it is the done
+    /// keyword, though the repeat has put the entry back, as `org-state` is in Org's hook.
+    public let to: String?
+
+    public init(heading: Int, from: String?, to: String?) {
+        self.heading = heading
+        self.from = from
+        self.to = to
+    }
 }
 
 public struct EditResult: Sendable, Equatable {

@@ -183,9 +183,11 @@ extension EmacsBuffer {
 
     /// What `org-todo` does after the keyword went from `previous` to the current one: CLOSED,
     /// the repeat of a repeating entry, and the log note, asking for its text with `answers`.
+    /// The change is kept for the result's `todoStateChanged` effect.
     func afterTodoChange(previous: String?, answers: [String: String]) throws {
         let state = todoKeyword
         guard state != previous else { return }
+        if let heading = saveExcursion({ try? backToHeading() }) { todoChanges.append((marker(heading), previous, state)) }
         let log = logSettings()
         var setup = try saveExcursion { try todoLogging(previous: previous, state: state, log: log) }
         if let state, settings.isDone(state), !(previous.map(settings.isDone) ?? false),

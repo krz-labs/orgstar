@@ -37,6 +37,8 @@ struct CaptureView: View {
     @State private var roam: RoamCapture?
     /// The `captureRequest` serial of an x-callback-url capture, whose caller hears how it ends.
     @State private var callbackSerial: Int?
+    /// The capture's hooks are running.
+    @State private var finishing = false
     @FocusState private var focused: Bool
     @Environment(\.dismissWindow) private var dismissWindow
     @Environment(\.openWindow) private var openWindow
@@ -287,7 +289,27 @@ struct CaptureView: View {
         return Calendar.current.date(from: DateComponents(year: d.year, month: d.month, day: d.day, hour: time.hour, minute: time.minute, second: time.second)) ?? now
     }
 
+    /// Files the capture once the `capture-before-finalize` hooks have run on it; a hook that
+    /// fails cancels it, with the window left open.
     private func finish(refile: Bool = false) {
+        guard let template, !finishing else { return }
+        guard session.hasHooks(.captureBeforeFinalize) else { return file(refile: refile) }
+        finishing = true
+        Task {
+            let hooked = await session.runCaptureHooks(text, template: template.key, interactive: true)
+            finishing = false
+            switch hooked {
+            case .failure(let error):
+                problem = error.message
+                if template.options.immediateFinish { editing = true }
+            case .success(let changed):
+                text = changed
+                file(refile: refile)
+            }
+        }
+    }
+
+    private func file(refile: Bool) {
         guard let template else { return }
         let opened = context.now
         let now = Date()

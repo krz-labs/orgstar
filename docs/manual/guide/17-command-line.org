@@ -67,6 +67,8 @@ Questions are answered with =--set Prompt=value=, by the prompt's text: =%^{Who}
 
 Targets work as in the app: a file is made when missing, =id= finds the heading in your folders, =clock= files under the running clock. =clock-in= with =clock-keep= starts the clock on the new entry; without =clock-keep= there's nothing to time, since the capture finishes at once. Templates with =denote = true= are refused; use them in the app.
 
+=capture-before-finalize= hooks (see [[file:18-user-commands.org::*Hooks][Hooks]]) run only in the app. When =commands.toml= has one, the tool files the entry without it and says so on standard error: "capture-before-finalize hooks in commands.toml run only in the app; captured without them". No command of the tool runs =after-todo-state-change= hooks, including =clock in= with =org-clock-in-switch-to-state=.
+
 ** clock
 
 #+BEGIN_SRC sh

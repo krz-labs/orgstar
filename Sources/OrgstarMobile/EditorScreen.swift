@@ -548,6 +548,7 @@ struct EditorScreen: View {
         editor.onBabel = { job in if ProAccess.shared.allows(.babel) { run(job) } }
         editor.onUserCommand = { request, finished in runUserCommand(request, finished: finished) }
         editor.onRefreshSetup = { session.refreshSetup() }
+        editor.onTodoStateChange = { [path] in session.afterTodoStateChange($0, in: path) }
         editor.onAgenda = { start, count in model.agendaRequest = .init(start: start, count: count) }
         editor.keymap = model.keymap
         editor.modal = model.modalKeys

@@ -131,6 +131,8 @@ final class MobileEditor: NSObject, DocumentBuffer {
     var onUserCommand: ((UserCommandRequest, _ finished: @escaping @MainActor (String?) -> Void) -> Void)?
     /// The file's setup files to read again (C-c C-c on a keyword line).
     var onRefreshSetup: (() -> Void)?
+    /// TODO keyword changes a command made, for the `after-todo-state-change` hooks.
+    var onTodoStateChange: (([Effect]) -> Void)?
     /// A block, a table's formulas or a field to edit apart (C-c ', C-c `).
     var onEditBlock: ((BlockEdit) -> Void)?
     /// A followed timestamp's agenda days: the first (a `Days` number) and how many.
@@ -396,6 +398,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
                     state.folds.insert(start)
                     setFolds(state)
                 case .refreshSetup: onRefreshSetup?()
+                case .todoStateChanged: onTodoStateChange?([effect])
                 case .timer(let timer): TimerModel.shared.set(timer)
                 case .snippet(let session): startSnippet(session)
                 default: break

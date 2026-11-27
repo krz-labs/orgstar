@@ -167,6 +167,18 @@ struct CaptureTests {
         #expect(unknown.status == 3)
         #expect(unknown.err.contains("j (Journal)"))
     }
+
+    /// Capture hooks run only in the app: the tool files without them and says so.
+    @Test func filesWithoutCaptureHooks() throws {
+        let sandbox = try Sandbox()
+        try sandbox.write(Self.templates, "capture.toml", in: sandbox.config)
+        try sandbox.write("api = 1\n[[hook]]\nevent = \"capture-before-finalize\"\nfile = \"check.js\"\nfunction = \"check\"\n", "commands.toml", in: sandbox.config)
+        try sandbox.write("* Inbox\n* Meetings\n", "inbox.org")
+        let (status, _, err) = sandbox.run("capture", "t", "Buy milk")
+        #expect(status == 0)
+        #expect(err == "orgstar: capture-before-finalize hooks in commands.toml run only in the app; captured without them\n")
+        #expect(try sandbox.read("inbox.org") == "* Inbox\n** TODO Buy milk\n* Meetings\n")
+    }
 }
 
 @MainActor

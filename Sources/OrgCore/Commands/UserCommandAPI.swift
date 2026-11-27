@@ -268,7 +268,8 @@ public struct UserCommandState: Sendable {
         var options = context.options
         for effect in result.effects {
             switch effect {
-            case .fold, .sparseTree, .snippet: continue
+            // A command's or hook's own TODO changes run no hooks.
+            case .fold, .sparseTree, .snippet, .todoStateChanged: continue
             case .timer(let timer): options.timer = timer
             default: break
             }
@@ -303,7 +304,7 @@ public struct UserCommandState: Sendable {
 
     /// Ranges moved by edits that don't overlap: an offset inside or at the end of a replaced
     /// range, or at an insertion, moves past the replacement.
-    static func map(_ ranges: [Range<Int>], through edits: [TextEdit]) -> [Range<Int>] {
+    public static func map(_ ranges: [Range<Int>], through edits: [TextEdit]) -> [Range<Int>] {
         let sorted = edits.sorted { $0.range.lowerBound < $1.range.lowerBound }
         func map(_ offset: Int) -> Int {
             var shift = 0

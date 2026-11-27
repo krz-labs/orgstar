@@ -232,7 +232,7 @@ public struct XCallbackRunner {
         // A link that launched the app can come before the folders were first read.
         if workspace.files.isEmpty { await workspace.refresh() }
         switch action {
-        case .capture: return capture(request, sheet: interactive)
+        case .capture: return await capture(request, sheet: interactive)
         case .open: return open(request)
         case .agenda: return .reply(await agenda(request))
         case .clockIn: return .reply(await clockIn(request, ask: ask))
@@ -273,12 +273,12 @@ public struct XCallbackRunner {
         }
     }
 
-    private func capture(_ request: XCallbackRequest, sheet: Bool) -> Step {
+    private func capture(_ request: XCallbackRequest, sheet: Bool) async -> Step {
         let properties = Self.properties(request)
         if sheet { return .capture(template: request.value("template"), properties: properties) }
         var answers = request.parameters
         for name in Self.reservedCaptureParameters { answers[name] = nil }
-        let placed = session.capture(
+        let placed = await session.captureRunningHooks(
             request.parameters["text"] ?? "", templateKey: request.value("template"), templates: templates(), workspace: workspace, clock: clock,
             clipboard: clipboard(), userName: userName, answers: answers, properties: properties
         )

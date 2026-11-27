@@ -1,5 +1,5 @@
 #+TITLE: User commands
-#+DESCRIPTION: Your own editing commands in JavaScript: commands.toml, the commands folder, the org API, trust, limits, and porting commands from Emacs Lisp.
+#+DESCRIPTION: Your own editing commands in JavaScript: commands.toml, the commands folder, the org API, hooks, trust, limits, and porting commands from Emacs Lisp.
 #+LEDE: Write your own editing commands in JavaScript. They run on the Mac and on iPhone and iPad, from the palette, keys and the key bar.
 
 * Overview
@@ -58,6 +58,7 @@ Problems are reported like those of the other configuration files (see [[file:13
 - =commands.toml: command slow: timeout must be 1 to 30 seconds=
 - =commands.toml: command review: unknown context headline=
 - =commands.toml: command find: workspace must be true or false=
+- =commands.toml: hook at line 12: unknown event post-command; the events are after-todo-state-change and capture-before-finalize= (see [[*Hooks][Hooks]])
 - =commands.toml: api 2 needs a newer orgstar= (no command is registered)
 - =commands.toml: missing api = 1= (no command is registered)
 - =commands.toml: commands/review.js isn't downloaded from iCloud yet= (iPhone and iPad; the download starts)
@@ -267,6 +268,94 @@ Any change to the file or to a module it imports asks again, including a change 
 
 Edit ▸ Cancel Running Task (=⌘.=, =app.babel.cancel=) stops a running command; the Commands list on iPhone and iPad has the same command. Nothing it returned is applied. Running another user command cancels the one before it.
 
+* Hooks
+
+A hook is a function that runs when something happens rather than from a key: after you change an entry's TODO state, or before a capture is filed. Declare it in =commands.toml= as =[[hook]]=, beside the commands:
+
+#+BEGIN_SRC toml
+api = 1
+
+[[hook]]
+event = "after-todo-state-change"   # org-after-todo-state-change-hook
+file = "todo.js"
+function = "logState"
+timeout = 2                         # optional, as for commands
+workspace = false                   # optional, as for commands
+
+[[hook]]
+event = "capture-before-finalize"   # org-capture-before-finalize-hook
+file = "capture.js"
+function = "check"
+#+END_SRC
+
+| Key         | Required | What it sets                                                                                    |
+|-------------+----------+-------------------------------------------------------------------------------------------------|
+| =event=     | Yes      | =after-todo-state-change= or =capture-before-finalize=.                                         |
+| =file=      | Yes      | As for a command.                                                                               |
+| =function=  | Yes      | As for a command.                                                                               |
+| =timeout=   | No       | As for a command: 1 to 30 seconds, 2 when not given.                                            |
+| =workspace= | No       | As for a command: =true= gives the hook the calls of [[*Reading your folders and capturing][Reading your folders and capturing]]. |
+
+An event may have several hooks; they run one after another, in the order of the file, as the functions of an Emacs hook do. Problems are reported by line, as =commands.toml: hook at line 12: no file commands/todo.js=, and the hook with the problem isn't used.
+
+The function is called with =org= and a second argument that describes the event. It returns =edits= and =message= as a command does, or nothing; =selection= and =copy= fail the hook with "/function/ in /file/: a hook returns only edits and message". =org.prompt= throws in a hook, and so does =org.run= with a command that asks: a hook can run where nobody can answer.
+
+There are no hooks that run on every key or every change (=post-command-hook=, =after-change-functions=, =post-self-insert-hook=): a hook runs in the same engine as a command, which takes too long for that.
+
+** after-todo-state-change
+
+Runs after a change of an entry's TODO keyword has been made: by the TODO commands in the editor (=C-c C-t=, =S-right=, =S-left=, the TODO keyword picker), =C-c C-c= on a heading, setting the =TODO= property, and clocking in with =org-clock-in-switch-to-state=; and in the agenda, the board, column view, the entry sheet on iPhone and iPad and the Apple Watch's Done. The second argument is:
+
+| Field   | Value                                                                                                    |
+|---------+----------------------------------------------------------------------------------------------------------|
+| =entry= | The entry after the change, as =org.heading()= describes it.                                             |
+| =from=  | The keyword before, or =null=.                                                                           |
+| =to=    | The keyword set, or =null=. For a repeating entry marked done it is the done keyword, though the repeat has put the entry back to =TODO=, as =org-state= is in Org's hook. |
+
+The hook runs on the file as the change left it: =org.text()=, =org.heading()= and =org.outline()= read that text, and the caret is at the start of the entry's heading. Its edits apply as a step of undo of their own, after the change's, so undoing once takes back the hook's edits and leaves the change. In a file that isn't open (a change from the agenda), the file is written at once. If the file changes before the hook's edits apply, as when you type while it runs, they aren't made: "/file/ changed while /function/ in /file/ ran; its changes weren't made."
+
+The change itself stays whatever the hook does. A hook that fails, throws or runs out of time shows why, and the next hook runs.
+
+Changes a hook or a user command makes don't run hooks: a hook that runs =org.run("org.todo.cycle")= doesn't run itself again. Nor do the command-line tool, Replace in Files and renaming a keyword in every file. Encrypted files and buffers with decrypted entries run no hooks, as they run no commands.
+
+#+BEGIN_SRC js
+// commands/todo.js: a line under the heading when an entry is done.
+export async function logState(org, { entry, from, to }) {
+  if (to !== "DONE") return
+  const text = await org.text()
+  const lineEnd = text.indexOf("\n", entry.start) + 1
+  return {
+    edits: [{ from: lineEnd, text: `- Done; was ${from ?? "no keyword"}\n` }],
+    message: `Done: ${entry.title}`,
+  }
+}
+#+END_SRC
+
+** capture-before-finalize
+
+Runs when you file a capture, before the entry is placed: from the capture window on the Mac, the capture sheet on iPhone and iPad, an x-callback-url =capture= without the sheet, and Shortcuts' Capture to Orgstar. The second argument is ={text, template}=: the entry as the template filled it and you edited it, and the template's key.
+
+The hook works on the capture as Emacs's does in the capture buffer: =org.text()= is the capture's text, =org.heading()= and =org.outline()= read its headings, =org.file()= gives =null=, and its =edits= change it. The entry is filed with the changed text. =org.fail(text)=, an error or the timeout cancels the capture: nothing is filed and the reason is shown, in the window or sheet, which stays open, or in the reply to the x-callback-url or the Shortcuts action.
+
+#+BEGIN_SRC js
+// commands/capture.js: tag entries about bills, and refuse an empty title.
+export async function check(org, { text, template }) {
+  const heading = await org.heading(0)
+  if (heading && !heading.title.trim()) return org.fail("The entry needs a title")
+  if (template !== "t" || !/\bbill\b/i.test(text)) return
+  const lineEnd = text.indexOf("\n")
+  return { edits: [{ from: lineEnd < 0 ? text.length : lineEnd, text: " :money:" }] }
+}
+#+END_SRC
+
+Capture hooks don't run for =org.capture= in a user command or a hook, for org-roam and dailies captures made without the capture window, or for =orgstar capture= (see [[file:17-command-line.org::*capture][capture]]), which files without them and says so.
+
+** Trust for hooks
+
+A hook's file is trusted as a command's is (see [[*Trust][Trust]]), and the same trust covers both: Always for one of the file's commands also lets its hooks run, and the other way round. The first time a hook from a file not trusted on this device would run, orgstar asks "Run hooks from commands/todo.js?", with a line saying when the hook runs. The question is an alert on the Mac, since hooks run from the agenda and the capture window too, and on iPhone and iPad.
+
+Where orgstar can't ask (an x-callback-url capture without the sheet, Shortcuts), a hook from a file not trusted here is skipped and the capture is filed without it, with "/function/ in /file/: commands/capture.js isn't trusted on this device yet, and orgstar can't ask here." Don't Run skips the hook this time, with "Not run".
+
 * Limits
 
 - *Time.* A command that runs longer than its =timeout= (2 seconds by default, at most 30) is stopped with "/title/ didn't finish within /n/ s and was stopped." Time waiting for a prompt doesn't count.
@@ -287,7 +376,7 @@ What Emacs Lisp has that user commands don't:
 - Buffer primitives: =point=, =goto-char=, =insert=, =re-search-forward= on the buffer, =save-excursion=, markers. A command gets the text and returns edits instead.
 - The Org API: =org-element-*=, =org-entry-put=. Read headings with =org.heading()= and =org.outline()=, and write the text yourself or run Org's commands with =org.run=. Over several files, a command with =workspace = true= reads with =org.search= and =org.outlineOf= and writes only with =org.capture=.
 - Other buffers, =find-file= and =with-temp-buffer=; changes to other files except by capture.
-- Hooks (=org-after-todo-state-change-hook=, =post-command-hook=), advice, minor modes and buffer-local variables.
+- Hooks other than =org-after-todo-state-change-hook= and =org-capture-before-finalize-hook= (see [[*Hooks][Hooks]]): no =post-command-hook=, =after-change-functions= or other per-keystroke hooks. Advice, minor modes and buffer-local variables.
 - =interactive= codes other than the prompts above; =C-u= prefix arguments.
 - Timers, processes and shell commands.
 
@@ -327,3 +416,9 @@ What Emacs Lisp has that user commands don't:
 | =(org-agenda-get-day-entries file date)=, =(org-agenda-list)= | =await org.agenda({from, to})= (=workspace = true=)     |
 | =(org-capture-string "Milk" "t")=, =(org-capture nil "t")= | =await org.capture("t", "Milk", {…})= (=workspace = true=) |
 | =(global-set-key (kbd "C-c u") #'my/command)=      | =[[bind]]= in =keymap.toml= with =command = "user.…"=               |
+| =(add-hook 'org-after-todo-state-change-hook #'my/fn)= | =[[hook]]= with =event = "after-todo-state-change"=            |
+| =org-state=, =org-last-state= in that hook         | =to= and =from= of the hook's second argument                      |
+| =(add-hook 'org-capture-before-finalize-hook #'my/fn)= | =[[hook]]= with =event = "capture-before-finalize"=            |
+| =(buffer-string)= in the capture buffer            | =await org.text()=, or =text= of the hook's second argument        |
+| =(plist-get org-capture-plist :key)=               | =template= of the hook's second argument                           |
+| =(user-error …)= in a capture hook                 | =return org.fail(…)=: the capture is canceled                      |

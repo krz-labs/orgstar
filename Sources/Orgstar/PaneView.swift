@@ -147,6 +147,7 @@ struct PaneView: NSViewRepresentable {
                 NSPasteboard.general.setString(text, forType: .string)
             case .refreshSetup: session?.refreshSetup()
             case .timer(let timer): TimerModel.shared.set(timer)
+            case .todoStateChanged: session?.afterTodoStateChange([effect], in: path)
             case .message, .sparseTree, .fold, .snippet: break
             }
         }

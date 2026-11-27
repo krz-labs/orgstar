@@ -40,6 +40,8 @@ final class EmacsBuffer {
     var lastInsertedTimestamp: String?
     /// Shown after the command commits, as `message`.
     var message: String?
+    /// TODO keyword changes `afterTodoChange` saw: the heading, the keyword before and after.
+    var todoChanges: [(heading: Marker, from: String?, to: String?)] = []
 
     let options: EditingOptions
 
@@ -501,7 +503,8 @@ func commitBuffer(_ context: EditContext, _ body: (EmacsBuffer) throws -> Void) 
     while prefix > 0, prefix < old.count, UTF16.isTrailSurrogate(old[prefix]) { prefix -= 1 }
     while suffix > 0, UTF16.isTrailSurrogate(old[old.count - suffix]) { suffix -= 1 }
     let caret = buffer.point
-    let effects: [Effect] = buffer.message.map { [.message($0)] } ?? []
+    let effects: [Effect] = (buffer.message.map { [.message($0)] } ?? [])
+        + buffer.todoChanges.map { .todoStateChanged(TodoStateChange(heading: $0.heading.position, from: $0.from, to: $0.to)) }
     guard old.count != new.count || prefix != old.count else {
         return .commit(EditResult(baseRevision: context.revision, edits: [], selection: [caret..<caret], effects: effects))
     }

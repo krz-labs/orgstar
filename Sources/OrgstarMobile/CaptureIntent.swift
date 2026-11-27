@@ -26,14 +26,14 @@ struct CaptureIntent: AppIntent {
         guard ProAccess.shared.isUnlocked else { throw Failure(message: "Shortcuts actions need orgstar+") }
         let model = MobileModel.shared
         guard let workspace = model.workspace else { throw Failure(message: model.failure ?? "orgstar isn't ready") }
-        let placed = model.session.capture(
+        let placed = await model.session.captureRunningHooks(
             text, templateKey: template, templates: CaptureTemplates.load().templates, workspace: workspace, clock: model.clock,
             clipboard: "", userName: ""
         )
         switch placed {
         case .failure(let error):
             throw Failure(message: error.message)
-        case .success(let chosen):
+        case .success(let (chosen, _, _)):
             for path in model.session.dirtyPaths { _ = model.session.save(path) }
             let message = "Captured with \(chosen.name)"
             return .result(value: message, dialog: "\(message)")

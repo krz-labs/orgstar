@@ -5,7 +5,7 @@ import OrgCore
 public enum UserCommandFile {
     /// Reads `commands.toml` in `folder` into `store`, without running anything. The problems
     /// found, each starting with the file's name; a missing file is none. A module iCloud hasn't
-    /// downloaded is reported and its download started; its command is kept.
+    /// downloaded is reported and its download started; its command or hook is kept.
     @discardableResult
     public static func load(into store: UserCommands = .shared, folder: URL, read: (URL) -> String? = { try? String(contentsOf: $0, encoding: .utf8) }) -> [String] {
         let modules = folder.appendingPathComponent(UserCommands.folderName)
@@ -15,17 +15,18 @@ public enum UserCommandFile {
         }
         var problems: [String] = []
         var commands: [UserCommand] = []
+        var hooks: [UserHook] = []
         do {
-            commands = try UserCommands.parse(text, problems: &problems) { path in
+            (commands, hooks) = try UserCommands.manifest(text, problems: &problems) { path in
                 FileManager.default.fileExists(atPath: modules.appendingPathComponent(path).path) || placeholder(modules.appendingPathComponent(path)) != nil
             }
         } catch {
             problems.append("\(error)")
         }
-        for file in Set(commands.map(\.file)).sorted() where needsDownload(modules.appendingPathComponent(file)) {
+        for file in Set(commands.map(\.file) + hooks.map(\.file)).sorted() where needsDownload(modules.appendingPathComponent(file)) {
             problems.append("\(UserCommands.folderName)/\(file) isn't downloaded from iCloud yet")
         }
-        store.replace(commands, folder: commands.isEmpty ? nil : modules)
+        store.replace(commands, hooks: hooks, folder: commands.isEmpty && hooks.isEmpty ? nil : modules)
         return problems.map { "\(UserCommands.fileName): \($0)" }
     }
 
@@ -148,20 +149,35 @@ public enum UserCommandTrust {
         public let imports: [String]
         /// Its commands can also read every file in the folders and capture to them.
         public let workspace: Bool
+        /// Asked for a hook on this event rather than a command.
+        public let hook: UserHook.Event?
 
-        public init(file: String, imports: [String] = [], workspace: Bool = false) {
+        public init(file: String, imports: [String] = [], workspace: Bool = false, hook: UserHook.Event? = nil) {
             self.file = file
             self.imports = imports
             self.workspace = workspace
+            self.hook = hook
         }
 
         public var title: String {
-            String(localized: "Run commands from \(file)?", comment: "Asked before a user command from a file not yet trusted on this device runs")
+            hook == nil
+                ? String(localized: "Run commands from \(file)?", comment: "Asked before a user command from a file not yet trusted on this device runs")
+                : String(localized: "Run hooks from \(file)?", comment: "Asked before a user hook from a file not yet trusted on this device runs")
         }
 
-        /// The modules it imports, if any, and what its commands can do, a line each.
+        /// When the hook runs, the modules it imports, if any, and what its commands can do, a
+        /// line each.
         public var message: String {
             var lines: [String] = []
+            switch hook {
+            case .afterTodoStateChange?:
+                lines.append(String(localized: "This hook runs after you change an entry's TODO state.",
+                                    comment: "When an after-todo-state-change hook runs, in the question before it runs"))
+            case .captureBeforeFinalize?:
+                lines.append(String(localized: "This hook runs before a capture is filed and can change or cancel it.",
+                                    comment: "When a capture-before-finalize hook runs, in the question before it runs"))
+            case nil: break
+            }
             if !imports.isEmpty {
                 let list = ListFormatter.localizedString(byJoining: imports)
                 lines.append(String(localized: "It imports \(list).", comment: "The modules a user command's file imports, in the question before it runs"))
@@ -183,17 +199,35 @@ public enum UserCommandTrust {
     public static func check(_ command: UserCommand, modules: URL, trust: TrustStore,
                              ask: @MainActor (Question, @escaping (Answer?) -> Void) -> Void,
                              run: @escaping () -> Void, refuse: @escaping (String) -> Void) {
-        guard let texts = UserCommandFile.moduleTexts(command.file, modules: modules) else {
-            return refuse("No file \(UserCommands.folderName)/\(command.file)")
+        check(file: command.file, workspace: command.workspace, modules: modules, trust: trust, ask: ask, run: run, refuse: refuse)
+    }
+
+    /// `check` for a hook: the same trust as its file's commands. Without `ask`, a hook from a
+    /// file not trusted here is refused.
+    public static func check(_ hook: UserHook, modules: URL, trust: TrustStore,
+                             ask: (@MainActor (Question, @escaping (Answer?) -> Void) -> Void)?,
+                             run: @escaping () -> Void, refuse: @escaping (String) -> Void) {
+        let shown = "\(UserCommands.folderName)/\(hook.file)"
+        check(file: hook.file, workspace: hook.workspace, hook: hook.event, modules: modules, trust: trust, ask: ask ?? { _, _ in
+            refuse(String(localized: "\(shown) isn't trusted on this device yet, and orgstar can't ask here.",
+                          comment: "A hook from a file not yet trusted, skipped where orgstar can't ask, as for a capture from Shortcuts"))
+        }, run: run, refuse: refuse)
+    }
+
+    private static func check(file: String, workspace: Bool, hook: UserHook.Event? = nil, modules: URL, trust: TrustStore,
+                              ask: @MainActor (Question, @escaping (Answer?) -> Void) -> Void,
+                              run: @escaping () -> Void, refuse: @escaping (String) -> Void) {
+        guard let texts = UserCommandFile.moduleTexts(file, modules: modules) else {
+            return refuse("No file \(UserCommands.folderName)/\(file)")
         }
         let text = UserCommandFile.trustedText(texts)
-        let path = modules.appendingPathComponent(command.file).path
+        let path = modules.appendingPathComponent(file).path
         let workspaceText = workspaceTrust + text
-        let accepted = command.workspace ? [workspaceText] : [text, workspaceText]
+        let accepted = workspace ? [workspaceText] : [text, workspaceText]
         if accepted.contains(where: { trust.isTrusted(path: path, content: $0) }) { return run() }
-        let imports = texts.filter { $0.key != command.file && $0.value != nil }.keys.sorted()
-        let question = Question(file: "\(UserCommands.folderName)/\(command.file)",
-                                imports: imports.map { "\(UserCommands.folderName)/\($0)" }, workspace: command.workspace)
+        let imports = texts.filter { $0.key != file && $0.value != nil }.keys.sorted()
+        let question = Question(file: "\(UserCommands.folderName)/\(file)",
+                                imports: imports.map { "\(UserCommands.folderName)/\($0)" }, workspace: workspace, hook: hook)
         ask(question) { answer in
             switch answer {
             case .runOnce: run()
@@ -203,5 +237,26 @@ public enum UserCommandTrust {
             case .dontRun, nil: refuse(String(localized: "Not run"))
             }
         }
+    }
+}
+
+/// What hooks need from the app: the trust kept for their files, the question for a file not yet
+/// trusted where the app can ask, where their messages go, and the folders for hooks with
+/// `workspace = true`.
+@MainActor
+public struct UserHookHost {
+    public var trust: TrustStore
+    /// Nil where the app can't ask; a hook from a file not trusted here is then skipped with a
+    /// message.
+    public var ask: (@MainActor (UserCommandTrust.Question, @escaping (UserCommandTrust.Answer?) -> Void) -> Void)?
+    public var report: @MainActor (String) -> Void
+    public var workspace: UserCommandWorkspace?
+
+    public init(trust: TrustStore, ask: (@MainActor (UserCommandTrust.Question, @escaping (UserCommandTrust.Answer?) -> Void) -> Void)?,
+                report: @escaping @MainActor (String) -> Void, workspace: UserCommandWorkspace? = nil) {
+        self.trust = trust
+        self.ask = ask
+        self.report = report
+        self.workspace = workspace
     }
 }

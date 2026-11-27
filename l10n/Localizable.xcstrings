@@ -500,6 +500,41 @@
         }
       }
     },
+    "%@ changed before %@ ran, so it didn't run.": {
+      "comment": "An after-todo-state-change hook not run because its file changed",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ hat sich geändert, bevor %2$@ lief, daher wurde der Hook nicht ausgeführt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ cambió antes de que se ejecutara %2$@, así que no se ejecutó."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ a changé avant l’exécution de %2$@, qui n’a donc pas été exécuté."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$@ の実行前に %1$@ が変更されたため、実行しませんでした。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ mudou antes de %2$@ ser executado, então ele não foi executado."
+          }
+        }
+      }
+    },
     "%@ changed on disk while saving, and the changes conflict with yours; both are in the editor between conflict markers.": {
       "localizations": {
         "de": {
@@ -530,6 +565,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "\"%@\" mudou no disco durante o salvamento, e as alterações conflitam com as suas; ambas estão no editor entre marcadores de conflito."
+          }
+        }
+      }
+    },
+    "%@ changed while %@ ran; its changes weren't made.": {
+      "comment": "An after-todo-state-change hook's edits refused because its file changed",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ hat sich geändert, während %2$@ lief; seine Änderungen wurden nicht vorgenommen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ cambió mientras se ejecutaba %2$@; sus cambios no se aplicaron."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ a changé pendant l’exécution de %2$@ ; ses modifications n’ont pas été appliquées."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$@ の実行中に %1$@ が変更されたため、その変更は反映されませんでした。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ mudou enquanto %2$@ era executado; as alterações dele não foram feitas."
           }
         }
       }
@@ -1155,6 +1225,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "\"%@\" só é salvo quando tiver uma senha."
+          }
+        }
+      }
+    },
+    "%@ isn't trusted on this device yet, and orgstar can't ask here.": {
+      "comment": "A hook from a file not yet trusted, skipped where orgstar can't ask, as for a capture from Shortcuts",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ist auf diesem Gerät noch nicht vertrauenswürdig, und orgstar kann hier nicht nachfragen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ aún no es de confianza en este dispositivo y orgstar no puede preguntar aquí."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ n’est pas encore approuvé sur cet appareil, et orgstar ne peut pas demander ici."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ はこのデバイスでまだ信頼されておらず、ここでは確認できません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ainda não é confiável neste dispositivo, e o orgstar não pode perguntar aqui."
           }
         }
       }
@@ -42038,6 +42143,41 @@
         }
       }
     },
+    "Run hooks from %@?": {
+      "comment": "Asked before a user hook from a file not yet trusted on this device runs",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hooks aus %@ ausführen?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Ejecutar los hooks de %@?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exécuter les hooks de %@ ?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ のフックを実行しますか？"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Executar hooks de %@?"
+          }
+        }
+      }
+    },
     "Run this %@ block? (%@)": {
       "comment": "Echo area prompt: the block's language, then the answers it accepts (yes, no, always), which stay in English",
       "localizations": {
@@ -51388,6 +51528,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "Este título está dentro de uma entrada criptografada, então não é movido sozinho; mova a entrada criptografada."
+          }
+        }
+      }
+    },
+    "This hook runs after you change an entry's TODO state.": {
+      "comment": "When an after-todo-state-change hook runs, in the question before it runs",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Hook läuft, nachdem du den TODO-Status eines Eintrags änderst."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este hook se ejecuta después de cambiar el estado TODO de una entrada."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce hook s’exécute après la modification de l’état TODO d’une entrée."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このフックは、項目の TODO 状態を変更した後に実行されます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este hook é executado depois que você muda o estado TODO de uma entrada."
+          }
+        }
+      }
+    },
+    "This hook runs before a capture is filed and can change or cancel it.": {
+      "comment": "When a capture-before-finalize hook runs, in the question before it runs",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Hook läuft, bevor eine Notiz abgelegt wird, und kann sie ändern oder abbrechen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este hook se ejecuta antes de archivar una captura y puede cambiarla o cancelarla."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce hook s’exécute avant le classement d’une capture et peut la modifier ou l’annuler."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このフックはキャプチャを保存する前に実行され、内容を変更したり取り消したりできます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este hook é executado antes de uma captura ser arquivada e pode alterá-la ou cancelá-la."
           }
         }
       }

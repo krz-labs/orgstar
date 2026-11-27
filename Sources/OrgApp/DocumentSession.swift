@@ -1213,7 +1213,10 @@ public final class DocumentSession {
             do {
                 let options = self.options
                 let step = try buffer.update { try $0.run(command, selection: [offset..<offset], now: now, answers: answers, options: options) }
-                if case .commit = step { changed(entry) }
+                if case .commit(let result) = step {
+                    changed(entry)
+                    afterTodoStateChange(result.effects, in: path)
+                }
                 return step
             } catch {
                 return .failed("\(error)")
@@ -1230,7 +1233,10 @@ public final class DocumentSession {
             if case .commit = step, state.isDirty, case .conflict = try closedFileSaver.save(&state, to: url) {
                 return .failed("\(name) changed on disk; nothing was changed.")
             }
-            if case .commit = step { textChanged?(path) }
+            if case .commit(let result) = step {
+                textChanged?(path)
+                afterTodoStateChange(result.effects, in: path, text: state.text)
+            }
             return step
         } catch {
             return .failed("Can't change \(name): \(error.localizedDescription)")
@@ -1487,6 +1493,10 @@ public final class DocumentSession {
     }
     #endif
     @ObservationIgnored private var userCommandTask: Task<String?, Never>?
+    /// What hooks need from the app; nil runs none.
+    @ObservationIgnored public var hooks: UserHookHost?
+    /// The hooks started last; the next wait for them.
+    @ObservationIgnored private var hookQueue: Task<Void, Never>?
     public private(set) var isRunningUserCommand = false
 
     /// Runs a user command on the focused buffer in the background, with `context` the editor's
@@ -1537,93 +1547,16 @@ public final class DocumentSession {
         guard entry.buffer.document.revision == request.revision, context.revision == request.revision else { return "The file changed; try again." }
         #if canImport(WebKit)
         guard let host = userCommandHost() else { return "No \(UserCommands.fileName)." }
-        final class State {
-            var failure: String?
-            var quit = false
-            /// `org.run("app.save")` ran.
-            var save = false
-            var buffer: UserCommandState
-            init(_ buffer: UserCommandState) { self.buffer = buffer }
-        }
-        let state = State(UserCommandState(
-            EditContext(revision: context.revision, text: context.text, tree: context.tree, selection: request.selection,
-                        now: context.now, calendar: context.calendar, options: context.options, knownTags: context.knownTags),
-            defaults: entry.buffer.document.defaults))
-        /// The answer to `prompt`; a canceled prompt throws.
-        func reply(to prompt: Prompt) async throws -> String {
-            try await withCheckedThrowingContinuation { continuation in
-                ask(prompt) { answer in
-                    guard let answer else {
-                        state.quit = true
-                        return continuation.resume(throwing: CommandHost.Failure.script("Quit"))
-                    }
-                    continuation.resume(returning: answer)
-                }
-            }
-        }
-        host.calls = { name, value in
-            if let answer = UserCommandAPI.answer(name, value, context: state.buffer.context, file: file) { return answer }
-            switch name {
-            case "prompt":
-                let prompt = UserCommandAPI.prompt(value)
-                return UserCommandAPI.answer(try await reply(to: prompt), to: prompt, now: Date(), calendar: state.buffer.context.calendar)
-            case "run":
-                let id = value as? String ?? ""
-                if UserCommandAPI.safeAppCommands.contains(id) {
-                    state.save = true
-                    return state.buffer.reply
-                }
-                let command: any OrgCommand
-                switch UserCommandAPI.builtIn(id) {
-                case .success(let found): command = found
-                case .failure(let problem): throw CommandHost.Failure.script(problem.message)
-                }
-                // A built-in command's prompts go through the same prompt as the command's own.
-                var answers: [String: String] = [:]
-                while true {
-                    switch state.buffer.run(command, answers: answers) {
-                    case .commit: return state.buffer.reply
-                    case .failed(let message): throw CommandHost.Failure.script(message)
-                    case .external: throw CommandHost.Failure.script(UserCommandAPI.external(id).message)
-                    case .prompt(let prompt): answers[prompt.key] = try await reply(to: prompt)
-                    }
-                }
-            case "message":
-                report(value as? String ?? "")
-                return NSNull()
-            case "fail":
-                state.failure = value as? String ?? ""
-                return NSNull()
-            case _ where UserCommandWorkspace.calls.contains(name):
-                guard command.workspace else {
-                    throw CommandHost.Failure.script("org.\(name) needs workspace = true on the command in \(UserCommands.fileName).")
-                }
-                guard let workspace else { throw CommandHost.Failure.script("org.\(name) isn't available here.") }
-                do throws(UserCommandWorkspace.Failure) {
-                    return try await workspace.answer(name, value, session: self, path: path)
-                } catch {
-                    throw CommandHost.Failure.script(error.message)
-                }
-            default:
-                throw CommandHost.Failure.script("org.\(name) isn't in API version \(UserCommands.apiVersion).")
-            }
-        }
+        let state = UserScript(file: command.file, function: command.function, timeout: command.timeout, workspace: command.workspace,
+                               title: command.title, buffer: UserCommandState(
+                                   EditContext(revision: context.revision, text: context.text, tree: context.tree, selection: request.selection,
+                                               now: context.now, calendar: context.calendar, options: context.options, knownTags: context.knownTags),
+                                   defaults: entry.buffer.document.defaults))
         let json: String
-        do {
-            json = try await host.run(module: command.file, function: command.function, context: "null",
-                                      timeout: .seconds(command.timeout), api: UserCommands.apiVersion)
-        } catch let CommandHost.Failure.timedOut(limit) {
-            let seconds = Int(limit.components.seconds)
-            return String(localized: "\(command.title) didn't finish within \(seconds) s and was stopped.", comment: "A user command passed its time limit")
-        } catch CommandHost.Failure.script(let message) {
-            if let failure = state.failure { return failure }
-            return state.quit ? "Quit" : "\(command.title): \(message)"
-        } catch CommandHost.Failure.stopped {
-            return String(localized: "\(command.title) was stopped: its web view ended, as when a command runs out of memory.", comment: "A user command whose web view ended")
-        } catch {
-            return String(localized: "\(command.title) canceled.", comment: "A user command canceled with Cancel Running Task")
+        switch await run(state, host: host, path: path, file: file, workspace: workspace, ask: ask, report: report) {
+        case .failure(let message): return message.text
+        case .success(let returned): json = returned
         }
-        if let failure = state.failure { return failure }
         guard !Task.isCancelled else { return String(localized: "\(command.title) canceled.", comment: "A user command canceled with Cancel Running Task") }
         switch state.buffer.result(json) {
         case .failure(let problem):
@@ -1640,6 +1573,281 @@ public final class DocumentSession {
         return "User commands aren't available here."
         #endif
     }
+
+    #if canImport(WebKit)
+    /// A run of a user command or hook: what it runs, the buffer as it sees it, and what its
+    /// calls asked for.
+    final class UserScript {
+        let file: String
+        let function: String
+        let timeout: Int
+        let workspace: Bool
+        let title: String
+        /// The second argument of a hook's function, as JSON; `null` for a command.
+        let argument: String
+        var buffer: UserCommandState
+        var failure: String?
+        var quit = false
+        /// `org.run("app.save")` ran.
+        var save = false
+
+        init(file: String, function: String, timeout: Int, workspace: Bool, title: String, argument: String = "null", buffer: UserCommandState) {
+            self.file = file
+            self.function = function
+            self.timeout = timeout
+            self.workspace = workspace
+            self.title = title
+            self.argument = argument
+            self.buffer = buffer
+        }
+    }
+
+    struct ScriptFailure: Error {
+        let text: String
+    }
+
+    /// Runs `script` in the host with API version 1 and its calls answered against its buffer;
+    /// the JSON it returned, or the message saying why it failed. `path` is the file the
+    /// workspace calls see it run in and `file` what `org.file()` gives. Without `ask`,
+    /// `org.prompt` and the prompts of `org.run`'s commands throw.
+    func run(_ script: UserScript, host: CommandHost, path: String, file: String?, workspace: UserCommandWorkspace?,
+             ask: (@MainActor (Prompt, @escaping (String?) -> Void) -> Void)?, report: @escaping @MainActor (String) -> Void) async -> Result<String, ScriptFailure> {
+        /// The answer to `prompt`; a canceled prompt throws.
+        func reply(to prompt: Prompt) async throws -> String {
+            guard let ask else { throw CommandHost.Failure.script("Hooks can't ask: org.prompt isn't available in them.") }
+            return try await withCheckedThrowingContinuation { continuation in
+                ask(prompt) { answer in
+                    guard let answer else {
+                        script.quit = true
+                        return continuation.resume(throwing: CommandHost.Failure.script("Quit"))
+                    }
+                    continuation.resume(returning: answer)
+                }
+            }
+        }
+        let calls: @MainActor (String, Any) async throws -> Any = { name, value in
+            if let answer = UserCommandAPI.answer(name, value, context: script.buffer.context, file: file) { return answer }
+            switch name {
+            case "prompt":
+                let prompt = UserCommandAPI.prompt(value)
+                return UserCommandAPI.answer(try await reply(to: prompt), to: prompt, now: Date(), calendar: script.buffer.context.calendar)
+            case "run":
+                let id = value as? String ?? ""
+                if UserCommandAPI.safeAppCommands.contains(id) {
+                    script.save = true
+                    return script.buffer.reply
+                }
+                let command: any OrgCommand
+                switch UserCommandAPI.builtIn(id) {
+                case .success(let found): command = found
+                case .failure(let problem): throw CommandHost.Failure.script(problem.message)
+                }
+                // A built-in command's prompts go through the same prompt as the command's own.
+                var answers: [String: String] = [:]
+                while true {
+                    switch script.buffer.run(command, answers: answers) {
+                    case .commit: return script.buffer.reply
+                    case .failed(let message): throw CommandHost.Failure.script(message)
+                    case .external: throw CommandHost.Failure.script(UserCommandAPI.external(id).message)
+                    case .prompt(let prompt): answers[prompt.key] = try await reply(to: prompt)
+                    }
+                }
+            case "message":
+                report(value as? String ?? "")
+                return NSNull()
+            case "fail":
+                script.failure = value as? String ?? ""
+                return NSNull()
+            case _ where UserCommandWorkspace.calls.contains(name):
+                guard script.workspace else {
+                    throw CommandHost.Failure.script("org.\(name) needs workspace = true on the command in \(UserCommands.fileName).")
+                }
+                guard let workspace else { throw CommandHost.Failure.script("org.\(name) isn't available here.") }
+                do throws(UserCommandWorkspace.Failure) {
+                    return try await workspace.answer(name, value, session: self, path: path)
+                } catch {
+                    throw CommandHost.Failure.script(error.message)
+                }
+            default:
+                throw CommandHost.Failure.script("org.\(name) isn't in API version \(UserCommands.apiVersion).")
+            }
+        }
+        let title = script.title
+        let json: String
+        do {
+            json = try await host.run(module: script.file, function: script.function, context: script.argument,
+                                      timeout: .seconds(script.timeout), api: UserCommands.apiVersion, answer: calls)
+        } catch let CommandHost.Failure.timedOut(limit) {
+            let seconds = Int(limit.components.seconds)
+            return .failure(ScriptFailure(text: String(localized: "\(title) didn't finish within \(seconds) s and was stopped.", comment: "A user command passed its time limit")))
+        } catch CommandHost.Failure.script(let message) {
+            if let failure = script.failure { return .failure(ScriptFailure(text: failure)) }
+            return .failure(ScriptFailure(text: script.quit ? "Quit" : "\(title): \(message)"))
+        } catch CommandHost.Failure.stopped {
+            return .failure(ScriptFailure(text: String(localized: "\(title) was stopped: its web view ended, as when a command runs out of memory.", comment: "A user command whose web view ended")))
+        } catch {
+            return .failure(ScriptFailure(text: String(localized: "\(title) canceled.", comment: "A user command canceled with Cancel Running Task")))
+        }
+        if let failure = script.failure { return .failure(ScriptFailure(text: failure)) }
+        return .success(json)
+    }
+    #endif
+
+    // MARK: - Hooks
+
+    /// Whether `commands.toml` has hooks for `event`.
+    public func hasHooks(_ event: UserHook.Event) -> Bool {
+        hooks != nil && !userCommands.hooks(event).isEmpty
+    }
+
+    /// Runs the `after-todo-state-change` hooks for the TODO changes in `effects`, from a commit
+    /// to `path`, after the hooks already waiting. `text` is the file's text after the commit;
+    /// nil reads the open buffer's.
+    public func afterTodoStateChange(_ effects: [Effect], in path: String, text: String? = nil) {
+        let changes = effects.compactMap { effect -> TodoStateChange? in
+            if case .todoStateChanged(let change) = effect { return change }
+            return nil
+        }
+        guard !changes.isEmpty, hasHooks(.afterTodoStateChange), let text = text ?? entry(path)?.buffer.document.text else { return }
+        let previous = hookQueue
+        hookQueue = Task {
+            await previous?.value
+            for change in changes { await runTodoHooks(change, in: path, text: text) }
+        }
+    }
+
+    /// Waits for the hooks started so far.
+    func hooksFinished() async {
+        await hookQueue?.value
+    }
+
+    /// Runs each `after-todo-state-change` hook, in file order, on `path` as `text`, the file
+    /// after the change. Each hook's edits apply as their own change, and the next hook sees
+    /// them; a file changed meanwhile ends the run.
+    func runTodoHooks(_ change: TodoStateChange, in path: String, text: String) async {
+        #if canImport(WebKit)
+        guard let hooks, let modules = userCommands.folder, let host = userCommandHost() else { return }
+        let list = userCommands.hooks(.afterTodoStateChange)
+        guard !list.isEmpty else { return }
+        if let refusal = refusesUserCommand(path) { return hooks.report(refusal) }
+        let name = (path as NSString).lastPathComponent
+        var text = text
+        var heading = change.heading
+        for hook in list {
+            if let refusal = await trust(hook, modules: modules, hooks: hooks) {
+                hooks.report("\(hook.title): \(refusal)")
+                continue
+            }
+            guard let context = hookContext(path, expecting: text, caret: heading) else {
+                return hooks.report(String(localized: "\(name) changed before \(hook.title) ran, so it didn't run.",
+                                           comment: "An after-todo-state-change hook not run because its file changed"))
+            }
+            let described = UserCommandAPI.answer("heading", heading, context: context, file: nil) ?? NSNull()
+            let argument: [String: Any] = ["entry": described, "from": change.from ?? NSNull(), "to": change.to ?? NSNull()]
+            guard let data = try? JSONSerialization.data(withJSONObject: argument), let json = String(data: data, encoding: .utf8) else { continue }
+            let script = UserScript(file: hook.file, function: hook.function, timeout: hook.timeout, workspace: hook.workspace, title: hook.title,
+                                    argument: json, buffer: UserCommandState(context, defaults: defaults))
+            let result: EditResult
+            switch await run(script, host: host, path: path, file: UserCommandFile.relativePath(path, roots: hooks.workspace?.workspace.rootPaths ?? []), workspace: hooks.workspace,
+                             ask: nil, report: hooks.report) {
+            case .failure(let failure):
+                hooks.report(failure.text)
+                continue
+            case .success(let returned):
+                switch Self.hookResult(script, returned) {
+                case .failure(let failure):
+                    hooks.report(failure.text)
+                    continue
+                case .success(let own): result = own
+                }
+            }
+            if !result.edits.isEmpty {
+                guard currentText(path) == context.text else {
+                    return hooks.report(String(localized: "\(name) changed while \(hook.title) ran; its changes weren't made.",
+                                               comment: "An after-todo-state-change hook's edits refused because its file changed"))
+                }
+                if let message = applyChanges(result.edits, to: path, expecting: context.text) { return hooks.report("\(hook.title): \(message)") }
+                text = currentText(path) ?? text
+                heading = UserCommandState.map([heading..<heading], through: result.edits)[0].lowerBound
+            }
+            if script.save, let entry = entry(path) { save(entry) }
+            for case .message(let message) in result.effects { hooks.report(message) }
+        }
+        #endif
+    }
+
+    /// Runs each `capture-before-finalize` hook, in file order, on `text`, the capture as filled
+    /// from template `template`: the text to file, changed by the hooks' edits, or why a hook
+    /// canceled the capture. Hooks from files not trusted here ask with `interactive`, and are
+    /// skipped with a message without.
+    public func runCaptureHooks(_ text: String, template: String, interactive: Bool) async -> Result<String, CaptureError> {
+        #if canImport(WebKit)
+        guard var hooks, let modules = userCommands.folder, let host = userCommandHost() else { return .success(text) }
+        if !interactive { hooks.ask = nil }
+        var text = text
+        for hook in userCommands.hooks(.captureBeforeFinalize) {
+            if let refusal = await trust(hook, modules: modules, hooks: hooks) {
+                hooks.report("\(hook.title): \(refusal)")
+                continue
+            }
+            let length = text.utf16.count
+            let context = EditContext(revision: 0, text: text, tree: OrgParser.parse(text, defaults: defaults), selection: [length..<length])
+            let argument: [String: Any] = ["text": text, "template": template]
+            guard let data = try? JSONSerialization.data(withJSONObject: argument), let json = String(data: data, encoding: .utf8) else { continue }
+            let script = UserScript(file: hook.file, function: hook.function, timeout: hook.timeout, workspace: hook.workspace, title: hook.title,
+                                    argument: json, buffer: UserCommandState(context, defaults: defaults))
+            let result = await run(script, host: host, path: "", file: nil, workspace: hooks.workspace, ask: nil, report: hooks.report)
+                .flatMap { Self.hookResult(script, $0) }
+            switch result {
+            case .failure(let failure):
+                return .failure(CaptureError(message: failure.text))
+            case .success(let result):
+                for edit in result.edits.reversed() { text = edit.apply(to: text) }
+                for case .message(let message) in result.effects { hooks.report(message) }
+            }
+        }
+        #endif
+        return .success(text)
+    }
+
+    #if canImport(WebKit)
+    /// What a hook returned, read as for a command; it may return only `edits` and `message`.
+    static func hookResult(_ script: UserScript, _ json: String) -> Result<EditResult, ScriptFailure> {
+        let returned = (try? JSONSerialization.jsonObject(with: Data(json.utf8))) as? [String: Any] ?? [:]
+        if ["selection", "copy"].contains(where: { returned[$0].map { !($0 is NSNull) } ?? false }) {
+            return .failure(ScriptFailure(text: "\(script.title): a hook returns only edits and message"))
+        }
+        return script.buffer.result(json).mapError { ScriptFailure(text: "\(script.title): \($0.message)") }
+    }
+
+    /// Nil when `hook`'s file is trusted, or once the person allowed it; else why it didn't run.
+    private func trust(_ hook: UserHook, modules: URL, hooks: UserHookHost) async -> String? {
+        await withCheckedContinuation { continuation in
+            UserCommandTrust.check(hook, modules: modules, trust: hooks.trust, ask: hooks.ask,
+                                   run: { continuation.resume(returning: nil) }, refuse: { continuation.resume(returning: $0) })
+        }
+    }
+
+    /// The file at `path` as an edit context with the caret at `caret`, when its text is
+    /// `expected`: the open buffer, or the file on disk.
+    private func hookContext(_ path: String, expecting expected: String, caret: Int) -> EditContext? {
+        if let entry = entry(path) {
+            let document = entry.buffer.document
+            guard document.text == expected else { return nil }
+            return EditContext(revision: document.revision, text: document.text, tree: document.tree, selection: [caret..<caret])
+        }
+        guard let bytes = try? fileSystem.read(URL(fileURLWithPath: path)) else { return nil }
+        let state = loaded(bytes, path: path)
+        guard state.text == expected else { return nil }
+        return EditContext(revision: state.revision, text: state.text, tree: state.tree, selection: [caret..<caret])
+    }
+
+    /// The text of `path`: its open buffer's, or the file's on disk.
+    private func currentText(_ path: String) -> String? {
+        if let entry = entry(path) { return entry.buffer.document.text }
+        return (try? fileSystem.read(URL(fileURLWithPath: path))).map { loaded($0, path: path).text }
+    }
+    #endif
 
     // MARK: - Locations
 

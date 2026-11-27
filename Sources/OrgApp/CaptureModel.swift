@@ -63,6 +63,42 @@ extension DocumentSession {
         _ text: String, templateKey key: String?, templates: [CaptureTemplate], workspace: WorkspaceModel, clock: ClockModel,
         clipboard: String, userName: String, answers: [String: String] = [:], properties: [String: String] = [:]
     ) -> Result<(template: CaptureTemplate, path: String, offset: Int), CaptureError> {
+        filled(text, templateKey: key, templates: templates, workspace: workspace, clipboard: clipboard, userName: userName,
+               answers: answers, properties: properties).flatMap { chosen, filled in
+            file(filled, with: chosen, workspace: workspace, clock: clock)
+        }
+    }
+
+    /// `capture(_:templateKey:…)` with the `capture-before-finalize` hooks run on the filled
+    /// template first. A hook from a file not trusted here is skipped, since nothing asks.
+    public func captureRunningHooks(
+        _ text: String, templateKey key: String?, templates: [CaptureTemplate], workspace: WorkspaceModel, clock: ClockModel,
+        clipboard: String, userName: String, answers: [String: String] = [:], properties: [String: String] = [:]
+    ) async -> Result<(template: CaptureTemplate, path: String, offset: Int), CaptureError> {
+        let chosen: CaptureTemplate, filledText: String
+        switch filled(text, templateKey: key, templates: templates, workspace: workspace, clipboard: clipboard, userName: userName,
+                      answers: answers, properties: properties) {
+        case .failure(let error): return .failure(error)
+        case .success(let prepared): (chosen, filledText) = prepared
+        }
+        switch await runCaptureHooks(filledText, template: chosen.key, interactive: false) {
+        case .failure(let error): return .failure(error)
+        case .success(let text): return file(text, with: chosen, workspace: workspace, clock: clock)
+        }
+    }
+
+    private func file(_ text: String, with chosen: CaptureTemplate, workspace: WorkspaceModel, clock: ClockModel)
+        -> Result<(template: CaptureTemplate, path: String, offset: Int), CaptureError> {
+        chosen.resolved(workspace: workspace, session: self, clock: clock).flatMap { resolved in
+            capture(text, template: resolved.template, root: workspace.rootPaths.first, file: resolved.file)
+        }.map { (chosen, $0.path, $0.offset) }
+    }
+
+    /// The template keyed `key` and its text filled as `capture(_:templateKey:…)` fills it.
+    private func filled(
+        _ text: String, templateKey key: String?, templates: [CaptureTemplate], workspace: WorkspaceModel,
+        clipboard: String, userName: String, answers: [String: String], properties: [String: String]
+    ) -> Result<(CaptureTemplate, String), CaptureError> {
         let key = key.flatMap { $0.isEmpty ? nil : $0 }
         guard let chosen = key.map({ key in templates.first { $0.key == key } }) ?? templates.first else {
             return .failure(CaptureError(message: "No capture template \"\(key ?? "")\""))
@@ -75,9 +111,7 @@ extension DocumentSession {
         guard case .success(let filled) = Capture.fill(chosen.template, context: context, answers: answers) else {
             return .failure(CaptureError(message: "Can't fill template \"\(chosen.key)\""))
         }
-        return chosen.resolved(workspace: workspace, session: self, clock: clock).flatMap { resolved in
-            capture(filled.text, template: resolved.template, root: workspace.rootPaths.first, file: resolved.file)
-        }.map { (chosen, $0.path, $0.offset) }
+        return .success((chosen, filled.text))
     }
 }
 

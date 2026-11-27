@@ -117,6 +117,9 @@ final class MobileModel {
             guard let self else { return }
             _ = self.clock.textChanged(path, self.session)
         }
+        // Shortcuts' capture can run without a window; the window's view asks and shows messages.
+        session.hooks = UserHookHost(trust: TrustStore(), ask: nil, report: { _ in },
+                                     workspace: workspace.map { UserCommandWorkspace(workspace: $0, clock: clock) })
         // A new Dynamic Type size restyles editors and the reader.
         sizeObserver = NotificationCenter.default.addObserver(forName: UIContentSizeCategory.didChangeNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.settingsVersion += 1 }
