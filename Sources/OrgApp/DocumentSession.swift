@@ -1493,13 +1493,14 @@ public final class DocumentSession {
     /// context at the request's revision; the message comes back through `report`. `file` is
     /// the file's path relative to its folder, for `org.file()`. Prompts go to `ask`. `finished`
     /// gets the message once the command has ended, nil when its result was applied.
-    public func startUserCommand(_ request: UserCommandRequest, context: EditContext, file: String?,
+    /// `workspace` answers the calls of commands with `workspace = true`.
+    public func startUserCommand(_ request: UserCommandRequest, context: EditContext, file: String?, workspace: UserCommandWorkspace? = nil,
                                  ask: @escaping @MainActor (Prompt, @escaping (String?) -> Void) -> Void,
                                  report: @escaping @MainActor (String) -> Void,
                                  finished: @escaping @MainActor (String?) -> Void = { _ in }) {
         userCommandTask?.cancel()
         isRunningUserCommand = true
-        let task = Task { await runUserCommand(request, context: context, file: file, ask: ask, report: report) }
+        let task = Task { await runUserCommand(request, context: context, file: file, workspace: workspace, ask: ask, report: report) }
         userCommandTask = task
         Task {
             let message = await task.value
@@ -1527,7 +1528,7 @@ public final class DocumentSession {
 
     /// Runs `request` in the focused buffer and applies what it returns as one change at the
     /// request's revision. The message to show; nil when the command's own messages were shown.
-    func runUserCommand(_ request: UserCommandRequest, context: EditContext, file: String?,
+    func runUserCommand(_ request: UserCommandRequest, context: EditContext, file: String?, workspace: UserCommandWorkspace? = nil,
                         ask: @escaping @MainActor (Prompt, @escaping (String?) -> Void) -> Void,
                         report: @escaping @MainActor (String) -> Void) async -> String? {
         let command = request.command
@@ -1593,6 +1594,16 @@ public final class DocumentSession {
             case "fail":
                 state.failure = value as? String ?? ""
                 return NSNull()
+            case _ where UserCommandWorkspace.calls.contains(name):
+                guard command.workspace else {
+                    throw CommandHost.Failure.script("org.\(name) needs workspace = true on the command in \(UserCommands.fileName).")
+                }
+                guard let workspace else { throw CommandHost.Failure.script("org.\(name) isn't available here.") }
+                do throws(UserCommandWorkspace.Failure) {
+                    return try await workspace.answer(name, value, session: self, path: path)
+                } catch {
+                    throw CommandHost.Failure.script(error.message)
+                }
             default:
                 throw CommandHost.Failure.script("org.\(name) isn't in API version \(UserCommands.apiVersion).")
             }

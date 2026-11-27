@@ -260,11 +260,16 @@ public struct XCallbackRunner {
         guard let key = request.value("template"), let text = request.parameters["text"],
               let template = templates().first(where: { $0.key == key }) else { return true }
         if template.options.denote || template.asksTreeDate { return true }
+        return !Self.unanswered(template, text: text, properties: Self.properties(request), given: Set(request.parameters.keys)).isEmpty
+    }
+
+    /// The prompts of `template` that `given` has no answer for, by prompt text, in order.
+    static func unanswered(_ template: CaptureTemplate, text: String, properties: [String: String], given: Set<String>) -> [String] {
         var context = CaptureContext(initial: text)
-        context.linkProperties = Self.properties(request)
-        return Capture.questions(template.template, context: context).contains { question in
-            if case .clipboard = question.kind { return false }
-            return request.parameters[question.prompt] == nil
+        context.linkProperties = properties
+        return Capture.questions(template.template, context: context).compactMap { question in
+            if case .clipboard = question.kind { return nil }
+            return given.contains(question.prompt) ? nil : question.prompt
         }
     }
 
@@ -386,14 +391,7 @@ public struct XCallbackRunner {
         let model = AgendaModel(workspace: workspace)
         model.viewSettings = AgendaViewLoader.settings(views)
         model.mode = view.mode
-        model.span = OrgPreferences.agendaSpan()
-        model.startOffset = OrgPreferences.agendaStartOffset()
-        model.startOnWeekday = OrgPreferences.agendaStartOnWeekday()
-        model.includeSubfolders = OrgPreferences.agendaSubfolders()
-        model.excludeArchives = OrgPreferences.agendaExcludeArchives()
-        model.hiddenFolders = HiddenFolders.shared.all
-        model.agendaFiles = OrgPreferences.agendaFiles()
-        model.options = OrgPreferences.agendaOptions(model.options)
+        Self.configure(model)
         await model.refresh(open: session.openTexts, now: now(), calendar: calendar)
         let entries = entries(model)
         let kept = Array(entries.prefix(limit))
@@ -403,15 +401,32 @@ public struct XCallbackRunner {
         return .success(["view": view.name, "result": json, "count": String(kept.count), "total": String(entries.count)])
     }
 
+    /// The agenda settings of the app's preferences.
+    static func configure(_ model: AgendaModel) {
+        model.span = OrgPreferences.agendaSpan()
+        model.startOffset = OrgPreferences.agendaStartOffset()
+        model.startOnWeekday = OrgPreferences.agendaStartOnWeekday()
+        model.includeSubfolders = OrgPreferences.agendaSubfolders()
+        model.excludeArchives = OrgPreferences.agendaExcludeArchives()
+        model.hiddenFolders = HiddenFolders.shared.all
+        model.agendaFiles = OrgPreferences.agendaFiles()
+        model.options = OrgPreferences.agendaOptions(model.options)
+    }
+
     /// The view's lines, in order: each day's overdue entries and then its rows, or the list.
     func entries(_ model: AgendaModel) -> [Entry] {
+        Self.entries(model, calendar: calendar, relative: relative)
+    }
+
+    /// `entries(_:)` with files named by `relative`.
+    static func entries(_ model: AgendaModel, calendar: Calendar, relative: (String) -> String) -> [Entry] {
         let today = model.today
         func make(_ results: [(header: String?, days: [AgendaDay], list: [AgendaItem])]) -> [Entry] {
             results.flatMap { result -> [Entry] in
                 let days = AgendaRows.groups(result.days, today: today, calendar: calendar).flatMap { group in
-                    (group.overdue + group.rows).map { line($0, day: group.day, section: result.header) }
+                    (group.overdue + group.rows).map { Self.line($0, day: group.day, section: result.header, relative: relative) }
                 }
-                let list = result.list.compactMap { AgendaRow(item: $0, day: today, today: today) }.map { line($0, day: nil, section: result.header) }
+                let list = result.list.compactMap { AgendaRow(item: $0, day: today, today: today) }.map { Self.line($0, day: nil, section: result.header, relative: relative) }
                 return days + list
             }
         }
@@ -421,7 +436,7 @@ public struct XCallbackRunner {
         return make([(nil, model.days, model.list)])
     }
 
-    private func line(_ row: AgendaRow, day: Int?, section: String?) -> Entry {
+    private static func line(_ row: AgendaRow, day: Int?, section: String?, relative: (String) -> String) -> Entry {
         func date(_ day: Int) -> String {
             let d = Days.date(day)
             return String(format: "%04d-%02d-%02d", d.year, d.month, d.day)

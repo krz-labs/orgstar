@@ -99,6 +99,26 @@ struct UserCommandManifestTests {
         ])
     }
 
+    @Test func readsWorkspaceAccess() throws {
+        let (commands, problems) = try parse("""
+            api = 1
+
+            [[command]]
+            name = "find"
+            file = "review.js"
+            function = "find"
+            workspace = true
+
+            [[command]]
+            name = "bad"
+            file = "review.js"
+            function = "bad"
+            workspace = "yes"
+            """)
+        #expect(commands == [UserCommand(name: "find", title: "find", file: "review.js", function: "find", workspace: true)])
+        #expect(problems == ["command bad: workspace must be true or false"])
+    }
+
     @Test func needsAKnownAPI() throws {
         let command = "\n[[command]]\nname = \"a\"\nfile = \"review.js\"\nfunction = \"a\"\n"
         #expect(try parse(command) == ([], ["missing api = 1"]))

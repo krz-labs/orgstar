@@ -136,6 +136,10 @@ public enum UserCommandTrust {
         }
     }
 
+    /// Put before the trusted text of a file trusted for commands with `workspace = true`. The
+    /// trusted text itself always starts with `// `, so no buffer-only text can match.
+    static let workspaceTrust = "\u{0}workspace\n"
+
     public struct Question: Equatable, Sendable {
         /// The command's file, as `commands/review.js`.
         public let file: String
@@ -173,7 +177,9 @@ public enum UserCommandTrust {
 
     /// Runs `run` at once when the command's file and its imports are trusted, else asks: Run
     /// Once runs it, Always trusts the files as they are now and runs it, anything else says
-    /// why nothing ran through `refuse`.
+    /// why nothing ran through `refuse`. Trust for commands with `workspace = true` is kept
+    /// apart: it covers the file's other commands too, but trust given without it doesn't
+    /// cover them.
     public static func check(_ command: UserCommand, modules: URL, trust: TrustStore,
                              ask: @MainActor (Question, @escaping (Answer?) -> Void) -> Void,
                              run: @escaping () -> Void, refuse: @escaping (String) -> Void) {
@@ -182,15 +188,17 @@ public enum UserCommandTrust {
         }
         let text = UserCommandFile.trustedText(texts)
         let path = modules.appendingPathComponent(command.file).path
-        if trust.isTrusted(path: path, content: text) { return run() }
+        let workspaceText = workspaceTrust + text
+        let accepted = command.workspace ? [workspaceText] : [text, workspaceText]
+        if accepted.contains(where: { trust.isTrusted(path: path, content: $0) }) { return run() }
         let imports = texts.filter { $0.key != command.file && $0.value != nil }.keys.sorted()
         let question = Question(file: "\(UserCommands.folderName)/\(command.file)",
-                                imports: imports.map { "\(UserCommands.folderName)/\($0)" })
+                                imports: imports.map { "\(UserCommands.folderName)/\($0)" }, workspace: command.workspace)
         ask(question) { answer in
             switch answer {
             case .runOnce: run()
             case .always:
-                trust.trust(path: path, content: text)
+                trust.trust(path: path, content: accepted[0])
                 run()
             case .dontRun, nil: refuse(String(localized: "Not run"))
             }

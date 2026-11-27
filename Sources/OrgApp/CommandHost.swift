@@ -424,6 +424,10 @@ public final class CommandHost {
                 prompt: options => call("prompt", typeof options === "string" ? { message: options } : options ?? {}),
                 message: text => call("message", String(text)),
                 run: id => call("run", String(id)),
+                search: query => call("search", String(query)),
+                outlineOf: path => call("outlineOf", String(path)),
+                agenda: span => call("agenda", span ?? {}),
+                capture: (template, text, fields) => call("capture", { template: String(template), text: text ?? null, fields: fields ?? null }),
                 fail,
               });
             }

@@ -40,6 +40,9 @@ public struct HeadingLocation: Sendable, Hashable {
     public let contentHash: String
     /// The text around the match: a search's words, or a backlink's link.
     public var snippet: Snippet?
+    /// The titles from the top-level heading down to this one; set by `search`, empty for the
+    /// file itself.
+    public var outlinePath: [String] = []
 
     public init(path: String, ordinal: Int, title: String, start: Int, contentHash: String) {
         self.path = path
@@ -331,7 +334,7 @@ public final class IndexStore: Sendable {
             let headings = try Row.fetchAll(
                 db,
                 sql: """
-                    SELECT f.path, f.hash, h.ordinal, h.title, h.start_offset, headings_fts.body, bm25(headings_fts) AS rank
+                    SELECT f.path, f.hash, h.ordinal, h.title, h.start_offset, h.outline_path, headings_fts.body, bm25(headings_fts) AS rank
                     FROM headings_fts
                     JOIN headings h ON h.id = headings_fts.rowid
                     JOIN files f ON f.id = h.file_id
@@ -340,7 +343,11 @@ public final class IndexStore: Sendable {
                     LIMIT ?
                     """,
                 arguments: [match, limit + overlay.count * 10]
-            ).map { (location: withSnippet(location($0), $0["body"]), rank: $0["rank"] as Double) }
+            ).map { row in
+                var found = withSnippet(location(row), row["body"])
+                found.outlinePath = (row["outline_path"] as String).split(separator: "\u{1F}", omittingEmptySubsequences: false).map(String.init)
+                return (location: found, rank: row["rank"] as Double)
+            }
             let files = try Row.fetchAll(
                 db,
                 sql: """
@@ -362,7 +369,11 @@ public final class IndexStore: Sendable {
         }
         let live = overlay.values.sorted { $0.path < $1.path }.flatMap { record in
             let file = matches(record.preamble) ? [withSnippet(fileLocation(record.path, title: record.title, hash: record.hash), record.preamble)] : []
-            return file + record.headings.filter { matches($0.title + "\n" + $0.body) }.map { withSnippet(location(record, $0), $0.body) }
+            return file + record.headings.filter { matches($0.title + "\n" + $0.body) }.map { heading in
+                var found = withSnippet(location(record, heading), heading.body)
+                found.outlinePath = heading.outlinePath
+                return found
+            }
         }
         return Array((live + indexed.filter { overlay[$0.path] == nil }).prefix(limit))
     }

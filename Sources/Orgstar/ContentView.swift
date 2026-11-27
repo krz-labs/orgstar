@@ -1316,8 +1316,10 @@ struct ContentView: View {
         UserCommandTrust.check(request.command, modules: modules, trust: trust, ask: ask, run: {
             guard let editor = commands.editor else { return finished("") }
             commands.show(String(localized: "Running \(request.command.title)… (⌘. to cancel)", comment: "A user command started"))
+            var access = UserCommandWorkspace(workspace: workspace, clock: clock)
+            access.userName = NSFullUserName()
             session.startUserCommand(request, context: editor.context(), file: UserCommandFile.relativePath(path, roots: workspace.rootPaths),
-                                     ask: editor.ask, report: { commands.show($0) }, finished: finished)
+                                     workspace: access, ask: editor.ask, report: { commands.show($0) }, finished: finished)
         }, refuse: {
             commands.show($0)
             finished($0)

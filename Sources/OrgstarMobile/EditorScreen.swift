@@ -456,6 +456,7 @@ struct EditorScreen: View {
             guard let editor else { return finished("") }
             message = String(localized: "Running \(request.command.title)…", comment: "A user command started on iPhone and iPad")
             session.startUserCommand(request, context: editor.editContext(), file: UserCommandFile.relativePath(path, roots: workspace.rootPaths),
+                                     workspace: UserCommandWorkspace(workspace: workspace, clock: model.clock),
                                      ask: editor.ask, report: { message = $0 }, finished: finished)
         }, refuse: {
             message = $0

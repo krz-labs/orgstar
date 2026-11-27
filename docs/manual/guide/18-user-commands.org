@@ -30,6 +30,7 @@ file = "headings.js"            # in commands/
 function = "upcaseTitle"        # an exported function
 when = "heading"                # optional; default: everywhere
 timeout = 5                     # optional, seconds; default 2, at most 30
+workspace = false               # optional; true lets it read your folders and capture
 
 [[command]]
 name = "weekly-review"
@@ -47,6 +48,7 @@ function = "weeklyReview"
 | =function= | Yes      | The name of a function the file exports. It may be =async=.                                                                             |
 | =when=     | No       | A context from [[file:03-keys.org::*Contexts][Contexts]] (=heading=, =table=, =item=, =region=, …). Where it doesn't hold, the palette and the Commands list leave the command out and its keys fall through. |
 | =timeout=  | No       | Seconds the command may run, 1 to 30; 2 when not given. Time spent waiting for your answer to a prompt doesn't count.                   |
+| =workspace= | No      | =true= lets the command search your folders, read other files' outlines and the agenda, and capture (see [[*Reading your folders and capturing][Reading your folders and capturing]]). Default =false=. |
 
 orgstar reads the file without running any code, so commands are listed and bindable before you have run them. It reloads the file, and the list of commands, when the file or anything in =commands/= changes; on iPhone and iPad it reloads when the synced folder changes.
 
@@ -55,6 +57,7 @@ Problems are reported like those of the other configuration files (see [[file:13
 - =commands.toml: command weekly-review: no file commands/review.js=
 - =commands.toml: command slow: timeout must be 1 to 30 seconds=
 - =commands.toml: command review: unknown context headline=
+- =commands.toml: command find: workspace must be true or false=
 - =commands.toml: api 2 needs a newer orgstar= (no command is registered)
 - =commands.toml: missing api = 1= (no command is registered)
 - =commands.toml: commands/review.js isn't downloaded from iCloud yet= (iPhone and iPad; the download starts)
@@ -81,6 +84,10 @@ Every call returns a promise; use =await=. Offsets are UTF-16 code units, as Jav
 | =org.message(text)=        | Shows =text= in the echo area while the command runs.                                                                       |
 | =org.fail(text)=           | Ends the command: nothing changes and =text= is shown. Use it as =return org.fail("…")=.                                    |
 | =org.run(id)=              | Runs one of Org's commands by id (=org.todo.cycle=) and gives the text and selection after it as ={text, selection}=. See [[*Running Org's commands][Running Org's commands]]. |
+| =org.search(query)=        | With =workspace = true=: headings and files in your folders that match =query=. See [[*Reading your folders and capturing][Reading your folders and capturing]]. |
+| =org.outlineOf(path)=      | With =workspace = true=: the headings of another org file in your folders, as =org.outline()= gives them.                   |
+| =org.agenda({from, to})=   | With =workspace = true=: the agenda's entries for a span of days.                                                           |
+| =org.capture(key, text, fields)= | With =workspace = true=: files =text= with a capture template.                                                        |
 | =org.version=              | =1=.                                                                                                                        |
 
 A heading is an object with:
@@ -136,6 +143,47 @@ export async function startTask(org) {
   - other user commands (=user.*=);
   - the editor's own commands, which aren't Org's: folding (=org.cycle=), movement and editing keys (=edit.*=), snippets and keyboard macros;
   - work Org does outside the text: running a code block (=org.babel.execute=, or =C-c C-c= on one), table formulas that need Emacs, following a link, tangling, editing a block apart, column view and the agenda. =org.run= throws with "/id/ needs work outside the text here …" instead of starting it, since its result would come back after the command had ended.
+
+** Reading your folders and capturing
+
+A command with =workspace = true= in =commands.toml= can also read the files in your folders and capture to them. Without it, these calls throw "org.search needs workspace = true on the command in commands.toml." Allowing such a command asks a separate question (see [[*Trust][Trust]]). Capture is the only way a command writes to a file other than its own.
+
+| Call                              | Gives                                                                                                            |
+|-----------------------------------+------------------------------------------------------------------------------------------------------------------|
+| =org.search(query)=               | The best 50 matches of the sidebar's search: headings whose title or text have every word of =query= as the start of a word, and files whose text before the first heading does. Unsaved changes in open files are searched. |
+| =org.outlineOf(path)=             | The headings of an org file (=.org= or =.org_archive=) in your folders, in order, as =org.outline()= describes them; offsets are in that file's text. =path= is relative to one of your folders (the first that has it) or absolute inside one. An open file is read as its buffer has it. |
+| =org.agenda({from, to})=          | The agenda's entries from =from= to =to=, both =YYYY-MM-DD= and both included; =from= defaults to today and =to= to =from=. At most 366 days and 200 entries. |
+| =org.capture(key, text, fields)=  | Files =text= with the template keyed =key= in =capture.toml= and gives ={template, file}=, =file= relative to its folder. |
+
+A search match is an object with:
+
+| Field     | Value                                                                                                   |
+|-----------+---------------------------------------------------------------------------------------------------------|
+| =file=    | The file, relative to its folder (=notes/plan.org=).                                                    |
+| =title=   | The heading's title, or for a match before the first heading the file's =#+TITLE= or name.              |
+| =outline= | The titles of the headings above it, top first; =[]= for a top-level heading or the file.               |
+| =start=   | Where the heading starts in its file, as =org.heading()='s =start=; =0= for the file.                    |
+| =heading= | =false= for a match in the text before the file's first heading.                                        |
+| =snippet= | The text around the match, or =null=.                                                                   |
+
+Agenda entries have the shape of those the x-callback-url =agenda= action returns (see [[file:15-alongside-emacs.org::*agenda][agenda]]): =title=, =todo=, =priority=, =tags=, =category=, =file=, =status=, =date=, =time=, =end= and =kind=, those without a value left out, in the agenda's order with each day's overdue entries first. The agenda uses your agenda settings and files; calendar events and reminders are left out.
+
+=org.capture= files without the capture window, by the rules of the x-callback-url =capture= action (see [[file:15-alongside-emacs.org::*capture][capture]]): =fields= answers the template's prompts by their text (={What: "Milk", Tags: "shop"}= for =%^{What}= and =%^g=), and every prompt must have an answer, or nothing is filed and the call throws naming the missing ones. =%^C= and =%^L= insert nothing and =%c= is empty, since commands don't read the clipboard. Templates that make a Denote note or ask for a date tree's day are refused, and so is a template whose target is the file the command runs in: return =edits= for that. The entry is filed when the call returns, even if the command fails later, as a change of the target file alone; the undo history of the command's own file is unchanged.
+
+#+BEGIN_SRC js
+// commands.toml: workspace = true
+export async function followUp(org) {
+  const here = await org.heading()
+  if (!here) return org.fail("Not in an entry")
+  const elsewhere = (await org.search(here.title)).filter(m => m.start !== here.start)
+  const see = elsewhere.length ? ` (see ${elsewhere[0].file})` : ""
+  await org.capture("t", `Follow up: ${here.title}${see}`)
+  const today = await org.agenda()
+  return { message: `Captured; ${today.length} entries on today's agenda` }
+}
+#+END_SRC
+
+Text that is encrypted on disk is never returned. =org.search= leaves out =.gpg= files, searches open files with entries decrypted as they are on disk, and gives =null= as the snippet of a match in an encrypted entry. =org.outlineOf= refuses =.gpg= files and reads a file with entries decrypted from disk. The agenda reads such files from disk, as it always does.
 
 * Examples
 
@@ -203,11 +251,15 @@ It imports commands/lib/dates.js.
 They can read and change the file you run them in, and nothing else: no other files and no network.
 #+END_EXAMPLE
 
+For a command with =workspace = true=, the last line is "They can read and change the file you run them in, read every file in your folders and capture to them, but not use the network."
+
 The question names the file's full path under =commands/= and every module it imports, directly or through another module; the line about imports is left out when there are none. On the Mac the question is in the echo area, with the answers listed above it; on iPhone and iPad it is an alert. [[*Limits][Limits]] has the details of what a command can't reach. The answers are Run Once, Always and Don't Run:
 
 - Run Once runs it this time and asks again next time.
 - Always runs it and doesn't ask again while the file and every module it imports stay as they are.
 - Don't Run, or cancelling, runs nothing.
+
+Trust for =workspace = true= is kept apart from trust for the buffer alone. A file you allowed with Always for commands without it asks again the first time one of its commands has =workspace = true=, including when you add =workspace = true= to a command you have run before. Always for a command with it also covers the file's other commands.
 
 Any change to the file or to a module it imports asks again, including a change that arrives by sync from another device. Trust is kept on each device, in =trusted.json= in orgstar's data folder, not in the configuration folder, so a command synced from another device runs here only after you allow it here. Code blocks and Lisp table formulas use the same store (see [[file:11-code-blocks.org][Code blocks]]).
 
@@ -219,8 +271,9 @@ Edit ▸ Cancel Running Task (=⌘.=, =app.babel.cancel=) stops a running comman
 
 - *Time.* A command that runs longer than its =timeout= (2 seconds by default, at most 30) is stopped with "/title/ didn't finish within /n/ s and was stopped." Time waiting for a prompt doesn't count.
 - *Memory.* A command that uses up its memory is stopped without affecting the app, and the next run starts fresh.
-- *The buffer only.* A command reads and changes the buffer it runs in, nothing else: no files, no network (=fetch=, =XMLHttpRequest=, =WebSocket=, =importScripts= and the rest are removed), no other buffers, no clipboard reads, no notifications, Calendar or other system services.
-- *Encrypted text.* Commands don't run in an encrypted file or in a buffer with entries decrypted that are encrypted on disk: "/file/ has decrypted entries, so user commands don't run in it."
+- *The buffer only.* A command reads and changes the buffer it runs in, nothing else: no files, no network (=fetch=, =XMLHttpRequest=, =WebSocket=, =importScripts= and the rest are removed), no other buffers, no clipboard reads, no notifications, Calendar or other system services. With =workspace = true= it can also read your folders through the calls in [[*Reading your folders and capturing][Reading your folders and capturing]] and capture to them, and nothing more: no files outside your folders (a symlink that leads out of them is refused) and still no network.
+- *Encrypted text.* Commands don't run in an encrypted file or in a buffer with entries decrypted that are encrypted on disk: "/file/ has decrypted entries, so user commands don't run in it." The calls that read your folders never return text that is encrypted on disk.
+- *Time in calls.* Time the app spends answering a call (a prompt, a search, reading the agenda) doesn't count against the =timeout=.
 - *Keyboard macros* record a key bound to a user command with the answers to its prompts, and wait for the command to finish when they play (see [[file:03-keys.org::*Keyboard macros][Keyboard macros]]).
 - *Startup.* When you have commands, the engine that runs them starts when an editor opens, so the first run doesn't wait for it. It stops after five minutes without a run.
 
@@ -232,8 +285,8 @@ What Emacs Lisp has that user commands don't:
 
 - Emacs Lisp functions and packages (=dash=, =s=, =org-ql=); =.el= files aren't read.
 - Buffer primitives: =point=, =goto-char=, =insert=, =re-search-forward= on the buffer, =save-excursion=, markers. A command gets the text and returns edits instead.
-- The Org API: =org-element-*=, =org-map-entries= over several files, =org-entry-put=. Read headings with =org.heading()= and =org.outline()=, and write the text yourself or run Org's commands with =org.run=.
-- Other buffers and files, =find-file=, =with-temp-buffer=, capture from a command.
+- The Org API: =org-element-*=, =org-entry-put=. Read headings with =org.heading()= and =org.outline()=, and write the text yourself or run Org's commands with =org.run=. Over several files, a command with =workspace = true= reads with =org.search= and =org.outlineOf= and writes only with =org.capture=.
+- Other buffers, =find-file= and =with-temp-buffer=; changes to other files except by capture.
 - Hooks (=org-after-todo-state-change-hook=, =post-command-hook=), advice, minor modes and buffer-local variables.
 - =interactive= codes other than the prompts above; =C-u= prefix arguments.
 - Timers, processes and shell commands.
@@ -269,4 +322,8 @@ What Emacs Lisp has that user commands don't:
 | =(org-promote-subtree)=, =(org-demote-subtree)=    | =await org.run("org.subtree.promote")=, =org.run("org.subtree.demote")= |
 | =(org-toggle-checkbox)=                            | =await org.run("org.checkbox.toggle")=                             |
 | =(save-buffer)=                                    | =await org.run("app.save")=                                        |
+| =(org-ql-select (org-agenda-files) '(regexp "milk"))= | =await org.search("milk")= (=workspace = true=)                 |
+| =(org-map-entries … nil 'agenda)= over files       | =await org.outlineOf(file)= for each file (=workspace = true=)     |
+| =(org-agenda-get-day-entries file date)=, =(org-agenda-list)= | =await org.agenda({from, to})= (=workspace = true=)     |
+| =(org-capture-string "Milk" "t")=, =(org-capture nil "t")= | =await org.capture("t", "Milk", {…})= (=workspace = true=) |
 | =(global-set-key (kbd "C-c u") #'my/command)=      | =[[bind]]= in =keymap.toml= with =command = "user.…"=               |

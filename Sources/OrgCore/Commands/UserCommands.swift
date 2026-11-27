@@ -14,14 +14,19 @@ public struct UserCommand: OrgCommand, Equatable {
     public let when: String?
     /// Seconds, at most `UserCommands.maximumTimeout`.
     public let timeout: Int
+    /// `workspace = true`: the command may also search the folders, read other files' outlines
+    /// and the agenda, and capture.
+    public let workspace: Bool
 
-    public init(name: String, title: String, file: String, function: String, when: String? = nil, timeout: Int = UserCommands.defaultTimeout) {
+    public init(name: String, title: String, file: String, function: String, when: String? = nil, timeout: Int = UserCommands.defaultTimeout,
+                workspace: Bool = false) {
         self.name = name
         self.title = title
         self.file = file
         self.function = function
         self.when = when
         self.timeout = timeout
+        self.workspace = workspace
     }
 
     public var id: String { UserCommands.commandPrefix + name }
@@ -86,7 +91,7 @@ public final class UserCommands: @unchecked Sendable {
         }
     }
 
-    static let keys: Set<String> = ["name", "title", "file", "function", "when", "timeout"]
+    static let keys: Set<String> = ["name", "title", "file", "function", "when", "timeout", "workspace"]
 
     /// The commands of a `commands.toml`. Entries that can't be used are skipped and reported in
     /// `problems`; with a missing or newer `api`, none is used. `exists` says whether a module
@@ -151,9 +156,17 @@ public final class UserCommands: @unchecked Sendable {
                 }
                 timeout = seconds
             }
+            var workspace = false
+            if let value = table.values["workspace"] {
+                guard let flag = value.bool else {
+                    problem("workspace must be true or false")
+                    continue
+                }
+                workspace = flag
+            }
             if let value = table.values["title"], value.string == nil { problem("title must be a string") }
             let title = table.values["title"]?.string.flatMap { $0.isEmpty ? nil : $0 } ?? name
-            result.append(UserCommand(name: name, title: title, file: file, function: function, when: when, timeout: timeout))
+            result.append(UserCommand(name: name, title: title, file: file, function: function, when: when, timeout: timeout, workspace: workspace))
         }
         guard let api else {
             if !result.isEmpty || tables.contains(where: { $0.name == "command" }) { problems.append("missing api = \(apiVersion)") }
