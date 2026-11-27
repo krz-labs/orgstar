@@ -1,6 +1,5 @@
 import Foundation
 import OrgCore
-import OrgPresentation
 import OrgWorkspace
 
 /// The configuration folder (`$XDG_CONFIG_HOME/orgstar`, else `~/.config/orgstar`) and
@@ -30,44 +29,6 @@ public enum UserConfig {
             return URL(fileURLWithPath: xdg).appendingPathComponent("orgstar")
         }
         return URL(fileURLWithPath: home).appendingPathComponent(".config/orgstar")
-    }
-
-    /// The theme `config.toml` (`text`) sets: its `[theme]` tables' colors over those of
-    /// `theme-file` (a path relative to `folder`), over the palettes `light-theme` and
-    /// `dark-theme` name; with problems in all three. Nil when `text` isn't TOML.
-    public static func theme(
-        config text: String, themeFile name: String?, lightTheme: String? = nil, darkTheme: String? = nil, in folder: URL,
-        read: (URL) -> String? = { try? String(contentsOf: $0, encoding: .utf8) }
-    ) -> (theme: ThemeSpec, problems: [String])? {
-        guard let tables = try? TOML.parse(text) else { return nil }
-        var (spec, problems) = ThemeSpec.base(light: lightTheme, dark: darkTheme)
-        if let name, !name.isEmpty {
-            if let themeText = read(folder.appendingPathComponent(name)) {
-                do {
-                    let (read, more) = ThemeSpec.reading(try TOML.parse(themeText), over: spec, file: name)
-                    spec = read
-                    problems += more
-                } catch {
-                    problems.append("\(name): \(error)")
-                }
-            } else {
-                problems.append("config.toml: theme-file \(name) can't be read")
-            }
-        }
-        let (merged, more) = ThemeSpec.reading(tables, over: spec)
-        return (merged, problems + more)
-    }
-
-    /// The file Copy to Config Folder writes.
-    public static let copiedThemeFile = "my-theme.toml"
-
-    /// Writes the two palettes into `folder` as `copiedThemeFile`; false, writing nothing, when
-    /// the file is already there.
-    public static func copyTheme(light: Palette, dark: Palette, to folder: URL) throws -> Bool {
-        let file = folder.appendingPathComponent(copiedThemeFile)
-        guard !FileManager.default.fileExists(atPath: file.path) else { return false }
-        try ThemeSpec.themeFile(light: light, dark: dark).write(to: file, atomically: true, encoding: .utf8)
-        return true
     }
 
     /// Where earlier versions kept the configuration files.
@@ -415,7 +376,7 @@ public enum UserConfig {
     ]
 
     /// `"-3d"` as -3; nil for anything else.
-    static func dayOffset(_ s: String) -> Int? {
+    public static func dayOffset(_ s: String) -> Int? {
         guard s.hasSuffix("d"), let n = Int(s.dropLast().replacingOccurrences(of: "+", with: "")) else { return nil }
         return n
     }
@@ -446,7 +407,7 @@ public enum UserConfig {
     }
 
     /// Stores a file value; a value of the wrong kind is a problem.
-    static func store(_ value: TOML.Value, _ setting: Setting, in defaults: UserDefaults) -> String? {
+    public static func store(_ value: TOML.Value, _ setting: Setting, in defaults: UserDefaults) -> String? {
         let key = setting.defaultsKey
         switch (setting.kind, value) {
         case (.lineNumbers, .bool(let b)):
@@ -540,10 +501,10 @@ public enum UserConfig {
                 continue
             }
             // Colors are the theme's to read; publishing projects are `Publish`'s.
-            if ThemeSpec.isThemeTable(table.name), table.name != "theme" { continue }
+            if ThemeTables.isThemeTable(table.name), table.name != "theme" { continue }
             if table.name == "publish", table.isArrayElement { continue }
             for (key, value) in table.values.sorted(by: { $0.key < $1.key }) {
-                if table.name == "theme", !ThemeSpec.typeKeys.contains(key) { continue }
+                if table.name == "theme", !ThemeTables.typeKeys.contains(key) { continue }
                 let name = path(table.name, key)
                 guard let setting = settings.first(where: { $0.path == name || $0.legacy == name }) else {
                     problems.append("config.toml: unknown setting \(name)")
@@ -589,7 +550,7 @@ public enum UserConfig {
         defaults.set(templates.map { $0.key + "\t" + $0.text }, forKey: denoteTemplatesKey)
     }
 
-    static func path(_ section: String, _ key: String) -> String { section.isEmpty ? key : section + "." + key }
+    public static func path(_ section: String, _ key: String) -> String { section.isEmpty ? key : section + "." + key }
 
     /// Whether the file uses names from before settings took Emacs's names.
     public static func usesLegacyNames(_ text: String) -> Bool {
@@ -650,7 +611,7 @@ public enum UserConfig {
     }
 
     /// The values a file sets, by `section.key`.
-    static func values(in text: String) -> [String: TOML.Value] {
+    public static func values(in text: String) -> [String: TOML.Value] {
         guard let tables = try? TOML.parse(text) else { return [:] }
         var result: [String: TOML.Value] = [:]
         for table in tables { for (key, value) in table.values { result[path(table.name, key)] = value } }
@@ -659,7 +620,7 @@ public enum UserConfig {
 
     // MARK: - Text
 
-    static func format(_ value: TOML.Value) -> String {
+    public static func format(_ value: TOML.Value) -> String {
         switch value {
         case .bool(let b): b ? "true" : "false"
         case .integer(let i): String(i)

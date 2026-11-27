@@ -488,16 +488,17 @@ public final class ClockModel {
 
     /// Brings the running clock in line with the open `CLOCK:` lines of `paths`, so that a
     /// clock started or stopped in Emacs, or on another device, is the one orgstar knows: the
-    /// running clock ends when its line was closed or removed, and with none running, the most
-    /// recently started of the open clocks not seen before becomes the running one. Others stay
-    /// dangling, for `org-resolve-clocks` at the next clock in. Returns a message when
-    /// something changed.
+    /// running clock ends when its line was closed or removed, and then or with none running,
+    /// the most recently started of the open clocks not seen before (and not started before the
+    /// one that ended) becomes the running one. Others stay dangling, for `org-resolve-clocks`
+    /// at the next clock in. Returns a message when something changed.
     @discardableResult
     public func sync(_ session: DocumentSession, paths: [String]) -> String? {
         guard !isResolving else { return nil }
         let open = openClocks(session, paths: paths)
         let fresh = open.filter { !seenOpen.contains($0.path + "\u{0}" + $0.start) }
         seenOpen.formUnion(open.map { $0.path + "\u{0}" + $0.start })
+        var stopped: (message: String, startedAt: Date)?
         if let running {
             guard paths.contains(running.path) || session.openDocuments.contains(where: { $0.path == running.path }) else { return nil }
             // Its line was closed or removed elsewhere; a file that can't be read says nothing.
@@ -506,9 +507,11 @@ public final class ClockModel {
             self.running = nil
             watched = nil
             save()
-            return "The clock in \"\(running.heading)\" was stopped elsewhere"
+            stopped = ("The clock in \"\(running.heading)\" was stopped elsewhere", running.startedAt)
         }
-        guard let newest = fresh.max(by: { $0.startedAt < $1.startedAt }) else { return nil }
+        // A clock in another entry started elsewhere as that one stopped, as clocking in there does.
+        let started = fresh.filter { clock in stopped.map { clock.startedAt >= $0.startedAt } ?? true }
+        guard let newest = started.max(by: { $0.startedAt < $1.startedAt }) else { return stopped?.message }
         running = Running(path: newest.path, start: newest.start, heading: newest.heading, startedAt: newest.startedAt)
         if let text = Self.text(newest.path, session), case let offset = (text as NSString).range(of: "CLOCK: [\(newest.start)]").location, offset != NSNotFound {
             let heading = DocumentModel(tree: OrgParser.parse(text)).headings.last { $0.headingRange.lowerBound <= offset }?.headingRange.lowerBound

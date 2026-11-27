@@ -1154,6 +1154,39 @@ struct SettingsView: View {
     }
     #endif
 
+    #if !APPSTORE
+    /// Links the `orgstar` command into a folder chosen in an open panel.
+    private func installCommandLineTool() {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = false
+        panel.canChooseDirectories = true
+        panel.canCreateDirectories = true
+        panel.showsHiddenFiles = true
+        panel.directoryURL = CommandLineTool.suggestedFolder()
+        panel.prompt = String(localized: "Install", table: "DeveloperID")
+        panel.message = String(localized: "Choose a folder on your PATH for the orgstar command, such as ~/.local/bin or /usr/local/bin.", table: "DeveloperID")
+        guard panel.runModal() == .OK, let folder = panel.url else { return }
+        let helper = CommandLineTool.helper()
+        let alert = NSAlert()
+        alert.messageText = String(localized: "Couldn't Install orgstar", table: "DeveloperID")
+        do {
+            let link = try CommandLineTool.install(helper, in: folder)
+            alert.messageText = String(localized: "Installed orgstar", table: "DeveloperID")
+            alert.informativeText = String(localized: "\(OrgPaths.abbreviatingWithTilde(link.path)) runs the command in this app. Type orgstar --help in Terminal.", table: "DeveloperID")
+        } catch {
+            switch error {
+            case .missing:
+                alert.informativeText = String(localized: "This copy of orgstar has no command-line tool.", table: "DeveloperID")
+            case .occupied(let path):
+                alert.informativeText = String(localized: "\(path) is already there and isn't a link. Move it away or choose another folder.", table: "DeveloperID")
+            case .unwritable(let path, let reason):
+                alert.informativeText = String(localized: "orgstar can't write in \(path): \(reason). Choose a folder of your own, such as ~/.local/bin, or make the link in Terminal: sudo ln -sf '\(helper.path)' '\(path)/orgstar'", table: "DeveloperID")
+            }
+        }
+        alert.runModal()
+    }
+    #endif
+
     private var general: some View {
         Form {
             Section {
@@ -1180,6 +1213,16 @@ struct SettingsView: View {
                     .settingsFooter()
             }
             #if !APPSTORE
+            Section {
+                LabeledContent {
+                    Button { installCommandLineTool() } label: { Text("Install Command-Line Tool…", tableName: "DeveloperID") }
+                } label: {
+                    Text("Command line", tableName: "DeveloperID")
+                }
+            } footer: {
+                Text("Links the orgstar command into a folder on your PATH, to print the agenda, capture, clock in and out, and export from Terminal.", tableName: "DeveloperID")
+                    .settingsFooter()
+            }
             if updates.canCheck {
                 Section {
                     Toggle(isOn: Binding(get: { updates.automatically }, set: { updates.automatically = $0 })) { Text("Check for updates automatically", tableName: "DeveloperID") }

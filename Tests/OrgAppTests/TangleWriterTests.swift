@@ -1,6 +1,7 @@
 import Foundation
 import Testing
 @testable import OrgApp
+@testable import OrgConfig
 @testable import OrgCore
 
 struct TangleWriterTests {

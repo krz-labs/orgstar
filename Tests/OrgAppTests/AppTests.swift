@@ -1283,6 +1283,28 @@ struct ClockModelTests {
         #expect(clock.running?.start == "2026-10-05 Mon 11:00")
     }
 
+    /// Clocking in on another entry elsewhere, in the same file, stops this clock and runs that one.
+    @Test func followsAClockSwitchedElsewhere() throws {
+        let notes = try Folder()
+        let work = try notes.write("work.org", "* Task\n:LOGBOOK:\nCLOCK: [2026-10-05 Mon 09:00]\n:END:\n* Next\n")
+        let session = DocumentSession(recovery: FileRecoveryStore(directory: notes.url.appendingPathComponent(".r")))
+        let clock = ClockModel(file: notes.url.appendingPathComponent("clock.json"))
+        clock.sync(session, paths: [work.path])
+        try """
+        * Task
+        :LOGBOOK:
+        CLOCK: [2026-10-05 Mon 09:00]--[2026-10-05 Mon 10:00] =>  1:00
+        :END:
+        * Next
+        :LOGBOOK:
+        CLOCK: [2026-10-05 Mon 10:00]
+        :END:
+
+        """.write(to: work, atomically: true, encoding: .utf8)
+        #expect(clock.sync(session, paths: [work.path]) == "Clock running in \"Next\" since [2026-10-05 Mon 10:00]")
+        #expect(clock.running?.start == "2026-10-05 Mon 10:00")
+    }
+
     @Test func clocksInAndOutAcrossFiles() throws {
         let notes = try Folder()
         let work = try notes.write("work.org", "* Task\nBody\n")

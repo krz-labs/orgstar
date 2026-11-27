@@ -1,6 +1,5 @@
 import Foundation
 import OrgCore
-import OrgPresentation
 
 /// The Org settings `config.toml` holds, read from user defaults with the file's fallbacks, for
 /// both apps.
@@ -80,23 +79,6 @@ public enum OrgPreferences {
         )
     }
 
-    /// `colors` with the type settings of `[theme]`: font, size, line spacing, heading step.
-    public static func theme(_ colors: ThemeSpec, _ defaults: UserDefaults = .standard) -> ThemeSpec {
-        var spec = colors
-        spec.font = string("themeFont", defaults)
-        spec.bodyFont = string("themeBodyFont", defaults)
-        spec.fontSize = integer("themeFontSize", defaults)
-        spec.lineSpacing = integer("themeLineSpacing", defaults)
-        spec.textWidth = integer("themeTextWidth", defaults)
-        spec.headingSizeStep = integer("themeHeadingStep", defaults)
-        return spec
-    }
-
-    /// `pdf-margin`, `pdf-font` and `pdf-page-numbers`.
-    @MainActor
-    public static func pdfOptions(_ defaults: UserDefaults = .standard) -> PDFExport.Options {
-        PDFExport.Options(margin: integer("pdfMargin", defaults), font: string("pdfFont", defaults), pageNumbers: bool("pdfPageNumbers", defaults))
-    }
 
     /// `show-markup`: link brackets and emphasis markers shown.
     public static func showMarkup(_ defaults: UserDefaults = .standard) -> Bool { bool("showMarkup", defaults) }
@@ -242,10 +224,6 @@ public enum OrgPreferences {
     public static func yankImageSaveMethod(_ defaults: UserDefaults = .standard) -> String {
         string("yankImageSaveMethod", defaults).nonEmpty ?? "attach"
     }
-    /// `org-yank-dnd-method`.
-    public static func yankDndMethod(_ defaults: UserDefaults = .standard) -> ImageYank.DropMethod {
-        ImageYank.DropMethod(rawValue: string("yankDndMethod", defaults)) ?? .ask
-    }
     /// `org-crypt-tag-matcher`, a tag.
     public static func cryptTag(_ defaults: UserDefaults = .standard) -> String {
         let tag = string("cryptTagMatcher", defaults).trimmingCharacters(in: .whitespaces)
@@ -294,16 +272,17 @@ public enum OrgPreferences {
         UserConfig.settings.first { $0.defaultsKey == key }?.fallback
     }
 
-    private static func bool(_ key: String, _ defaults: UserDefaults) -> Bool {
+    /// A setting by its user-defaults key, the file's fallback when it isn't set.
+    public static func bool(_ key: String, _ defaults: UserDefaults) -> Bool {
         defaults.object(forKey: key) as? Bool ?? fallback(key)?.bool ?? false
     }
 
-    private static func string(_ key: String, _ defaults: UserDefaults) -> String {
+    public static func string(_ key: String, _ defaults: UserDefaults) -> String {
         defaults.string(forKey: key) ?? fallback(key)?.string ?? ""
     }
 
     /// Integers, and day offsets stored as integers with a string such as `"+0d"` as the fallback.
-    private static func integer(_ key: String, _ defaults: UserDefaults) -> Int {
+    public static func integer(_ key: String, _ defaults: UserDefaults) -> Int {
         if let value = defaults.object(forKey: key) as? Int { return value }
         switch fallback(key) {
         case .integer(let value)?: return value

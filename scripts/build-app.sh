@@ -31,6 +31,8 @@ swift build -c release $arch_flags --product OrgstarSpotlight
 # shellcheck disable=SC2086
 swift build -c release $arch_flags --product OrgstarWidgets
 # shellcheck disable=SC2086
+swift build -c release $arch_flags --product OrgstarCLI
+# shellcheck disable=SC2086
 binary="$(swift build -c release $arch_flags --show-bin-path)/Orgstar"
 
 rm -rf "$app" .build/app/dSYMs
@@ -55,6 +57,12 @@ find "$app/Contents/Resources/SwiftMath_SwiftMath.bundle" -path '*/mathFonts.bun
 # MathJax, for PDF export. Pyodide is for the App Store builds; this one runs python3.
 cp -R "$(dirname "$binary")/Orgstar_OrgMathJax.bundle" "$app/Contents/Resources/"
 rm -rf "$app/Contents/Resources/Orgstar_OrgMathJax.bundle/Pyodide"
+
+# The orgstar command, which Settings ▸ General links into a folder on the PATH. It reads
+# reveal.js and MathJax from the bundle above.
+mkdir -p "$app/Contents/Helpers"
+cp "$(dirname "$binary")/OrgstarCLI" "$app/Contents/Helpers/orgstar"
+strip -x "$app/Contents/Helpers/orgstar"
 
 # Updates: the appcast and its signing key, for signed builds only; a dev build never checks.
 if [ "$sign" != "-" ]; then
@@ -249,6 +257,8 @@ for item in "$fw/XPCServices/Installer.xpc" "$fw/XPCServices/Downloader.xpc" "$f
     # shellcheck disable=SC2086
     codesign --force --sign "$sign" $sign_flags "$item"
 done
+# shellcheck disable=SC2086
+codesign --force --sign "$sign" $sign_flags --identifier sh.krz.orgstar.cli "$app/Contents/Helpers/orgstar"
 
 # The hardened runtime needs Calendar access declared for the agenda's events.
 keychain=""

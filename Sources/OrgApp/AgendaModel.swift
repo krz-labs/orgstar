@@ -4,6 +4,20 @@ import OrgCore
 import OrgIndex
 import OrgPresentation
 
+/// What one view of a block agenda shows.
+public struct AgendaBlockResult: Equatable, Sendable {
+    public let header: String
+    public let mode: AgendaMode
+    public var days: [AgendaDay] = []
+    public var list: [AgendaItem] = []
+    public var events: [AgendaEvent] = []
+
+    public var isAgenda: Bool {
+        if case .agenda = mode { return true }
+        return false
+    }
+}
+
 /// Parsed agenda files by path, kept while the file's modification date and size and the
 /// settings it was parsed with hold. Agenda models over one workspace can share one.
 @MainActor

@@ -21,7 +21,7 @@ differ in where they come from, how orgstar+ is bought, and what they can run.
   with the iPhone and iPad app.
 - The download version, from Homebrew or files.krz.sh, is signed with a Developer ID and
   notarized. It runs code blocks with the programs installed on the Mac, hands some tables and
-  exports to Emacs, and updates itself.
+  exports to Emacs, has an =orgstar= command for Terminal, and updates itself.
 
 ** From the Mac App Store
 
@@ -38,6 +38,8 @@ brew tap krz/tap https://gitbay.org/krz/homebrew-tap.git
 brew install --cask orgstar
 #+END_SRC
 
+The cask also links the =orgstar= command into Homebrew's =bin= folder; see [[file:guide/17-command-line.org][The command line]].
+
 ** As a download
 
 Download the newest =orgstar-<version>.dmg= from [[https://files.krz.sh/orgstar/][files.krz.sh/orgstar]], open it, and drag
@@ -47,6 +49,9 @@ Developer ID and notarized by Apple, so it opens without warnings.
 Once the app has been launched, Finder opens =.org= files with it, Quick Look shows
 them formatted, and Spotlight indexes their headings and text. The same is true of the Mac
 App Store version.
+
+To use the =orgstar= command in Terminal, click Settings ▸ General ▸ Install Command-Line
+Tool… and choose a folder on your =PATH=, such as =~/.local/bin=. See [[file:guide/17-command-line.org][The command line]].
 
 * The Mac App Store version
 
@@ -64,6 +69,7 @@ App Store version.
 | Files outside your folders | After you grant access to their folder                                        | Directly                                                                                        |
 | Attachments                | Copied, or moved from inside your folders                                     | Copied, moved, linked or symlinked                                                              |
 | Git                        | No                                                                            | Commits as you save, with pull and push; commits in File ▸ History…                             |
+| Command line               | No                                                                            | The =orgstar= command: agenda, capture, clock, export, tangle, open                             |
 | Updates                    | The Mac App Store                                                             | Built in, or Homebrew                                                                           |
 | orgstar+                   | In-app purchase, shared with iPhone and iPad                                  | License key                                                                                     |
 
@@ -166,7 +172,8 @@ What's New in orgstar shows them again, in both versions.
 
 * Uninstalling
 
-Delete =orgstar.app=, or run =brew uninstall --cask orgstar=. To remove your settings as
+Delete =orgstar.app=, or run =brew uninstall --cask orgstar=, and the =orgstar= link if you
+installed the command from Settings, such as =~/.local/bin/orgstar=. To remove your settings as
 well, delete =~/.config/orgstar/= (=brew uninstall --zap --cask orgstar= does both). The App
 Store version keeps its settings, index and recovery versions in
 =~/Library/Containers/sh.krz.orgstar/=, and the widgets' data in

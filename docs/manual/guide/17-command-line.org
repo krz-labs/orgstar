@@ -1,0 +1,122 @@
+#+TITLE: The command line
+#+DESCRIPTION: The orgstar command: the agenda as text or JSON, capture, clocking in and out, export, tangling and opening a file in the app, from Terminal and scripts.
+#+LEDE: The download version comes with an orgstar command that works on your files with the app's configuration, whether or not the app is running.
+
+* Installing the command
+
+The command is inside the app, at =orgstar.app/Contents/Helpers/orgstar=. To run it as =orgstar=:
+
+- Settings ▸ General ▸ Install Command-Line Tool… asks for a folder on your =PATH= and puts a link to the command there. =~/.local/bin= needs no administrator password; =/usr/local/bin= works when you can write to it. When orgstar can't write in the folder, the alert gives the =sudo ln -sf …= line to run in Terminal instead.
+- The Homebrew cask links it as =orgstar= when it installs the app.
+- A build from source has it at =.build/app/orgstar.app/Contents/Helpers/orgstar=.
+
+The link points into the app, so updating the app updates the command. The Mac App Store version has no command: its sandbox can't reach your files from another program.
+
+* What it reads
+
+The command reads the files the app reads and changes them the way the app does:
+
+- The configuration folder (see [[file:13-configuration.org][Configuration]]): =config.toml= for the settings, =capture.toml= for capture templates and =views.toml= for agenda views. Problems in them are printed as warnings.
+- The folders added in the app (File ▸ Add Folder…), from the app's data folder, =~/Library/Application Support/Orgstar=. =org-agenda-files= in =config.toml= chooses the agenda files as in the app.
+- Each file's own settings and =#+SETUPFILE:=.
+
+It doesn't need the app to be running. Choices kept only in the app are not read: folders hidden from the agenda, Calendar events and Reminders in the agenda, and each file's export choices.
+
+| Variable              | What it sets                                                                                         |
+|-----------------------+------------------------------------------------------------------------------------------------------|
+| =ORGSTAR_CONFIG_DIR=  | The configuration folder, instead of =$XDG_CONFIG_HOME/orgstar= or =~/.config/orgstar=                |
+| =ORGSTAR_DATA_DIR=    | The data folder, which holds the folder list, the running clock and recovery versions                |
+| =ORGSTAR_ROOT=        | A folder to read besides those added in the app                                                      |
+
+* Commands
+
+=orgstar --help= lists the commands, and =orgstar <command> --help= describes one. =orgstar --version= prints the app's version.
+
+** agenda
+
+#+BEGIN_SRC sh
+orgstar agenda
+orgstar agenda "TODO List"
+orgstar agenda Work --json
+#+END_SRC
+
+Prints the agenda as Emacs's agenda buffer shows it, with the span and start of Settings ▸ Agenda, the prefix format, sorting and time grid of =config.toml=. A name prints that view instead: TODO List, Stuck Projects, or a =[[view]]= of =views.toml=, block views included.
+
+#+BEGIN_EXAMPLE
+Week-agenda (W48):
+Friday     27 November 2026
+               8:00...... ----------------
+  tasks:      14:00-15:00 Meeting with Sam
+  tasks:      Scheduled:  TODO Write report
+  tasks:      In   3 d.:  TODO Pay rent :home:
+#+END_EXAMPLE
+
+=--json= prints the view's blocks, each with its header and its days and entries. An entry has its file, line and offset, category, keyword, title, tags, time and leader (=extra=), and the line as the text shows it.
+
+** capture
+
+#+BEGIN_SRC sh
+orgstar capture t "Buy milk"
+pbpaste | orgstar capture n
+orgstar capture m "Agenda for Monday" --set Who=Sam
+#+END_SRC
+
+Files an entry with the template of =capture.toml= that has that key, at once, as Shortcuts' Capture to Orgstar does. The text is =%i=: the argument, or standard input when there is none. =%?= is dropped.
+
+Questions are answered with =--set Prompt=value=, by the prompt's text: =%^{Who}= by =--set Who=…=. A question with a default (=%^{Room|Office}=) takes it when not set. A question with neither stops the capture with exit status 4 and names what to set, and nothing is written. Unset, =%^g= and =%^G= add no tags and the date questions take today; set them with =--set Tags=work:urgent= or =--set Date=+2d=. =%a=, =%c=, =%x= and =%f= are empty, since there's no buffer or clipboard. =%k= and =%K= are the running clock's entry.
+
+Targets work as in the app: a file is made when missing, =id= finds the heading in your folders, =clock= files under the running clock. =clock-in= with =clock-keep= starts the clock on the new entry; without =clock-keep= there's nothing to time, since the capture finishes at once. Templates with =denote = true= are refused; use them in the app.
+
+** clock
+
+#+BEGIN_SRC sh
+orgstar clock in work.org::"Write report"
+orgstar clock in id:0F3C2A1E-6B8D-4E3A-9B4F-2D1C0A9E8B7F
+orgstar clock status
+orgstar clock out
+#+END_SRC
+
+=clock in= starts the clock on a heading, named by its title (with or without a leading =*=), =#custom-id= or =id:ID=, after the file and =::=; =id:ID= alone looks in every folder. A running clock is clocked out first, as =org-clock-in= does. =clock out= stops the running clock. =clock status= prints the running clock, or with =--json= an object whose =running= is the clock or =null=; it exits with 3 when no clock runs.
+
+The command writes only the org file: the =CLOCK:= line, in the =LOGBOOK= drawer when =org-clock-into-drawer= says so, with the switch to =org-clock-in-switch-to-state= and the rounding and zero-time settings of =config.toml=. The running clock is the one the app shows when its line is still open, else the most recently started open =CLOCK:= line in the agenda files. The app watches your folders, so a clock started or stopped from the command line shows in the app as one started or stopped in Emacs does; the app's own record of the clock is never written by the command, so the two never write the same file.
+
+** export and tangle
+
+#+BEGIN_SRC sh
+orgstar export notes.org --to html
+orgstar export notes.org --to md -o -
+orgstar export notes.org --to odt -o ~/Desktop/notes.odt
+orgstar tangle init.org
+#+END_SRC
+
+Exports the whole file as File ▸ Export does, to =html=, =md=, =latex=, =txt=, =odt=, =reveal= or =pdf=, beside the file and named by =#+EXPORT_FILE_NAME= or the file's name, or to the path =-o= gives; =-o -= writes to standard output. Code in the HTML export isn't coloured. =pdf= runs the LaTeX export through =latexmk=, or =pdflatex= three times, as Emacs's =org-latex-export-to-pdf= does, so it needs TeX, such as MacTeX; the app's own PDF export doesn't.
+
+=tangle= writes the file's code blocks with =:tangle= to their files, as Tangle File (=C-c C-v t=) does, from the file as saved.
+
+** open
+
+#+BEGIN_SRC sh
+orgstar open notes.org
+orgstar open notes.org::"Reading list"
+orgstar open id:0F3C2A1E-6B8D-4E3A-9B4F-2D1C0A9E8B7F
+#+END_SRC
+
+Opens the file in orgstar, at the heading when one is named, through the app's =orgstar://entry= link. It starts orgstar when it isn't running.
+
+* How files are written
+
+The command saves a file the way the app saves one that isn't open: through a temporary file that replaces it, merged with any change made since it was read, and with the version it replaces kept for File ▸ History… as the app keeps them. Encrypted =.org.gpg= files and files that aren't UTF-8 are refused.
+
+There's no lock between the app and the command. A file open in orgstar takes in the command's change as it takes in one from Emacs: merged into the buffer, unsaved edits included, or shown as a conflict to resolve when both changed the same lines.
+
+* Exit status
+
+| Status | Meaning                                                                                                      |
+|--------+--------------------------------------------------------------------------------------------------------------|
+|      0 | Done                                                                                                         |
+|      1 | Failed: a file couldn't be read, written or exported, or it changed while being written                      |
+|      2 | Usage: an unknown command or option, or a missing argument                                                   |
+|      3 | Not found: no such file, heading, view or template; no running clock                                         |
+|      4 | Refused: a capture question without an answer, or a file or command that needs the app                      |
+
+Messages go to standard error, prefixed with =orgstar:=.

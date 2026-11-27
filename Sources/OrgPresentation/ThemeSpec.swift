@@ -192,11 +192,11 @@ public struct ThemeSpec: Equatable, Sendable {
     // MARK: - Reading
 
     /// Keys of `[theme]` that aren't colors; config.toml's settings handle them.
-    public static let typeKeys: Set<String> = ["font", "body-font", "font-size", "line-spacing", "text-width", "heading-size-step", "theme-file", "light-theme", "dark-theme"]
+    public static var typeKeys: Set<String> { ThemeTables.typeKeys }
 
     /// Whether a table holds theme colors.
     public static func isThemeTable(_ name: String) -> Bool {
-        name == "theme" || name.hasPrefix("theme.")
+        ThemeTables.isThemeTable(name)
     }
 
     /// `base` with the colors of `tables` laid over it, in order; problems for keys and

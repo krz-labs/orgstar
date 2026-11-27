@@ -26,7 +26,8 @@ let package = Package(
         .executable(name: "OrgstarShare", targets: ["OrgstarShare"]),
         .executable(name: "OrgstarWidgets", targets: ["OrgstarWidgets"]),
         .executable(name: "OrgstarWatch", targets: ["OrgstarWatch"]),
-        .executable(name: "OrgstarWatchWidgets", targets: ["OrgstarWatchWidgets"])
+        .executable(name: "OrgstarWatchWidgets", targets: ["OrgstarWatchWidgets"]),
+        .executable(name: "OrgstarCLI", targets: ["OrgstarCLI"])
     ],
     dependencies: [
         .package(url: "https://github.com/groue/GRDB.swift", from: "7.11.1"),
@@ -88,7 +89,9 @@ let package = Package(
             ]
         ),
         .executableTarget(name: "OrgstarSpike", dependencies: ["OrgEditorAppKit"]),
-        .target(name: "OrgApp", dependencies: ["OrgWorkspace", "OrgDocument", "OrgPresentation", "OrgWatchData"]),
+        // Settings and the configuration files, without UI: the apps and the command-line tool read them.
+        .target(name: "OrgConfig", dependencies: ["OrgCore", "OrgWorkspace"]),
+        .target(name: "OrgApp", dependencies: ["OrgConfig", "OrgWorkspace", "OrgDocument", "OrgPresentation", "OrgWatchData"]),
         // MathJax for PDF export, the dot and mermaid libraries, Pyodide, and reveal.js for slides, which need no network; the apps link it, extensions don't.
         .target(name: "OrgMathJax", resources: [.copy("MathJax"), .copy("Diagrams"), .copy("Pyodide"), .copy("Reveal")]),
         // What the phone and the watch send each other; Foundation only, so the watch builds it.
@@ -109,6 +112,9 @@ let package = Package(
         // The Mac's widget extension, bundled into the app by scripts/build-app.sh; the iOS one
         // is built from the same sources by ios/Orgstar.xcodeproj.
         .executableTarget(name: "OrgstarWidgets", dependencies: ["OrgApp"]),
+        // The `orgstar` command, bundled into the download app's Contents/Helpers by scripts/build-app.sh.
+        .executableTarget(name: "OrgstarCLI", dependencies: ["OrgConfig", "OrgDocument"]),
+        .testTarget(name: "OrgstarCLITests", dependencies: ["OrgstarCLI", "OrgConfig", "OrgDocument"]),
         .testTarget(name: "OrgCoreTests", dependencies: ["OrgCore"], exclude: ["Conformance"]),
         .testTarget(name: "OrgDocumentTests", dependencies: ["OrgDocument"]),
         .testTarget(name: "OrgWatchDataTests", dependencies: ["OrgWatchData"]),

@@ -1,6 +1,5 @@
 import Foundation
 import OrgCore
-import OrgPresentation
 
 /// What the agenda window shows.
 public enum AgendaMode: Hashable, Sendable {
@@ -27,20 +26,6 @@ public enum AgendaMode: Hashable, Sendable {
         case .search: "search"
         case .blocks: "agenda"
         }
-    }
-}
-
-/// What one view of a block agenda shows.
-public struct AgendaBlockResult: Equatable, Sendable {
-    public let header: String
-    public let mode: AgendaMode
-    public var days: [AgendaDay] = []
-    public var list: [AgendaItem] = []
-    public var events: [AgendaEvent] = []
-
-    public var isAgenda: Bool {
-        if case .agenda = mode { return true }
-        return false
     }
 }
 
@@ -158,8 +143,9 @@ public enum AgendaViewLoader {
         return settings
     }
 
-    /// The built-in views followed by the user's, and the problems found in the file.
-    public static func load(userFile: URL = userFile) -> (views: [AgendaViewDefinition], problems: [String]) {
+    /// The built-in views followed by the user's, and the problems found in the file. Stuck
+    /// views start from the `[org-stuck-projects]` settings in `defaults`.
+    public static func load(userFile: URL = userFile, defaults: UserDefaults = .standard) -> (views: [AgendaViewDefinition], problems: [String]) {
         let interval = Perf.begin("views.load")
         defer { interval.end() }
         guard let text = try? String(contentsOf: userFile, encoding: .utf8) else { return (builtIn, []) }
@@ -195,13 +181,13 @@ public enum AgendaViewLoader {
         for (name, table, blockTables) in parsed {
             guard let settings = settings(table, &problems) else { continue }
             if blockTables.isEmpty {
-                guard let mode = mode(table, name: name, &problems) else { continue }
+                guard let mode = mode(table, name: name, defaults: defaults, &problems) else { continue }
                 views.append(AgendaViewDefinition(name: name, mode: mode, settings: settings))
                 continue
             }
             var blocks: [AgendaBlock] = []
             for block in blockTables {
-                guard var mode = mode(block, name: name, &problems), let own = Self.settings(block, &problems) else { continue }
+                guard var mode = mode(block, name: name, defaults: defaults, &problems), let own = Self.settings(block, &problems) else { continue }
                 // The view's span and start go to agenda blocks without their own.
                 if case .agenda(let span, let start) = mode {
                     mode = .agenda(span: span ?? table.values["span"]?.integer, startOffset: start ?? table.values["start"]?.integer)
@@ -262,7 +248,7 @@ public enum AgendaViewLoader {
     }
 
     /// The view a `[[view]]` or `[[view.block]]` table describes.
-    static func mode(_ table: TOML.Table, name: String, _ problems: inout [String]) -> AgendaMode? {
+    static func mode(_ table: TOML.Table, name: String, defaults: UserDefaults = .standard, _ problems: inout [String]) -> AgendaMode? {
         let match = table.values["match"]?.string
         let type = table.values["type"]?.string ?? "agenda"
         switch type {
@@ -278,7 +264,7 @@ public enum AgendaViewLoader {
             return type.hasSuffix("match") ? .match(match, todoOnly: type == "todo-match") : .search(match, todoOnly: type == "todo-search")
         case "stuck":
             if ["match", "keywords", "tags", "regexp"].allSatisfy({ table.values[$0] == nil }) { return .stuck(nil) }
-            var definition = OrgPreferences.stuckProjects()
+            var definition = OrgPreferences.stuckProjects(defaults)
             if let match { definition.match = match }
             if let keywords = table.values["keywords"]?.string { definition.todo = OrgPreferences.words(keywords) }
             if let tags = table.values["tags"]?.string { definition.tags = OrgPreferences.words(tags) }

@@ -37,6 +37,7 @@ reminders, export and tangling.
 14. [[file:guide/14-ios.org][iPhone and iPad]]
 15. [[file:guide/15-alongside-emacs.org][Working alongside Emacs and other tools]]
 16. [[file:guide/16-flashcards.org][Flashcards]]
+17. [[file:guide/17-command-line.org][The command line]]
 
 * Principles
 

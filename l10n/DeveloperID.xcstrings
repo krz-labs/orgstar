@@ -1,6 +1,74 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%@ is already there and isn't a link. Move it away or choose another folder.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ existiert bereits und ist kein Link. Verschiebe die Datei oder wähle einen anderen Ordner."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ya existe y no es un enlace. Muévelo o elige otra carpeta."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ existe déjà et n’est pas un lien. Déplacez-le ou choisissez un autre dossier."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ はすでに存在し、リンクではありません。移動するか、別のフォルダを選んでください。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ já existe e não é um link. Mova-o ou escolha outra pasta."
+          }
+        }
+      }
+    },
+    "%@ runs the command in this app. Type orgstar --help in Terminal.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ startet den Befehl in dieser App. Gib im Terminal orgstar --help ein."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ejecuta el comando de esta app. Escribe orgstar --help en Terminal."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ lance la commande de cette app. Tapez orgstar --help dans le Terminal."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ はこのアプリ内のコマンドを実行します。ターミナルで orgstar --help と入力してください。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ executa o comando deste app. Digite orgstar --help no Terminal."
+          }
+        }
+      }
+    },
     "%@: git couldn't sign in to the remote (%@). orgstar can't answer prompts; use an SSH key in the agent or a credential helper.": {
       "localizations": {
         "de": {
@@ -239,6 +307,74 @@
         }
       }
     },
+    "Choose a folder on your PATH for the orgstar command, such as ~/.local/bin or /usr/local/bin.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle einen Ordner in deinem PATH für den Befehl orgstar, etwa ~/.local/bin oder /usr/local/bin."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige una carpeta de tu PATH para el comando orgstar, como ~/.local/bin o /usr/local/bin."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez un dossier de votre PATH pour la commande orgstar, comme ~/.local/bin ou /usr/local/bin."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar コマンドを置く PATH 上のフォルダを選んでください（~/.local/bin や /usr/local/bin など）。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escolha uma pasta do seu PATH para o comando orgstar, como ~/.local/bin ou /usr/local/bin."
+          }
+        }
+      }
+    },
+    "Command line": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Befehlszeile"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Línea de comandos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ligne de commande"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コマンドライン"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linha de Comando"
+          }
+        }
+      }
+    },
     "Commit": {
       "localizations": {
         "de": {
@@ -405,6 +541,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Commit e push de %1$@ em %2$@."
+          }
+        }
+      }
+    },
+    "Couldn't Install orgstar": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar konnte nicht installiert werden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha podido instalar orgstar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d’installer orgstar"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar をインストールできませんでした"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não Foi Possível Instalar o orgstar"
           }
         }
       }
@@ -715,6 +885,108 @@
         }
       }
     },
+    "Install": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installieren"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instalar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installer"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "インストール"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instalar"
+          }
+        }
+      }
+    },
+    "Install Command-Line Tool…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Befehlszeilenwerkzeug installieren …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instalar herramienta de línea de comandos…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installer l’outil en ligne de commande…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コマンドラインツールをインストール…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instalar Ferramenta de Linha de Comando…"
+          }
+        }
+      }
+    },
+    "Installed orgstar": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar installiert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar instalado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar installé"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar をインストールしました"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar Instalado"
+          }
+        }
+      }
+    },
     "License key": {
       "localizations": {
         "de": {
@@ -745,6 +1017,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Chave de licença"
+          }
+        }
+      }
+    },
+    "Links the orgstar command into a folder on your PATH, to print the agenda, capture, clock in and out, and export from Terminal.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verlinkt den Befehl orgstar in einen Ordner in deinem PATH, um im Terminal die Agenda auszugeben, zu erfassen, die Uhr zu starten und zu stoppen und zu exportieren."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enlaza el comando orgstar en una carpeta de tu PATH para mostrar la agenda, capturar, iniciar y detener el reloj y exportar desde Terminal."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crée un lien vers la commande orgstar dans un dossier de votre PATH, pour afficher l’agenda, capturer, démarrer et arrêter l’horloge et exporter depuis le Terminal."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar コマンドへのリンクを PATH 上のフォルダに作成し、ターミナルからアジェンダの表示、キャプチャ、時間計測の開始と終了、書き出しができるようにします。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cria um link para o comando orgstar em uma pasta do seu PATH, para mostrar a agenda, capturar, iniciar e parar o relógio e exportar pelo Terminal."
           }
         }
       }
@@ -1055,6 +1361,40 @@
         }
       }
     },
+    "This copy of orgstar has no command-line tool.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Kopie von orgstar enthält kein Befehlszeilenwerkzeug."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta copia de orgstar no tiene herramienta de línea de comandos."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette copie d’orgstar n’a pas d’outil en ligne de commande."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この orgstar にはコマンドラインツールが含まれていません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta cópia do orgstar não tem ferramenta de linha de comando."
+          }
+        }
+      }
+    },
     "git isn't installed. Install the Xcode command line tools or git from Homebrew.": {
       "localizations": {
         "de": {
@@ -1085,6 +1425,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "O git não está instalado. Instale as ferramentas de linha de comando do Xcode ou o git do Homebrew."
+          }
+        }
+      }
+    },
+    "orgstar can't write in %@: %@. Choose a folder of your own, such as ~/.local/bin, or make the link in Terminal: sudo ln -sf '%@' '%@/orgstar'": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar kann nicht in %1$@ schreiben: %2$@. Wähle einen eigenen Ordner, etwa ~/.local/bin, oder lege den Link im Terminal an: sudo ln -sf '%3$@' '%4$@/orgstar'"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar no puede escribir en %1$@: %2$@. Elige una carpeta tuya, como ~/.local/bin, o crea el enlace en Terminal: sudo ln -sf '%3$@' '%4$@/orgstar'"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar ne peut pas écrire dans %1$@ : %2$@. Choisissez un dossier à vous, comme ~/.local/bin, ou créez le lien dans le Terminal : sudo ln -sf '%3$@' '%4$@/orgstar'"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar は %1$@ に書き込めません: %2$@。~/.local/bin など自分のフォルダを選ぶか、ターミナルでリンクを作成してください: sudo ln -sf '%3$@' '%4$@/orgstar'"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O orgstar não pode gravar em %1$@: %2$@. Escolha uma pasta sua, como ~/.local/bin, ou crie o link no Terminal: sudo ln -sf '%3$@' '%4$@/orgstar'"
           }
         }
       }
