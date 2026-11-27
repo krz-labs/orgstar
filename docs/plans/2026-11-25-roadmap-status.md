@@ -9,8 +9,11 @@ Where the milestone work stands, so a session can pick it up at any point. Read 
 - Milestone 4 (Commands and editing speed) is closed: 12 issues (#236 added during it; #156 closed with #142), 6 merge requests (479–484), about one day.
 - Milestone 5 (Sync and files) is closed: 11 issues (#238 and #239 added during it), 10 merge requests (486–492, 494, 495), about two days, most of it on #153's four review rounds. #87 (OneDrive greyed out in the iOS folder picker) moved to the Backlog: still greyed out on 2026-11-26; re-test later, Graph API app-folder sync is the fallback.
 - On `main` with everything merged: `swift test` (about 1,475 tests), both Xcode builds and every performance gate pass (three gate runs on 2026-11-27: 1 MB open 83–89 ms, typing p95 unchanged; new gates for Lint File and Lint All Folders).
+- After milestones 6 and 7's merges (2026-11-26): `swift test`, both Xcode builds and every gate pass at load average 4.5 (1 MB Markdown open 79 ms, 10,000-note index build 9.3 s, backlinks over 49,400 links 0.55 s). #168 and #160 add index migrations v5 and v6; existing indexes re-read their files once.
 - Released: 1.3.0 (milestones 1, 4 and 5) and 1.3.1 (an unchanged entry keeps its message after Decrypt Entry in File, the iOS passphrase sheet as a form with navigation bar buttons, What's New shows a skipped version's notes, no compiler warnings in `Sources/`). Download, appcast, cask and krz.sh are live; App Store builds 884 (1.3.0) and 890 (1.3.1) are uploaded, and submitting for review is the owner's call. The 1 MB open gate measured 92–117 ms with Plex running and was skipped for both releases at the owner's word; run releases on a quiet Mac.
-- Owed: Xcode's "Update to recommended settings" on `ios/Orgstar.xcodeproj` (Xcode only; review its list there).
+- Milestone 6 (Formats, import and export): 4 of 6 issues closed, merge requests 509 (#166 printing), 510 (#161 Markdown and Obsidian import), 511 (#159 Markdown and plain-text editing) and 512 (#160 Denote in Markdown and text). Open: #164 and #90, both waiting on the owner (see open questions).
+- Milestone 7 (Notes and knowledge): 2 of 3 issues closed, merge requests 506 (#168 org-roam gaps) and 507 (#170 citations and Zotero). Open: #172, waiting on the owner.
+- Also merged: 505 (Xcode's recommended project settings), 508 (snapshot runs skip the Keychain prompt for the clock title key). Filed to the Backlog: #241 (inline math in export), #242 (backlinks pane titles a Denote text note by its file name).
 - Simulators: "iPhone 17", "iPad Air 11-inch (M4)" (iOS 27.0) and "Apple Watch Series 11 (46mm)" (watchOS 27.0). Reuse them; do not create others.
 
 | Milestone | Open | Closed |
@@ -19,11 +22,11 @@ Where the milestone work stands, so a session can pick it up at any point. Read 
 | 2 Capture | 6 | 0 |
 | 3 Agenda and planning | 9 | 0 |
 | 4 Commands and editing speed | 0 | 12 |
-| 5 Sync and files | 0 | 11 |
-| 6 Formats, import and export | 6 | 0 |
-| 7 Notes and knowledge | 3 | 0 |
+| 5 Sync and files | 0 | 10 |
+| 6 Formats, import and export | 2 | 4 |
+| 7 Notes and knowledge | 1 | 2 |
 | 8 Automation and extension | 3 | 0 |
-| Backlog | 42 | 0 |
+| Backlog | 44 | 0 |
 
 #109 (code scanning) has no milestone and stays out of scope.
 
@@ -127,7 +130,24 @@ gitbay milestone list
 7. #239: one app-wide "Use Face ID to Decrypt" (Touch ID on the Mac) in UserDefaults, undecided until the first typed passphrase or a launch with passphrases saved by an earlier version asks; Not Now records off and leaves earlier items unread but listed with Forget; only a passphrase that opens every encrypted message in the file is saved; turning off deletes every saved passphrase. The Mac quit prompt saves only while on and never asks.
 8. The download version embeds the Developer ID provisioning profile (`~/Library/MobileDevice/Provisioning Profiles/orgstar_dev_id.provisionprofile`, valid to 2044, tied to the Developer ID Application certificate created 2026-10-10) and uses the protected Keychain like the App Store build. A new certificate means a new profile; `release-mac.sh` stops without one.
 
+## Decisions taken in milestones 6 and 7, for the owner to confirm or overrule
+
+1. #168: nodes with `ROAM_EXCLUDE` (any value but `nil`, not inherited) are left out of the chooser and node sections. New nodes and daily captures go through the capture window (Mac) or sheet (iOS); nothing is written until Capture. Roam templates live in capture.toml as `[[roam-template]]`, `[[roam-dailies-template]]` and `[[roam-ref-template]]`.
+2. #170: Insert Citation adds one key per run and always asks for the style of a new citation (Emacs asks only with `C-u`); prefix and suffix prompts are added; `C-u` deletion is not supported. Following a citation shows the entry with Open file, DOI, URL and Show in Bibliography.
+3. #166: printing a file needs orgstar+ (the print panel saves PDFs); printing the agenda is free. ⌥⌘P prints, since ⌘P is Quick Open. Pages are PDF export's. An entry encrypted on disk prints as its plaintext if the buffer holds it decrypted.
+4. #161: Markdown and Obsidian import is Mac only. Links between notes become relative `file:` links; no IDs are added. Nothing is ever replaced: taken names get ` 2`, ` 3`.
+5. #159: Markdown (`.md`, `.markdown`) and `.txt` open in the editor with highlighting and folding; every org command is refused in them except folding and, from #160, Open Link, Insert Node Link and the two Denote renames.
+6. #160: `denote-file-type` in config.toml sets new notes' type. Rename from front matter now also rewrites the front matter from what it read and sorts keywords, as Denote does, Org notes included. Capture with `denote = true` and denote-journal entries stay Org. Without the Denote notes package, Insert Node Link is refused outside Org.
+
 ## Device checks owed
+
+### From milestones 6 and 7
+
+- #168: the capture window and sheet for new nodes and dailies past the orgstar+ gate; org-protocol `roam-ref` from a browser.
+- #170: Insert Citation and following a citation in the real app on the Mac and iPhone; Zotero links with Zotero and Better BibTeX running.
+- #166: the iOS print sheet; a real printer on each platform.
+- #161: File ▸ Import with a real vault, including the Mac App Store sandbox's access to the source and destination folders.
+- #159, #160: Markdown and text notes on a device; Insert Node Link and Rename Note on iOS (the simulator stopped at the orgstar+ paywall); following a link to a Markdown note from the iOS reader still opens Quick Look.
 
 ### From milestone 5
 
@@ -202,7 +222,8 @@ From the handoff, still unanswered:
 - #122: does snooze move only the notification, or rewrite the timestamp?
 - #129: how closely to follow org-ql's syntax.
 - #164: Beamer and reveal.js, or only the in-app presentation mode.
-- #172: which package's card format to read and write.
+- #172: which package's card format to read and write (org-drill, org-fc, org-srs, anki-editor).
+- #90: Pyodide in the sandboxed builds is about 10 MB bundled or a download on first use; needs a spike on the download and the owner's choice between them.
 
 New:
 
