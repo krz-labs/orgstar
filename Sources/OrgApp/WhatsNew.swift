@@ -38,6 +38,17 @@ public enum WhatsNew {
 
     /// Newest first. A version without an entry shows nothing.
     public static let releases: [ReleaseNotes] = [
+        ReleaseNotes(version: "1.4.0", items: [
+            .init("printer", "Printing", "Print the file, a subtree, the selection or the agenda."),
+            .init("doc.plaintext", "Markdown and plain text",
+                  "Markdown and text files open with highlighting, heading folds and an outline, and search finds them."),
+            .init("note.text", "Denote in Markdown and text",
+                  "Denote notes in Markdown and plain text, with their front matter, renaming, links and backlinks."),
+            .init("quote.opening", "Citations",
+                  "Insert citations from your bibliography, complete keys after @, follow a citation to its entry, and open Zotero links."),
+            .init("point.3.connected.trianglepath.dotted", "More org-roam",
+                  "Aliases, refs, excluded nodes, tags in the node chooser, and capture templates for new nodes and daily notes."),
+        ] + mac14),
         ReleaseNotes(version: "1.3.0", items: [
             .init("text.cursor", "Completion as you type",
                   "A completion list opens by itself in every preset, matches loosely, and offers words from your files, id links by title, property values and Denote notes."),
@@ -90,6 +101,7 @@ public enum WhatsNew {
         ReleaseNotes.Item("arrow.triangle.branch", "Working Copy", "Sync a folder that is a git repository through Working Copy."),
     ]
     private static let mac13: [ReleaseNotes.Item] = []
+    private static let mac14: [ReleaseNotes.Item] = []
     #else
     private static let ios: [ReleaseNotes.Item] = []
     private static let ios13: [ReleaseNotes.Item] = []
@@ -97,6 +109,12 @@ public enum WhatsNew {
         ReleaseNotes.Item("record.circle", "Keyboard macros",
                           "Record and replay keyboard macros in the Emacs and Mac presets; named ones are kept across restarts."),
         ReleaseNotes.Item("command", "Command palette", "Recent commands come first, and the ones you use most rank higher."),
+    ]
+    private static let mac14 = [
+        ReleaseNotes.Item("square.and.arrow.down", "Import Markdown and Obsidian",
+                          "File ▸ Import converts Markdown files or an Obsidian vault to org files."),
+        ReleaseNotes.Item("textformat.size", "Larger text",
+                          "Settings ▸ Appearance ▸ Size now enlarges the agenda and the sidebars as well as the editor."),
     ]
     private static let mac = [
         ReleaseNotes.Item("sidebar.left", "Agenda in the sidebar",

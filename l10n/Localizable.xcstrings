@@ -5390,6 +5390,40 @@
         }
       }
     },
+    "Aliases, refs, excluded nodes, tags in the node chooser, and capture templates for new nodes and daily notes.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aliasse, Refs, ausgeschlossene Knoten, Tags in der Knotenauswahl und Erfassungsvorlagen für neue Knoten und Tagesnotizen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alias, refs, nodos excluidos, etiquetas en el selector de nodos y plantillas de captura para nodos nuevos y notas diarias."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alias, refs, nœuds exclus, étiquettes dans le sélecteur de nœuds et modèles de capture pour les nouveaux nœuds et les notes quotidiennes."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "エイリアス、refs、除外ノード、ノード選択でのタグ表示、新しいノードとデイリーノート用のキャプチャテンプレート。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aliases, refs, nós excluídos, tags no seletor de nós e modelos de captura para novos nós e notas diárias."
+          }
+        }
+      }
+    },
     "Align Table": {
       "comment": "Command title",
       "localizations": {
@@ -10590,6 +10624,40 @@
         }
       }
     },
+    "Citations": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zitate"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Citas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Citations"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "引用"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Citações"
+          }
+        }
+      }
+    },
     "Clear": {
       "localizations": {
         "de": {
@@ -15113,6 +15181,74 @@
         }
       }
     },
+    "Denote in Markdown and text": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denote in Markdown und Text"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denote en Markdown y texto"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denote en Markdown et en texte"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown とテキストの Denote"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denote em Markdown e texto"
+          }
+        }
+      }
+    },
+    "Denote notes in Markdown and plain text, with their front matter, renaming, links and backlinks.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denote-Notizen in Markdown und reinem Text, mit Front Matter, Umbenennen, Links und Rückverweisen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notas de Denote en Markdown y texto sin formato, con su front matter, cambio de nombre, enlaces y retroenlaces."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les notes Denote en Markdown et en texte brut, avec leur front matter, le renommage, les liens et les rétroliens."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown とプレーンテキストの Denote ノートに対応。フロントマター、名前の変更、リンク、バックリンクも使えます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notas do Denote em Markdown e texto simples, com front matter, renomeação, links e backlinks."
+          }
+        }
+      }
+    },
     "Destination": {
       "localizations": {
         "de": {
@@ -19138,6 +19274,40 @@
         }
       }
     },
+    "File ▸ Import converts Markdown files or an Obsidian vault to org files.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Datei ▸ Importieren wandelt Markdown-Dateien oder einen Obsidian-Tresor in org-Dateien um."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archivo ▸ Importar convierte archivos Markdown o una bóveda de Obsidian en archivos org."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fichier ▸ Importer convertit des fichiers Markdown ou un coffre Obsidian en fichiers org."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイル ▸ 読み込む で Markdown ファイルや Obsidian の保管庫を org ファイルに変換します。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arquivo ▸ Importar converte arquivos Markdown ou um cofre do Obsidian em arquivos org."
+          }
+        }
+      }
+    },
     "Files": {
       "localizations": {
         "de": {
@@ -22202,6 +22372,40 @@
         }
       }
     },
+    "Import Markdown and Obsidian": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown und Obsidian importieren"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importar Markdown y Obsidian"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importer Markdown et Obsidian"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown と Obsidian の読み込み"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importar Markdown e Obsidian"
+          }
+        }
+      }
+    },
     "Import Obsidian Vault": {
       "localizations": {
         "de": {
@@ -24007,6 +24211,40 @@
         }
       }
     },
+    "Insert citations from your bibliography, complete keys after @, follow a citation to its entry, and open Zotero links.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Füge Zitate aus deiner Bibliografie ein, vervollständige Schlüssel nach @, folge einem Zitat zu seinem Eintrag und öffne Zotero-Links."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserta citas de tu bibliografía, completa claves después de @, sigue una cita hasta su entrada y abre enlaces de Zotero."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insérez des citations depuis votre bibliographie, complétez les clés après @, suivez une citation jusqu'à son entrée et ouvrez les liens Zotero."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "参考文献から引用を挿入し、@ の後でキーを補完し、引用からその項目へ移動し、Zotero リンクを開けます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insira citações da sua bibliografia, complete chaves depois de @, siga uma citação até a entrada dela e abra links do Zotero."
+          }
+        }
+      }
+    },
     "Insert or Update Clock Table": {
       "comment": "Command title",
       "localizations": {
@@ -24867,6 +25105,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Exportação para LaTeX, OpenDocument e texto simples"
+          }
+        }
+      }
+    },
+    "Larger text": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Größere Schrift"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Texto más grande"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Texte plus grand"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "大きな文字"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Texto maior"
           }
         }
       }
@@ -26765,6 +27037,74 @@
         }
       }
     },
+    "Markdown and plain text": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown und reiner Text"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown y texto sin formato"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown et texte brut"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown とプレーンテキスト"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown e texto simples"
+          }
+        }
+      }
+    },
+    "Markdown and text files open with highlighting, heading folds and an outline, and search finds them.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown- und Textdateien öffnen sich mit Hervorhebung, einklappbaren Überschriften und einer Gliederung, und die Suche findet sie."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los archivos Markdown y de texto se abren con resaltado, encabezados plegables y un esquema, y la búsqueda los encuentra."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les fichiers Markdown et texte s'ouvrent avec la coloration, le repli des titres et un plan, et la recherche les trouve."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown とテキストファイルは、ハイライト、見出しの折りたたみ、アウトライン付きで開き、検索の対象にもなります。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arquivos Markdown e de texto abrem com destaque, títulos recolhíveis e um sumário, e a busca os encontra."
+          }
+        }
+      }
+    },
     "Marks it %@": {
       "localizations": {
         "de": {
@@ -27204,6 +27544,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mais do app para Mac"
+          }
+        }
+      }
+    },
+    "More org-roam": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehr org-roam"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más org-roam"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plus d'org-roam"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "org-roam の強化"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mais org-roam"
           }
         }
       }
@@ -35481,6 +35855,74 @@
         }
       }
     },
+    "Print the file, a subtree, the selection or the agenda.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drucke die Datei, einen Teilbaum, die Auswahl oder die Agenda."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imprime el archivo, un subárbol, la selección o la agenda."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imprimez le fichier, une sous-arborescence, la sélection ou l'agenda."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイル、サブツリー、選択範囲、またはアジェンダを印刷できます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imprima o arquivo, uma subárvore, a seleção ou a agenda."
+          }
+        }
+      }
+    },
+    "Printing": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drucken"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impresión"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impression"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "印刷"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impressão"
+          }
+        }
+      }
+    },
     "Print…": {
       "comment": "Command title",
       "localizations": {
@@ -41737,6 +42179,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ajustes"
+          }
+        }
+      }
+    },
+    "Settings ▸ Appearance ▸ Size now enlarges the agenda and the sidebars as well as the editor.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einstellungen ▸ Darstellung ▸ Größe vergrößert jetzt neben dem Editor auch die Agenda und die Seitenleisten."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajustes ▸ Apariencia ▸ Tamaño ahora agranda la agenda y las barras laterales además del editor."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages ▸ Apparence ▸ Taille agrandit désormais l'agenda et les barres latérales en plus de l'éditeur."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定 ▸ 外観 ▸ サイズ で、エディタに加えてアジェンダとサイドバーも大きくなります。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajustes ▸ Aparência ▸ Tamanho agora aumenta a agenda e as barras laterais, além do editor."
           }
         }
       }
