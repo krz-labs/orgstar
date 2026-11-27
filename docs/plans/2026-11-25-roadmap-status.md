@@ -11,6 +11,12 @@ Where the milestone work stands, so a session can pick it up at any point. Read 
 - On `main` with everything merged: `swift test` (about 1,475 tests), both Xcode builds and every performance gate pass (three gate runs on 2026-11-27: 1 MB open 83–89 ms, typing p95 unchanged; new gates for Lint File and Lint All Folders).
 - After milestones 6 and 7's merges (2026-11-26): `swift test`, both Xcode builds and every gate pass at load average 4.5 (1 MB Markdown open 79 ms, 10,000-note index build 9.3 s, backlinks over 49,400 links 0.55 s). #168 and #160 add index migrations v5 and v6; existing indexes re-read their files once.
 - Released: 1.3.0 (milestones 1, 4 and 5) and 1.3.1 (an unchanged entry keeps its message after Decrypt Entry in File, the iOS passphrase sheet as a form with navigation bar buttons, What's New shows a skipped version's notes, no compiler warnings in `Sources/`). Download, appcast, cask and krz.sh are live; App Store builds 884 (1.3.0) and 890 (1.3.1) are uploaded, and submitting for review is the owner's call. The 1 MB open gate measured 92–117 ms with Plex running and was skipped for both releases at the owner's word; run releases on a quiet Mac.
+- Milestone 6 (Formats, import and export) is closed: 6 issues, merge requests 509 (#166 printing), 510 (#161 Markdown and Obsidian import), 511 (#159 Markdown and plain-text editing), 512 (#160 Denote in Markdown and text), 516 (#90 Python in Pyodide) and 517 (#164 reveal.js export and presentation mode).
+- Milestone 7 (Notes and knowledge) is closed: 3 issues, merge requests 506 (#168 org-roam gaps), 507 (#170 citations and Zotero) and 518 (#172 flashcards in org-fc's format).
+- Also merged: 505 (Xcode's recommended project settings), 508 (snapshot runs skip the Keychain prompt for the clock title key), 513 (this document). Filed to the Backlog: #241 (inline math in export), #242 (backlinks pane titles a Denote text note by its file name), #243 (presentation mode text on iPad stays at body size).
+- After milestones 6 and 7 (2026-11-26, `main` at 801e496): `swift test`, both Xcode builds and every gate pass (1 MB open 92 ms at load average 4; one earlier run at load 7 missed a gate). #168 and #160 add index migrations v5 and v6; existing indexes re-read their files once. #240 (`CryptSaverTests.closedFilesKeepNothingAfterTheirWrite`) fails about 1 run in 3 when run alone.
+- App size: Pyodide adds 13.6 MB installed to the iOS and Mac App Store apps (not the download build or extensions); reveal.js adds 2.7 MB to every app.
+- Released: 1.3.0 (milestones 1, 4 and 5) and 1.3.1 (an unchanged entry keeps its message after Decrypt Entry in File, the iOS passphrase sheet as a form with navigation bar buttons, What's New shows a skipped version's notes, no compiler warnings in `Sources/`). Download, appcast, cask and krz.sh are live; App Store builds 884 (1.3.0) and 890 (1.3.1) are uploaded, and submitting for review is the owner's call. The 1 MB open gate measured 92–117 ms with Plex running and was skipped for both releases at the owner's word; run releases on a quiet Mac.
 - Milestone 6 (Formats, import and export): 4 of 6 issues closed, merge requests 509 (#166 printing), 510 (#161 Markdown and Obsidian import), 511 (#159 Markdown and plain-text editing) and 512 (#160 Denote in Markdown and text). Open: #164 and #90, both waiting on the owner (see open questions).
 - Milestone 7 (Notes and knowledge): 2 of 3 issues closed, merge requests 506 (#168 org-roam gaps) and 507 (#170 citations and Zotero). Open: #172, waiting on the owner.
 - Also merged: 505 (Xcode's recommended project settings), 508 (snapshot runs skip the Keychain prompt for the clock title key). Filed to the Backlog: #241 (inline math in export), #242 (backlinks pane titles a Denote text note by its file name).
@@ -23,10 +29,10 @@ Where the milestone work stands, so a session can pick it up at any point. Read 
 | 3 Agenda and planning | 9 | 0 |
 | 4 Commands and editing speed | 0 | 12 |
 | 5 Sync and files | 0 | 10 |
-| 6 Formats, import and export | 2 | 4 |
-| 7 Notes and knowledge | 1 | 2 |
+| 6 Formats, import and export | 0 | 6 |
+| 7 Notes and knowledge | 0 | 3 |
 | 8 Automation and extension | 3 | 0 |
-| Backlog | 44 | 0 |
+| Backlog | 45 | 0 |
 
 #109 (code scanning) has no milestone and stays out of scope.
 
@@ -139,6 +145,10 @@ gitbay milestone list
 5. #159: Markdown (`.md`, `.markdown`) and `.txt` open in the editor with highlighting and folding; every org command is refused in them except folding and, from #160, Open Link, Insert Node Link and the two Denote renames.
 6. #160: `denote-file-type` in config.toml sets new notes' type. Rename from front matter now also rewrites the front matter from what it read and sorts keywords, as Denote does, Org notes included. Capture with `denote = true` and denote-journal entries stay Org. Without the Denote notes package, Insert Node Link is refused outside Org.
 
+7. #90 (owner's choice: bundle): python blocks run in Pyodide 314.0.8 (standard library only, no matplotlib or numpy) in the iOS and Mac App Store builds, with the same `.babel` gate as other languages. One interpreter; a session gets its own namespace per folder and name; unloaded after 1 minute idle, 15 with a session; a 5-minute timeout or a cancel ends the worker and every session. `:dir` must exist but blocks run in Pyodide's own file system. The download build keeps `python3`.
+8. #164 (owner's choice: presentation mode and reveal.js, no Beamer): reveal.js export needs orgstar+ and writes one self-contained `.html` (linked to `#+REVEAL_ROOT` when set); presentation mode (⌃⌘P, iOS Present) is free, one heading per slide, with the iPad showing next slide and notes while an external display shows the slide.
+9. #172 (owner's choice: org-fc): flashcards are free (widget and watch keep their existing gates); SM2 `sm2-v1` only, other `FC_ALGO` values refused when rated; review covers every added folder; history goes to `org-fc-review-history-file` (default `org-fc-reviews.tsv` in the config folder).
+
 ## Device checks owed
 
 ### From milestones 6 and 7
@@ -147,6 +157,9 @@ gitbay milestone list
 - #170: Insert Citation and following a citation in the real app on the Mac and iPhone; Zotero links with Zotero and Better BibTeX running.
 - #166: the iOS print sheet; a real printer on each platform.
 - #161: File ▸ Import with a real vault, including the Mac App Store sandbox's access to the source and destination folders.
+- #90: a python block in the sandboxed Mac App Store app; start-up time and memory on a real iPhone (simulator: 4.1 s first run, 121 MB).
+- #164: the iPad external display; hardware keys on iOS; the reveal.js speaker view; a `#+REVEAL_ROOT` deck against a reveal.js 6 CDN.
+- #172: the Flashcards widget's count and tap; watch review and its rating reaching the file; the Mac desktop widget; iPad layout and hardware-keyboard rating; the text-input card flow; the history file at an Emacs path from the sandboxed builds.
 - #159, #160: Markdown and text notes on a device; Insert Node Link and Rename Note on iOS (the simulator stopped at the orgstar+ paywall); following a link to a Markdown note from the iOS reader still opens Quick Look.
 
 ### From milestone 5
@@ -221,9 +234,6 @@ From the handoff, still unanswered:
 - #115: an option on capture templates, or a separate quick-add field?
 - #122: does snooze move only the notification, or rewrite the timestamp?
 - #129: how closely to follow org-ql's syntax.
-- #164: Beamer and reveal.js, or only the in-app presentation mode.
-- #172: which package's card format to read and write (org-drill, org-fc, org-srs, anki-editor).
-- #90: Pyodide in the sandboxed builds is about 10 MB bundled or a download on first use; needs a spike on the download and the owner's choice between them.
 
 New:
 
