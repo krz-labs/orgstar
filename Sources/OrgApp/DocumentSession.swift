@@ -482,6 +482,10 @@ public final class DocumentSession {
         history.removeAll { $0 == entry.path }
         history.insert(entry.path, at: 0)
         refresh(pane)
+        // A worker ready ahead of the first user command run in this buffer.
+        #if canImport(WebKit)
+        if !userCommands.all.isEmpty { userCommandHost()?.prepare() }
+        #endif
     }
 
     /// The buffer before or after the focused one, wrapping, in the focused pane.
@@ -1463,6 +1467,132 @@ public final class DocumentSession {
     /// Stops the running block; its results aren't inserted.
     public func cancelBabel() {
         babelTask?.cancel()
+    }
+
+    // MARK: - User commands
+
+    /// The commands of `commands.toml`; their folder is where the host loads modules from.
+    @ObservationIgnored public var userCommands = UserCommands.shared
+    #if canImport(WebKit)
+    @ObservationIgnored private var commandHost: CommandHost?
+
+    /// The host for the commands' folder, made again when the folder changed.
+    func userCommandHost() -> CommandHost? {
+        guard let folder = userCommands.folder else { return nil }
+        if commandHost?.folder != folder {
+            commandHost?.unload()
+            commandHost = CommandHost(folder: folder)
+        }
+        return commandHost
+    }
+    #endif
+    @ObservationIgnored private var userCommandTask: Task<String?, Never>?
+    public private(set) var isRunningUserCommand = false
+
+    /// Runs a user command on the focused buffer in the background, with `context` the editor's
+    /// context at the request's revision; the message comes back through `report`. `file` is
+    /// the file's path relative to its folder, for `org.file()`. Prompts go to `ask`.
+    public func startUserCommand(_ request: UserCommandRequest, context: EditContext, file: String?,
+                                 ask: @escaping @MainActor (Prompt, @escaping (String?) -> Void) -> Void,
+                                 report: @escaping @MainActor (String) -> Void) {
+        userCommandTask?.cancel()
+        isRunningUserCommand = true
+        let task = Task { await runUserCommand(request, context: context, file: file, ask: ask, report: report) }
+        userCommandTask = task
+        Task {
+            let message = await task.value
+            if userCommandTask == task {
+                userCommandTask = nil
+                isRunningUserCommand = false
+            }
+            if let message { report(message) }
+        }
+    }
+
+    /// Stops the running user command; nothing it returns is applied.
+    public func cancelUserCommand() {
+        userCommandTask?.cancel()
+    }
+
+    /// Why a user command doesn't run in `path`'s buffer: it's an encrypted file or holds
+    /// decrypted entries, which a command could copy elsewhere in the file. Nil when it runs.
+    public func refusesUserCommand(_ path: String) -> String? {
+        let name = (path as NSString).lastPathComponent
+        guard Self.isEncryptedFile(path) || entry(path).map({ crypt.isPrivate($0.buffer.document.text, for: $0.path) }) == true else { return nil }
+        return String(localized: "\(name) has decrypted entries, so user commands don't run in it.", comment: "A user command refused in a buffer holding decrypted text")
+    }
+
+    /// Runs `request` in the focused buffer and applies what it returns as one change at the
+    /// request's revision. The message to show; nil when the command's own messages were shown.
+    func runUserCommand(_ request: UserCommandRequest, context: EditContext, file: String?,
+                        ask: @escaping @MainActor (Prompt, @escaping (String?) -> Void) -> Void,
+                        report: @escaping @MainActor (String) -> Void) async -> String? {
+        let command = request.command
+        guard let path, let entry = entry(path) else { return "No file is open." }
+        if let refusal = refusesUserCommand(path) { return refusal }
+        guard entry.buffer.document.revision == request.revision, context.revision == request.revision else { return "The file changed; try again." }
+        #if canImport(WebKit)
+        guard let host = userCommandHost() else { return "No \(UserCommands.fileName)." }
+        final class State {
+            var failure: String?
+            var quit = false
+        }
+        let state = State()
+        let context = EditContext(revision: context.revision, text: context.text, tree: context.tree, selection: request.selection,
+                                  now: context.now, calendar: context.calendar, options: context.options, knownTags: context.knownTags)
+        host.calls = { name, value in
+            if let answer = UserCommandAPI.answer(name, value, context: context, file: file) { return answer }
+            switch name {
+            case "prompt":
+                let prompt = UserCommandAPI.prompt(value)
+                return try await withCheckedThrowingContinuation { continuation in
+                    ask(prompt) { answer in
+                        guard let answer else {
+                            state.quit = true
+                            return continuation.resume(throwing: CommandHost.Failure.script("Quit"))
+                        }
+                        continuation.resume(returning: UserCommandAPI.answer(answer, to: prompt, now: Date(), calendar: context.calendar))
+                    }
+                }
+            case "message":
+                report(value as? String ?? "")
+                return NSNull()
+            case "fail":
+                state.failure = value as? String ?? ""
+                return NSNull()
+            default:
+                throw CommandHost.Failure.script("org.\(name) isn't in API version \(UserCommands.apiVersion).")
+            }
+        }
+        let json: String
+        do {
+            json = try await host.run(module: command.file, function: command.function, context: "null",
+                                      timeout: .seconds(command.timeout), api: UserCommands.apiVersion)
+        } catch let CommandHost.Failure.timedOut(limit) {
+            let seconds = Int(limit.components.seconds)
+            return String(localized: "\(command.title) didn't finish within \(seconds) s and was stopped.", comment: "A user command passed its time limit")
+        } catch CommandHost.Failure.script(let message) {
+            if let failure = state.failure { return failure }
+            return state.quit ? "Quit" : "\(command.title): \(message)"
+        } catch CommandHost.Failure.stopped {
+            return String(localized: "\(command.title) was stopped: its web view ended, as when a command runs out of memory.", comment: "A user command whose web view ended")
+        } catch {
+            return String(localized: "\(command.title) canceled.", comment: "A user command canceled with Cancel Running Task")
+        }
+        if let failure = state.failure { return failure }
+        guard !Task.isCancelled else { return String(localized: "\(command.title) canceled.", comment: "A user command canceled with Cancel Running Task") }
+        switch UserCommandAPI.result(json, in: context) {
+        case .failure(let problem):
+            return "\(command.title): \(problem.message)"
+        case .success(let result):
+            guard entries.contains(where: { $0 === entry }) else { return "The file was closed before the command finished." }
+            if case .failed(let message) = entry.buffer.perform(PrecomputedEdit(result), now: Date(), answers: [:]) { return message }
+            if !result.edits.isEmpty { changed(entry) }
+            return nil
+        }
+        #else
+        return "User commands aren't available here."
+        #endif
     }
 
     // MARK: - Locations

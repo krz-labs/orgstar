@@ -124,6 +124,8 @@ final class MobileEditor: NSObject, DocumentBuffer {
     var onTangle: ((Tangle.Scope) -> Void)?
     /// A source block to run (C-c C-c).
     var onBabel: ((BabelJob) -> Void)?
+    /// A user command to run.
+    var onUserCommand: ((UserCommandRequest) -> Void)?
     /// The file's setup files to read again (C-c C-c on a keyword line).
     var onRefreshSetup: (() -> Void)?
     /// A block, a table's formulas or a field to edit apart (C-c ', C-c `).
@@ -408,6 +410,8 @@ final class MobileEditor: NSObject, DocumentBuffer {
             onEditBlock?(edit)
         case .external(.babel(let job)) where onBabel != nil:
             onBabel?(job)
+        case .external(.userCommand(let request)) where onUserCommand != nil:
+            onUserCommand?(request)
         case .external(.tangle(let scope)) where onTangle != nil:
             onTangle?(scope)
         case .external(.agenda(let start, let count)) where onAgenda != nil:
@@ -503,8 +507,10 @@ final class MobileEditor: NSObject, DocumentBuffer {
         case _ where id.hasPrefix("app.") || Self.linkCommands.contains(id):
             if let onAppCommand { onAppCommand(id) } else { onMessage?(Self.unavailable(command: id)) }
         default:
-            if let command = Commands.command(id) {
+            if let command: any OrgCommand = Commands.command(id) ?? UserCommands.shared.command(id) {
                 _ = perform(command)
+            } else if id.hasPrefix(UserCommands.commandPrefix) {
+                fail("No command \(id.dropFirst(UserCommands.commandPrefix.count)) in \(UserCommands.fileName)")
             } else {
                 fail(Self.unavailable(command: id))
             }
@@ -516,7 +522,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
 
     func applies(_ id: String, in context: EditContext) -> Bool {
         if refuses(id) { return false }
-        if let command = Commands.command(id) ?? Snippets.command(id) { return command.applies(in: context) }
+        if let command: any OrgCommand = Commands.command(id) ?? Snippets.command(id) ?? UserCommands.shared.command(id) { return command.applies(in: context) }
         switch id {
         case "org.snippet.next-field", "org.snippet.previous-field": return snippetSession != nil
         case "org.cycle":
@@ -538,7 +544,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
         case "app.crypt.open-entry", "app.crypt.decrypt-entry": return onAppCommand != nil && OrgCrypt.encryptedRange(context.text, at: context.caret) != nil
         case "app.table-export", "app.table-export.tsv", "app.plot": return onAppCommand != nil && ImportTable.exportText(context.text, at: context.caret, path: "") != nil
         case "app.word-count", "app.recovery", "app.sync-conflicts", "app.lint", "app.lint-folders", "app.flashcards.review", "app.attach.photo", "app.attach.camera", "app.attach.scan",
-             "app.rename-tag", "app.rename-todo-keyword": return onAppCommand != nil
+             "app.rename-tag", "app.rename-todo-keyword", "app.babel.cancel": return onAppCommand != nil
         case _ where id.hasPrefix(NamedMacros.commandPrefix): return true
         case "app.refile", "app.refile.copy", "app.archive": return onAppCommand != nil && Presentation.heading(containing: context.caret, in: context.tree) != nil
         case "app.export-dialog", "app.export-subtree-dialog", "app.share-subtree", "app.copy-rich-text", "app.export.html-open", "app.export-body-only", "app.export.icalendar-agenda", "app.export.icalendar-combined": return onAppCommand != nil

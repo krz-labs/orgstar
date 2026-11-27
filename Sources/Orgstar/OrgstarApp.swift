@@ -799,7 +799,7 @@ struct OrgstarApp: App {
             CommandGroup(after: .textEditing) {
                 Button("Cancel Running Task") { commands.run("app.babel.cancel") }
                     .keyboardShortcut(".")
-                    .disabled(!session.isRunningBabel && commands.emacsTask == nil)
+                    .disabled(!session.isRunningBabel && !session.isRunningUserCommand && commands.emacsTask == nil)
                 Button("Search Notes") { commands.focusSearch = true }
                     .keyboardShortcut("f", modifiers: [.command, .shift])
             }

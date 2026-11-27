@@ -324,6 +324,8 @@ public enum ExternalRequest: Sendable, Equatable {
     case agenda(start: Int, days: Int)
     /// Write source blocks to their files (`org-babel-tangle`); the app knows the file's path.
     case tangle(Tangle.Scope)
+    /// Run a user command (`UserCommand`); its edits come back to apply at the request's revision.
+    case userCommand(UserCommandRequest)
 }
 
 /// A named operation. Keys, menus, the palette and touch controls all run commands.

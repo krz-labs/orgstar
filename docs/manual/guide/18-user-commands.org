@@ -1,0 +1,238 @@
+#+TITLE: User commands
+#+DESCRIPTION: Your own editing commands in JavaScript: commands.toml, the commands folder, the org API, trust, limits, and porting commands from Emacs Lisp.
+#+LEDE: Write your own editing commands in JavaScript. They run on the Mac and on iPhone and iPad, from the palette, keys and the key bar.
+
+* Overview
+
+A user command is a JavaScript function that reads the buffer it runs in and returns the changes to make. You declare it in =commands.toml= in the configuration folder and put its code in the =commands= folder beside it:
+
+#+BEGIN_EXAMPLE
+~/.config/orgstar/
+  commands.toml
+  commands/
+    headings.js
+    review.js
+#+END_EXAMPLE
+
+Each command gets the id =user.=/name/ and appears wherever commands do: the command palette, =keymap.toml= bindings, the Commands list on iPhone and iPad, and =[key-bar]=. Its changes are one step of undo. User commands are included in every version of orgstar; they don't need orgstar+.
+
+The download version, the Mac App Store version and the iOS app run the same commands with the same API, so a command works unchanged on every device the configuration folder reaches. On iPhone and iPad the folder is the one chosen in Settings (see [[file:14-ios.org][iPhone and iPad]]).
+
+* commands.toml
+
+#+BEGIN_SRC toml
+api = 1
+
+[[command]]
+name = "upcase-title"           # the command user.upcase-title
+title = "Upcase Heading Title"  # shown in the palette; default: the name
+file = "headings.js"            # in commands/
+function = "upcaseTitle"        # an exported function
+when = "heading"                # optional; default: everywhere
+timeout = 5                     # optional, seconds; default 2, at most 30
+
+[[command]]
+name = "weekly-review"
+title = "Add Weekly Review"
+file = "review.js"
+function = "weeklyReview"
+#+END_SRC
+
+| Key        | Required | What it sets                                                                                                                            |
+|------------+----------+-----------------------------------------------------------------------------------------------------------------------------------------|
+| =api=      | Yes      | The API version the commands are written for, at the top of the file. This version of orgstar runs =1=.                                 |
+| =name=     | Yes      | Letters, digits, =-= and =_=. The command's id is =user.=/name/.                                                                         |
+| =title=    | No       | The title in the palette, the Commands list and key hints, shown as written.                                                           |
+| =file=     | Yes      | A =.js= or =.mjs= file in =commands/=, which may be in a subfolder (=lib/dates.js=).                                                      |
+| =function= | Yes      | The name of a function the file exports. It may be =async=.                                                                             |
+| =when=     | No       | A context from [[file:03-keys.org::*Contexts][Contexts]] (=heading=, =table=, =item=, =region=, …). Where it doesn't hold, the palette and the Commands list leave the command out and its keys fall through. |
+| =timeout=  | No       | Seconds the command may run, 1 to 30; 2 when not given. Time spent waiting for your answer to a prompt doesn't count.                   |
+
+orgstar reads the file without running any code, so commands are listed and bindable before you have run them. It reloads the file, and the list of commands, when the file or anything in =commands/= changes; on iPhone and iPad it reloads when the synced folder changes.
+
+Problems are reported like those of the other configuration files (see [[file:13-configuration.org::*Problems in the files][Problems in the files]]), and the command with the problem isn't registered:
+
+- =commands.toml: command weekly-review: no file commands/review.js=
+- =commands.toml: command slow: timeout must be 1 to 30 seconds=
+- =commands.toml: command review: unknown context headline=
+- =commands.toml: api 2 needs a newer orgstar= (no command is registered)
+- =commands.toml: missing api = 1= (no command is registered)
+- =commands.toml: commands/review.js isn't downloaded from iCloud yet= (iPhone and iPad; the download starts)
+
+* The commands folder
+
+Files in =commands/= are ES modules. They may import each other by relative path (=import { pad } from "./lib/text.js"=) and nothing else: imports from other folders or URLs fail. Each run starts fresh, so nothing a command keeps in a variable survives to its next run, and a changed file is read again.
+
+The function is called with one argument, =org=, the API below. Its return value says what to change.
+
+* The API, version 1
+
+Every call returns a promise; use =await=. Offsets are UTF-16 code units, as JavaScript strings count them, so =text.slice(from, to)= gives the text between two offsets.
+
+| Call                       | Gives                                                                                                                       |
+|----------------------------+-----------------------------------------------------------------------------------------------------------------------------|
+| =org.text()=               | The buffer's text when the command started.                                                                                 |
+| =org.selection()=          | The selections as =[{from, to}]=, the main caret first. With nothing selected, =from= and =to= are both the caret.          |
+| =org.heading(at)=          | The heading whose entry holds the offset =at= (default: the caret), as described below, or =null= before the first heading. |
+| =org.outline()=            | Every heading in the file, in order, as =org.heading()= describes it.                                                       |
+| =org.file()=               | The file's path relative to its folder (=notes/plan.org=), or =null= for a buffer without a file.                           |
+| =org.settings()=           | =todoKeywords=, =doneKeywords=, =priorities= (={highest, lowest, default}=), =fileTags=, =tags= (the tags used in your folders), =fillColumn= and =tagsColumn=. |
+| =org.prompt(options)=      | Asks in the echo area (the Mac) or a sheet (iPhone and iPad) and gives the answer as a string. Throws when you cancel.      |
+| =org.message(text)=        | Shows =text= in the echo area while the command runs.                                                                       |
+| =org.fail(text)=           | Ends the command: nothing changes and =text= is shown. Use it as =return org.fail("…")=.                                    |
+| =org.version=              | =1=.                                                                                                                        |
+
+A heading is an object with:
+
+| Field                    | Value                                                                                                   |
+|--------------------------+---------------------------------------------------------------------------------------------------------|
+| =level=                  | The number of stars.                                                                                    |
+| =keyword=, =done=        | The TODO keyword or =null=, and whether it is a done keyword.                                           |
+| =priority=               | The cookie's value (="A"=) or =null=.                                                                   |
+| =title=                  | The title as written, without keyword, priority or tags.                                                |
+| =tags=                   | The heading's own tags, without inherited ones.                                                         |
+| =start=, =end=           | Where the heading line starts and where its subtree ends (the start of the next heading at its level or above, or the end of the file). |
+| =titleStart=, =titleEnd= | Where the title is.                                                                                     |
+| =scheduled=, =deadline=, =closed= | The planning line's timestamps as written (="<2026-11-30 Mon>"=), or =null=.                    |
+| =properties=             | The property drawer as an object (={EFFORT: "1:00"}=).                                                  |
+
+=org.prompt= takes =message=, =initial= (text the answer starts with), =choices= (answers to complete from), =requireMatch= (the answer must be one of =choices=; default false) and =date= (ask for a date as Org's date prompt does, and give =YYYY-MM-DD= or =YYYY-MM-DD HH:MM=). =org.prompt("Week: ")= is short for =org.prompt({message: "Week: "})=.
+
+** The return value
+
+The function returns an object with any of these, or nothing:
+
+| Field       | Value                                                                                                                                       |
+|-------------+---------------------------------------------------------------------------------------------------------------------------------------------|
+| =edits=     | A list of ={from, to, text}= in the text the command was given. =to= defaults to =from= (an insertion) and =text= to =""= (a deletion). Edits may not overlap or start at the same offset. |
+| =selection= | Where the caret or selection goes, in the text after the edits: an offset, ={from, to}=, or a list of them. Without it, the selection moves with the edits. |
+| =message=   | Text for the echo area.                                                                                                                     |
+| =copy=      | Text for the clipboard (the kill ring).                                                                                                    |
+
+orgstar checks the edits before it makes any of them. An edit outside the text, edits that overlap, an edit that splits an emoji or other character in two, or an unknown field fail the command with a message such as =Add Weekly Review: edits overlap=, and nothing changes.
+
+The edits are applied together as one step of undo, and only if the buffer is as it was when the command started. If you type, or the file changes on disk, while the command runs or waits for a prompt, its result is refused with "The file changed; try again."
+
+* Examples
+
+=commands/headings.js= upcases the current heading's title:
+
+#+BEGIN_SRC js
+export async function upcaseTitle(org) {
+  const heading = await org.heading()
+  if (!heading) return org.fail("Not in an entry")
+  const text = await org.text()
+  const title = text.slice(heading.titleStart, heading.titleEnd)
+  return {
+    edits: [{ from: heading.titleStart, to: heading.titleEnd, text: title.toUpperCase() }],
+    message: `Upcased ${title}`,
+  }
+}
+#+END_SRC
+
+=commands/review.js= asks for a week and adds a child heading at the end of the current entry's subtree, with the caret after its stars:
+
+#+BEGIN_SRC js
+export async function weeklyReview(org) {
+  const heading = await org.heading()
+  if (!heading) return org.fail("Not on a heading")
+  const week = await org.prompt({ message: "Week: ", initial: "W48" })
+  const stars = "*".repeat(heading.level + 1)
+  return {
+    edits: [{ from: heading.end, to: heading.end, text: `${stars} Review ${week}\n` }],
+    selection: heading.end + stars.length + 1,
+  }
+}
+#+END_SRC
+
+=commands/outline.js= copies the path of the current entry, using the outline:
+
+#+BEGIN_SRC js
+export async function copyPath(org) {
+  const here = await org.heading()
+  if (!here) return org.fail("Not in an entry")
+  const outline = await org.outline()
+  const path = outline.filter(h => h.start <= here.start && h.end >= here.end).map(h => h.title).join(" / ")
+  return { copy: path, message: `Copied ${path}` }
+}
+#+END_SRC
+
+Bind a command like any other in =keymap.toml=:
+
+#+BEGIN_SRC toml
+[[bind]]
+keys = "C-c u"
+command = "user.upcase-title"
+#+END_SRC
+
+* Running a command
+
+Run a command from the palette, a key bound in =keymap.toml=, the Commands list on iPhone and iPad, or a key bar button (=[key-bar]= in =config.toml= takes =user.= ids). The echo area shows "Running /title/… (⌘. to cancel)" while it runs.
+
+** Trust
+
+The first time you run a command from a file, orgstar asks:
+
+#+BEGIN_EXAMPLE
+Run commands from commands/review.js?
+#+END_EXAMPLE
+
+A command can read and change the file you run it in, and nothing else (see [[*Limits][Limits]]). The answers are Run Once, Always and Don't Run:
+
+- Run Once runs it this time and asks again next time.
+- Always runs it and doesn't ask again while the file and every module it imports stay as they are.
+- Don't Run, or cancelling, runs nothing.
+
+Any change to the file or to a module it imports asks again, including a change that arrives by sync from another device. Trust is kept on each device, in =trusted.json= in orgstar's data folder, not in the configuration folder, so a command synced from another device runs here only after you allow it here. Code blocks and Lisp table formulas use the same store (see [[file:11-code-blocks.org][Code blocks]]).
+
+** Cancelling
+
+Edit ▸ Cancel Running Task (=⌘.=, =app.babel.cancel=) stops a running command; the Commands list on iPhone and iPad has the same command. Nothing it returned is applied. Running another user command cancels the one before it.
+
+* Limits
+
+- *Time.* A command that runs longer than its =timeout= (2 seconds by default, at most 30) is stopped with "/title/ didn't finish within /n/ s and was stopped." Time waiting for a prompt doesn't count.
+- *Memory.* A command that uses up its memory is stopped without affecting the app, and the next run starts fresh.
+- *The buffer only.* A command reads and changes the buffer it runs in, nothing else: no files, no network (=fetch=, =XMLHttpRequest=, =WebSocket=, =importScripts= and the rest are removed), no other buffers, no clipboard reads, no notifications, Calendar or other system services.
+- *Encrypted text.* Commands don't run in an encrypted file or in a buffer with entries decrypted that are encrypted on disk: "/file/ has decrypted entries, so user commands don't run in it."
+- *Keyboard macros* don't wait for a user command to finish.
+- *Startup.* When you have commands, the engine that runs them starts when an editor opens, so the first run doesn't wait for it. It stops after five minutes without a run.
+
+* Compared with Emacs Lisp
+
+User commands cover the small interactive commands people keep in =init.el=: insert a dated heading, set a property from a prompt, toggle a tag, clean up a list, convert the region. They are written in JavaScript rather than Emacs Lisp, and the API is orgstar's, not Emacs's. Import from Emacs lists bindings to functions your configuration defines with =defun= as not imported, with a note pointing here.
+
+What Emacs Lisp has that user commands don't:
+
+- Emacs Lisp functions and packages (=dash=, =s=, =org-ql=); =.el= files aren't read.
+- Buffer primitives: =point=, =goto-char=, =insert=, =re-search-forward= on the buffer, =save-excursion=, markers. A command gets the text and returns edits instead.
+- The Org API: =org-element-*=, =org-map-entries= over several files, =org-entry-put=, calling Org's own commands (=org-todo=, =org-schedule=). Read headings with =org.heading()= and =org.outline()=, and write the text yourself.
+- Other buffers and files, =find-file=, =with-temp-buffer=, capture from a command.
+- Hooks (=org-after-todo-state-change-hook=, =post-command-hook=), advice, minor modes and buffer-local variables.
+- =interactive= codes other than the prompts above; =C-u= prefix arguments.
+- Timers, processes and shell commands.
+
+** Porting table
+
+| Emacs Lisp                                         | User command                                                       |
+|----------------------------------------------------+--------------------------------------------------------------------|
+| =(buffer-string)=                                  | =await org.text()=                                                 |
+| =(point)=, =(region-beginning)=, =(region-end)=    | =(await org.selection())[0]=                                       |
+| =(org-get-heading t t t t)=                        | =(await org.heading()).title=                                      |
+| =(org-get-todo-state)=                             | =(await org.heading()).keyword=                                    |
+| =(org-get-tags nil t)=                             | =(await org.heading()).tags=                                       |
+| =(org-entry-get nil "EFFORT")=                     | =(await org.heading()).properties.EFFORT=                          |
+| =(org-entry-get nil "SCHEDULED")=                  | =(await org.heading()).scheduled=                                  |
+| =(org-map-entries …)= in the current file          | =(await org.outline()).forEach(…)=                                 |
+| =(org-end-of-subtree)=                             | =(await org.heading()).end=                                        |
+| =(buffer-file-name)=                               | =await org.file()=                                                 |
+| =org-todo-keywords=, =org-tag-alist=               | =(await org.settings()).todoKeywords=, =.tags=                     |
+| =(read-string "Week: " "W48")=                     | =await org.prompt({message: "Week: ", initial: "W48"})=            |
+| =(completing-read "Tag: " tags nil t)=             | =await org.prompt({message: "Tag: ", choices: tags, requireMatch: true})= |
+| =(org-read-date)=                                  | =await org.prompt({message: "Date: ", date: true})=                |
+| =(insert …)=, =(delete-region …)=, =(replace-match …)= | An entry in =edits=                                            |
+| =(goto-char …)=, =(set-mark …)=                    | =selection=                                                        |
+| =(message …)=                                      | =org.message(…)= or =message=                                      |
+| =(user-error …)=                                   | =return org.fail(…)=                                               |
+| =(kill-new …)=                                     | =copy=                                                             |
+| =(global-set-key (kbd "C-c u") #'my/command)=      | =[[bind]]= in =keymap.toml= with =command = "user.…"=               |

@@ -517,7 +517,7 @@ struct ContentView: View {
         }
         .onChange(of: ConfigSync.shared.changedFile?.serial) {
             // Named macros are commands keymap.toml can bind.
-            if ["keymap.toml", NamedMacros.fileName].contains(ConfigSync.shared.changedFile?.name) { loadKeymap() }
+            if ["keymap.toml", NamedMacros.fileName, UserCommands.fileName].contains(ConfigSync.shared.changedFile?.name) { loadKeymap() }
         }
         .onChange(of: commands.jumpRequest?.id) {
             guard let request = commands.jumpRequest else { return }
@@ -1216,6 +1216,8 @@ struct ContentView: View {
         case .tangle(let scope):
             guard ProAccess.shared.allows(.babel), reach(session.tangleFiles(scope)) else { return }
             commands.show(session.tangle(scope))
+        case .userCommand(let request):
+            runUserCommand(request)
         case .agenda(let start, let days):
             commands.agendaRequest = (start, days)
             openWindow(id: "agenda")
@@ -1291,6 +1293,17 @@ struct ContentView: View {
                 }
             }
         }
+    }
+
+    /// Runs a user command once its file is trusted on this device.
+    private func runUserCommand(_ request: UserCommandRequest) {
+        guard let path = session.path, let modules = session.userCommands.folder else { return }
+        if let refusal = session.refusesUserCommand(path) { return commands.show(refusal) }
+        UserCommandTrust.check(request.command, modules: modules, trust: trust, ask: commands.ask, run: {
+            guard let context = commands.editor?.context() else { return }
+            commands.show(String(localized: "Running \(request.command.title)… (⌘. to cancel)", comment: "A user command started"))
+            session.startUserCommand(request, context: context, file: UserCommandFile.relativePath(path, roots: workspace.rootPaths), ask: commands.ask) { commands.show($0) }
+        }, refuse: { commands.show($0) })
     }
 
     /// Runs an `elisp:` link's form once trusted, asking as `org-link-elisp-confirm-function` does.
@@ -1460,7 +1473,9 @@ struct ContentView: View {
             focusPane(window)
         case "app.window-new": openWindow(id: "editor")
         case "app.babel.cancel":
-            if session.isRunningBabel {
+            if session.isRunningUserCommand {
+                session.cancelUserCommand()
+            } else if session.isRunningBabel {
                 session.cancelBabel()
             } else if let task = commands.emacsTask {
                 task.cancel()

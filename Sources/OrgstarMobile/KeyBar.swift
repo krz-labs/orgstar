@@ -90,6 +90,9 @@ struct KeyBar: View {
             let name = String(id.dropFirst(NamedMacros.commandPrefix.count))
             return NamedMacros.shared.names.contains(name) ? Item(label: name, symbol: nil, action: .command(id)) : nil
         }
+        if id.hasPrefix(UserCommands.commandPrefix) {
+            return UserCommands.shared.command(id).map { Item(label: $0.title, symbol: nil, action: .command(id)) }
+        }
         guard !AppStoreCommands.hidden.contains(id), let title = commandTitles[id].map(CommandTitle.localized) else { return nil }
         return Item(label: title, symbol: commandSymbols[id], action: .command(id), face: KeyBarLayout.face(title: title))
     }

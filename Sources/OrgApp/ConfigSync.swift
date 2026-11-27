@@ -29,6 +29,7 @@ public final class ConfigSync {
     @ObservationIgnored private var themeProblems: [String] = []
     @ObservationIgnored private var macroProblems: [String] = []
     @ObservationIgnored private var snippetProblems: [String] = []
+    @ObservationIgnored private var commandProblems: [String] = []
     /// Why the file couldn't be read or written, the last time a setting was to go into it.
     @ObservationIgnored private var fileProblem: String?
     @ObservationIgnored private var applying = false
@@ -69,6 +70,7 @@ public final class ConfigSync {
         }
         loadMacros()
         readSnippets()
+        loadCommands()
         observer = NotificationCenter.default.addObserver(forName: UserDefaults.didChangeNotification, object: defaults, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.writeBack() }
         }
@@ -95,8 +97,11 @@ public final class ConfigSync {
                     if self.isThemeFile(file) { self.readTheme() }
                     if name == NamedMacros.fileName { self.loadMacros() }
                     if name == Snippets.fileName { self.readSnippets() }
+                    // A module added or removed changes which commands load.
+                    let inCommands = file.path.hasPrefix(directory.path + "/" + UserCommands.folderName + "/")
+                    if name == UserCommands.fileName || inCommands { self.loadCommands() }
                     self.serial += 1
-                    self.changedFile = (name, self.serial)
+                    self.changedFile = (inCommands ? UserCommands.fileName : name, self.serial)
                 }
             }
         }
@@ -116,6 +121,7 @@ public final class ConfigSync {
         themeProblems = []
         macroProblems = []
         snippetProblems = []
+        commandProblems = []
         fileProblem = nil
         self.url = url
         start(watch: watches)
@@ -139,6 +145,12 @@ public final class ConfigSync {
     private func loadMacros() {
         let problems = MacroFile.load(from: url.deletingLastPathComponent().appendingPathComponent(NamedMacros.fileName))
         macroProblems = problems.map { "\(NamedMacros.fileName): \($0)" }
+        updateProblems()
+    }
+
+    /// `commands.toml`, beside the file, into the user commands.
+    private func loadCommands() {
+        commandProblems = UserCommandFile.load(folder: url.deletingLastPathComponent())
         updateProblems()
     }
 
@@ -174,7 +186,7 @@ public final class ConfigSync {
     }
 
     private func updateProblems() {
-        let all = (fileProblem.map { [$0] } ?? []) + configProblems + themeProblems + macroProblems + snippetProblems
+        let all = (fileProblem.map { [$0] } ?? []) + configProblems + themeProblems + macroProblems + snippetProblems + commandProblems
         if all != problems { problems = all }
     }
 

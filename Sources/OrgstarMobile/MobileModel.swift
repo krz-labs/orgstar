@@ -163,6 +163,7 @@ final class MobileModel {
         modalKeys = preset.isModal
         configProblems += loaded.problems.map { "keymap.toml: " + $0 }
         configProblems += MacroFile.load().map { "\(NamedMacros.fileName): " + $0 }
+        configProblems += configFolder.map { UserCommandFile.load(folder: $0, read: Self.read) } ?? UserCommandFile.load(folder: UserConfig.directory)
         SnippetLibrary.shared.reload(from: UserConfig.file(Snippets.fileName), read: configFolder == nil ? { try? String(contentsOf: $0, encoding: .utf8) } : Self.read)
         configProblems += SnippetLibrary.shared.problems
         configProblems += KeyBar.problems()

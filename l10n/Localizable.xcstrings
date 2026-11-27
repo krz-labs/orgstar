@@ -465,6 +465,41 @@
         }
       }
     },
+    "%@ canceled.": {
+      "comment": "A user command canceled with Cancel Running Task",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Befehl %@ abgebrochen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comando %@ cancelado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commande %@ annulée."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コマンド「%@」をキャンセルしました。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comando %@ cancelado."
+          }
+        }
+      }
+    },
     "%@ changed on disk while saving, and the changes conflict with yours; both are in the editor between conflict markers.": {
       "localizations": {
         "de": {
@@ -495,6 +530,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "\"%@\" mudou no disco durante o salvamento, e as alterações conflitam com as suas; ambas estão no editor entre marcadores de conflito."
+          }
+        }
+      }
+    },
+    "%@ didn't finish within %lld s and was stopped.": {
+      "comment": "A user command passed its time limit",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Befehl %1$@ wurde nicht innerhalb von %2$lld s fertig und wurde gestoppt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El comando %1$@ no terminó en %2$lld s y se detuvo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La commande %1$@ ne s’est pas terminée en %2$lld s et a été arrêtée."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コマンド「%1$@」は%2$lld秒以内に終わらなかったため停止しました。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O comando %1$@ não terminou em %2$lld s e foi interrompido."
           }
         }
       }
@@ -604,6 +674,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "\"%@\" tem entradas descriptografadas que estão criptografadas no disco, então o Emacs não recebe uma cópia."
+          }
+        }
+      }
+    },
+    "%@ has decrypted entries, so user commands don't run in it.": {
+      "comment": "A user command refused in a buffer holding decrypted text",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ enthält entschlüsselte Einträge, daher laufen eigene Befehle darin nicht."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ tiene entradas descifradas, así que los comandos propios no se ejecutan en él."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ contient des entrées déchiffrées, les commandes personnelles ne s’y exécutent donc pas."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ には復号されたエントリがあるため、ユーザーコマンドは実行されません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ tem entradas descriptografadas, então comandos do usuário não são executados nele."
           }
         }
       }
@@ -1326,6 +1431,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Estado %@"
+          }
+        }
+      }
+    },
+    "%@ was stopped: its web view ended, as when a command runs out of memory.": {
+      "comment": "A user command whose web view ended",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Befehl %@ wurde gestoppt: Seine Web-Ansicht wurde beendet, etwa weil der Befehl keinen Speicher mehr hatte."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El comando %@ se detuvo: su vista web terminó, como ocurre cuando un comando se queda sin memoria."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La commande %@ a été arrêtée : sa vue web s’est fermée, comme lorsqu’une commande manque de mémoire."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コマンド「%@」は停止しました。メモリ不足のときなどと同じく、Webビューが終了しました。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O comando %@ foi interrompido: sua visualização web terminou, como quando um comando fica sem memória."
           }
         }
       }
@@ -6208,6 +6348,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Renomear também em org-todo-keywords no config.toml"
+          }
+        }
+      }
+    },
+    "Always": {
+      "comment": "Answer to the question before a user command runs",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Immer"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siempre"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toujours"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "常に実行"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sempre"
           }
         }
       }
@@ -15926,6 +16101,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Descartar as alterações?"
+          }
+        }
+      }
+    },
+    "Don't Run": {
+      "comment": "Answer to the question before a user command runs",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht ausführen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No ejecutar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ne pas exécuter"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "実行しない"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não executar"
           }
         }
       }
@@ -41654,6 +41864,41 @@
         }
       }
     },
+    "Run Once": {
+      "comment": "Answer to the question before a user command runs",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einmal ausführen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecutar una vez"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exécuter une fois"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1回だけ実行"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Executar uma vez"
+          }
+        }
+      }
+    },
     "Run Source Block": {
       "comment": "Command title",
       "localizations": {
@@ -41723,6 +41968,41 @@
         }
       }
     },
+    "Run commands from %@?": {
+      "comment": "Asked before a user command from a file not yet trusted on this device runs",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Befehle aus %@ ausführen?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Ejecutar comandos de %@?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exécuter les commandes de %@ ?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ のコマンドを実行しますか？"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Executar comandos de %@?"
+          }
+        }
+      }
+    },
     "Run this %@ block? (%@)": {
       "comment": "Echo area prompt: the block's language, then the answers it accepts (yes, no, always), which stay in English",
       "localizations": {
@@ -41788,6 +42068,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "Executando bloco de %@… (⌘. para cancelar)"
+          }
+        }
+      }
+    },
+    "Running %@…": {
+      "comment": "A user command started on iPhone and iPad",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ wird ausgeführt …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecutando %@…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exécution de %@…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@を実行中…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Executando %@…"
+          }
+        }
+      }
+    },
+    "Running %@… (⌘. to cancel)": {
+      "comment": "A user command started",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ wird ausgeführt … (⌘. zum Abbrechen)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejecutando %@… (⌘. para cancelar)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exécution de %@… (⌘. pour annuler)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@を実行中…（⌘.でキャンセル）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Executando %@… (⌘. para cancelar)"
           }
         }
       }

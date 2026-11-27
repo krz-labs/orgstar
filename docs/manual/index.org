@@ -38,6 +38,7 @@ reminders, export and tangling.
 15. [[file:guide/15-alongside-emacs.org][Working alongside Emacs and other tools]]
 16. [[file:guide/16-flashcards.org][Flashcards]]
 17. [[file:guide/17-command-line.org][The command line]]
+18. [[file:guide/18-user-commands.org][User commands]]
 
 * Principles
 

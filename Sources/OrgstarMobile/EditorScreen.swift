@@ -420,6 +420,18 @@ struct EditorScreen: View {
         }
     }
 
+    /// Runs a user command once its file is trusted on this device.
+    private func runUserCommand(_ request: UserCommandRequest) {
+        guard let modules = session.userCommands.folder else { return }
+        if let refusal = session.refusesUserCommand(path) { return message = refusal }
+        let ask: @MainActor (Prompt, @escaping (String?) -> Void) -> Void = { prompt = PromptRequest(prompt: $0, reply: $1) }
+        UserCommandTrust.check(request.command, modules: modules, trust: trust, ask: ask, run: {
+            guard let context = editor?.editContext() else { return }
+            message = String(localized: "Running \(request.command.title)…", comment: "A user command started on iPhone and iPad")
+            session.startUserCommand(request, context: context, file: UserCommandFile.relativePath(path, roots: workspace.rootPaths), ask: ask) { message = $0 }
+        }, refuse: { message = $0 })
+    }
+
     private func start() {
         let pane: EditorPane
         if let existing = self.pane {
@@ -502,6 +514,7 @@ struct EditorScreen: View {
         editor.onColumnView = { view in sheet = .columns(view) }
         editor.onTangle = { scope in if ProAccess.shared.allows(.babel) { message = session.tangle(scope) } }
         editor.onBabel = { job in if ProAccess.shared.allows(.babel) { run(job) } }
+        editor.onUserCommand = { request in runUserCommand(request) }
         editor.onRefreshSetup = { session.refreshSetup() }
         editor.onAgenda = { start, count in model.agendaRequest = .init(start: start, count: count) }
         editor.keymap = model.keymap
@@ -515,6 +528,14 @@ struct EditorScreen: View {
                 if let onPaneCommand { if let text = onPaneCommand(id) { message = text } } else { message = MobileEditor.unavailable(command: id) }
             } else if id == "app.save" {
                 _ = session.save(path)
+            } else if id == "app.babel.cancel" {
+                if session.isRunningUserCommand {
+                    session.cancelUserCommand()
+                } else if session.isRunningBabel {
+                    session.cancelBabel()
+                } else {
+                    message = String(localized: "Nothing is running")
+                }
             } else if id == "app.archive" {
                 if let caret = self.editor?.editContext().caret { message = session.archive(from: (path, caret)) }
             } else if id == "app.copy-rich-text" {
@@ -1166,7 +1187,7 @@ struct CommandPalette: View {
         ("app.toggle-markup", "Show or Hide Markup"), ("app.word-count", "Word Count"),
         ("org.snippet.next-field", "Next Snippet Field"), ("org.snippet.previous-field", "Previous Snippet Field"),
         ("app.recovery", "Recovery Versions…"), ("app.sync-conflicts", "Resolve Sync Conflicts…"), ("app.lint", "Lint File"), ("app.lint-folders", "Lint All Folders"),
-        ("app.flashcards.review", "Review Flashcards"),
+        ("app.flashcards.review", "Review Flashcards"), ("app.babel.cancel", "Cancel Running Task"),
         ("app.working-copy.sync", "Sync with Working Copy"),
         ("app.cite.insert", "Insert Citation…"),
         ("org.toggle-inline-images", "Show or Hide Inline Images"), ("org.toggle-inline-images-linked", "Show or Hide Inline Images, Including Described Links"), ("org.latex-preview", "Show or Hide LaTeX Previews"), ("editor.toggle-truncate-lines", "Truncate or Wrap Long Lines"), ("editor.toggle-auto-fill", "Turn Auto Fill On or Off"),
@@ -1228,6 +1249,8 @@ struct CommandPalette: View {
         let paneCommands: [(id: String, title: String)] = !panes ? [] : [("app.split-right", "Split Pane Right"), ("app.split-below", "Split Pane Below")]
             + (split ? [("app.pane-next", "Next Pane"), ("app.pane-close", "Close Pane"), ("app.pane-only", "Close Other Panes")] : [])
         return Self.commands(macros: editor.namedMacros, panes: paneCommands)
+            // A user command's `when` leaves it out where it doesn't apply.
+            .filter { UserCommands.shared.command($0.id)?.applies(in: context) ?? true }
             .map { command in
                 CommandRow(id: command.id, title: CommandTitle.localized(command.title), keys: editor.keymap.keyLabels(for: command.id).first,
                            reason: reason(command.id, context))
@@ -1237,7 +1260,8 @@ struct CommandPalette: View {
     /// The commands listed, with English titles: `panes`, the editor's, and the named macros.
     static func commands(macros: NamedMacros, panes: [(id: String, title: String)] = []) -> [(id: String, title: String)] {
         var seen = Set<String>()
-        return (panes + viewCommands + Commands.everything.map { ($0.id, $0.title) } + macros.names.map { (NamedMacros.commandPrefix + $0, $0) })
+        return (panes + viewCommands + Commands.everything.map { ($0.id, $0.title) } + macros.names.map { (NamedMacros.commandPrefix + $0, $0) }
+                + UserCommands.shared.all.map { ($0.id, $0.title) })
             .filter { !AppStoreCommands.hidden.contains($0.id) && offered($0.id) && seen.insert($0.id).inserted }
     }
 

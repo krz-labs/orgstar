@@ -23,6 +23,7 @@ The folder holds these files:
 | =views.toml=         | Saved agenda views                                               | No                                    |
 | =macros.toml=        | Named keyboard macros                                            | Yes, when you name a macro            |
 | =snippets.toml=      | Snippets and templates for new files                             | Only by Import from Emacs             |
+| =commands.toml=      | Your own commands; their code is in =commands/= beside it (see [[file:18-user-commands.org][User commands]]) | No       |
 | =default-theme.toml= | The default theme's colors, for reference                        | Yes, at every launch                  |
 
 =config.toml= is the source of truth. The Settings window writes each change into it, keeping your comments and the order of lines, and edits you make to the file apply while orgstar runs. The [[file:17-command-line.org][orgstar command]] reads the same folder, =ORGSTAR_CONFIG_DIR= included. If the file doesn't exist at launch, orgstar creates it with every setting at its current value and a comment after each one. A file that is there but can't be read, such as one that isn't UTF-8, is left as it is: the change isn't written and a message says why, as it does when a write fails. Import from Emacs and saving an agenda view treat =capture.toml=, =views.toml= and =keymap.toml= the same way.
@@ -45,7 +46,7 @@ If =config.toml= has a line orgstar can't use, the problem shows in the message 
 - =config.toml: org-agenda-start-day must look like "-3d" or "+0d"=
 - =config.toml: theme.light.background must be a color such as "#1f2328"=
 
-A file that isn't valid TOML is reported with its parse error, and none of it applies. =keymap.toml=, =capture.toml=, =views.toml=, =macros.toml= and =snippets.toml= report their problems the same way when they are read.
+A file that isn't valid TOML is reported with its parse error, and none of it applies. =keymap.toml=, =capture.toml=, =views.toml=, =macros.toml=, =snippets.toml= and =commands.toml= report their problems the same way when they are read.
 
 * The Settings window
 
@@ -435,7 +436,7 @@ Keys are letters, digits, =_= and =-=. Emacs import adds entries here; remove on
 
 ** [key-bar]
 
-The buttons of the key bar above the on-screen keyboard on iPhone and iPad, in order: =iphone= where the editor is narrow (iPhone, and iPad in Slide Over or a narrow split), =ipad= where it is wide. Each is a list of ids: the key bar's own buttons, or any command id from the Commands list, =org.snippet:<trigger>= for a snippet and =macro.named.<name>= for a named keyboard macro. A list may run over several lines.
+The buttons of the key bar above the on-screen keyboard on iPhone and iPad, in order: =iphone= where the editor is narrow (iPhone, and iPad in Slide Over or a narrow split), =ipad= where it is wide. Each is a list of ids: the key bar's own buttons, or any command id from the Commands list, =org.snippet:<trigger>= for a snippet, =macro.named.<name>= for a named keyboard macro and =user.<name>= for a user command. A list may run over several lines.
 
 #+BEGIN_SRC toml
 [key-bar]

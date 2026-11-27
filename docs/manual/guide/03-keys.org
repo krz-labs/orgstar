@@ -332,6 +332,18 @@ command = "macro.named.done-and-next"
 
 orgstar reloads =macros.toml= when you save it, and reads =keymap.toml= again so that bindings to new names apply.
 
+* User commands
+
+Commands you write in JavaScript and declare in =commands.toml= have ids =user.=/name/ (see [[file:18-user-commands.org][User commands]]). They are in the palette under their titles, shown as written, and =keymap.toml= binds them like any other command, in every preset and Doom state:
+
+#+BEGIN_SRC toml
+[[bind]]
+keys = "C-c u"
+command = "user.upcase-title"
+#+END_SRC
+
+A command with =when= in =commands.toml= is left out of the palette where its context doesn't hold, and its keys fall through there as a binding's =when= makes them. orgstar reads =keymap.toml= again when =commands.toml= changes, so bindings to new commands apply. A binding to a =user.= id that =commands.toml= doesn't define is reported as an unknown command.
+
 * Vim editing (Doom preset)
 
 The Doom preset edits modally, as Doom Emacs does with =evil=, =evil-org=, =evil-surround=, =evil-snipe= and =evil-nerd-commenter=. orgstar implements these itself; none of them are Emacs packages running inside it. The caret is a block in normal and visual states and a bar in insert state, and the modeline shows the state.
@@ -1202,7 +1214,7 @@ No preset binds these. Run them from the palette or a menu, or bind them in =key
 | Messages (=app.messages=) | Lists the last 100 messages of the echo area (=view-echo-area-messages=). View ▸ Messages. |
 | Show Agenda or Files in Sidebar (=app.sidebar-agenda=) | Switches the sidebar between the files and the agenda, as the button at the right of its bar does. |
 | Verbatim, Code, Strike-Through (=org.emphasize.verbatim=, =org.emphasize.code=, =org.emphasize.strike-through=) | =org-emphasize= with ===, =~= or =+=. |
-| Cancel Running Task (=app.babel.cancel=) | Stops the src block that is running, or an export or table recalculation running in Emacs. Edit ▸ Cancel Running Task, =⌘.=. |
+| Cancel Running Task (=app.babel.cancel=) | Stops the user command or src block that is running, or an export or table recalculation running in Emacs. Edit ▸ Cancel Running Task, =⌘.=. |
 | Edit Config File (=app.edit-config=) | Opens =config.toml= in the editor. =⌥⌘,=. |
 | Import from Emacs… (=app.import-emacs=) | Opens Import from Emacs…. |
 | Revert to File on Disk (=app.revert=) | Replaces the buffer with the file on disk; unsaved changes go to recovery (=revert-buffer=). |

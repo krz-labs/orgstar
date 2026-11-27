@@ -190,6 +190,8 @@ public struct EmacsImport: Sendable {
         var addedCommands: [(entry: Sexp, source: String)] = []
         var usesEvil = false
         var order = 0
+        /// Functions the configuration defines itself (`defun`).
+        var defuns: Set<String> = []
 
         mutating func assign(_ name: String, _ value: Sexp, _ source: String, priority: Int, deferred: Bool) {
             assignments.append(Assignment(name: name, value: value, source: source, rank: priority * 2 + (deferred ? 1 : 0)))
@@ -253,6 +255,7 @@ public struct EmacsImport: Sendable {
             case "defun", "defun!", "add-hook!":
                 // Doom sets org's defaults in the functions its module runs when org loads.
                 if doom, head == "defun" { body(args.dropFirst(2), deferred: true) }
+                if !doom, head != "add-hook!", let name = args.first?.symbol { defuns.insert(name) }
             case "doom!":
                 usesEvil = args.contains { $0.symbol == "evil" || $0.head == "evil" }
             case "map!":
@@ -503,6 +506,10 @@ public struct EmacsImport: Sendable {
         for binding in scanner.bindings {
             guard let commandName = Self.unquote(binding.command)?.symbol ?? binding.command.symbol else {
                 unsupported.append(Note(id: id(), name: binding.keys, reason: "bound to code, not a command", source: binding.source))
+                continue
+            }
+            if Self.commands[commandName] == nil, scanner.defuns.contains(commandName) {
+                unsupported.append(Note(id: id(), name: "\(binding.keys) → \(commandName)", reason: "your own function; write it as a user command in commands.toml", source: binding.source))
                 continue
             }
             guard let command = Self.commands[commandName] else {

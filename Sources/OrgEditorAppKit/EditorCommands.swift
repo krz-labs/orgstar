@@ -4,8 +4,8 @@ import OrgCore
 
 /// Every command a key, menu or the palette can run, by id.
 public struct EditorCommand: Sendable {
-    /// The title as the string catalog translates it.
-    public var localizedTitle: String { CommandTitle.localized(title) }
+    /// The title as the string catalog translates it; a user command's as written.
+    public var localizedTitle: String { id.hasPrefix(UserCommands.commandPrefix) ? title : CommandTitle.localized(title) }
 
     public enum Action: Sendable {
         /// An `OrgCore` command, run through `OrgEditor.perform`.
@@ -37,8 +37,8 @@ public struct EditorCommand: Sendable {
 }
 
 public enum EditorCommands {
-    /// Every command, with the named keyboard macros.
-    public static var all: [EditorCommand] { builtIn + namedMacros(NamedMacros.shared) }
+    /// Every command, with the named keyboard macros and the user commands.
+    public static var all: [EditorCommand] { builtIn + namedMacros(NamedMacros.shared) + userCommands(UserCommands.shared) }
 
     public static let builtIn: [EditorCommand] = Commands.everything.map { EditorCommand(id: $0.id, title: $0.title, action: .text($0)) } + [
         EditorCommand(id: "org.cycle", title: "Cycle Visibility", action: .view),
@@ -272,6 +272,11 @@ public enum EditorCommands {
         store.names.map { EditorCommand(id: NamedMacros.commandPrefix + $0, title: $0, action: .view) }
     }
 
+    /// The commands of `commands.toml`.
+    public static func userCommands(_ store: UserCommands) -> [EditorCommand] {
+        store.all.map { EditorCommand(id: $0.id, title: $0.title, action: .text($0)) }
+    }
+
     private static func movement(_ name: String, _ title: String, _ selector: String) -> EditorCommand {
         let extending = String(selector.dropLast()) + "AndModifySelection:"
         return EditorCommand(id: "edit.\(name)", title: title, action: .edit(selector: selector, extending: extending))
@@ -286,6 +291,7 @@ public enum EditorCommands {
     /// A command by id; any `macro.named.` id is one, which says so when no macro has its name.
     public static func command(_ id: String) -> EditorCommand? {
         if let command = byID[id] { return command }
+        if let command = UserCommands.shared.command(id) { return EditorCommand(id: id, title: command.title, action: .text(command)) }
         guard id.hasPrefix(NamedMacros.commandPrefix) else { return nil }
         return EditorCommand(id: id, title: String(id.dropFirst(NamedMacros.commandPrefix.count)), action: .view)
     }

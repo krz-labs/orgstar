@@ -314,7 +314,13 @@ struct PaletteView: View {
     @Environment(\.dismiss) private var dismiss
 
     private var matches: (recent: [EditorCommand], rest: [EditorCommand]) {
-        CommandRanking.rank(EditorCommands.all.filter { $0.inPalette && !hiddenCommandIDs.contains($0.id) }, query: query,
+        // A user command's `when` leaves it out where it doesn't apply.
+        let context = commands.editor?.context()
+        func offered(_ command: EditorCommand) -> Bool {
+            guard case .text(let user as UserCommand) = command.action else { return true }
+            return context.map(user.applies) ?? false
+        }
+        return CommandRanking.rank(EditorCommands.all.filter { $0.inPalette && !hiddenCommandIDs.contains($0.id) && offered($0) }, query: query,
                             id: \.id, titles: { [$0.localizedTitle, $0.title] })
     }
 

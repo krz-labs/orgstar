@@ -160,7 +160,7 @@ Bold, Italic and Code are in the edit menu of a selection, under Format: each pu
 
 *** Choosing the buttons
 
-Settings ▸ Key Bar lists the bar's buttons in order. Drag a row by its handle to move it, tap the red minus to remove it, and tap Add Button… to add one from the Commands list, grouped as Commands groups it, with the bar's own buttons (Overview, Open Link, Bold, Italic, Code and the rest) first. Any command can be a button, as can a snippet and a named keyboard macro. Reset to Default brings back the buttons above. The iPhone and iPad tabs at the top choose the list: the iPhone buttons show where the editor is narrow, which includes iPad in Slide Over or a narrow split, and the iPad buttons where it is wide.
+Settings ▸ Key Bar lists the bar's buttons in order. Drag a row by its handle to move it, tap the red minus to remove it, and tap Add Button… to add one from the Commands list, grouped as Commands groups it, with the bar's own buttons (Overview, Open Link, Bold, Italic, Code and the rest) first. Any command can be a button, as can a snippet, a named keyboard macro and a user command (see [[file:18-user-commands.org][User commands]]). Reset to Default brings back the buttons above. The iPhone and iPad tabs at the top choose the list: the iPhone buttons show where the editor is narrow, which includes iPad in Slide Over or a narrow split, and the iPad buttons where it is wide.
 
 The lists are =[key-bar]= in the configuration folder's =config.toml= (see [[file:13-configuration.org][Configuration]]), so edits there apply too, and other devices using the folder share them. Without a configuration folder, they are kept on the device. An id the app doesn't know is reported in red under the folder in Settings, and skipped.
 
