@@ -17,6 +17,8 @@ Where the milestone work stands, so a session can pick it up at any point. Read 
 - After milestones 6 and 7 (2026-11-26, `main` at 801e496): `swift test`, both Xcode builds and every gate pass (1 MB open 92 ms at load average 4; one earlier run at load 7 missed a gate). #168 and #160 add index migrations v5 and v6; existing indexes re-read their files once. #240 (`CryptSaverTests.closedFilesKeepNothingAfterTheirWrite`) fails about 1 run in 3 when run alone.
 - App size: Pyodide adds 13.6 MB installed to the iOS and Mac App Store apps (not the download build or extensions); reveal.js adds 2.7 MB to every app.
 - Milestone 8 (Automation and extension), 2026-11-27: merge requests 522 (#173 review: `docs/plans/2026-11-27-user-commands.md`), 523 (#175 x-callback-url) and 524 (#174 `orgstar` command-line tool). Open: #244 → #245 (JavaScript command host, then `commands.toml` and API 1), #246, #247, #248 (after #245), and #249 (watch item: whether python blocks in Pyodide reach the network; research and test before the next release that ships Pyodide). `main` at cf1c2de passes `swift test`, both Xcode builds and the gates (1 MB open 91 ms at load 5; 126 ms on a run at load 6.6).
+- Milestone 8, 2026-11-27 (continued): user commands built in full: 526 (#244 JavaScript host in a WebKit worker), 527 (#245 `commands.toml`, API 1, trust), 529 (#250 trust prompt with the full path, imports and what a command can do), 528 (#246 `org.run` and macros), 530 (#247 `workspace = true`: search, other files' outlines, agenda, capture; separate trust) and 531 (#248 hooks after TODO changes and before capture). Open: #249 only. Filed to the Backlog: #251 (iOS ignores `.copy` effects), #252 (Vim register macros don't wait for user commands), #253 (Mac echo area overflows the editor column in narrow windows). `main` at 071e94a passes `swift test`, both Xcode builds and the gates.
+- Gates: the first run after a build has missed the 1 MB open limit in every check on 2026-11-26/27 (109–126 ms at load 5–8) and the rerun has passed (84–94 ms). Rerun before calling a failure real; if it starts failing on the rerun too, look at it.
 - Before the next release: #249; the Homebrew cask needs `binary "#{appdir}/orgstar.app/Contents/Helpers/orgstar"`; notarize a build with the helper in `Contents/Helpers`.
 - Released: 1.3.0 (milestones 1, 4 and 5) and 1.3.1 (an unchanged entry keeps its message after Decrypt Entry in File, the iOS passphrase sheet as a form with navigation bar buttons, What's New shows a skipped version's notes, no compiler warnings in `Sources/`). Download, appcast, cask and krz.sh are live; App Store builds 884 (1.3.0) and 890 (1.3.1) are uploaded, and submitting for review is the owner's call. The 1 MB open gate measured 92–117 ms with Plex running and was skipped for both releases at the owner's word; run releases on a quiet Mac.
 - Milestone 6 (Formats, import and export): 4 of 6 issues closed, merge requests 509 (#166 printing), 510 (#161 Markdown and Obsidian import), 511 (#159 Markdown and plain-text editing) and 512 (#160 Denote in Markdown and text). Open: #164 and #90, both waiting on the owner (see open questions).
@@ -33,8 +35,8 @@ Where the milestone work stands, so a session can pick it up at any point. Read 
 | 5 Sync and files | 0 | 10 |
 | 6 Formats, import and export | 0 | 6 |
 | 7 Notes and knowledge | 0 | 3 |
-| 8 Automation and extension | 6 | 3 |
-| Backlog | 45 | 0 |
+| 8 Automation and extension | 1 | 9 |
+| Backlog | 48 | 0 |
 
 #109 (code scanning) has no milestone and stays out of scope.
 
@@ -156,6 +158,8 @@ gitbay milestone list
 12. #174: the command-line tool is download-only, reads the same config and folders, writes through the app's saver and recovery store, reads but never writes `clock.json`; PDF from the command line needs TeX. Settings code moved into a UI-free `OrgConfig` library.
 13. #115: natural-language parsing is a per-template capture option, with one default template using it. #122: snooze moves the notification by default; a setting rewrites the timestamp instead. #129: org-ql syntax (sexp and plain), common predicates, in views.toml and `org-ql` dynamic blocks. #229: no size limit; warn before opening files over 5 MB, dismissable forever.
 
+14. #246: `org.run` refuses `app.*` commands except `app.save`, and commands that need work outside the text (Babel, Emacs tables). #247: a command's capture to its own file is refused; `%c` is empty; a capture stays filed if the command later fails. #248: hooks don't run from the command-line tool (`orgstar capture` files and notes it), from hooks or user commands, Replace in Files or keyword renames; an untrusted hook is skipped where orgstar can't ask (x-callback-url, Shortcuts).
+
 ## Device checks owed
 
 ### From milestones 6 and 7
@@ -167,6 +171,7 @@ gitbay milestone list
 - #90: a python block in the sandboxed Mac App Store app; start-up time and memory on a real iPhone (simulator: 4.1 s first run, 121 MB).
 - #164: the iPad external display; hardware keys on iOS; the reveal.js speaker view; a `#+REVEAL_ROOT` deck against a reveal.js 6 CDN.
 - #174: Settings ▸ Install Command-Line Tool… in the running app; the app adopting a clock in or out from the command line; `orgstar open` launching the app; PDF through real TeX.
+- User commands (#245–#248, #250): a command, the trust alert and Always on the Mac and a device; hooks' trust alerts; a capture hook in the Mac window and iOS sheet; undo after a hook; `org.capture` and `org.agenda` on a device.
 - #175: the Mac approval alert and a callback opening another Mac app.
 - #172: the Flashcards widget's count and tap; watch review and its rating reaching the file; the Mac desktop widget; iPad layout and hardware-keyboard rating; the text-input card flow; the history file at an Emacs path from the sandboxed builds.
 - #159, #160: Markdown and text notes on a device; Insert Node Link and Rename Note on iOS (the simulator stopped at the orgstar+ paywall); following a link to a Markdown note from the iOS reader still opens Quick Look.
