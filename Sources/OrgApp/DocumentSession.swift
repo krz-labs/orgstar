@@ -1491,10 +1491,12 @@ public final class DocumentSession {
 
     /// Runs a user command on the focused buffer in the background, with `context` the editor's
     /// context at the request's revision; the message comes back through `report`. `file` is
-    /// the file's path relative to its folder, for `org.file()`. Prompts go to `ask`.
+    /// the file's path relative to its folder, for `org.file()`. Prompts go to `ask`. `finished`
+    /// gets the message once the command has ended, nil when its result was applied.
     public func startUserCommand(_ request: UserCommandRequest, context: EditContext, file: String?,
                                  ask: @escaping @MainActor (Prompt, @escaping (String?) -> Void) -> Void,
-                                 report: @escaping @MainActor (String) -> Void) {
+                                 report: @escaping @MainActor (String) -> Void,
+                                 finished: @escaping @MainActor (String?) -> Void = { _ in }) {
         userCommandTask?.cancel()
         isRunningUserCommand = true
         let task = Task { await runUserCommand(request, context: context, file: file, ask: ask, report: report) }
@@ -1506,6 +1508,7 @@ public final class DocumentSession {
                 isRunningUserCommand = false
             }
             if let message { report(message) }
+            finished(message)
         }
     }
 
@@ -1536,22 +1539,52 @@ public final class DocumentSession {
         final class State {
             var failure: String?
             var quit = false
+            /// `org.run("app.save")` ran.
+            var save = false
+            var buffer: UserCommandState
+            init(_ buffer: UserCommandState) { self.buffer = buffer }
         }
-        let state = State()
-        let context = EditContext(revision: context.revision, text: context.text, tree: context.tree, selection: request.selection,
-                                  now: context.now, calendar: context.calendar, options: context.options, knownTags: context.knownTags)
+        let state = State(UserCommandState(
+            EditContext(revision: context.revision, text: context.text, tree: context.tree, selection: request.selection,
+                        now: context.now, calendar: context.calendar, options: context.options, knownTags: context.knownTags),
+            defaults: entry.buffer.document.defaults))
+        /// The answer to `prompt`; a canceled prompt throws.
+        func reply(to prompt: Prompt) async throws -> String {
+            try await withCheckedThrowingContinuation { continuation in
+                ask(prompt) { answer in
+                    guard let answer else {
+                        state.quit = true
+                        return continuation.resume(throwing: CommandHost.Failure.script("Quit"))
+                    }
+                    continuation.resume(returning: answer)
+                }
+            }
+        }
         host.calls = { name, value in
-            if let answer = UserCommandAPI.answer(name, value, context: context, file: file) { return answer }
+            if let answer = UserCommandAPI.answer(name, value, context: state.buffer.context, file: file) { return answer }
             switch name {
             case "prompt":
                 let prompt = UserCommandAPI.prompt(value)
-                return try await withCheckedThrowingContinuation { continuation in
-                    ask(prompt) { answer in
-                        guard let answer else {
-                            state.quit = true
-                            return continuation.resume(throwing: CommandHost.Failure.script("Quit"))
-                        }
-                        continuation.resume(returning: UserCommandAPI.answer(answer, to: prompt, now: Date(), calendar: context.calendar))
+                return UserCommandAPI.answer(try await reply(to: prompt), to: prompt, now: Date(), calendar: state.buffer.context.calendar)
+            case "run":
+                let id = value as? String ?? ""
+                if UserCommandAPI.safeAppCommands.contains(id) {
+                    state.save = true
+                    return state.buffer.reply
+                }
+                let command: any OrgCommand
+                switch UserCommandAPI.builtIn(id) {
+                case .success(let found): command = found
+                case .failure(let problem): throw CommandHost.Failure.script(problem.message)
+                }
+                // A built-in command's prompts go through the same prompt as the command's own.
+                var answers: [String: String] = [:]
+                while true {
+                    switch state.buffer.run(command, answers: answers) {
+                    case .commit: return state.buffer.reply
+                    case .failed(let message): throw CommandHost.Failure.script(message)
+                    case .external: throw CommandHost.Failure.script(UserCommandAPI.external(id).message)
+                    case .prompt(let prompt): answers[prompt.key] = try await reply(to: prompt)
                     }
                 }
             case "message":
@@ -1581,13 +1614,15 @@ public final class DocumentSession {
         }
         if let failure = state.failure { return failure }
         guard !Task.isCancelled else { return String(localized: "\(command.title) canceled.", comment: "A user command canceled with Cancel Running Task") }
-        switch UserCommandAPI.result(json, in: context) {
+        switch state.buffer.result(json) {
         case .failure(let problem):
             return "\(command.title): \(problem.message)"
         case .success(let result):
             guard entries.contains(where: { $0 === entry }) else { return "The file was closed before the command finished." }
             if case .failed(let message) = entry.buffer.perform(PrecomputedEdit(result), now: Date(), answers: [:]) { return message }
             if !result.edits.isEmpty { changed(entry) }
+            // A save that fails shows why, as Save does.
+            if state.save { save(entry) }
             return nil
         }
         #else

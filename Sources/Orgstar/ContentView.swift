@@ -364,6 +364,7 @@ struct ContentView: View {
         .onChange(of: editorSettings, initial: true) { _, settings in commands.editorSettings = settings }
         .onAppear {
             commands.externalHandler = runExternal
+            commands.userCommandHandler = runUserCommand
             commands.filesHandler = { attachActions.drop($0) }
             commands.imageHandler = { attachActions.yankImage($0, ext: $1) }
             #if APPSTORE
@@ -1295,10 +1296,15 @@ struct ContentView: View {
         }
     }
 
-    /// Runs a user command once its file is trusted on this device.
-    private func runUserCommand(_ request: UserCommandRequest) {
-        guard let path = session.path, let modules = session.userCommands.folder else { return }
-        if let refusal = session.refusesUserCommand(path) { return commands.show(refusal) }
+    /// Runs a user command once its file is trusted on this device; `finished` gets its message
+    /// once it has ended, nil when its result was applied. The command's prompts go through the
+    /// editor, so keyboard macros record and replay their answers.
+    private func runUserCommand(_ request: UserCommandRequest, finished: @escaping @MainActor (String?) -> Void = { _ in }) {
+        guard let path = session.path, let modules = session.userCommands.folder else { return finished("") }
+        if let refusal = session.refusesUserCommand(path) {
+            commands.show(refusal)
+            return finished(refusal)
+        }
         let ask: @MainActor (UserCommandTrust.Question, @escaping (UserCommandTrust.Answer?) -> Void) -> Void = { question, reply in
             let answers = UserCommandTrust.Answer.allCases
             // The echo area's line can cut the path short, so the detail above it repeats it whole.
@@ -1308,10 +1314,14 @@ struct ContentView: View {
             }
         }
         UserCommandTrust.check(request.command, modules: modules, trust: trust, ask: ask, run: {
-            guard let context = commands.editor?.context() else { return }
+            guard let editor = commands.editor else { return finished("") }
             commands.show(String(localized: "Running \(request.command.title)… (⌘. to cancel)", comment: "A user command started"))
-            session.startUserCommand(request, context: context, file: UserCommandFile.relativePath(path, roots: workspace.rootPaths), ask: commands.ask) { commands.show($0) }
-        }, refuse: { commands.show($0) })
+            session.startUserCommand(request, context: editor.context(), file: UserCommandFile.relativePath(path, roots: workspace.rootPaths),
+                                     ask: editor.ask, report: { commands.show($0) }, finished: finished)
+        }, refuse: {
+            commands.show($0)
+            finished($0)
+        })
     }
 
     /// Runs an `elisp:` link's form once trusted, asking as `org-link-elisp-confirm-function` does.

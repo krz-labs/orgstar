@@ -128,6 +128,7 @@ struct PaneView: NSViewRepresentable {
             session.reveal(offset)
         }
         editor.onExternal = { [weak commands] request in commands?.externalHandler?(request) }
+        editor.onUserCommand = { [weak commands] request, finished in commands?.userCommandHandler?(request, finished) }
         editor.onFiles = { [weak commands] in commands?.filesHandler?($0) }
         editor.onImage = { [weak commands] in commands?.imageHandler?($0, $1) }
         editor.knownTags = { [weak commands] in MainActor.assumeIsolated { commands?.knownTags() ?? [] } }

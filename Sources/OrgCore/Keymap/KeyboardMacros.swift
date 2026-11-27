@@ -106,6 +106,38 @@ public struct MacroRecorder: Sendable {
     }
 }
 
+/// Work a replayed key started that the replay waits for before its next key, as a user
+/// command running. It ends once, with the message it failed with or nil.
+@MainActor
+public final class MacroWait {
+    private var outcome: String??
+    private var waiting: [CheckedContinuation<String?, Never>] = []
+
+    public init() {}
+
+    public func finish(_ failure: String?) {
+        guard outcome == nil else { return }
+        outcome = .some(failure)
+        for continuation in waiting { continuation.resume(returning: failure) }
+        waiting = []
+    }
+
+    /// The failure, once the work has ended.
+    public var value: String? {
+        get async {
+            if let outcome { return outcome }
+            return await withCheckedContinuation { waiting.append($0) }
+        }
+    }
+}
+
+/// Where a macro replay stopped: at its end, with the error that ended it or nil, or at work
+/// it waits for.
+public enum MacroStep {
+    case ended(String?)
+    case waiting(MacroWait)
+}
+
 /// Macros named with `kmacro-name-last-macro`, kept in `macros.toml` in the configuration
 /// folder. Each runs as the command `macro.named.<name>`, which `keymap.toml` can bind.
 public final class NamedMacros: @unchecked Sendable {

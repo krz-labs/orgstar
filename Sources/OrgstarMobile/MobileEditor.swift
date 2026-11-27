@@ -77,6 +77,8 @@ final class MobileEditor: NSObject, DocumentBuffer {
     var macroKeys: [KeyChord] = []
     var kmacroDepth = 0
     var macroError: String?
+    /// Work the last replayed key started, which the replay waits for.
+    var macroWait: MacroWait?
     var macroRepeatKey: KeyChord?
     var commandKeys: [KeyChord]?
     /// Named macros (`macros.toml`).
@@ -124,8 +126,9 @@ final class MobileEditor: NSObject, DocumentBuffer {
     var onTangle: ((Tangle.Scope) -> Void)?
     /// A source block to run (C-c C-c).
     var onBabel: ((BabelJob) -> Void)?
-    /// A user command to run.
-    var onUserCommand: ((UserCommandRequest) -> Void)?
+    /// A user command to run; `finished` gets its message once it has ended, nil when its result
+    /// was applied, and a keyboard macro replaying waits for that.
+    var onUserCommand: ((UserCommandRequest, _ finished: @escaping @MainActor (String?) -> Void) -> Void)?
     /// The file's setup files to read again (C-c C-c on a keyword line).
     var onRefreshSetup: (() -> Void)?
     /// A block, a table's formulas or a field to edit apart (C-c ', C-c `).
@@ -411,7 +414,9 @@ final class MobileEditor: NSObject, DocumentBuffer {
         case .external(.babel(let job)) where onBabel != nil:
             onBabel?(job)
         case .external(.userCommand(let request)) where onUserCommand != nil:
-            onUserCommand?(request)
+            let wait = kmacroDepth > 0 ? MacroWait() : nil
+            macroWait = wait
+            onUserCommand?(request) { wait?.finish($0) }
         case .external(.tangle(let scope)) where onTangle != nil:
             onTangle?(scope)
         case .external(.agenda(let start, let count)) where onAgenda != nil:

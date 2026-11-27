@@ -401,6 +401,10 @@ public final class OrgEditor: NSObject {
     public var onPrompt: ((Prompt, _ reply: @escaping (String?) -> Void) -> Void)?
     /// Runs work outside the text, such as a table recalculation in Emacs.
     public var onExternal: ((ExternalRequest) -> Void)?
+    /// Runs a user command, calling `finished` with its message once it has ended, nil when its
+    /// result was applied; a keyboard macro replaying waits for that. Without it, user commands
+    /// go to `onExternal`.
+    public var onUserCommand: ((UserCommandRequest, _ finished: @escaping @MainActor (String?) -> Void) -> Void)?
     /// Tags used across the workspace, for tag completion.
     public var knownTags: @Sendable () -> [String] = { [] }
     /// Answers completion's questions to the index; run off the main actor.
@@ -495,6 +499,8 @@ public final class OrgEditor: NSObject {
     var macroKeys: [KeyChord] = []
     var kmacroDepth = 0
     var macroError: String?
+    /// Work the last replayed key started, which the replay waits for.
+    var macroWait: MacroWait?
     var macroRepeatKey: KeyChord?
     var commandKeys: [KeyChord]?
     /// Named macros (`macros.toml`).
@@ -753,6 +759,10 @@ public final class OrgEditor: NSObject {
             }
         case .failed(let message):
             fail(message)
+        case .external(.userCommand(let request)) where onUserCommand != nil:
+            let wait = kmacroDepth > 0 ? MacroWait() : nil
+            macroWait = wait
+            onUserCommand?(request) { wait?.finish($0) }
         case .external(let request):
             if let onExternal { onExternal(request) } else { onMessage?(EmacsFallback.wording("This needs Emacs, which isn't available here.", "This isn't available here.")) }
         case .prompt(let prompt):

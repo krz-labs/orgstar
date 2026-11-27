@@ -71,8 +71,8 @@ Every call returns a promise; use =await=. Offsets are UTF-16 code units, as Jav
 
 | Call                       | Gives                                                                                                                       |
 |----------------------------+-----------------------------------------------------------------------------------------------------------------------------|
-| =org.text()=               | The buffer's text when the command started.                                                                                 |
-| =org.selection()=          | The selections as =[{from, to}]=, the main caret first. With nothing selected, =from= and =to= are both the caret.          |
+| =org.text()=               | The buffer's text: as the command started, or as the last =org.run= left it.                                               |
+| =org.selection()=          | The selections as =[{from, to}]=, the main caret first. With nothing selected, =from= and =to= are both the caret. After =org.run=, where that command left them. |
 | =org.heading(at)=          | The heading whose entry holds the offset =at= (default: the caret), as described below, or =null= before the first heading. |
 | =org.outline()=            | Every heading in the file, in order, as =org.heading()= describes it.                                                       |
 | =org.file()=               | The file's path relative to its folder (=notes/plan.org=), or =null= for a buffer without a file.                           |
@@ -80,6 +80,7 @@ Every call returns a promise; use =await=. Offsets are UTF-16 code units, as Jav
 | =org.prompt(options)=      | Asks in the echo area (the Mac) or a sheet (iPhone and iPad) and gives the answer as a string. Throws when you cancel.      |
 | =org.message(text)=        | Shows =text= in the echo area while the command runs.                                                                       |
 | =org.fail(text)=           | Ends the command: nothing changes and =text= is shown. Use it as =return org.fail("…")=.                                    |
+| =org.run(id)=              | Runs one of Org's commands by id (=org.todo.cycle=) and gives the text and selection after it as ={text, selection}=. See [[*Running Org's commands][Running Org's commands]]. |
 | =org.version=              | =1=.                                                                                                                        |
 
 A heading is an object with:
@@ -104,14 +105,37 @@ The function returns an object with any of these, or nothing:
 
 | Field       | Value                                                                                                                                       |
 |-------------+---------------------------------------------------------------------------------------------------------------------------------------------|
-| =edits=     | A list of ={from, to, text}= in the text the command was given. =to= defaults to =from= (an insertion) and =text= to =""= (a deletion). Edits may not overlap or start at the same offset. |
+| =edits=     | A list of ={from, to, text}= in the text the command was given, or after =org.run=, in the text the last =org.run= gave. =to= defaults to =from= (an insertion) and =text= to =""= (a deletion). Edits may not overlap or start at the same offset. |
 | =selection= | Where the caret or selection goes, in the text after the edits: an offset, ={from, to}=, or a list of them. Without it, the selection moves with the edits. |
 | =message=   | Text for the echo area.                                                                                                                     |
 | =copy=      | Text for the clipboard (the kill ring).                                                                                                    |
 
 orgstar checks the edits before it makes any of them. An edit outside the text, edits that overlap, an edit that splits an emoji or other character in two, or an unknown field fail the command with a message such as =Add Weekly Review: edits overlap=, and nothing changes.
 
-The edits are applied together as one step of undo, and only if the buffer is as it was when the command started. If you type, or the file changes on disk, while the command runs or waits for a prompt, its result is refused with "The file changed; try again."
+The edits are applied together as one step of undo, with the changes of the commands run with =org.run=, and only if the buffer is as it was when the command started. If you type, or the file changes on disk, while the command runs or waits for a prompt, its result is refused with "The file changed; try again."
+
+** Running Org's commands
+
+=org.run(id)= runs a built-in command on the text as it is at that point in the command, with the caret where the command has left it, and resolves with ={text, selection}= after it: =text= is the new text and =selection= the selections as =org.selection()= gives them. The ids are those of the palette and =keymap.toml= (see [[file:03-keys.org][Keys]]): =org.todo.cycle=, =org.schedule=, =org.heading.insert= and the rest. Later calls read the new text, and later =org.run= calls work on it.
+
+#+BEGIN_SRC js
+export async function startTask(org) {
+  await org.run("org.todo.cycle")        // TODO
+  await org.run("org.schedule")          // asks for the date
+  const { selection } = await org.run("org.heading.insert-todo")
+  return { edits: [{ from: selection[0].from, text: "Follow up" }] }
+}
+#+END_SRC
+
+- *One step of undo.* Nothing reaches the buffer until the command returns. Then the changes of every =org.run=, and the command's own =edits= after them, apply together as one step of undo. If the command fails or is cancelled, none of them apply.
+- *Prompts.* A command that asks (=org.schedule= for a date, =org.tags.set= for tags) asks through the same prompt as =org.prompt=. Cancelling it makes =org.run= throw =Quit=.
+- *Failures.* A command that can't run at the caret makes =org.run= throw an error with the command's own message (=error.message=), as =user-error= does in Emacs. Catch it to go on; uncaught, the command ends with that message and nothing changes.
+- *Messages and the clipboard.* Messages and text for the clipboard from the commands run are shown and copied when the command's changes apply. Folding, sparse trees and snippet fields from them are not.
+- *What it refuses.* =org.run= throws for:
+  - commands of the app (=app.*=: export, refile, capture, the clock, windows), except =app.save=, which saves the file after the command's changes apply. They need windows, other files or the network, which a command doesn't reach;
+  - other user commands (=user.*=);
+  - the editor's own commands, which aren't Org's: folding (=org.cycle=), movement and editing keys (=edit.*=), snippets and keyboard macros;
+  - work Org does outside the text: running a code block (=org.babel.execute=, or =C-c C-c= on one), table formulas that need Emacs, following a link, tangling, editing a block apart, column view and the agenda. =org.run= throws with "/id/ needs work outside the text here …" instead of starting it, since its result would come back after the command had ended.
 
 * Examples
 
@@ -197,7 +221,7 @@ Edit ▸ Cancel Running Task (=⌘.=, =app.babel.cancel=) stops a running comman
 - *Memory.* A command that uses up its memory is stopped without affecting the app, and the next run starts fresh.
 - *The buffer only.* A command reads and changes the buffer it runs in, nothing else: no files, no network (=fetch=, =XMLHttpRequest=, =WebSocket=, =importScripts= and the rest are removed), no other buffers, no clipboard reads, no notifications, Calendar or other system services.
 - *Encrypted text.* Commands don't run in an encrypted file or in a buffer with entries decrypted that are encrypted on disk: "/file/ has decrypted entries, so user commands don't run in it."
-- *Keyboard macros* don't wait for a user command to finish.
+- *Keyboard macros* record a key bound to a user command with the answers to its prompts, and wait for the command to finish when they play (see [[file:03-keys.org::*Keyboard macros][Keyboard macros]]).
 - *Startup.* When you have commands, the engine that runs them starts when an editor opens, so the first run doesn't wait for it. It stops after five minutes without a run.
 
 * Compared with Emacs Lisp
@@ -208,7 +232,7 @@ What Emacs Lisp has that user commands don't:
 
 - Emacs Lisp functions and packages (=dash=, =s=, =org-ql=); =.el= files aren't read.
 - Buffer primitives: =point=, =goto-char=, =insert=, =re-search-forward= on the buffer, =save-excursion=, markers. A command gets the text and returns edits instead.
-- The Org API: =org-element-*=, =org-map-entries= over several files, =org-entry-put=, calling Org's own commands (=org-todo=, =org-schedule=). Read headings with =org.heading()= and =org.outline()=, and write the text yourself.
+- The Org API: =org-element-*=, =org-map-entries= over several files, =org-entry-put=. Read headings with =org.heading()= and =org.outline()=, and write the text yourself or run Org's commands with =org.run=.
 - Other buffers and files, =find-file=, =with-temp-buffer=, capture from a command.
 - Hooks (=org-after-todo-state-change-hook=, =post-command-hook=), advice, minor modes and buffer-local variables.
 - =interactive= codes other than the prompts above; =C-u= prefix arguments.
@@ -237,4 +261,12 @@ What Emacs Lisp has that user commands don't:
 | =(message …)=                                      | =org.message(…)= or =message=                                      |
 | =(user-error …)=                                   | =return org.fail(…)=                                               |
 | =(kill-new …)=                                     | =copy=                                                             |
+| =(org-todo)=                                       | =await org.run("org.todo.cycle")=                                  |
+| =(org-schedule nil)=, =(org-deadline nil)=         | =await org.run("org.schedule")=, =org.run("org.deadline")=         |
+| =(org-insert-heading)=, =(org-insert-todo-heading nil)= | =await org.run("org.heading.insert")=, =org.run("org.heading.insert-todo")= |
+| =(org-set-tags-command)=                           | =await org.run("org.tags.set")=                                    |
+| =(org-set-effort)=, =(org-set-property …)=         | =await org.run("org.effort.set")=, =org.run("org.property.read-and-set")= |
+| =(org-promote-subtree)=, =(org-demote-subtree)=    | =await org.run("org.subtree.promote")=, =org.run("org.subtree.demote")= |
+| =(org-toggle-checkbox)=                            | =await org.run("org.checkbox.toggle")=                             |
+| =(save-buffer)=                                    | =await org.run("app.save")=                                        |
 | =(global-set-key (kbd "C-c u") #'my/command)=      | =[[bind]]= in =keymap.toml= with =command = "user.…"=               |

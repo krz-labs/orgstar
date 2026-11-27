@@ -18,7 +18,7 @@ extension OrgEditor {
 
     /// Asks through `onPrompt`, recording the answer while a macro records. While one replays,
     /// the answer comes from its keys.
-    func ask(_ prompt: Prompt, reply: @escaping (String?) -> Void) {
+    public func ask(_ prompt: Prompt, reply: @escaping (String?) -> Void) {
         if kmacroDepth > 0 {
             guard let (answer, used) = MacroRecorder.reply(from: macroKeys) else {
                 // The rest of the macro doesn't answer it: it is the person's to answer.
@@ -112,36 +112,95 @@ extension OrgEditor {
 
     /// Feeds `keys` through `handleChord` `count` times, or with 0 until a command fails or a
     /// round changes nothing. False when a command failed.
+    /// A key that starts a user command leaves the replay waiting until the command has
+    /// finished; it goes on from there.
     @discardableResult
     func playMacro(_ keys: [KeyChord], count: Int) -> Bool {
         guard kmacroDepth < 20 else {
             fail("Keyboard macros nest too deeply")
             return false
         }
-        let outer = macroKeys
+        let replay = MacroReplay(keys: keys, count: count, outer: macroKeys)
+        let outermost = kmacroDepth == 0
         kmacroDepth += 1
-        defer {
-            kmacroDepth -= 1
-            macroKeys = outer
-            if kmacroDepth == 0 { macroError = nil }
+        switch replayMacro(replay) {
+        case .ended(let error):
+            return error == nil
+        case .waiting(let wait):
+            // A replay this one runs in waits for the rest of it.
+            let rest = resumeMacro(replay, after: wait)
+            if !outermost { macroWait = rest }
+            return true
         }
+    }
+
+    /// Goes on with `replay` each time the work it waits for has finished.
+    private func resumeMacro(_ replay: MacroReplay, after wait: MacroWait) -> MacroWait {
+        let rest = MacroWait()
+        Task { [weak self] in
+            var wait = wait
+            while true {
+                let failure = await wait.value
+                guard let self else { return rest.finish("") }
+                if let failure, self.macroError == nil { self.macroError = failure }
+                switch self.replayMacro(replay) {
+                case .ended(let error): return rest.finish(error)
+                case .waiting(let next): wait = next
+                }
+            }
+        }
+        return rest
+    }
+
+    /// A macro being replayed: the rounds run, and the state the current round started from,
+    /// nil between rounds.
+    final class MacroReplay {
+        let keys: [KeyChord]
+        let count: Int
+        /// The keys left in the replay this one runs in.
+        let outer: [KeyChord]
         var rounds = 0
-        var failed = false
-        while count == 0 ? rounds < 100_000 : rounds < count {
-            rounds += 1
-            let before = (document.revision, textView.selectedRange())
-            macroKeys = keys
+        var before: (Int, NSRange)?
+
+        init(keys: [KeyChord], count: Int, outer: [KeyChord]) {
+            self.keys = keys
+            self.count = count
+            self.outer = outer
+        }
+    }
+
+    /// Feeds `replay`'s keys through `handleChord` until it ends with the error that stopped it,
+    /// nil when it ran through, or until a key leaves `macroWait` set: the replay waits for
+    /// that work and goes on with the next key.
+    private func replayMacro(_ replay: MacroReplay) -> MacroStep {
+        while true {
+            if replay.before == nil {
+                guard replay.count == 0 ? replay.rounds < 100_000 : replay.rounds < replay.count else { return endReplay(replay) }
+                replay.rounds += 1
+                replay.before = (document.revision, textView.selectedRange())
+                macroKeys = replay.keys
+            }
             while !macroKeys.isEmpty, macroError == nil {
                 let key = macroKeys.removeFirst()
+                macroWait = nil
                 if !handleChord(key) { typeUnhandled(key) }
+                if let wait = macroWait {
+                    macroWait = nil
+                    return .waiting(wait)
+                }
             }
-            if macroError != nil {
-                failed = true
-                break
-            }
-            if count == 0, before == (document.revision, textView.selectedRange()) { break }
+            if macroError != nil { return endReplay(replay) }
+            if replay.count == 0, let before = replay.before, before == (document.revision, textView.selectedRange()) { return endReplay(replay) }
+            replay.before = nil
         }
-        return !failed
+    }
+
+    private func endReplay(_ replay: MacroReplay) -> MacroStep {
+        let error = macroError
+        kmacroDepth -= 1
+        macroKeys = replay.outer
+        if kmacroDepth == 0 { macroError = nil }
+        return .ended(error)
     }
 
     /// A replayed key that `handleChord` left to the text system, which gets it as an event.

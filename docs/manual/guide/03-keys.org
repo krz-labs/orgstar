@@ -317,6 +317,8 @@ In the Doom preset the Emacs keys above that start with =C-x= work in every stat
 
 *What is recorded.* Keys typed in the editor, including =⌘= keys, which replay through the menus; the answers to the editor's questions; and keys typed during incremental search. Commands chosen with the mouse from a menu, the palette or the toolbar are not recorded, nor is what is typed into the palette, Quick Open or the app's own windows and sheets (refile targets, capture, export). Starting or stopping a recording from Edit ▸ Macros keeps every key typed in between.
 
+*User commands.* A key bound to a user command is recorded like any other, with the answers to the command's prompts, including those of the Org commands it runs. When the macro plays, it waits for the command to finish before the next key, and a command that fails stops it (see [[file:18-user-commands.org][User commands]]). The question before a command from a file not yet trusted on this device isn't recorded; it is asked whenever it comes up.
+
 The last macro and the recording are shared by every buffer, as in Emacs. The last macro is gone when orgstar quits; name it to keep it.
 
 ** Named macros

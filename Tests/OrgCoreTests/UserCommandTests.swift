@@ -239,3 +239,39 @@ struct UserCommandAPITests {
         #expect(UserCommandAPI.answer("+2d", to: prompt, now: now, calendar: utc) == "+2d")
     }
 }
+
+struct UserCommandStateTests {
+    func context(_ text: String, caret: Int) -> EditContext {
+        EditContext(revision: 3, text: text, tree: OrgParser.parse(text), selection: [caret..<caret])
+    }
+
+    /// Commands run one after another on the text the last one left; the command's own edits
+    /// are in that text, and the result is one change from the text it started with.
+    @Test func composesIntoOneResult() throws {
+        var state = UserCommandState(context("* a\n* b\n", caret: 2), defaults: .default)
+        guard case .commit = state.run(TodoCycle(), answers: [:]) else { Issue.record("no commit"); return }
+        #expect(state.context.text == "* TODO a\n* b\n")
+        #expect(state.context.selection == [7..<7])
+        #expect(state.reply["text"] as? String == "* TODO a\n* b\n")
+        guard case .commit = state.run(NextHeading(), answers: [:]) else { Issue.record("no commit"); return }
+        let result = try state.result(#"{"edits": [{"from": 11, "text": "!"}]}"#).get()
+        #expect(result.baseRevision == 3)
+        #expect(result.edits.count == 1)
+        var text = state.start.text
+        for edit in result.edits.reversed() { text = edit.apply(to: text) }
+        #expect(text == "* TODO a\n* !b\n")
+        #expect(result.selection == [9..<9])
+    }
+
+    @Test func refusesWhatIsntBuiltIn() {
+        func refusal(_ id: String) -> String? {
+            if case .failure(let problem) = UserCommandAPI.builtIn(id) { return problem.message }
+            return nil
+        }
+        #expect(refusal("org.todo.cycle") == nil)
+        #expect(refusal("app.export.html") == "app.export.html is a command of the app, which user commands can't run")
+        #expect(refusal("user.other") == "A user command can't run another: user.other")
+        #expect(refusal("org.cycle") == "No built-in command org.cycle")
+        #expect(UserCommandAPI.safeAppCommands == ["app.save"])
+    }
+}

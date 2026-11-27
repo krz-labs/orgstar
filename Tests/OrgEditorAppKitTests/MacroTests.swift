@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import OrgCore
+import OrgDocument
 import Testing
 @testable import OrgApp
 @testable import OrgEditorAppKit
@@ -235,6 +236,86 @@ struct MacroTests {
         #expect(MacroRecorder.reply(from: keys)?.reply == .answer(text))
         #expect(MacroRecorder.reply(from: KeySequence.parse("a b DEL c RET z")!)! == (.answer("ac"), 5))
         #expect(MacroRecorder.reply(from: KeySequence.parse("a")!) == nil)
+    }
+
+    /// A keyboard macro records a user command's key and its prompt's answer; replaying waits
+    /// for the command to finish before the next key, and answers its prompt from the macro.
+    @Test func macrosWaitForUserCommands() async throws {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("orgstar-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let modules = folder.appendingPathComponent("config/commands")
+        try FileManager.default.createDirectory(at: modules, withIntermediateDirectories: true)
+        try Data("""
+            export async function stamp(org) {
+              const word = await org.prompt("Word: ");
+              await new Promise(resolve => setTimeout(resolve, 100));
+              const { selection: [{ from }] } = await org.run("org.todo.cycle");
+              const heading = await org.heading();
+              return { edits: [{ from: heading.titleEnd, text: " " + word }], selection: from };
+            }
+            """.utf8).write(to: modules.appendingPathComponent("stamp.js"))
+        let file = folder.appendingPathComponent("a.org")
+        try Data("* one\n* two\n* three\n".utf8).write(to: file)
+        let shared = (UserCommands.shared.all, UserCommands.shared.folder)
+        defer { UserCommands.shared.replace(shared.0, folder: shared.1) }
+        UserCommands.shared.replace([UserCommand(name: "stamp", title: "Stamp", file: "stamp.js", function: "stamp")], folder: modules)
+        OrgEditor.kmacro = MacroRecorder()
+        defer { OrgEditor.kmacro = MacroRecorder() }
+
+        let session = DocumentSession(recovery: FileRecoveryStore(directory: folder.appendingPathComponent("r")))
+        session.saveMode = .explicit
+        session.userCommands = UserCommands.shared
+        session.open(file.path)
+        let h = Harness(try #require(session.document))
+        h.editor.onChange = { [weak session] in session?.bufferChanged() }
+        session.attach(h.editor)
+        var problems: [String] = []
+        let toml = "[[bind]]\nkeys = \"C-c u\"\ncommand = \"user.stamp\"\n[[bind]]\nkeys = \"C-c m\"\ncommand = \"macro.named.stamp\"\n"
+        let user = try Keymap(toml: toml, problems: &problems, commands: Set(EditorCommands.all.map(\.id) + ["macro.named.stamp"]))
+        h.editor.keymap = .layered([KeymapPreset.emacs.keymap, user])
+        var asked = 0
+        h.editor.onPrompt = { _, reply in
+            asked += 1
+            reply("ok")
+        }
+        var messages: [String] = []
+        h.editor.onMessage = { messages.append($0) }
+        h.editor.onUserCommand = { [weak session, weak h] request, finished in
+            guard let session, let h else { return }
+            session.startUserCommand(request, context: h.editor.context(), file: "a.org", ask: h.editor.ask, report: { messages.append($0) }, finished: finished)
+        }
+        func settled() async throws {
+            for _ in 0..<250 where session.isRunningUserCommand || h.editor.kmacroDepth > 0 { try await Task.sleep(for: .milliseconds(20)) }
+            #expect(!session.isRunningUserCommand && h.editor.kmacroDepth == 0)
+        }
+        h.caret(at: 2)
+        type(h, "C-x ( C-c u")
+        try await settled()
+        type(h, "C-n C-x )")
+        #expect(h.string == "* TODO one ok\n* two\n* three\n")
+        #expect(OrgEditor.kmacro.last == KeySequence.parse("C-c u o k RET C-n"))
+        #expect(asked == 1)
+
+        type(h, "C-u 2 C-x e")
+        try await settled()
+        #expect(h.string == "* TODO one ok\n* TODO two ok\n* TODO three ok\n")
+        #expect(asked == 1)
+        #expect(!messages.contains { $0.contains("undefined") })
+        h.checkInSync()
+        // Each run is one undo step.
+        h.textView.undoManager?.undo()
+        #expect(h.string == "* TODO one ok\n* TODO two ok\n* three\n")
+
+        // A macro waits for a named macro it runs that waits for a user command.
+        let store = NamedMacros()
+        store.replace(["stamp": try OrgEditor.kmacro.lastMacro()])
+        h.editor.namedMacros = store
+        OrgEditor.kmacro.last = KeySequence.parse("C-c m C-e !")
+        h.caret(at: 30)
+        type(h, "C-x e")
+        try await settled()
+        #expect(h.string == "* TODO one ok\n* TODO two ok\n* TODO three ok\n!")
+        #expect(asked == 1)
     }
 
     // MARK: - Emacs

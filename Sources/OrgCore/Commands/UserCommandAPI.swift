@@ -205,4 +205,119 @@ public enum UserCommandAPI {
         let day = String(format: "%04d-%02d-%02d", read.year, read.month, read.day)
         return read.timeGiven ? day + String(format: " %02d:%02d", read.hour, read.minute) : day
     }
+
+    // MARK: - org.run
+
+    /// The commands of the app `org.run` runs; it refuses the others. An entry may not need a
+    /// window, a sheet or another file, and may not change the text.
+    public static let safeAppCommands: Set<String> = [
+        // Writes the buffer to its own file, as the person's own save would, once the command's
+        // changes are applied; nothing is saved when the command fails.
+        "app.save",
+    ]
+
+    /// The built-in command `org.run(id)` runs, or why it doesn't run `id`. `safeAppCommands`
+    /// are the caller's to handle.
+    public static func builtIn(_ id: String) -> Result<any OrgCommand, Problem> {
+        if id.hasPrefix(UserCommands.commandPrefix) { return .failure(Problem("A user command can't run another: \(id)")) }
+        if id.hasPrefix("app.") { return .failure(Problem("\(id) is a command of the app, which user commands can't run")) }
+        guard let command = Commands.command(id) else { return .failure(Problem("No built-in command \(id)")) }
+        return .success(command)
+    }
+
+    /// Why `org.run(id)` refused a command that asked for work outside the text.
+    public static func external(_ id: String) -> Problem {
+        Problem("\(id) needs work outside the text here (code blocks, Emacs, links, tangling or a view), which org.run doesn't do")
+    }
+}
+
+/// The buffer as a running user command sees it: the text it started with, changed by the
+/// built-in commands it ran with `org.run`. Calls read the current text, the command's
+/// returned edits are in it, and the result is one change from the starting text.
+public struct UserCommandState: Sendable {
+    /// The context the command started with.
+    public let start: EditContext
+    /// The text and selection now.
+    public private(set) var context: EditContext
+    let defaults: OrgSettings
+    /// Effects of the commands run that the result keeps: those without offsets.
+    private var effects: [Effect] = []
+    /// Whether a built-in command ran.
+    private var ran = false
+
+    /// `defaults` are the settings the buffer's tree was parsed with.
+    public init(_ start: EditContext, defaults: OrgSettings) {
+        self.start = start
+        context = start
+        self.defaults = defaults
+    }
+
+    /// Runs `command` at the current text and selection. A commit becomes the current state.
+    public mutating func run(_ command: any OrgCommand, answers: [String: String]) -> CommandStep {
+        let current = EditContext(revision: context.revision, text: context.text, tree: context.tree, selection: context.selection,
+                                  now: context.now, calendar: context.calendar, answers: answers, options: context.options,
+                                  knownTags: context.knownTags)
+        let step = command.run(in: current)
+        guard case .commit(let result) = step else { return step }
+        var text = context.text
+        var tree = context.tree
+        for edit in result.edits.sorted(by: { $0.range.lowerBound > $1.range.lowerBound }) {
+            tree = OrgParser.reparse(tree, oldText: text, edit: edit, defaults: defaults)
+            text = edit.apply(to: text)
+        }
+        var options = context.options
+        for effect in result.effects {
+            switch effect {
+            case .fold, .sparseTree, .snippet: continue
+            case .timer(let timer): options.timer = timer
+            default: break
+            }
+            effects.append(effect)
+        }
+        context = EditContext(revision: context.revision, text: text, tree: tree,
+                              selection: result.selection ?? Self.map(context.selection, through: result.edits),
+                              now: context.now, calendar: context.calendar, options: options, knownTags: context.knownTags)
+        ran = true
+        return step
+    }
+
+    /// What `org.run` resolves with: the text and the selections.
+    public var reply: [String: Any] {
+        ["text": context.text, "selection": context.selection.map(UserCommandAPI.range)]
+    }
+
+    /// The command's returned JSON, in the current text, as one result at the starting revision.
+    public func result(_ json: String) -> Result<EditResult, UserCommandAPI.Problem> {
+        let own: EditResult
+        switch UserCommandAPI.result(json, in: context) {
+        case .failure(let problem): return .failure(problem)
+        case .success(let result): own = result
+        }
+        guard ran else { return .success(own) }
+        var text = context.text
+        for edit in own.edits.reversed() { text = edit.apply(to: text) }
+        return .success(EditResult(baseRevision: start.revision, edits: TextEdit.between(start.text, text),
+                                   selection: own.selection ?? Self.map(context.selection, through: own.edits),
+                                   effects: effects + own.effects))
+    }
+
+    /// Ranges moved by edits that don't overlap: an offset inside or at the end of a replaced
+    /// range, or at an insertion, moves past the replacement.
+    static func map(_ ranges: [Range<Int>], through edits: [TextEdit]) -> [Range<Int>] {
+        let sorted = edits.sorted { $0.range.lowerBound < $1.range.lowerBound }
+        func map(_ offset: Int) -> Int {
+            var shift = 0
+            for edit in sorted {
+                let lower = edit.range.lowerBound, upper = edit.range.upperBound
+                if offset < lower || (offset == lower && upper > lower) { return offset + shift }
+                if offset <= upper { return lower + shift + edit.replacement.utf16.count }
+                shift += edit.replacement.utf16.count - edit.range.count
+            }
+            return offset + shift
+        }
+        return ranges.map { range in
+            let lower = map(range.lowerBound)
+            return lower..<max(lower, map(range.upperBound))
+        }
+    }
 }

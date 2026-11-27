@@ -443,16 +443,24 @@ struct EditorScreen: View {
         }
     }
 
-    /// Runs a user command once its file is trusted on this device.
-    private func runUserCommand(_ request: UserCommandRequest) {
-        guard let modules = session.userCommands.folder else { return }
-        if let refusal = session.refusesUserCommand(path) { return message = refusal }
-        let ask: @MainActor (Prompt, @escaping (String?) -> Void) -> Void = { prompt = PromptRequest(prompt: $0, reply: $1) }
+    /// Runs a user command once its file is trusted on this device; `finished` gets its message
+    /// once it has ended, nil when its result was applied. The command's prompts go through the
+    /// editor, so keyboard macros record and replay their answers.
+    private func runUserCommand(_ request: UserCommandRequest, finished: @escaping @MainActor (String?) -> Void) {
+        guard let modules = session.userCommands.folder else { return finished("") }
+        if let refusal = session.refusesUserCommand(path) {
+            message = refusal
+            return finished(refusal)
+        }
         UserCommandTrust.check(request.command, modules: modules, trust: trust, ask: { trustRequest = TrustRequest(question: $0, reply: $1) }, run: {
-            guard let context = editor?.editContext() else { return }
+            guard let editor else { return finished("") }
             message = String(localized: "Running \(request.command.title)…", comment: "A user command started on iPhone and iPad")
-            session.startUserCommand(request, context: context, file: UserCommandFile.relativePath(path, roots: workspace.rootPaths), ask: ask) { message = $0 }
-        }, refuse: { message = $0 })
+            session.startUserCommand(request, context: editor.editContext(), file: UserCommandFile.relativePath(path, roots: workspace.rootPaths),
+                                     ask: editor.ask, report: { message = $0 }, finished: finished)
+        }, refuse: {
+            message = $0
+            finished($0)
+        })
     }
 
     private func start() {
@@ -537,7 +545,7 @@ struct EditorScreen: View {
         editor.onColumnView = { view in sheet = .columns(view) }
         editor.onTangle = { scope in if ProAccess.shared.allows(.babel) { message = session.tangle(scope) } }
         editor.onBabel = { job in if ProAccess.shared.allows(.babel) { run(job) } }
-        editor.onUserCommand = { request in runUserCommand(request) }
+        editor.onUserCommand = { request, finished in runUserCommand(request, finished: finished) }
         editor.onRefreshSetup = { session.refreshSetup() }
         editor.onAgenda = { start, count in model.agendaRequest = .init(start: start, count: count) }
         editor.keymap = model.keymap

@@ -47,6 +47,8 @@ final class AppCommands {
     var editorSettings = EditorSettings()
     /// Runs work outside the text (a table recalculation in Emacs); the main window sets it.
     var externalHandler: ((ExternalRequest) -> Void)?
+    /// Runs a user command and says when it has finished; the main window sets it.
+    var userCommandHandler: ((UserCommandRequest, @escaping @MainActor (String?) -> Void) -> Void)?
     /// Files and images pasted or dropped on an editor; the main window sets them.
     var filesHandler: (([URL]) -> Void)?
     var imageHandler: ((Data, String) -> Void)?

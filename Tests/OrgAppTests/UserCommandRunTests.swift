@@ -44,6 +44,37 @@ struct UserCommandRunTests {
         name = "copy"
         file = "bad.js"
         function = "copy"
+
+        [[command]]
+        name = "compose"
+        file = "run.js"
+        function = "compose"
+
+        [[command]]
+        name = "schedule"
+        file = "run.js"
+        function = "schedule"
+
+        [[command]]
+        name = "promote"
+        title = "Promote"
+        file = "run.js"
+        function = "promote"
+
+        [[command]]
+        name = "refused"
+        file = "run.js"
+        function = "refused"
+
+        [[command]]
+        name = "save"
+        file = "run.js"
+        function = "save"
+
+        [[command]]
+        name = "edit-while-running"
+        file = "run.js"
+        function = "editWhileRunning"
         """
     static let headings = """
         import { upper } from "./lib/text.js";
@@ -76,6 +107,48 @@ struct UserCommandRunTests {
         export async function refuse(org) { await org.fail("Not today"); }
         export async function copy(org) { org.message("Copying"); return { copy: (await org.file()) ?? "none" }; }
         """
+    static let builtIns = """
+        export async function compose(org) {
+          await org.run("org.todo.cycle");
+          await org.run("org.todo.cycle");
+          const { text, selection: [{ from }] } = await org.run("org.heading.insert");
+          if (text !== await org.text()) return org.fail("org.text() isn't the text org.run gave");
+          return { edits: [{ from, text: "New" }] };
+        }
+        export async function schedule(org) {
+          await org.run("org.schedule");
+          await org.message((await org.heading()).scheduled);
+        }
+        export async function promote(org) {
+          try {
+            await org.run("org.heading.promote");
+          } catch (error) {
+            org.message("caught " + error.message);
+          }
+          await org.run("org.heading.promote");
+        }
+        export async function refused(org) {
+          const messages = [];
+          for (const id of ["app.export.html", "user.compose", "org.cycle", "org.babel.execute"]) {
+            try {
+              await org.run(id);
+              messages.push("ran " + id);
+            } catch (error) {
+              messages.push(error.message);
+            }
+          }
+          await org.message(messages.join(" | "));
+        }
+        export async function save(org) {
+          await org.run("org.todo.cycle");
+          const { text } = await org.run("app.save");
+          await org.message(text.slice(0, 6));
+        }
+        export async function editWhileRunning(org) {
+          await org.run("org.todo.cycle");
+          await org.prompt("Go on? ");
+        }
+        """
     static let file = "* Plan the week :work:\nbody\n* Next\n"
 
     let config: Folder
@@ -92,6 +165,7 @@ struct UserCommandRunTests {
         try config.write("commands/lib/text.js", "export const upper = s => s.toUpperCase();\n")
         try config.write("commands/review.js", Self.review)
         try config.write("commands/bad.js", Self.bad)
+        try config.write("commands/run.js", Self.builtIns)
         path = try notes.write("a.org", Self.file).path
         session = DocumentSession(recovery: FileRecoveryStore(directory: notes.url.appendingPathComponent(".recovery")))
         session.saveMode = .explicit
@@ -154,6 +228,102 @@ struct UserCommandRunTests {
         var reported: [String] = []
         #expect(try await run("copy", report: { reported.append($0) }) == nil)
         #expect(reported == ["Copying"])
+    }
+
+    // MARK: - org.run
+
+    /// The commands a script runs and its own edits after them are one undo step, with the text
+    /// and selection that running the same commands directly gives.
+    @Test func runningBuiltInsIsOneUndoStep() async throws {
+        let direct = StateBuffer(DocumentState(bytes: Array(Self.file.utf8)))
+        direct.selection = [4..<4]
+        for id in ["org.todo.cycle", "org.todo.cycle", "org.heading.insert"] {
+            guard case .commit = direct.perform(try #require(Commands.command(id)), now: Date(), answers: [:]) else {
+                Issue.record("\(id) didn't commit")
+                return
+            }
+        }
+        let caret = direct.selection[0].lowerBound
+        #expect(try await run("compose") == nil)
+        #expect(buffer.document.text == (direct.document.text as NSString).replacingCharacters(in: NSRange(location: caret, length: 0), with: "New"))
+        #expect(buffer.document.text.hasPrefix("* DONE Pl"))
+        #expect(buffer.selection == [caret + 3..<caret + 3])
+        #expect(buffer.update { $0.undo() } != nil)
+        #expect(buffer.document.text == Self.file)
+        #expect(!buffer.document.canUndo)
+    }
+
+    /// A built-in command's prompt goes through the prompt the command's own prompts use.
+    @Test func aBuiltInsPromptGoesThroughThePrompt() async throws {
+        var asked: [Prompt] = []
+        var reported: [String] = []
+        let message = try await run("schedule", ask: { prompt, reply in
+            asked.append(prompt)
+            reply("2026-12-01")
+        }, report: { reported.append($0) })
+        #expect(message == nil)
+        #expect(asked.count == 1 && asked.first?.key == "date" && asked.first?.date != nil)
+        let scheduled = "* Plan the week :work:\nSCHEDULED: <2026-12-01 Tue>\nbody\n* Next\n"
+        #expect(buffer.document.text == scheduled)
+        #expect(reported == ["<2026-12-01 Tue>"])
+        // Canceling it ends the command with nothing changed.
+        #expect(try await run("schedule") == "Quit")
+        #expect(buffer.document.text == scheduled)
+    }
+
+    /// A failing built-in rejects with its message, which the script can catch.
+    @Test func aFailingBuiltInRejectsWithItsMessage() async throws {
+        let document = buffer.document
+        let context = EditContext(revision: document.revision, text: document.text, tree: document.tree, selection: [4..<4])
+        guard case .failed(let failure) = PromoteHeading().run(in: context) else {
+            Issue.record("promoting a level 1 heading didn't fail")
+            return
+        }
+        var reported: [String] = []
+        #expect(try await run("promote", report: { reported.append($0) }) == "Promote: \(failure)")
+        #expect(reported == ["caught \(failure)"])
+        #expect(buffer.document.text == Self.file)
+    }
+
+    /// Commands of the app other than the safe ones, user commands, the editor's own commands
+    /// and work outside the text are refused.
+    @Test func refusesWhatIsntABuiltInCommand() async throws {
+        let block = "#+begin_src sh\necho hi\n#+end_src\n"
+        _ = buffer.perform(ReplaceText(old: buffer.document.text, new: block), now: Date(), answers: [:])
+        let document = buffer.document
+        let context = EditContext(revision: document.revision, text: document.text, tree: document.tree, selection: [2..<2])
+        guard case .external(.babel) = ExecuteSrcBlock().run(in: context) else {
+            Issue.record("the block doesn't run through Babel")
+            return
+        }
+        var reported: [String] = []
+        #expect(try await run("refused", at: 2, report: { reported.append($0) }) == nil)
+        #expect(reported == [[
+            "app.export.html is a command of the app, which user commands can't run",
+            "A user command can't run another: user.compose",
+            "No built-in command org.cycle",
+            UserCommandAPI.external("org.babel.execute").message,
+        ].joined(separator: " | ")])
+        #expect(buffer.document.text == block)
+    }
+
+    /// `app.save` saves the file once the command's changes are applied.
+    @Test func saveRunsAfterTheChanges() async throws {
+        var reported: [String] = []
+        #expect(try await run("save", report: { reported.append($0) }) == nil)
+        #expect(reported == ["* TODO"])
+        #expect(buffer.document.text.hasPrefix("* TODO Plan"))
+        #expect(!buffer.document.isDirty)
+        #expect(try String(contentsOfFile: path, encoding: .utf8) == buffer.document.text)
+    }
+
+    @Test func anEditWhileRunningRefusesWhatItsCommandsDid() async throws {
+        let message = try await run("edit-while-running", ask: { [buffer] _, reply in
+            _ = buffer.perform(ReplaceText(old: buffer.document.text, new: buffer.document.text + "typed\n"), now: Date(), answers: [:])
+            reply("yes")
+        })
+        #expect(message == "The file changed; try again.")
+        #expect(buffer.document.text == Self.file + "typed\n")
     }
 
     @Test func cancelStopsTheCommand() async throws {

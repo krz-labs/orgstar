@@ -423,6 +423,7 @@ public final class CommandHost {
                 settings: () => call("settings", null),
                 prompt: options => call("prompt", typeof options === "string" ? { message: options } : options ?? {}),
                 message: text => call("message", String(text)),
+                run: id => call("run", String(id)),
                 fail,
               });
             }
