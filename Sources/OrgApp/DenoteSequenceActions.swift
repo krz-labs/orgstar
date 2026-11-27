@@ -162,7 +162,7 @@ extension RoamActions {
             chooseSequenceFile("Link to file with sequence", files) { file in
                 guard let id = Denote.identifier(ofFile: file.path) else { return }
                 let text = (try? String(contentsOfFile: file.path, encoding: .utf8)) ?? ""
-                let title = Denote.frontMatter(of: text).title ?? Denote.name(ofFile: file.path).title ?? ""
+                let title = Denote.frontMatter(ofFile: file.path, text: text).title ?? Denote.name(ofFile: file.path).title ?? ""
                 insertLink("denote:" + id, title.isEmpty ? file.sequence : file.sequence + "  " + title)
             }
         case "hierarchy":
@@ -172,7 +172,7 @@ extension RoamActions {
             let labels = ordered.map { file -> String in
                 let depth = (try? model.depth(file.sequence)) ?? 1
                 let text = (try? String(contentsOfFile: file.path, encoding: .utf8)) ?? ""
-                let title = Denote.frontMatter(of: text).title ?? Denote.name(ofFile: file.path).title ?? ""
+                let title = Denote.frontMatter(ofFile: file.path, text: text).title ?? Denote.name(ofFile: file.path).title ?? ""
                 let keywords = Denote.name(ofFile: file.path).keywords.joined(separator: "_")
                 return String(repeating: "  ", count: depth - 1) + file.sequence + (title.trimmingCharacters(in: .whitespaces).isEmpty ? "" : " " + title)
                     + (keywords.isEmpty ? "" : " _" + keywords)

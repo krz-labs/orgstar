@@ -7,8 +7,8 @@ public enum FileKind: String, Sendable {
     case archive
     /// A Syncthing conflict copy: listed, never indexed for search, agenda or IDs.
     case conflict
-    /// Markdown or plain text: searched, titled by its front matter or first heading;
-    /// never read for the agenda, IDs or links.
+    /// Markdown or plain text: searched, titled by its front matter or first heading, read
+    /// for Denote's links; never read for the agenda or IDs.
     case text
     /// Any other file: listed and openable, never read by the index.
     case other
@@ -138,11 +138,10 @@ public struct FileRecord: Sendable, Equatable {
         let source = SourceText(bytes: bytes)
         if kind == .text {
             settingsVersion = settings.version
-            links = []
             fileID = nil
             fileTags = []
             fileRoam = RoamProperties()
-            (headings, title, preamble) = Self.textRows(source.text, path: path)
+            (headings, links, title, preamble) = Self.textRows(source.text, path: path)
             return
         }
         var resolved = settings
@@ -152,10 +151,20 @@ public struct FileRecord: Sendable, Equatable {
             ? ([], [], nil, nil, "", [], RoamProperties()) : Self.rows(source.text, settings: resolved)
     }
 
-    /// A Markdown file's headings, with their own text as bodies, its title and the text
-    /// before its first heading; a plain text file's text, untitled.
-    static func textRows(_ text: String, path: String) -> (headings: [HeadingRecord], title: String?, preamble: String) {
-        guard Markdown.isPath(path) else { return ([], nil, text) }
+    /// A Markdown file's headings, with their own text as bodies and the Denote links in them,
+    /// the links before its first heading, its title and the text before its first heading; a
+    /// plain text file's links and text, titled by its Denote front matter when its name has a
+    /// Denote identifier.
+    static func textRows(_ text: String, path: String) -> (headings: [HeadingRecord], links: [LinkRow], title: String?, preamble: String) {
+        let markdown = Markdown.isPath(path)
+        let denoteLinks = Denote.links(in: text, markdown: markdown)
+        func links(_ range: Range<Int>) -> [LinkRow] {
+            denoteLinks.filter { range.contains($0.range.lowerBound) }.map { LinkRow(type: "denote", target: $0.target) }
+        }
+        guard markdown else {
+            let title = Denote.identifier(ofFile: path) == nil ? nil : Denote.frontMatter(of: text, type: .text).title
+            return ([], links(0..<Int.max), title?.isEmpty == false ? title : nil, text)
+        }
         let u = Array(text.utf16)
         let structure = Markdown.structure(u)
         let headings = structure.headings
@@ -170,11 +179,13 @@ public struct FileRecord: Sendable, Equatable {
                 ordinal: index, parent: open.last, start: heading.start, end: end, level: heading.level,
                 todo: nil, isDone: false, priority: nil, title: heading.title,
                 outlinePath: open.map { headings[$0].title } + [heading.title], orgID: nil, archived: false,
-                body: slice(heading.lineEnd..<max(heading.lineEnd, bodyEnd)), tags: [], properties: [], timestamps: [], clocks: [], links: []
+                body: slice(heading.lineEnd..<max(heading.lineEnd, bodyEnd)), tags: [], properties: [], timestamps: [], clocks: [],
+                links: links(heading.start..<max(heading.start, bodyEnd))
             ))
             open.append(index)
         }
-        return (records, Markdown.title(u, structure), slice(0..<(headings.first?.start ?? u.count)))
+        let first = headings.first?.start ?? u.count
+        return (records, links(0..<first), Markdown.title(u, structure), slice(0..<first))
     }
 
     /// The settings version a file's rows are built under: the index's, with the keywords of

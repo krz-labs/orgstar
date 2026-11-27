@@ -595,6 +595,10 @@ public struct EmacsImport: Sendable {
         case "denote-directory", "denote-journal-directory", "denote-journal-keyword":
             guard let text = value.string else { return note("not a string") }
             add(name, .string(text))
+        case "denote-file-type":
+            // nil is the first of `denote-file-types`, org.
+            guard let type = value.symbol, type == "nil" || Denote.FileType(rawValue: type) != nil else { return note("not org, markdown-yaml, markdown-toml or text") }
+            add(name, .string(type == "nil" ? "org" : type))
         case "denote-sequence-scheme":
             guard let scheme = value.symbol, DenoteSequence.Scheme(rawValue: scheme) != nil else { return note("not numeric, alphanumeric or alphanumeric-delimited") }
             add(name, .string(scheme))

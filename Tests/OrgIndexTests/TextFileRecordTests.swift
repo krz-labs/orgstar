@@ -27,6 +27,17 @@ struct TextFileRecordTests {
         #expect(file.preamble == "* not a heading\n#+title: not a title\n")
     }
 
+    /// Denote's links are read from Markdown and text files, and a text note is titled by its
+    /// Denote front matter.
+    @Test func denoteLinksAndTitles() {
+        let md = record("/notes/20261011T120000--a.md", "Intro [x](denote:20261011T120001)\n# H\n[[denote:20261011T120002][y]] [z](https://z)\n", kind: .text)
+        #expect(md.links.map(\.target) == ["denote:20261011T120001"])
+        #expect(md.headings[0].links.map(\.target) == ["denote:20261011T120002"])
+        let txt = record("/notes/20261011T120003--b.txt", "title:      Plain Note\n---------------------------\n\n[x](denote:1) [[denote:20261011T120001]]\n", kind: .text)
+        #expect(txt.title == "Plain Note" && txt.links.map(\.target) == ["denote:20261011T120001"])
+        #expect(record("/notes/b.txt", "title: Not a note\n", kind: .text).title == nil)
+    }
+
     @Test func searchFindsTextFiles() throws {
         let store = try IndexStore()
         try store.write(record("/notes/a.md", "---\ntitle: Pond\n---\nOtters swim.\n# Herons\nThey wade.\n", kind: .text))

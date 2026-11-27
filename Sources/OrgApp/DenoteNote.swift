@@ -1,9 +1,9 @@
 import Foundation
 import OrgCore
 
-/// A new Denote note, as `denote` makes it: `IDENTIFIER==signature--title__keywords.org` in
-/// `denote-directory` or a folder under it, starting with the Org front matter and then the
-/// template.
+/// A new Denote note, as `denote` makes it: `IDENTIFIER==signature--title__keywords.org` (or
+/// `.md`, `.txt` for those file types) in `denote-directory` or a folder under it, starting
+/// with the front matter and then the template.
 public enum DenoteNote {
     /// `denote-directories`: the folders of `denote-directory`, separated by `:`, else the
     /// first sidebar folder.
@@ -76,36 +76,42 @@ public enum DenoteNote {
 
     /// `denote-rename-file` of the file at `path` with `text`: its new path and text, the
     /// keywords sorted, the identifier kept (or for a file without one, its modification
-    /// time's, unused under `roots`), the front matter rewritten or, without one, added.
-    /// A nil `date` keeps the front matter's.
+    /// time's, unused under `roots`), the front matter rewritten in the file's type or, without
+    /// one, added; a Markdown file without front matter gets `preferred`'s when that is a
+    /// Markdown type. A nil `date` keeps the front matter's. The text of a file Denote has no
+    /// type for stays as it is.
     public static func renaming(
-        _ path: String, text: String, title: String, keywords: [String], signature: String, date: Date?, roots: [String]
+        _ path: String, text: String, title: String, keywords: [String], signature: String, date: Date?, roots: [String], preferred: Denote.FileType = .org
     ) -> (path: String, text: String) {
-        let name = Denote.name(ofFile: path), front = Denote.frontMatter(of: text)
+        let name = Denote.name(ofFile: path)
+        let type = name.ext.isEmpty ? .org : Denote.FileType(path: path, text: text, preferred: preferred)
+        let front = Denote.frontMatter(of: text, type: type ?? .org)
         let modified = (try? FileManager.default.attributesOfItem(atPath: path)[.modificationDate] as? Date) ?? Date()
         let identifier = name.identifier ?? front.identifier ?? unusedIdentifier(date ?? modified, roots: roots)
         let keywords = Denote.keywords(keywords), signature = Denote.signature(signature)
         let target = ((path as NSString).deletingLastPathComponent as NSString).appendingPathComponent(
             Denote.fileName(identifier: identifier, signature: signature, title: title, keywords: keywords, extension: name.ext.isEmpty ? "org" : name.ext))
-        guard name.ext == "org" || name.ext.isEmpty else { return (target, text) }
-        return (target, Denote.rewritingFrontMatter(text, title: title, keywords: keywords, signature: signature, date: date, identifier: identifier, now: date ?? modified))
+        guard let type else { return (target, text) }
+        return (target, Denote.rewritingFrontMatter(text, title: title, keywords: keywords, signature: signature, date: date, identifier: identifier,
+                                                    now: date ?? modified, type: type))
     }
 
-    /// Makes the note's file in `folder`. Its identifier is `now`'s, or as
+    /// Makes the note's file of `type` in `folder`. Its identifier is `now`'s, or as
     /// `denote-generate-identifier-as-date` does, the first second after it no file under
     /// `roots` (by default `folder`) has; the front matter keeps `now`. Fails rather than
     /// replace a file.
     public static func create(
-        title: String, keywords: [String], in folder: String, roots: [String] = [], now: Date = Date(), signature: String = "", template: String = ""
+        title: String, keywords: [String], in folder: String, roots: [String] = [], now: Date = Date(), signature: String = "", template: String = "",
+        type: Denote.FileType = .org
     ) throws -> (path: String, id: String) {
         let id = unusedIdentifier(now, roots: roots.isEmpty ? [folder] : roots)
         let keywords = Denote.keywords(keywords)
         let signature = Denote.signature(signature)
-        let name = Denote.fileName(identifier: id, signature: signature, title: title, keywords: keywords)
+        let name = Denote.fileName(identifier: id, signature: signature, title: title, keywords: keywords, extension: type.ext)
         let path = (folder as NSString).appendingPathComponent(name)
         try FileManager.default.createDirectory(atPath: folder, withIntermediateDirectories: true)
         guard !FileManager.default.fileExists(atPath: path) else { throw Dailies.Failure("\(name) is already there") }
-        let text = Denote.frontMatter(title: title, date: now, keywords: keywords, identifier: id, signature: signature) + template
+        let text = Denote.frontMatter(title: title, date: now, keywords: keywords, identifier: id, signature: signature, type: type) + template
         try Data(text.utf8).write(to: URL(fileURLWithPath: path), options: .withoutOverwriting)
         return (path, id)
     }

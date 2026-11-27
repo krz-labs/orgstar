@@ -153,6 +153,47 @@ struct DailiesTests {
         #expect(try String(contentsOfFile: new, encoding: .utf8) == "#+title:      New Name\n#+date:       [2026-10-11 Sun 12:00]\n#+filetags:   :a:b:\n#+identifier: 20261011T120000\n\nBody\n")
     }
 
+    /// Markdown and text notes: made in `denote-file-type`, renamed with their front matter in
+    /// their own format, linked to by Insert Node Link, which only Denote may do outside org.
+    @MainActor
+    @Test func textTypeNotes() throws {
+        let h = try Harness()
+        let defaults = UserDefaults.standard
+        defaults.set("denote", forKey: "notesPackage")
+        defaults.set("markdown-toml", forKey: "denoteFileType")
+        defer { defaults.removeObject(forKey: "notesPackage"); defaults.removeObject(forKey: "denoteFileType") }
+        h.answers = ["node": "Field Notes", "keywords": "work"]
+        h.actions.run("app.node.find")
+        let note = try #require(h.opened.first)
+        #expect(note.hasSuffix("--field-notes__work.md"), "\(h.shown)")
+        #expect(try String(contentsOfFile: note, encoding: .utf8).hasPrefix("+++\ntitle      = \"Field Notes\"\ndate       = "))
+
+        let path = try h.write("20261011T120000--old__x.txt", "title:      Old\ndate:       2026-10-11\ntags:       x\nidentifier: 20261011T120000\n---------------------------\n\nBody\n")
+        h.session.open(path)
+        h.opened = []
+        h.answers = ["title": "New Name", "keywords": "b, a"]
+        h.actions.run("app.node.rename")
+        #expect(h.asked.suffix(2).map(\.initial) == ["Old", "x"])
+        let renamed = h.folder.appendingPathComponent("20261011T120000--new-name__a_b.txt").path
+        #expect(h.opened == [renamed], "\(h.shown)")
+        #expect(try String(contentsOfFile: renamed, encoding: .utf8)
+            == "title:      New Name\ndate:       2026-10-11\ntags:       a  b\nidentifier: 20261011T120000\n---------------------------\n\nBody\n")
+
+        let md = try h.write("20261011T130000--edited__x.md", "---\ntitle:      \"Edited Title\"\ntags:       [\"y\"]\nidentifier: \"20261011T130000\"\n---\n")
+        h.session.open(md)
+        h.opened = []
+        h.actions.run("app.node.rename-from-front-matter")
+        #expect(h.opened == [h.folder.appendingPathComponent("20261011T130000--edited-title__y.md").path], "\(h.shown)")
+
+        h.answers = ["node": "Linked Note", "keywords": ""]
+        h.actions.run("app.node.insert")
+        #expect(h.links.last?.1 == "Linked Note" && h.links.last?.0.hasPrefix("denote:") == true)
+        defaults.removeObject(forKey: "notesPackage")
+        let count = h.links.count
+        h.actions.run("app.node.insert")
+        #expect(h.links.count == count && h.shown.last == "Not an org file")
+    }
+
     @MainActor
     @Test func renamesFolderFromFrontMatter() throws {
         let h = try Harness()
@@ -275,7 +316,7 @@ struct DailiesTests {
         actions.renameFromFrontMatter()
         let new = folder.appendingPathComponent("20261011T120000--new-name__x_y.org").path
         #expect(opened == new && !FileManager.default.fileExists(atPath: old), "\(shown)")
-        #expect(try String(contentsOfFile: new, encoding: .utf8) == "#+title:      New Name\n#+filetags:   :x:y:\n")
+        #expect(try String(contentsOfFile: new, encoding: .utf8) == "#+title:      New Name\n#+filetags:   :x:y:\n#+identifier: 20261011T120000\n")
     }
 
     @MainActor
@@ -323,6 +364,29 @@ struct NodeIndexTests {
         let nodes = try store.denoteNodes()
         #expect(nodes.map(\.id) == ["20261011T120000", "20261012T120000"])
         #expect(nodes.map(\.title) == ["A note", "20261012T120000--untitled"])
+    }
+
+    /// Markdown and text notes are nodes too, titled by their front matter; their Denote links
+    /// are backlinks.
+    @Test func denoteTextNotesAreNodesAndLink() throws {
+        let store = try IndexStore()
+        let settings = IndexSettings()
+        try store.write(FileRecord(path: "/n/20261011T120000--a__x.org", root: "/n", kind: .org, bytes: Array("#+title: A note\n".utf8), mtime: 1, settings: settings))
+        try store.write(FileRecord(path: "/n/20261013T120000--m.md", root: "/n", kind: .text,
+                                   bytes: Array("---\ntitle: \"Markdown\"\n---\nSee [A](denote:20261011T120000).\n# Part\nAnd [[denote:20261014T120000][T]].\n".utf8), mtime: 1, settings: settings))
+        try store.write(FileRecord(path: "/n/20261014T120000--t.txt", root: "/n", kind: .text,
+                                   bytes: Array("title:      Text note\nidentifier: 20261014T120000\n---------------------------\n\n[[denote:20261011T120000]]\n".utf8), mtime: 1, settings: settings))
+        try store.write(FileRecord(path: "/n/20261015T120000--other.markdown", root: "/n", kind: .text, bytes: Array("# Other\n".utf8), mtime: 1, settings: settings))
+        let nodes = try store.denoteNodes()
+        #expect(nodes.map(\.id) == ["20261011T120000", "20261013T120000", "20261014T120000"])
+        #expect(nodes.map(\.title) == ["A note", "Markdown", "Text note"])
+        let links = try store.links()
+        #expect(links.map(\.target).sorted() == ["denote:20261011T120000", "denote:20261011T120000", "denote:20261014T120000"])
+        #expect(links.first { $0.target == "denote:20261014T120000" }?.source.title == "Part")
+        let target = Backlinks.Target(path: "/n/20261011T120000--a__x.org")
+        #expect(links.filter { Backlinks.links($0.target, from: $0.source.path, to: target) }.map(\.source.path).sorted()
+            == ["/n/20261013T120000--m.md", "/n/20261014T120000--t.txt"])
+        #expect(Backlinks.context(in: "See [A](denote:20261011T120000) and [[denote:x][X]].", link: "denote:20261011T120000")?.text == "See A and X.")
     }
 
     @Test func filesAndHeadingsWithIDsAreNodes() throws {

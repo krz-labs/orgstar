@@ -6,13 +6,20 @@ public enum OrgOnlyCommands {
         id == "org.cycle" || id == "org.cycle-global" || id.hasPrefix("org.fold.")
     }
 
-    /// Whether `id` is refused in a file that isn't org; `markdown` lets the fold commands run.
-    public static func refuses(_ id: String, markdown: Bool) -> Bool {
+    /// Whether `id` is refused in a file that isn't org; `markdown` lets the fold commands run,
+    /// and a `path` with a Denote file type lets Denote's link and rename commands run.
+    public static func refuses(_ id: String, markdown: Bool, path: String? = nil) -> Bool {
         if markdown, folds(id) { return false }
+        if denoteCommands.contains(id), let path, Denote.FileType(path: path) != nil { return false }
         if id.hasPrefix("org.") || id.hasPrefix("app.attach.") { return true }
         if id.hasPrefix("app.export.") { return !id.hasPrefix("app.export.icalendar-") }
         return appCommands.contains(id)
     }
+
+    /// Commands that follow, insert or rename as Denote does in its Markdown and text notes:
+    /// Open Link on a `denote:` link, Insert Node Link, Rename Note and Rename Note from Front
+    /// Matter.
+    static let denoteCommands: Set<String> = ["org.link.open", "app.node.insert", "app.node.rename", "app.node.rename-from-front-matter"]
 
     /// App commands that act on the open file's entries, tables, links or Denote front matter.
     static let appCommands: Set<String> = [

@@ -197,6 +197,10 @@ public final class IndexStore: Sendable {
                 UPDATE files SET settings_version = -1;
                 """)
         }
+        migrator.registerMigration("v6") { db in
+            // Denote's links in Markdown and text files, and Denote titles of text files; they are read again.
+            try db.execute(sql: "UPDATE files SET settings_version = -1 WHERE kind = 'text'")
+        }
         return migrator
     }
 
@@ -477,15 +481,17 @@ public final class IndexStore: Sendable {
         return indexed.filter { overlay[$0.location.path] == nil } + live
     }
 
-    /// Every Org file with a Denote identifier in its name, as a node with that identifier,
-    /// titled by its `#+TITLE`, else its name; unsaved buffers' titles in place of their files'.
+    /// Every Org, Markdown (`.md`) and text file with a Denote identifier in its name, as a
+    /// node with that identifier, titled by its front matter (an Org file's `#+TITLE`, a
+    /// Markdown file's first heading without one), else its name; unsaved buffers' titles in
+    /// place of their files'.
     public func denoteNodes(overlay: [String: FileRecord] = [:]) throws -> [Node] {
         func node(_ path: String, _ title: String?, _ hash: String) -> Node? {
-            guard let id = Denote.identifier(ofFile: path) else { return nil }
+            guard Denote.FileType(path: path) != nil, let id = Denote.identifier(ofFile: path) else { return nil }
             return Node(id: id, title: title ?? ((path as NSString).lastPathComponent as NSString).deletingPathExtension, location: .file(path, contentHash: hash))
         }
         let indexed = try database.read { db in
-            try Row.fetchAll(db, sql: "SELECT path, hash, title FROM files WHERE kind = 'org' ORDER BY path").compactMap { node($0["path"], $0["title"], $0["hash"]) }
+            try Row.fetchAll(db, sql: "SELECT path, hash, title FROM files WHERE kind IN ('org', 'text') ORDER BY path").compactMap { node($0["path"], $0["title"], $0["hash"]) }
         }
         let live = overlay.values.sorted { $0.path < $1.path }.compactMap { node($0.path, $0.title, $0.hash) }
         return indexed.filter { overlay[$0.location.path] == nil } + live
@@ -515,18 +521,18 @@ public final class IndexStore: Sendable {
     }
 
     /// Every link and the heading it's in, or the file for links before its first heading,
-    /// unsaved buffers' in place of their files'.
+    /// unsaved buffers' in place of their files'. Of Markdown and text files, Denote's links.
     public func links(overlay: [String: FileRecord] = [:]) throws -> [(source: HeadingLocation, target: String)] {
         let indexed = try database.read { db in
             try Row.fetchAll(
                 db,
                 sql: """
                     SELECT f.path, f.hash, -1 AS ordinal, '' AS title, 0 AS start_offset, l.target
-                    FROM file_links l JOIN files f ON f.id = l.file_id WHERE f.kind = 'org'
+                    FROM file_links l JOIN files f ON f.id = l.file_id WHERE f.kind IN ('org', 'text')
                     UNION ALL
                     SELECT f.path, f.hash, h.ordinal, h.title, h.start_offset, l.target
                     FROM links l JOIN headings h ON h.id = l.heading_id JOIN files f ON f.id = h.file_id
-                    WHERE f.kind = 'org' ORDER BY 1, 3
+                    WHERE f.kind IN ('org', 'text') ORDER BY 1, 3
                     """
             ).map { row in
                 let location = location(row)

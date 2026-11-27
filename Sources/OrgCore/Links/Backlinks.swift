@@ -67,22 +67,33 @@ public enum Backlinks {
         return Links.normalizedTitle(wanted) == Links.normalizedTitle(title)
     }
 
+    /// Denote's Markdown link, `[description](denote:ID)`.
+    nonisolated(unsafe) private static let markdownLink = /\[([^\]\n]*)\]\((denote:[^()\[\]\s]+)\)/
+
     /// The line of `body` with the link to `link` in it, links shown as they read (their
     /// description, else what they link to), and the range of that link in the line. A line
-    /// longer than `width` keeps the part around the link.
+    /// longer than `width` keeps the part around the link. Denote's Markdown links count too.
     public static func context(in body: String, link: String, width: Int = 160) -> (text: String, link: Range<Int>)? {
         for line in body.split(whereSeparator: \.isNewline) {
-            guard line.contains("[[" + link + "]") else { continue }
+            guard line.contains("[[" + link + "]") || line.contains("](" + link + ")") else { continue }
             var text = ""
             var found: Range<Int>?
             var rest = Substring(line)
-            while let match = rest.firstMatch(of: bracketLink) {
-                text += rest[..<match.range.lowerBound]
-                let shown = match.2.map(String.init) ?? String(match.1)
+            while true {
+                let bracket = rest.firstMatch(of: bracketLink), markdown = rest.firstMatch(of: markdownLink)
+                let next: (range: Range<Substring.Index>, target: Substring, shown: String)
+                if let bracket, markdown.map({ bracket.range.lowerBound <= $0.range.lowerBound }) ?? true {
+                    next = (bracket.range, bracket.1, bracket.2.map(String.init) ?? String(bracket.1))
+                } else if let markdown {
+                    next = (markdown.range, markdown.2, markdown.1.isEmpty ? String(markdown.2) : String(markdown.1))
+                } else {
+                    break
+                }
+                text += rest[..<next.range.lowerBound]
                 let start = text.utf16.count
-                text += shown
-                if found == nil, match.1 == link { found = start..<text.utf16.count }
-                rest = rest[match.range.upperBound...]
+                text += next.shown
+                if found == nil, next.target == link { found = start..<text.utf16.count }
+                rest = rest[next.range.upperBound...]
             }
             text += rest
             guard var range = found else { continue }

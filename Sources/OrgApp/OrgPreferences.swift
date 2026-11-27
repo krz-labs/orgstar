@@ -207,6 +207,10 @@ public enum OrgPreferences {
     public static func denoteSequenceScheme(_ defaults: UserDefaults = .standard) -> DenoteSequence.Scheme {
         DenoteSequence.Scheme(rawValue: string("denoteSequenceScheme", defaults)) ?? .numeric
     }
+    /// `denote-file-type`: the file type of new notes.
+    public static func denoteFileType(_ defaults: UserDefaults = .standard) -> Denote.FileType {
+        Denote.FileType(rawValue: string("denoteFileType", defaults)) ?? .org
+    }
     /// `denote-prompts`: what a new note asks after its title, in order.
     public static func denotePrompts(_ defaults: UserDefaults = .standard) -> [String] {
         string("denotePrompts", defaults).split(whereSeparator: \.isWhitespace).map(String.init)

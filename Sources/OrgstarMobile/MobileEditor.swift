@@ -112,7 +112,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
     /// Whether `id` is refused because the file isn't org: in Markdown only the fold commands
     /// of org's run, so none writes org into the file.
     func refuses(_ id: String) -> Bool {
-        !isOrg && OrgOnlyCommands.refuses(id, markdown: isMarkdown)
+        !isOrg && OrgOnlyCommands.refuses(id, markdown: isMarkdown, path: options.filePath)
     }
     var onChange: (() -> Void)?
     var onMessage: ((String) -> Void)?
@@ -647,7 +647,10 @@ final class MobileEditor: NSObject, DocumentBuffer {
 
     private func openLinkAtCaret() {
         let caret = textView.selectedRange.location
-        if let link = Links.link(at: caret, text: document.text, tree: document.tree)?.link ?? Links.citation(at: caret, text: document.text, tree: document.tree) {
+        if !isOrg {
+            // Only Denote's links are followed outside org.
+            if let link = Denote.link(at: caret, in: document.text, markdown: isMarkdown) { onLink?(link) } else { onMessage?("No link here") }
+        } else if let link = Links.link(at: caret, text: document.text, tree: document.tree)?.link ?? Links.citation(at: caret, text: document.text, tree: document.tree) {
             onLink?(link)
         } else if let days = Links.timestampDays(at: caret, text: document.text) {
             onAgenda?(days.start, days.count)

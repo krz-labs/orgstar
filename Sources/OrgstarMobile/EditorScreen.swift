@@ -597,9 +597,10 @@ struct EditorScreen: View {
 }
 
 extension EditorScreen {
-    /// Follows a link; files the editor doesn't open show in Quick Look.
+    /// Follows a link; Markdown and text files open in the editor, other files it doesn't open
+    /// show in Quick Look.
     private func follow(_ link: OrgLink) {
-        switch session.follow(link, workspace: workspace, isText: { _ in false }) {
+        switch session.follow(link, workspace: workspace, isText: { Markdown.isPath($0) || Markdown.isPlainTextPath($0) }) {
         case .shown:
             // A link to another file shows it on its own screen; this pane keeps its file.
             guard let pane, let target = pane.path, target != path else { message = nil; return }
@@ -647,7 +648,7 @@ extension EditorScreen {
                 let context = editor.editContext()
                 let range = context.selection.first ?? context.caret..<context.caret
                 let selected = (context.text as NSString).substring(with: NSRange(range))
-                let text = Links.makeString(link, selected.isEmpty ? title : selected)
+                let text = Denote.linkText(link, description: selected.isEmpty ? title : selected, inFile: context.options.filePath)
                 let end = range.lowerBound + (text as NSString).length
                 _ = editor.perform(PrecomputedEdit(EditResult(baseRevision: context.revision, edits: [TextEdit(range: range, replacement: text)], selection: [end..<end])))
             },

@@ -139,6 +139,10 @@ identifier, such as a PDF. A search after =::=, such as =::#custom-id= or =::*He
 works as in a =file:= link. Backlinks list =denote:= links to a file, and to a heading when
 the link searches for it.
 
+In Denote's Markdown and text notes, Open Link (or a =⌘=-click on the Mac) follows
+=[[denote:ID]]= and =[[denote:ID][Title]]=, and in Markdown also Denote's own
+=[Title](denote:ID)=; other links there aren't followed. Backlinks list these notes too.
+
 ** Emacs Lisp links
 
 Following an =elisp:= link whose path starts with =(= asks
@@ -428,9 +432,9 @@ reads one =(file+head NAME HEAD)= template into the three settings, and several 
 With =notes-package = "denote"= in =config.toml=, the same commands follow Denote:
 
 - The graph draws the notes with a Denote identifier and their =denote:= links to each other.
-- Find Node… and Insert Node Link… list the Org files whose names have a Denote
-  identifier, titled by their =#+title:=, and Insert Node Link… inserts
-  =[[denote:…][Title]]=.
+- Find Node… and Insert Node Link… list the Org, Markdown (=.md=) and text (=.txt=) files
+  whose names have a Denote identifier, titled by their front matter's title, and Insert
+  Node Link… inserts =[[denote:…][Title]]=, or =[Title](denote:…)= in a Markdown note.
 - A title no note has makes a note in =denote-directory= (the first folder unless set),
   after the questions =denote-prompts= lists, in its order. The default is
   ="title keywords"=; the title is always the one typed.
@@ -443,9 +447,10 @@ With =notes-package = "denote"= in =config.toml=, the same commands follow Denot
   - =signature=: put in the name after ~==~, in lower case with ~=~ between words, and
     in a =#+signature:= line.
 
-  =file-type= and =identifier= are not asked: notes are Org, and the identifier is the
-  date's, or the first second after it no file under =denote-directory= has. With the
-  default prompts:
+  =file-type= and =identifier= are not asked: a note is in the file type
+  =denote-file-type= sets (Org unless set; see /Markdown and text notes/ below), and the
+  identifier is the date's, or the first second after it no file under
+  =denote-directory= has. With the default prompts:
 
   #+BEGIN_SRC org
   ,#+title:      Field Notes
@@ -482,12 +487,64 @@ kept unique across them.
 - Rename Note from Front Matter renames the open file from its =#+title:=,
   =#+filetags:= and =#+signature:=, keeping its identifier, as
   =denote-rename-file-using-front-matter= does. A missing line leaves that part out of
-  the name, and the keywords keep their order.
+  the name. The keywords are sorted, and the front matter is rewritten from what was
+  read: keywords sorted and in lower case, the signature as it is in the name, and an
+  =#+identifier:= line added when there was none.
 - Rename Notes in Folder from Front Matter… does that for every Denote note in a
   folder of =denote-directory=, as =denote-dired-rename-marked-files-using-front-matter=
   does with them all marked.
 
 Links keep working after a rename, as they use the identifier.
+
+*** Markdown and text notes
+
+Denote's =markdown-yaml=, =markdown-toml= and =text= file types are read and written
+with their own front matter. With =denote-file-type = "markdown-yaml"= in =config.toml=, a
+new note is =20261119T120000--field-notes__ideas_work.md= and starts:
+
+#+BEGIN_SRC yaml
+---
+title:      "Field Notes"
+date:       2026-11-19T12:00:00+01:00
+tags:       ["ideas", "work"]
+identifier: "20261119T120000"
+---
+#+END_SRC
+
+=markdown-toml= writes the same lines between =+++= lines, as =title      = "Field Notes"=
+and so on. =text= makes a =.txt= note:
+
+#+BEGIN_SRC text
+title:      Field Notes
+date:       2026-11-19
+tags:       ideas  work
+identifier: 20261119T120000
+---------------------------
+#+END_SRC
+
+A =signature:= line follows the identifier when the note has one. A =.md= file is YAML
+when it starts with =---= and TOML when it starts with =+++=; one with neither takes
+=denote-file-type= when that is a Markdown type, else YAML.
+
+In these notes:
+
+- Find Node…, Insert Node Link…, the graph and backlinks work as for Org notes; on the
+  Mac the backlinks pane shows under the outline for them too. Insert
+  Node Link… writes =[Title](denote:ID)= in Markdown and =[[denote:ID][Title]]= in text, as
+  Denote's =denote-md-link-format= and =denote-org-link-format= do; =[[denote:ID]]= when
+  there is no title.
+- Open Link follows =denote:= links (see /denote links/ above).
+- Rename Note…, Rename Note from Front Matter and Rename Notes in Folder from Front
+  Matter… rename them and rewrite their front matter in its own format: Markdown values
+  in double quotes, keywords as =["a", "b"]= in Markdown and separated by two spaces in
+  text, the date as RFC 3339 (=2026-11-19T12:00:00+01:00=) in Markdown and =2026-11-19= in
+  text. A line that is there keeps its key and spacing. A file without front matter gets
+  it at the top.
+
+Otherwise they are Markdown and text files as described in [[file:01-files-and-folders.org][Files and folders]]: org's
+commands, Store Link, the sequence commands and denote-org's blocks aren't available in
+them. Capture templates with =denote = true= and denote-journal's entries are always Org
+notes, since they file org entries, as Denote's =denote-org-capture= does.
 
 *** Query links
 
@@ -574,11 +631,12 @@ A new sequence note asks for its title and the =denote-prompts= questions other 
 
 *** Importing and limits
 
-Import from Emacs reads =denote-directory= (a folder or a list), =denote-prompts=,
-=denote-templates=, =denote-silo-directories=, =denote-sequence-scheme=,
-=denote-journal-directory=, =denote-journal-keyword=, =denote-journal-interval= and
-=denote-journal-title-format=. Templates that are functions, and Denote notes in
-Markdown or plain text, are not supported.
+Import from Emacs reads =denote-directory= (a folder or a list), =denote-file-type=,
+=denote-prompts=, =denote-templates=, =denote-silo-directories=,
+=denote-sequence-scheme=, =denote-journal-directory=, =denote-journal-keyword=,
+=denote-journal-interval= and =denote-journal-title-format=. Templates that are functions,
+file types added to =denote-file-types=, =denote-date-format= and the =file-type= prompt
+are not supported.
 
 * Inline images
 

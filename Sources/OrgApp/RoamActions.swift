@@ -122,6 +122,8 @@ public struct RoamActions {
                 }
             }
         case "app.node.insert":
+            // An `id:` link is org syntax; only Denote's links go in its Markdown and text notes.
+            if !denote, let path = session.path, !DocumentSession.isOrgPath(path) { return show("Not an org file") }
             chooseNode("Node: ") { choice in
                 switch choice {
                 case .existing(let node, let title): insertLink(linkType + node.id, title)
@@ -319,7 +321,8 @@ public struct RoamActions {
             guard reachFolders([answers.folder ?? root]) else { return }
             do {
                 let note = try DenoteNote.create(title: title, keywords: answers.keywords, in: answers.folder ?? root, roots: roots,
-                                                 now: answers.date ?? Date(), signature: answers.signature, template: answers.template)
+                                                 now: answers.date ?? Date(), signature: answers.signature, template: answers.template,
+                                                 type: OrgPreferences.denoteFileType())
                 refresh()
                 show("Created \((note.path as NSString).lastPathComponent)")
                 then(.created(path: note.path, offset: (session.text(of: note.path).map { ($0 as NSString).length }) ?? 0, id: note.id, title: title))
@@ -367,12 +370,14 @@ public struct RoamActions {
     }
 
     /// `denote-rename-file-using-front-matter`: the open file renamed from its title,
-    /// keywords and signature, keeping its identifier.
+    /// keywords and signature, keeping its identifier, and its front matter rewritten from them.
     func renameFromFrontMatter() {
         guard let path = session.path else { return show("No file is open") }
         guard let text = session.text(of: path) else { return show("Can't read \((path as NSString).lastPathComponent)") }
-        guard let target = Denote.renamed(path, text: text) else { return show("Not a Denote note: no front matter or identifier") }
-        guard target != path else { return show("Nothing to rename") }
+        guard let (target, rewritten) = Denote.renamed(path, text: text) else { return show("Not a Denote note: no front matter or identifier") }
+        guard target != path || rewritten != text else { return show("Nothing to rename") }
+        if rewritten != text, case .failed(let message) = session.perform(ReplaceText(old: text, new: rewritten), path: path, at: 0, expect: nil) { return show(message) }
+        guard target != path else { return show("Front matter rewritten") }
         rename(path, to: target)
     }
 
@@ -405,7 +410,7 @@ public struct RoamActions {
     func renameNote() {
         guard let path = session.path else { return show("No file is open") }
         guard let text = session.text(of: path) else { return show("Can't read \((path as NSString).lastPathComponent)") }
-        let name = Denote.name(ofFile: path), front = Denote.frontMatter(of: text)
+        let name = Denote.name(ofFile: path), type = Denote.FileType(path: path, text: text) ?? .org, front = Denote.frontMatter(of: text, type: type)
         var title = front.title ?? name.title?.replacingOccurrences(of: "-", with: " ") ?? ""
         var keywords = front.keywords ?? name.keywords
         var signature = name.signature ?? front.signature ?? ""
@@ -433,7 +438,7 @@ public struct RoamActions {
                     ask(prompts.dropFirst())
                 }
             case "date":
-                self.ask(Prompt(key: "date", message: "Rename \(file) with DATE: ", date: Prompt.DateRead(defaultDate: Denote.date(of: text)))) { answer in
+                self.ask(Prompt(key: "date", message: "Rename \(file) with DATE: ", date: Prompt.DateRead(defaultDate: Denote.date(of: text, type: type)))) { answer in
                     guard let answer else { return }
                     date = answer.isEmpty ? nil : Self.date(answer)
                     ask(prompts.dropFirst())
@@ -443,7 +448,7 @@ public struct RoamActions {
         }
         func finish() {
             let (target, rewritten) = DenoteNote.renaming(path, text: text, title: title, keywords: keywords, signature: signature, date: date,
-                                                          roots: DenoteNote.directories(roots: roots()))
+                                                          roots: DenoteNote.directories(roots: roots()), preferred: OrgPreferences.denoteFileType())
             guard target != path || rewritten != text else { return show("Nothing to rename") }
             if rewritten != text, case .failed(let message) = session.perform(ReplaceText(old: text, new: rewritten), path: path, at: 0, expect: nil) { return show(message) }
             guard target != path else { return show("Front matter rewritten") }
@@ -453,7 +458,8 @@ public struct RoamActions {
     }
 
     /// `denote-dired-rename-marked-files-using-front-matter`, with every Denote note in a
-    /// folder of `denote-directory` marked: each renamed from its front matter.
+    /// folder of `denote-directory` marked: each renamed from its front matter, which is
+    /// rewritten from the values read.
     func renameFolderFromFrontMatter() {
         let folders = DenoteNote.folderChoices(DenoteNote.directories(roots: roots()))
         guard !folders.isEmpty else { return show("No folder for notes") }
@@ -464,9 +470,17 @@ public struct RoamActions {
             for name in ((try? FileManager.default.contentsOfDirectory(atPath: folder)) ?? []).sorted() where Denote.identifier(ofFile: name) != nil {
                 let path = (folder as NSString).appendingPathComponent(name)
                 guard let text = session.text(of: path) ?? (try? String(contentsOfFile: path, encoding: .utf8)),
-                      let target = Denote.renamed(path, text: text), target != path else { continue }
-                guard !FileManager.default.fileExists(atPath: target) else { problems.append("\((target as NSString).lastPathComponent) is already there"); continue }
+                      let (target, rewritten) = Denote.renamed(path, text: text), target != path || rewritten != text else { continue }
+                guard target == path || !FileManager.default.fileExists(atPath: target) else { problems.append("\((target as NSString).lastPathComponent) is already there"); continue }
                 do {
+                    if rewritten != text {
+                        if session.openPaths.contains(path) {
+                            if case .failed(let message) = session.perform(ReplaceText(old: text, new: rewritten), path: path, at: 0, expect: nil) { throw Dailies.Failure(message) }
+                        } else {
+                            try rewritten.write(toFile: path, atomically: true, encoding: .utf8)
+                        }
+                    }
+                    guard target != path else { continue }
                     try move(path, to: target)
                     renamed += 1
                     if shown == path { open(target, 0) }

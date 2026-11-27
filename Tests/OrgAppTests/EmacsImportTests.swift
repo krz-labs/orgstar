@@ -315,6 +315,7 @@ struct EmacsImportTests {
             (setq denote-journal-directory "~/notes/journal/" denote-journal-keyword "diary")
             (setq denote-journal-title-format 'day-date-month-year-24h)
             (setq denote-journal-interval 'weekly)
+            (setq denote-file-type 'markdown-yaml)
             """#.write(to: folder.appendingPathComponent("init.el"), atomically: true, encoding: .utf8)
         let s = settings(EmacsImport.scan(EmacsImport.files(in: folder)))
         #expect(s["denote-directory"] == .string("~/notes/"))
@@ -322,6 +323,7 @@ struct EmacsImportTests {
         #expect(s["denote-journal-keyword"] == .string("diary"))
         #expect(s["denote-journal-title-format"] == .string("%A %-e %B %Y %H:%M"))
         #expect(s["denote-journal-interval"] == .string("weekly"))
+        #expect(s["denote-file-type"] == .string("markdown-yaml"))
     }
 
     @MainActor

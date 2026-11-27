@@ -95,7 +95,7 @@ show-hidden-files = true
 ignored-folders = ".git .hg node_modules build"
 #+END_SRC
 
-Org files (=.org= and =.org_archive=), Markdown files (=.md=, =.markdown=) and =.txt= files are read by the index. Only org files feed the agenda, IDs and links; Markdown and text files are searched. Other files are listed and can be opened, but their contents are not searched.
+Org files (=.org= and =.org_archive=), Markdown files (=.md=, =.markdown=) and =.txt= files are read by the index. Only org files feed the agenda, IDs and links; Markdown and text files are searched, and their =denote:= links are read for backlinks (see [[file:09-links.org][Links]]). Other files are listed and can be opened, but their contents are not searched.
 
 ** Creating, renaming and trashing files
 
@@ -206,7 +206,7 @@ While the field holds text, the outline pane shows the results in place of the o
 
 How matching works:
 
-- orgstar searches heading titles, the text under each heading and the text before a file's first heading, in =.org= and =.org_archive= files, and in Markdown files by their =#= headings. A Markdown file's result for the text before its first heading is titled by the =title= in its front matter, else its first heading. A =.txt= file is searched as a whole and titled by its name. Other files are not searched. Syncthing conflict copies are not searched.
+- orgstar searches heading titles, the text under each heading and the text before a file's first heading, in =.org= and =.org_archive= files, and in Markdown files by their =#= headings. A Markdown file's result for the text before its first heading is titled by the =title= in its front matter, else its first heading. A =.txt= file is searched as a whole and titled by its name, or a Denote note's by the =title:= in its front matter. Other files are not searched. Syncthing conflict copies are not searched.
 - Each word you type matches words that start with it, ignoring case and accents: =proj= finds =project= and =projection=.
 - Every word must match within the same heading, or within the text before the first heading.
 - Up to 50 results show, best matches first.

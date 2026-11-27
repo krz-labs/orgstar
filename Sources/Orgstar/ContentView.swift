@@ -302,7 +302,7 @@ struct ContentView: View {
                         if query.isEmpty {
                             VStack(spacing: 0) {
                                 OutlineColumn(session: session)
-                                if backlinksShown, session.isOrg {
+                                if backlinksShown, session.isOrg || session.path.flatMap({ Denote.FileType(path: $0) }) != nil {
                                     Divider()
                                     BacklinksPane(workspace: workspace, session: session, commands: commands) { location in
                                         selectedFile = location.path
@@ -987,7 +987,7 @@ struct ContentView: View {
                 let context = editor.context()
                 let range = context.selection.first ?? context.caret..<context.caret
                 let selected = (context.text as NSString).substring(with: NSRange(range))
-                let text = Links.makeString(link, selected.isEmpty ? title : selected)
+                let text = Denote.linkText(link, description: selected.isEmpty ? title : selected, inFile: context.options.filePath)
                 let end = range.lowerBound + (text as NSString).length
                 editor.perform(PrecomputedEdit(EditResult(baseRevision: context.revision, edits: [TextEdit(range: range, replacement: text)], selection: [end..<end])))
             },
@@ -1390,7 +1390,7 @@ struct ContentView: View {
             return commands.show(Self.unavailable(EditorCommands.all.first { $0.id == id }?.title ?? id))
         }
         if let feature = ProFeature.required(byCommand: id), !ProAccess.shared.allows(feature) { return }
-        if !session.isOrg, Printing.commands.contains(id) || OrgOnlyCommands.refuses(id, markdown: session.isMarkdown) {
+        if !session.isOrg, Printing.commands.contains(id) || OrgOnlyCommands.refuses(id, markdown: session.isMarkdown, path: session.path) {
             commands.show(String(localized: "Not an org file"))
             return
         }

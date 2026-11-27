@@ -173,9 +173,15 @@ public final class OrgEditor: NSObject {
             self.redrawShaded([view.selectedRange()])
         }
         view.onCommandClick = { [weak self, unowned view] offset in
-            guard let self, Links.link(at: offset, text: self.document.text, tree: self.document.tree) != nil
-                || Links.citation(at: offset, text: self.document.text, tree: self.document.tree) != nil
-                || Links.timestampDays(at: offset, text: self.document.text) != nil else { return false }
+            guard let self else { return false }
+            if !self.isOrg {
+                // Only Denote's links are followed outside org.
+                guard Denote.link(at: offset, in: self.document.text, markdown: self.isMarkdown) != nil else { return false }
+            } else {
+                guard Links.link(at: offset, text: self.document.text, tree: self.document.tree) != nil
+                    || Links.citation(at: offset, text: self.document.text, tree: self.document.tree) != nil
+                    || Links.timestampDays(at: offset, text: self.document.text) != nil else { return false }
+            }
             self.active = view
             self.setCaret(offset)
             self.run("org.link.open")
@@ -617,7 +623,7 @@ public final class OrgEditor: NSObject {
     /// Whether `id` is refused because the file isn't org: in Markdown only the fold commands
     /// of org's run, so none writes org into the file.
     func refuses(_ id: String) -> Bool {
-        !isOrg && OrgOnlyCommands.refuses(id, markdown: isMarkdown)
+        !isOrg && OrgOnlyCommands.refuses(id, markdown: isMarkdown, path: options.filePath)
     }
 
     /// The file's structure for folding: the org tree, or for Markdown a tree of its headings.

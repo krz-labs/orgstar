@@ -263,11 +263,16 @@ public struct OpenLinkAtPoint: OrgCommand {
     public var id: String { "org.link.open" }
     public var title: String { "Open Link" }
     public func applies(in context: EditContext) -> Bool {
-        Links.link(at: context.caret, text: context.text, tree: context.tree) != nil
+        if let markdown = Self.denoteText(context) { return Denote.link(at: context.caret, in: context.text, markdown: markdown) != nil }
+        return Links.link(at: context.caret, text: context.text, tree: context.tree) != nil
             || Citations.keys(at: context.caret, text: context.text, tree: context.tree) != nil
             || Links.timestampDays(at: context.caret, text: context.text) != nil
     }
     public func run(in context: EditContext) -> CommandStep {
+        if let markdown = Self.denoteText(context) {
+            guard let link = Denote.link(at: context.caret, in: context.text, markdown: markdown) else { return .failed("No link to follow here") }
+            return .external(.openLink(link))
+        }
         if let found = Links.link(at: context.caret, text: context.text, tree: context.tree) {
             return .external(.openLink(found.link))
         }
@@ -278,6 +283,13 @@ public struct OpenLinkAtPoint: OrgCommand {
             return .external(.agenda(start: days.start, days: days.count))
         }
         return .failed("No link to follow here")
+    }
+
+    /// In a Markdown or text file Denote has a type for, whether it is Markdown: only its
+    /// `denote:` links are followed there. Nil in other files.
+    static func denoteText(_ context: EditContext) -> Bool? {
+        guard let path = context.options.filePath, let type = Denote.FileType(path: path), type != .org else { return nil }
+        return type.isMarkdown
     }
 }
 

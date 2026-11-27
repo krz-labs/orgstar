@@ -73,7 +73,7 @@ struct DenoteOracleTests {
     @Test(.enabled(if: enabled)) func filesMatchDenote() throws {
         let theirs = try Self.folder(), ours = try Self.folder()
         defer { try? FileManager.default.removeItem(at: theirs); try? FileManager.default.removeItem(at: ours) }
-        let front = "#+title:      New Title\n#+signature:  Two Words\n#+filetags:   :Zeta:alpha:\n#+identifier: 20261011T080000\n\nBody\n"
+        let front = "#+title:      New Title\n#+signature:  Two Words\n#+filetags:   :zeta:alpha:\n#+identifier: 20261011T080000\n\nBody\n"
         let old = "20261011T080000==1a--old__x.org"
         for dir in [theirs, ours] { try front.write(to: dir.appendingPathComponent(old), atomically: true, encoding: .utf8) }
         try Self.denote(theirs, """
@@ -81,15 +81,99 @@ struct DenoteOracleTests {
               (denote "Field Notes" (denote-keywords-sort (list "work" "ideas")) 'org nil "2026-10-11 12:00:05")
               (save-buffer)
               (let ((denote-journal-directory nil)) (denote-journal-new-entry "2026-10-11 12:00:00") (save-buffer))
-              (denote-rename-file-using-front-matter \(theirs.appendingPathComponent(old).path.debugDescription)))
+              (denote-rename-file-using-front-matter \(theirs.appendingPathComponent(old).path.debugDescription))
+              (save-some-buffers t))
             """)
         _ = try DenoteNote.create(title: "Field Notes", keywords: ["work", "ideas"], in: ours.path, now: DailiesTests.day.addingTimeInterval(5))
         _ = try Dailies(directory: ours.path, journal: Dailies.Journal()).ensure(DailiesTests.day)
         let renamed = Denote.renamed(ours.appendingPathComponent(old).path, text: front)!
-        try FileManager.default.moveItem(atPath: ours.appendingPathComponent(old).path, toPath: renamed)
+        try renamed.text.write(to: ours.appendingPathComponent(old), atomically: true, encoding: .utf8)
+        try FileManager.default.moveItem(atPath: ours.appendingPathComponent(old).path, toPath: renamed.path)
 
         let names = try FileManager.default.contentsOfDirectory(atPath: theirs.path).sorted()
         #expect(names.count == 3)
+        #expect(try FileManager.default.contentsOfDirectory(atPath: ours.path).sorted() == names)
+        for name in names {
+            #expect(try String(contentsOf: ours.appendingPathComponent(name), encoding: .utf8)
+                == String(contentsOf: theirs.appendingPathComponent(name), encoding: .utf8), "\(name)")
+        }
+    }
+
+    /// New notes in the Markdown and text file types, as files Denote and orgstar each make.
+    @Test(.enabled(if: enabled)) func textTypeNotesMatchDenote() throws {
+        let theirs = try Self.folder(), ours = try Self.folder()
+        defer { try? FileManager.default.removeItem(at: theirs); try? FileManager.default.removeItem(at: ours) }
+        let notes: [(type: Denote.FileType, title: String, keywords: [String], signature: String, minute: Int)] = [
+            (.markdownYAML, "Field \"Notes\": a\\b", ["work", "ideas"], "Part One", 1),
+            (.markdownYAML, "Bare", [], "", 2),
+            (.markdownTOML, "Toml Note", ["zeta", "alpha"], "1a", 3),
+            (.markdownTOML, "", [], "", 4),
+            (.text, "Plain Note", ["work", "ideas"], "x", 5),
+            (.text, "Bare Text", [], "", 6),
+        ]
+        let calls = notes.map { n in
+            "(denote \(n.title.debugDescription) (denote-keywords-sort (list \(n.keywords.map(\.debugDescription).joined(separator: " ")))) '\(n.type.rawValue) nil \(String(format: "\"2026-10-11 12:%02d:05\"", n.minute)) nil \(n.signature.debugDescription)) (save-buffer)"
+        }.joined(separator: "\n")
+        try Self.denote(theirs, "(progn \(calls))")
+        for n in notes {
+            _ = try DenoteNote.create(title: n.title, keywords: n.keywords, in: ours.path, now: DailiesTests.day.addingTimeInterval(Double(n.minute * 60 + 5)),
+                                      signature: n.signature, type: n.type)
+        }
+        let names = try FileManager.default.contentsOfDirectory(atPath: theirs.path).sorted()
+        #expect(names.count == notes.count)
+        #expect(try FileManager.default.contentsOfDirectory(atPath: ours.path).sorted() == names)
+        for name in names {
+            #expect(try String(contentsOf: ours.appendingPathComponent(name), encoding: .utf8)
+                == String(contentsOf: theirs.appendingPathComponent(name), encoding: .utf8), "\(name)")
+        }
+    }
+
+    /// `denote-rename-file` and `denote-rename-file-using-front-matter` on Markdown and text
+    /// notes: front matter rewritten, a line added and one removed, front matter added to a file
+    /// without any, and names and front matter taken from edited front matter.
+    @Test(.enabled(if: enabled)) func textTypeRenamesMatchDenote() throws {
+        let theirs = try Self.folder(), ours = try Self.folder()
+        defer { try? FileManager.default.removeItem(at: theirs); try? FileManager.default.removeItem(at: ours) }
+        let files = [
+            "20261011T120000--old-yaml__x.md": "---\ntitle:      \"Old Yaml\"\ndate:       2026-10-11T12:00:00+02:00\ntags:       [\"x\"]\nidentifier: \"20261011T120000\"\n---\n\n# Body\n",
+            "20261011T130000==zz--old-toml.md": "+++\ntitle      = \"Old Toml\"\ndate       = 2026-10-11T13:00:00-05:00\ntags       = []\nidentifier = \"20261011T130000\"\nsignature  = \"zz\"\n+++\n\nBody\n",
+            "20261011T140000--old-text__x.txt": "title:      Old Text\ntags:       x\nidentifier: 20261011T140000\n---------------------------\n\nBody\n",
+            "plain.md": "# Heading\n\nNo front matter\n",
+            "plain.txt": "No front matter\n",
+            "20261011T150000--edited-yaml__x.md": "---\ntitle:      \"New \\\"Q\\\" Title\"\ndate:       2026-10-11T15:00:00+00:00\ntags:       [\"zeta\", \"alpha\"]\nidentifier: \"20261011T150000\"\nsignature:  \"Two Words\"\n---\n\nBody\n",
+            "20261011T160000--edited-toml__x.md": "+++\ntitle      = 'Toml Title'\ntags       = [\"zeta\", \"alpha\"]\nidentifier = \"20261011T160000\"\n+++\n\nBody\n",
+            "20261011T170000--edited-text__x.txt": "title:      Text Title\ndate:       2026-10-11\ntags:       zeta  alpha\nidentifier: 20261011T170000\n---------------------------\n\nBody\n",
+        ]
+        for dir in [theirs, ours] { for (name, text) in files { try text.write(to: dir.appendingPathComponent(name), atomically: true, encoding: .utf8) } }
+        let renames: [(file: String, title: String, keywords: [String], signature: String)] = [
+            ("20261011T120000--old-yaml__x.md", "New \"Yaml\"", ["zeta", "alpha"], "Part One"),
+            ("20261011T130000==zz--old-toml.md", "New Toml", ["k"], ""),
+            ("20261011T140000--old-text__x.txt", "New Text", ["a", "b"], "s1"),
+            ("plain.md", "Plain Markdown", ["k"], ""),
+            ("plain.txt", "Plain Text", [], ""),
+        ]
+        let fromFrontMatter = ["20261011T150000--edited-yaml__x.md", "20261011T160000--edited-toml__x.md", "20261011T170000--edited-text__x.txt"]
+        let calls = renames.map { r in
+            "(denote-rename-file \(theirs.appendingPathComponent(r.file).path.debugDescription) \(r.title.debugDescription) (list \(r.keywords.map(\.debugDescription).joined(separator: " "))) \(r.signature.debugDescription) \"2026-10-11 12:00:00\" \((Denote.identifier(ofFile: r.file) ?? "").debugDescription))"
+        } + fromFrontMatter.map { "(denote-rename-file-using-front-matter \(theirs.appendingPathComponent($0).path.debugDescription))" }
+        try Self.denote(theirs, "(progn " + calls.joined(separator: "\n") + "\n(save-some-buffers t))")
+        let date = Calendar.current.date(from: DateComponents(year: 2026, month: 10, day: 11, hour: 12))!
+        for r in renames {
+            let path = ours.appendingPathComponent(r.file).path
+            let text = try String(contentsOfFile: path, encoding: .utf8)
+            let (target, rewritten) = DenoteNote.renaming(path, text: text, title: r.title, keywords: r.keywords, signature: r.signature, date: date, roots: [ours.path])
+            try rewritten.write(toFile: path, atomically: true, encoding: .utf8)
+            if target != path { try FileManager.default.moveItem(atPath: path, toPath: target) }
+        }
+        for file in fromFrontMatter {
+            let path = ours.appendingPathComponent(file).path
+            let (target, rewritten) = try #require(Denote.renamed(path, text: String(contentsOfFile: path, encoding: .utf8)))
+            try rewritten.write(toFile: path, atomically: true, encoding: .utf8)
+            if target != path { try FileManager.default.moveItem(atPath: path, toPath: target) }
+        }
+        let names = try FileManager.default.contentsOfDirectory(atPath: theirs.path).sorted()
+        #expect(names.contains("20261011T120000==part=one--new-yaml__alpha_zeta.md") && names.contains("20261011T160000--toml-title__alpha_zeta.md"))
+        #expect(!names.contains("plain.md") && !names.contains("plain.txt"))
         #expect(try FileManager.default.contentsOfDirectory(atPath: ours.path).sorted() == names)
         for name in names {
             #expect(try String(contentsOf: ours.appendingPathComponent(name), encoding: .utf8)
