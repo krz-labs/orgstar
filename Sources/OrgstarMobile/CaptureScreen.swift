@@ -11,6 +11,8 @@ struct CaptureScreen: View {
     let workspace: WorkspaceModel
     let session: DocumentSession
     let request: CaptureRequest
+    /// Called with the template and file once the entry is filed.
+    var filed: (CaptureTemplate, String) -> Void = { _, _ in }
     @Environment(\.dismiss) private var dismiss
     @Environment(ClockModel.self) private var clock
     @Environment(MobileModel.self) private var model
@@ -223,6 +225,7 @@ struct CaptureScreen: View {
             problem = error.message
             editing = true
         case .success(let entry):
+            filed(template, entry.path)
             // Clocked from when capture began.
             let paths = workspace.files.filter { $0.kind == .org }.map(\.path)
             Task { [clock, session, opened = context.now] in

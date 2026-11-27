@@ -228,19 +228,31 @@ extension DocumentSession {
         _ text: String, templateKey key: String?, templates: [CaptureTemplate], workspace: WorkspaceModel, clock: ClockModel,
         clipboard: String, userName: String
     ) -> Result<CaptureTemplate, CaptureError> {
+        capture(text, templateKey: key, templates: templates, workspace: workspace, clock: clock, clipboard: clipboard, userName: userName).map(\.template)
+    }
+
+    /// `capture(_:templateKey:…)` with prompts answered by their prompt text (`%^{What}` by
+    /// `answers["What"]`, empty when missing) and org-protocol's link properties for `%a`,
+    /// `%:link` and the like. The template used, and the file and offset of the entry.
+    public func capture(
+        _ text: String, templateKey key: String?, templates: [CaptureTemplate], workspace: WorkspaceModel, clock: ClockModel,
+        clipboard: String, userName: String, answers: [String: String] = [:], properties: [String: String] = [:]
+    ) -> Result<(template: CaptureTemplate, path: String, offset: Int), CaptureError> {
         let key = key.flatMap { $0.isEmpty ? nil : $0 }
         guard let chosen = key.map({ key in templates.first { $0.key == key } }) ?? templates.first else {
             return .failure(CaptureError(message: "No capture template \"\(key ?? "")\""))
         }
         var context = CaptureContext(initial: text, clipboard: clipboard, userName: userName, allTags: (try? workspace.index.tags()) ?? [])
+        if let annotation = properties["annotation"] { context.annotation = annotation }
+        context.linkProperties = properties
         context.readsTemplateFiles()
-        let answers = Capture.questions(chosen.template, context: context).map { _ in "" }
+        let answers = Capture.questions(chosen.template, context: context).map { answers[$0.prompt] ?? "" }
         guard case .success(let filled) = Capture.fill(chosen.template, context: context, answers: answers) else {
             return .failure(CaptureError(message: "Can't fill template \"\(chosen.key)\""))
         }
         return chosen.resolved(workspace: workspace, session: self, clock: clock).flatMap { resolved in
             capture(filled.text, template: resolved.template, root: workspace.rootPaths.first, file: resolved.file)
-        }.map { _ in chosen }
+        }.map { (chosen, $0.path, $0.offset) }
     }
 }
 

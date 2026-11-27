@@ -166,8 +166,66 @@ final class AppCommands {
         captureRequest = (nil, [:], day, captureSerial)
     }
 
+    /// Runs x-callback-url actions; the main window sets it.
+    @ObservationIgnored var xCallbackRunner: XCallbackRunner?
+    /// The x-callback-url capture the capture window shows, with its `captureRequest` serial.
+    @ObservationIgnored private(set) var captureCallback: (request: XCallbackRequest, serial: Int)?
+
+    /// An `orgstar://x-callback-url/…` link.
+    func handle(xCallback request: XCallbackRequest) {
+        guard let runner = xCallbackRunner else { return reply(request, .failure(.notReady, "orgstar isn't ready")) }
+        Task { await take(runner.run(request, ask: askClock), for: request, runner: runner) }
+    }
+
+    private func take(_ step: XCallbackRunner.Step, for request: XCallbackRequest, runner: XCallbackRunner) async {
+        switch step {
+        case .reply(let reply):
+            self.reply(request, reply)
+        case .approve(let source):
+            NSApp.activate()
+            let alert = NSAlert()
+            alert.messageText = XCallbackApprovals.question(source)
+            alert.informativeText = XCallbackApprovals.explanation(source)
+            alert.addButton(withTitle: String(localized: "Allow"))
+            alert.addButton(withTitle: String(localized: "Don’t Allow"))
+            guard alert.runModal() == .alertFirstButtonReturn else { return reply(request, .failure(.notAllowed, "Not allowed")) }
+            runner.approvals.allow(source)
+            await take(runner.run(request, ask: askClock), for: request, runner: runner)
+        case .capture(let template, let properties):
+            if let pending = captureCallback { captureEnded(serial: pending.serial, filed: nil) }
+            captureSerial += 1
+            captureRequest = (template, properties, nil, captureSerial)
+            captureCallback = (request, captureSerial)
+            run("app.capture")
+        case .open(let path, let offset, let reply):
+            NSApp.activate()
+            jump(path: path, offset: offset)
+            self.reply(request, reply)
+        }
+    }
+
+    /// Opens the request's callback for `reply`; a failure without one shows its message.
+    private func reply(_ request: XCallbackRequest, _ reply: XCallbackReply) {
+        if let url = request.callbackURL(for: reply) {
+            NSWorkspace.shared.open(url)
+        } else if case .failure(_, let message) = reply {
+            show(message)
+        }
+    }
+
+    /// The capture window filed the capture with this serial, or closed without filing it.
+    func captureEnded(serial: Int, filed: (template: CaptureTemplate, path: String)?) {
+        guard let pending = captureCallback, pending.serial == serial else { return }
+        captureCallback = nil
+        reply(pending.request, filed.map { xCallbackRunner?.captured($0.template, path: $0.path) ?? .success([:]) } ?? .cancel)
+    }
+
     /// `org-protocol://capture` and `store-link`, and the widgets' `orgstar://` links.
     func handle(protocolURL url: String) {
+        if let request = URL(string: url).flatMap(XCallbackRequest.init(url:)) {
+            handle(xCallback: request)
+            return
+        }
         if let link = URL(string: url).flatMap(AppLink.init(url:)) {
             switch link {
             case .agenda: run("app.agenda")
@@ -563,6 +621,10 @@ struct OrgstarApp: App {
                         session.fileWritten = { GitAutoCommit.shared.fileWritten($0) }
                         #endif
                         CaptureIntent.environment = (model, session, clock, commands)
+                        var runner = XCallbackRunner(workspace: model, session: session, clock: clock)
+                        runner.clipboard = { NSPasteboard.general.string(forType: .string) ?? "" }
+                        runner.userName = NSFullUserName()
+                        commands.xCallbackRunner = runner
                     }
             case .failure(let error):
                 ContentUnavailableView("Can't Open the Index", systemImage: "exclamationmark.triangle", description: Text(error.localizedDescription))
@@ -1438,9 +1500,10 @@ struct SettingsView: View {
                 Text("Templates go in \(CaptureTemplates.userFile.path).")
                     .settingsFooter()
             }
+            XCallbackSettings()
         }
         .formStyle(.grouped)
-        .frame(height: 160)
+        .frame(height: 360)
     }
 }
 

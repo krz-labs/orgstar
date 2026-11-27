@@ -86,6 +86,7 @@ struct SettingsScreen: View {
                 }
             }
             DecryptSettings()
+            XCallbackSettings()
             Section {
                 let _ = model.settingsVersion
                 Toggle("Show days without entries", isOn: Binding {

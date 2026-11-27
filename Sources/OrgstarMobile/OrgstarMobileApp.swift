@@ -166,11 +166,34 @@ extension CaptureRequest {
     }
 }
 
+/// Asks whether an app may use x-callback-url links that write to files or read them.
+private struct XCallbackApproval: ViewModifier {
+    typealias Pending = (request: XCallbackRequest, source: XCallbackApprovals.Source)
+    @Binding var pending: Pending?
+    let allow: (Pending) -> Void
+    let deny: (Pending) -> Void
+
+    func body(content: Content) -> some View {
+        content.alert(pending.map { XCallbackApprovals.question($0.source) } ?? "", isPresented: Binding { pending != nil } set: { if !$0 { pending = nil } },
+                      presenting: pending) { pending in
+            Button("Allow") { allow(pending) }
+            Button("Don’t Allow", role: .cancel) { deny(pending) }
+        } message: { pending in
+            Text(XCallbackApprovals.explanation(pending.source))
+        }
+    }
+}
+
 struct RootView: View {
     let model: MobileModel
     let workspace: WorkspaceModel
     let agenda: AgendaModel
     @State private var capture: CaptureRequest?
+    /// An x-callback-url capture in the sheet: its request, the sheet's request, and the reply
+    /// once it is filed.
+    @State private var xCallbackCapture: (request: XCallbackRequest, id: UUID, filed: XCallbackReply?)?
+    /// An x-callback-url request waiting for the answer to whether its app may use links.
+    @State private var approval: (request: XCallbackRequest, source: XCallbackApprovals.Source)?
     /// The share extension's link whose capture sheet is showing, with its request's id. The link
     /// stays in the inbox until the sheet is dismissed.
     @State private var shared: (link: CaptureInbox.Link, request: UUID)?
@@ -407,8 +430,16 @@ struct RootView: View {
             if let id, id != shared?.request { shared = nil }
         }
         .sheet(item: $capture, onDismiss: captureDismissed) { request in
-            CaptureScreen(workspace: workspace, session: session, request: request)
+            CaptureScreen(workspace: workspace, session: session, request: request) { template, path in
+                if xCallbackCapture?.id == request.id { xCallbackCapture?.filed = xCallbackRunner.captured(template, path: path) }
+            }
         }
+        .modifier(XCallbackApproval(pending: $approval, allow: { pending in
+            XCallbackApprovals.shared.allow(pending.source)
+            run(pending.request)
+        }, deny: { pending in
+            reply(pending.request, .failure(.notAllowed, "Not allowed"))
+        }))
         .sheet(item: $sharedFiles) { shared in
             RefileSheet(targets: workspace.refileTargets(openPath: nil, document: nil, settings: RefileSettings(targets: [.init(files: .workspace, spec: .all)])),
                         title: "Attach to") { target in
@@ -513,6 +544,10 @@ struct RootView: View {
 
     /// The shared capture was saved or discarded, so its link goes; then the next one shows.
     private func captureDismissed() {
+        if let pending = xCallbackCapture, capture?.id != pending.id {
+            xCallbackCapture = nil
+            reply(pending.request, pending.filed ?? .cancel)
+        }
         if let shared { model.inbox?.remove(shared.link) }
         shared = nil
         showWaiting()
@@ -520,7 +555,9 @@ struct RootView: View {
 
     /// A widget's or the Live Activity's link, or an org-protocol URL.
     private func handle(_ url: URL) {
-        if let callback = WorkingCopy.callback(url) {
+        if let request = XCallbackRequest(url: url) {
+            run(request)
+        } else if let callback = WorkingCopy.callback(url) {
             model.workingCopy.finished(callback, workspace: workspace, session: session)
         } else if let link = AppLink(url: url) {
             open(link)
@@ -538,6 +575,43 @@ struct RootView: View {
             actions.follow(request)
         } else if url.scheme == "org-protocol" {
             message = "orgstar handles org-protocol capture and store-link"
+        }
+    }
+
+    private var xCallbackRunner: XCallbackRunner {
+        XCallbackRunner(workspace: workspace, session: session, clock: model.clock)
+    }
+
+    /// An `orgstar://x-callback-url/…` link.
+    private func run(_ request: XCallbackRequest) {
+        Task {
+            switch await xCallbackRunner.run(request, ask: model.clockPrompts.ask) {
+            case .reply(let reply):
+                // Captures and clocks are written at once, as Shortcuts' are.
+                if [.capture, .clockIn, .clockOut].contains(request.known) {
+                    for path in session.dirtyPaths { _ = session.save(path) }
+                }
+                self.reply(request, reply)
+            case .approve(let source):
+                approval = (request, source)
+            case .capture(let template, let properties):
+                if let pending = xCallbackCapture { reply(pending.request, pending.filed ?? .cancel) }
+                let sheet = CaptureRequest(template: template, properties: properties)
+                xCallbackCapture = (request, sheet.id, nil)
+                capture = sheet
+            case .open(let path, let offset, let reply):
+                model.openRequest = .offset(path, offset)
+                self.reply(request, reply)
+            }
+        }
+    }
+
+    /// Opens the request's callback for `reply`; a failure without one shows its message.
+    private func reply(_ request: XCallbackRequest, _ reply: XCallbackReply) {
+        if let url = request.callbackURL(for: reply) {
+            UIApplication.shared.open(url)
+        } else if case .failure(_, let message) = reply {
+            self.message = message
         }
     }
 

@@ -35,6 +35,8 @@ struct CaptureView: View {
     @State private var day: Int?
     /// An org-roam capture: its templates in place of capture.toml's, filed through it.
     @State private var roam: RoamCapture?
+    /// The `captureRequest` serial of an x-callback-url capture, whose caller hears how it ends.
+    @State private var callbackSerial: Int?
     @FocusState private var focused: Bool
     @Environment(\.dismissWindow) private var dismissWindow
     @Environment(\.openWindow) private var openWindow
@@ -136,6 +138,7 @@ struct CaptureView: View {
             reset()
             takeRequest()
         }
+        .onDisappear { endCallback(filed: nil) }
     }
 
     /// What an empty answer means.
@@ -200,6 +203,9 @@ struct CaptureView: View {
     private func takeRequest() {
         guard let request = commands.captureRequest else { return }
         commands.captureRequest = nil
+        // Another capture takes the window from an x-callback-url one, which ends cancelled.
+        endCallback(filed: nil)
+        if commands.captureCallback?.serial == request.serial { callbackSerial = request.serial }
         if let roam = commands.roamCapture {
             commands.roamCapture = nil
             self.roam = roam
@@ -315,6 +321,7 @@ struct CaptureView: View {
             return
         case .success(let entry):
             commands.show("Captured to \(Self.target(template))")
+            endCallback(filed: (template, entry.path))
             let options = template.options
             let paths = workspace.files.filter { $0.kind == .org }.map(\.path)
             Task { [commands, clock, session, workspace] in
@@ -345,8 +352,16 @@ struct CaptureView: View {
     }
 
     private func close() {
+        endCallback(filed: nil)
         reset()
         dismissWindow(id: "capture")
+    }
+
+    /// Tells an x-callback-url capture's caller it was filed, or cancelled when `filed` is nil.
+    private func endCallback(filed: (template: CaptureTemplate, path: String)?) {
+        guard let serial = callbackSerial else { return }
+        callbackSerial = nil
+        commands.captureEnded(serial: serial, filed: filed)
     }
 }
 

@@ -332,6 +332,8 @@ Every prompt in the template takes its default (an empty answer: today for dates
 
 On the Mac, the action opens orgstar if it isn't running and waits up to five seconds for it to be ready.
 
+Apps other than Shortcuts can capture through ~orgstar://x-callback-url/capture~ links, which also answer the template's prompts and report back; see [[file:15-alongside-emacs.org::*orgstar:// links and x-callback-url][orgstar:// links and x-callback-url]].
+
 * Capture on iOS
 
 The Capture button (a square with a pencil) at the top of the Agenda and Folders tabs opens the capture sheet. The + on a day's header in the Agenda tab opens it for that day, as described in [[*Capturing onto an agenda day][Capturing onto an agenda day]]; date prompts then show that day as their default. The templates come from the =capture.toml= in your synced configuration folder (see [[file:14-ios.org][iOS]]).

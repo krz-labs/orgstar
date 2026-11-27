@@ -332,6 +332,8 @@ The widgets and the Live Activity open the app with these links, which also work
 | =orgstar://review=                     | Review Flashcards                          |
 | ~orgstar://entry?path=/path/file.org&offset=N~ | The file in the reader, at offset N |
 
+Other apps can also capture, open an entry, read the agenda and clock in and out through ~orgstar://x-callback-url/…~ links, and get results back. See [[file:15-alongside-emacs.org::*orgstar:// links and x-callback-url][orgstar:// links and x-callback-url]].
+
 * Apple Watch
 
 The watch app shows today's agenda from your iPhone, marks entries done, shows and stops the running clock, and takes dictated captures. It comes with orgstar on iPhone and installs on a paired watch as other watch apps do. It reads nothing itself: your iPhone sends it today's agenda and the clock whenever its widgets update (when files, edits or settings change while orgstar is open, and when you return to it) and whenever the clock starts or stops, and the watch keeps the last one it got. Until it has one, it shows only =Open orgstar on your iPhone to show your agenda here.=

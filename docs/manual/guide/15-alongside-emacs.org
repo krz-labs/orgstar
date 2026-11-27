@@ -178,6 +178,143 @@ Other sub-protocols, such as =open-source=, show "orgstar handles org-protocol c
 
 The Shortcuts action Capture to orgstar, on the Mac and iOS, files text with a capture template without opening the capture window. See [[file:08-capture.org][Capture]].
 
+* orgstar:// links and x-callback-url
+
+orgstar registers the =orgstar:= URL scheme on the Mac and iOS. These links open part of the app; the widgets and the Live Activity use them, and they work from Shortcuts, a browser, a note or =open= in Terminal:
+
+| Link                                           | Opens                                                 |
+|------------------------------------------------+-------------------------------------------------------|
+| =orgstar://agenda=                             | The agenda                                            |
+| =orgstar://clock=                              | The entry of the running clock                        |
+| =orgstar://review=                             | Review Flashcards                                     |
+| ~orgstar://capture?template=t~                 | Capture with that template, or the template list      |
+| ~orgstar://entry?path=/path/file.org&offset=N~ | The file at offset N                                  |
+
+** x-callback-url
+
+Links of the form ~orgstar://x-callback-url/action?parameters~ follow [[https://x-callback-url.com][x-callback-url 1.0]]: another app asks orgstar to do something and names links to open afterwards. Besides an action's own parameters, every action takes:
+
+| Parameter   | Meaning                                                                                  |
+|-------------+------------------------------------------------------------------------------------------|
+| =x-success= | Opened when the action succeeds, with the result's parameters added to its query         |
+| =x-error=   | Opened when it fails, with =errorCode= and =errorMessage= added                          |
+| =x-cancel=  | Opened when you close the capture window or sheet without filing                         |
+| =x-source=  | The calling app's name, shown when orgstar asks whether to allow it                      |
+
+Values are percent-encoded, as in any URL; encode a =+= in a value as =%2B=. Without =x-error=, an error shows in orgstar's message area.
+
+*** capture
+
+| Parameter       | Meaning                                                                          |
+|-----------------+----------------------------------------------------------------------------------|
+| =template=      | A template's =key= in =capture.toml=                                             |
+| =text=          | The text, inserted as =%i=                                                       |
+| =url=, =title=  | A link, as org-protocol gives one: =%a=, =%:link=, =%:description=               |
+| /prompt name/   | The answer to the prompt with that text: =What= for =%^{What}=, =Tags= for =%^g=, =Date= for =%^t=, =Effort= for =%^{Effort}p= |
+
+With =template= and =text= given and a parameter for every prompt in the template, orgstar files the entry without showing anything, as Capture to orgstar does in Shortcuts; on iOS the file is saved at once. =%^C= and =%^L= insert nothing. Otherwise the capture window (Mac) or sheet (iOS) opens with the template chosen (the template list without =template=), the text as =%i= and the link as =%a=, and asks what is missing; prompt answers given in the link aren't filled in there. Templates that make a Denote note or ask for a date tree's day (=time-prompt=) always open it. Closing it without filing opens =x-cancel=.
+
+Result: =template= (the key) and =file= (the target, relative to its folder).
+
+*** open
+
+| Parameter | Meaning                                                                                       |
+|-----------+-----------------------------------------------------------------------------------------------|
+| =file=    | A file relative to one of your folders (the first that has it), or an absolute path inside one |
+| =heading= | With =file=: the first heading with this title                                                |
+| =id=      | Instead of =file=: the heading with this =ID= property                                         |
+
+Shows the file or heading: in the editor on the Mac, in the reader on iOS. Result: =file=.
+
+*** agenda
+
+| Parameter | Meaning                                                                                                    |
+|-----------+------------------------------------------------------------------------------------------------------------|
+| =view=    | A view's name: =Agenda= (the default), =TODO List=, =Stuck Projects=, or one in =views.toml=; case is ignored |
+| =limit=   | How many entries to return: 50 when not given, at most 200                                                 |
+
+Runs the view with your agenda settings, as the agenda shows it. Calendar events and reminders are left out. Result:
+
+| Parameter | Meaning                                                 |
+|-----------+---------------------------------------------------------|
+| =view=    | The view's name                                         |
+| =result=  | The entries, as a JSON array                            |
+| =count=   | How many entries =result= holds                         |
+| =total=   | How many entries the view has; more than =count= when =limit= cut it |
+
+Each entry is an object with these keys, those without a value left out:
+
+| Key        | Value                                                                                       |
+|------------+---------------------------------------------------------------------------------------------|
+| =title=    | The heading's title                                                                         |
+| =todo=     | Its TODO keyword                                                                            |
+| =priority= | Its priority letter                                                                         |
+| =tags=     | Its tags, as an array                                                                       |
+| =category= | Its category                                                                                |
+| =file=     | Its file, relative to its folder                                                            |
+| =status=   | =overdue=, =due-soon=, =normal= or =done=                                                   |
+| =date=     | Agenda views: the day it shows on, =2026-11-26=; overdue entries show on today              |
+| =time=, =end= | Agenda views: its start and end time, =10:00=                                            |
+| =kind=     | Agenda views: =scheduled=, =deadline=, =habit= or =timestamp=                               |
+| =section=  | Block views: the header of the block it is in                                               |
+
+To show an entry, pass its =file= and =title= to =open= as =file= and =heading=.
+
+*** clock-in, clock-out and clock-status
+
+=clock-in= takes =id=, or =file= and =heading=, as =open= does, and clocks in to that heading; without them, to the entry clocked last. Dangling clocks are asked about in orgstar first, as Clock In asks. =clock-out= stops the running clock. =clock-status= changes nothing.
+
+| Action         | Result                                                                                 |
+|----------------+----------------------------------------------------------------------------------------|
+| =clock-in=     | As =clock-status=                                                                      |
+| =clock-out=    | =heading=, =file= and =minutes= clocked                                                |
+| =clock-status= | =running= (=true= or =false=), and while a clock runs =heading=, =file=, =started= (ISO 8601) and =minutes= |
+
+On iOS the file is saved at once.
+
+*** Errors
+
+| =errorCode=          | When                                                                     |
+|----------------------+--------------------------------------------------------------------------|
+| =unknown-action=     | The action isn't one of the above                                        |
+| =missing-parameter=  | =open= without =file= or =id=                                            |
+| =invalid-parameter=  | =limit= isn't a number above 0                                           |
+| =not-found=          | No such file, heading, ID or view                                        |
+| =capture-failed=     | The template can't be filled or filed; =errorMessage= says why            |
+| =clock-failed=       | Clocking in or out failed; =errorMessage= says why                       |
+| =no-clock=           | =clock-out= with no clock running                                        |
+| =not-allowed=        | You chose Don't Allow                                                    |
+| =needs-orgstar-plus= | The action needs orgstar+                                                |
+| =not-ready=          | The Mac app's window isn't open yet                                      |
+
+*** Which links orgstar opens
+
+orgstar opens =x-success=, =x-error= and =x-cancel= only for other apps' schemes. It never opens =orgstar:= links (a link could call itself), =org-protocol:= links (they would capture), or =http:=, =https:=, =file:=, =ftp:=, =javascript:=, =data:=, =about:= and =blob:= links, which would send results to a web server or open a download. Such a callback is skipped and the action still runs.
+
+*** Allowing apps
+
+A link from a web page or another app could write to your files or read them. So capture without the window or sheet, =clock-in=, =clock-out=, =agenda= and =clock-status= need orgstar+, as Shortcuts actions do, and the first time an app uses one of them orgstar asks: Allow "/name/" to use orgstar?, with where results go. Allow remembers the app; Don't Allow opens =x-error= with =not-allowed=. An app is the =x-source= name together with the schemes of its callbacks, so a link that gives an allowed name but sends results to another app asks again. =x-source= is whatever the link says, so allow only names you expect to see.
+
+=open= and capture through the window or sheet never ask, as =org-protocol://capture= doesn't: they show what they do and write nothing until you file.
+
+Allowed apps are listed under Apps Allowed to Use Links, in Settings ▸ Capture on the Mac and the Settings tab on iOS, each with Forget.
+
+*** Shortcuts or x-callback-url
+
+In Shortcuts, use the Capture to orgstar action: it runs without switching apps and returns its message as a value. Use x-callback-url from apps that support it (Drafts, launchers, Shortcuts' Open X-Callback URL action, =open= in Terminal), and for opening entries, the agenda and the clock, which have no Shortcuts action.
+
+*** Examples
+
+#+BEGIN_SRC text
+orgstar://x-callback-url/capture?template=t&text=Call%20Sam&x-source=Drafts&x-success=drafts://
+orgstar://x-callback-url/capture?template=w&url=https%3A%2F%2Fexample.com&title=Example&x-cancel=myapp://cancelled
+orgstar://x-callback-url/open?file=work%2Fprojects.org&heading=Website
+orgstar://x-callback-url/agenda?view=TODO%20List&limit=10&x-source=My%20App&x-success=myapp://agenda
+orgstar://x-callback-url/clock-in?id=5f0c1e2a&x-success=myapp://clocked
+#+END_SRC
+
+The agenda example opens a link like ~myapp://agenda?count=1&result=%5B%7B%22title%22…&total=1&view=TODO%20List~. On the Mac, try them from Terminal with =open '…'=.
+
 * Compatibility notes
 
 ** Defaults that differ from Emacs

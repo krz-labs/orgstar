@@ -5835,6 +5835,40 @@
         }
       }
     },
+    "Allow": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erlauben"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permitir"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autoriser"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "許可"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permitir"
+          }
+        }
+      }
+    },
     "Allow Access to Calendars…": {
       "localizations": {
         "de": {
@@ -5938,6 +5972,40 @@
         }
       }
     },
+    "Allow links from an app that doesn't give its name?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Links von einer App erlauben, die ihren Namen nicht angibt?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Permitir enlaces de una app que no da su nombre?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autoriser les liens d’une app qui ne donne pas son nom ?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名前を示さないAppからのリンクを許可しますか？"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permitir links de um app que não informa seu nome?"
+          }
+        }
+      }
+    },
     "Allow orgstar to read your calendars in System Settings ▸ Privacy & Security ▸ Calendars.": {
       "localizations": {
         "de": {
@@ -6002,6 +6070,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Permita que o orgstar leia seus lembretes em Ajustes do Sistema ▸ Privacidade e Segurança ▸ Lembretes."
+          }
+        }
+      }
+    },
+    "Allow “%@” to use orgstar?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ erlauben, orgstar zu verwenden?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Permitir que «%@» use orgstar?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autoriser « %@ » à utiliser orgstar ?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”にorgstarの使用を許可しますか？"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permitir que “%@” use o orgstar?"
           }
         }
       }
@@ -6106,6 +6208,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Renomear também em org-todo-keywords no config.toml"
+          }
+        }
+      }
+    },
+    "An app that doesn't give its name": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine App, die ihren Namen nicht angibt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una app que no da su nombre"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une app qui ne donne pas son nom"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名前を示さないApp"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um app que não informa seu nome"
           }
         }
       }
@@ -6276,6 +6412,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "Aplica-se aos arquivos quando são abertos. Visualizar ▸ Truncar Linhas Longas alterna o arquivo atual."
+          }
+        }
+      }
+    },
+    "Apps Allowed to Use Links": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps, die Links verwenden dürfen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps autorizadas a usar enlaces"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps autorisées à utiliser les liens"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リンクの使用を許可したApp"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps Autorizados a Usar Links"
+          }
+        }
+      }
+    },
+    "Apps that may capture, clock in and out, and read your agenda and clock through orgstar:// x-callback-url links without asking.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps, die über orgstar://-x-callback-url-Links ohne Nachfrage erfassen, die Zeiterfassung starten und stoppen und deine Agenda und Uhr lesen dürfen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps que pueden capturar, iniciar y detener el reloj y leer tu agenda y tu reloj mediante enlaces x-callback-url de orgstar:// sin preguntar."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps qui peuvent capturer, démarrer et arrêter le chronomètre, et lire votre agenda et votre chronomètre via des liens x-callback-url orgstar:// sans demander."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar:// の x-callback-url リンクを通じて、確認なしでキャプチャ、クロックの開始と停止、アジェンダとクロックの読み取りができるApp。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps que podem capturar, iniciar e parar o relógio e ler sua agenda e seu relógio por links x-callback-url orgstar:// sem perguntar."
           }
         }
       }
@@ -15908,6 +16112,40 @@
         }
       }
     },
+    "Don’t Allow": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht erlauben"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No permitir"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ne pas autoriser"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "許可しない"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não Permitir"
+          }
+        }
+      }
+    },
     "Doom's keys open the list by itself and match letters in order, as Doom's corfu does; the Emacs and Mac keys do neither unless set here. Expand Word completes the word before the caret from your files whatever is set.": {
       "localizations": {
         "de": {
@@ -25035,6 +25273,40 @@
         }
       }
     },
+    "Its links will be able to capture, clock in and out, and read your agenda and clock without asking again. %@. You can forget it in Settings.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ihre Links können dann ohne erneute Nachfrage erfassen, die Zeiterfassung starten und stoppen und deine Agenda und Uhr lesen. %@. In den Einstellungen kannst du sie vergessen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sus enlaces podrán capturar, iniciar y detener el reloj y leer tu agenda y tu reloj sin volver a preguntar. %@. Puedes olvidarla en Ajustes."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ses liens pourront capturer, démarrer et arrêter le chronomètre, et lire votre agenda et votre chronomètre sans redemander. %@. Vous pouvez l’oublier dans les Réglages."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このAppのリンクは、再確認なしでキャプチャ、クロックの開始と停止、アジェンダとクロックの読み取りができるようになります。%@。設定で削除できます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Os links dele poderão capturar, iniciar e parar o relógio e ler sua agenda e seu relógio sem perguntar de novo. %@. Você pode esquecê-lo em Ajustes."
+          }
+        }
+      }
+    },
     "Kanban": {
       "localizations": {
         "de": {
@@ -32023,6 +32295,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nenhum registro recente"
+          }
+        }
+      }
+    },
+    "No results are sent back": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Es werden keine Ergebnisse zurückgesendet"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se devuelven resultados"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun résultat n’est renvoyé"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "結果は返されません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum resultado é enviado de volta"
           }
         }
       }
@@ -40932,6 +41238,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Restaurar Compras"
+          }
+        }
+      }
+    },
+    "Results go to %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ergebnisse gehen an %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los resultados van a %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les résultats vont à %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "結果の送信先: %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Os resultados vão para %@"
           }
         }
       }
