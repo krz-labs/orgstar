@@ -256,12 +256,12 @@ Code blocks (see [[file:11-code-blocks.org][Code blocks]]):
 - =:post= and noweb references that run a block (=<<name()>>=) take a block in the same file, as =name= or =name(arg=value)=. =name[header arguments](…)=, an index such as =name()[0]=, and blocks in other files or the Library of Babel are refused: "References like … aren't supported yet."
 - A =:post= reference is resolved once with an empty =*this*= before the block runs, so one that can't be resolved stops the run before it starts; Org runs the block and then fails.
 - =org-sbe= in a table formula doesn't run a block that has =:post=; on the Mac download version the table is recalculated in Emacs.
-- =:session= is supported only for shells, Python, Ruby, JavaScript and R; on iOS and in the Mac App Store version, only for JavaScript. C, C++, D, Java, Fortran and Clojure ignore it, as in Org.
+- =:session= is supported only for shells, Python, Ruby, JavaScript and R; on iOS and in the Mac App Store version, only for JavaScript and Python. C, C++, D, Java, Fortran and Clojure ignore it, as in Org.
 - Clojure runs with babashka or the Clojure CLI only; other =:backend= values are refused.
 - R blocks return their standard output, whatever =:results= says; ob-R returns the value with =:results value=.
 - Header arguments, =:var= values and =:cache= that need Lisp evaluated by Emacs are refused when orgstar's interpreter can't evaluate them: "… is Lisp that only Emacs can evaluate; nothing was run."
 - Tangling refuses =:var= and noweb references that would run a block, tables and lists in a shell block's =:var=, and =:var= in languages other than shells, Python, Emacs Lisp, C, C++, D, Java, Fortran and Clojure.
-- On iOS and in the Mac App Store version, only Emacs Lisp, JavaScript, calc, sqlite, dot and mermaid blocks run: Emacs Lisp in orgstar's own interpreter, JavaScript in JavaScriptCore. A block whose =:var=, =:post= or noweb reference runs a block in another language runs nothing.
+- On iOS and in the Mac App Store version, only Emacs Lisp, JavaScript, Python, calc, sqlite, dot and mermaid blocks run: Emacs Lisp in orgstar's own interpreter, JavaScript in JavaScriptCore, Python in Pyodide with the standard library only. A block whose =:var=, =:post= or noweb reference runs a block in another language runs nothing.
 
 Links (see [[file:09-links.org][Links]]):
 

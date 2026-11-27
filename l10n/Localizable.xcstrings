@@ -36748,6 +36748,74 @@
         }
       }
     },
+    "Pyodide stopped: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pyodide wurde beendet: %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pyodide se detuvo: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pyodide s'est arrêté : %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pyodideが停止しました：%@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Pyodide parou: %@"
+          }
+        }
+      }
+    },
+    "Python blocks can't draw graphics in this version of orgstar: matplotlib isn't included.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Python-Blöcke können in dieser Version von orgstar keine Grafiken zeichnen: matplotlib ist nicht enthalten."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los bloques de Python no pueden dibujar gráficos en esta versión de orgstar: matplotlib no está incluido."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les blocs Python ne peuvent pas dessiner de graphiques dans cette version d'orgstar : matplotlib n'est pas inclus."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このバージョンのorgstarでは、Pythonブロックはグラフィックを描画できません：matplotlibが含まれていません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blocos de Python não podem desenhar gráficos nesta versão do orgstar: o matplotlib não está incluído."
+          }
+        }
+      }
+    },
     "Quick Open…": {
       "comment": "Command title",
       "localizations": {

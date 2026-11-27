@@ -7,4 +7,6 @@ public enum OrgMathJax {
     /// Viz.js 3.31.0's `viz-global.js` and mermaid 12.3.0's `mermaid.min.js`, for dot and mermaid blocks.
     public static var viz: URL? { Bundle.module.url(forResource: "viz-global", withExtension: "js", subdirectory: "Diagrams") }
     public static var mermaid: URL? { Bundle.module.url(forResource: "mermaid.min", withExtension: "js", subdirectory: "Diagrams") }
+    /// The folder of Pyodide 314.0.8's core files, for python blocks in the App Store builds.
+    public static var pyodide: URL? { Bundle.module.url(forResource: "Pyodide", withExtension: nil) }
 }

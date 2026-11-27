@@ -54,8 +54,8 @@ App Store version.
 
 | Feature                    | Mac App Store version                                                         | Download version                                                                                |
 |----------------------------+-------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------|
-| Code blocks                | Emacs Lisp, JavaScript, calc, sqlite, dot and mermaid, each built in          | Every language installed; Emacs Lisp in Emacs and JavaScript in node, or built in without them  |
-| Sessions, graphics         | JavaScript sessions; dot and mermaid as SVG or PNG                            | Yes                                                                                             |
+| Code blocks                | Emacs Lisp, JavaScript, Python, calc, sqlite, dot and mermaid, each built in  | Every language installed; Emacs Lisp in Emacs and JavaScript in node, or built in without them  |
+| Sessions, graphics         | JavaScript and Python sessions; dot and mermaid as SVG or PNG                 | Yes                                                                                             |
 | Tangling                   | Yes                                                                           | Yes                                                                                             |
 | Table formulas             | Those orgstar computes itself                                                 | The rest in Emacs as well                                                                       |
 | Plots                      | Drawn with Swift Charts, following a subset of gnuplot's =set=                | gnuplot when installed, else Swift Charts                                                       |
@@ -70,7 +70,8 @@ App Store version.
 A block in another language reports "/language/ blocks don't run in this version of
 orgstar." An Emacs Lisp block that uses more than the interpreter has reports "This block uses
 Emacs Lisp that runs only in Emacs." A JavaScript block that uses something only node has
-reports "This block uses /name/, which runs only in node." A table whose formulas need Emacs is recalculated up to
+reports "This block uses /name/, which runs only in node." A Python block runs in Pyodide, with
+the standard library only. A table whose formulas need Emacs is recalculated up to
 the first formula that needs it, which the message names with the reason; the fields
 before it stay and the rest are unchanged. The Emacs exports are
 not in the File ▸ Export menu, the export dialog or the command palette; a key bound to

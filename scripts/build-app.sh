@@ -52,8 +52,9 @@ strip -x "$app/Contents/MacOS/Orgstar"
 cp -R "$(dirname "$binary")/SwiftMath_SwiftMath.bundle" "$app/Contents/Resources/"
 find "$app/Contents/Resources/SwiftMath_SwiftMath.bundle" -path '*/mathFonts.bundle/*' \
     \( -name '*.otf' -o -name '*.plist' \) ! -name 'latinmodern-math.*' -delete
-# MathJax, for PDF export.
+# MathJax, for PDF export. Pyodide is for the App Store builds; this one runs python3.
 cp -R "$(dirname "$binary")/Orgstar_OrgMathJax.bundle" "$app/Contents/Resources/"
+rm -rf "$app/Contents/Resources/Orgstar_OrgMathJax.bundle/Pyodide"
 
 # Updates: the appcast and its signing key, for signed builds only; a dev build never checks.
 if [ "$sign" != "-" ]; then

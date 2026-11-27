@@ -89,8 +89,8 @@ let package = Package(
         ),
         .executableTarget(name: "OrgstarSpike", dependencies: ["OrgEditorAppKit"]),
         .target(name: "OrgApp", dependencies: ["OrgWorkspace", "OrgDocument", "OrgPresentation", "OrgWatchData"]),
-        // MathJax for PDF export and the dot and mermaid libraries, which need no network; the apps link it, extensions don't.
-        .target(name: "OrgMathJax", resources: [.copy("MathJax"), .copy("Diagrams")]),
+        // MathJax for PDF export, the dot and mermaid libraries and Pyodide, which need no network; the apps link it, extensions don't.
+        .target(name: "OrgMathJax", resources: [.copy("MathJax"), .copy("Diagrams"), .copy("Pyodide")]),
         // What the phone and the watch send each other; Foundation only, so the watch builds it.
         .target(name: "OrgWatchData"),
         // The watch app and its complications, bundled by scripts/build-watch-app.sh.

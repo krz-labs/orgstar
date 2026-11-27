@@ -103,9 +103,9 @@ For =js=, =javascript= and =R=, =:cmd= names a different program. Since it runs 
 
 Any other language is refused with "No way to run /language/ blocks yet."
 
-A run that takes longer than five minutes is stopped. Runs in a =:session= have no time limit, except in JavaScriptCore.
+A run that takes longer than five minutes is stopped. Runs in a =:session= have no time limit, except in JavaScriptCore and Pyodide.
 
-The [[file:../install.org][Mac App Store version]] starts no programs, so only Emacs Lisp, JavaScript, calc, sqlite, dot and mermaid blocks run there; see /In the Mac App Store version/ below.
+The [[file:../install.org][Mac App Store version]] starts no programs, so only Emacs Lisp, JavaScript, Python, calc, sqlite, dot and mermaid blocks run there; see /In the Mac App Store version/ below.
 
 ** JavaScript in JavaScriptCore
 
@@ -126,6 +126,18 @@ Some things still differ from node:
 - =:cmd= is ignored.
 
 JavaScriptCore has no way to stop a running program. A block that is canceled, or stopped after five minutes, ends at once, but if its program never finishes it keeps running in the background, on one processor core, until orgstar quits. Cancelling a block in a =:session= discards the session.
+
+** Python in Pyodide
+
+In the Mac App Store version and on iOS, =python= blocks run in Pyodide 314.0.8, which is CPython 3.14 compiled to WebAssembly, built into the app and run in a hidden web view. The download version always runs =python3=. A block runs as Emacs runs it with =python3=, with the same results, output and error output: the body as a function whose =return= value is the result, or with =:results output= what it prints, and with =:session= at top level, where the value is the last expression's. An uncaught error writes its traceback to the error output; outside a session the run ends with status 1, as =python3= does.
+
+What differs from =python3=:
+
+- Only the standard library is there. =numpy=, =matplotlib= and other packages are not, and can't be installed: =import numpy= fails with =ModuleNotFoundError=. A block with =:results graphics= fails with "Python blocks can't draw graphics in this version of orgstar: matplotlib isn't included." A =:file= result that is the block's value or output is written as for any other language.
+- The block can't see your files or start programs. It runs in Pyodide's own file system, in =/home/pyodide=, and files it writes there are not kept. =:dir= must name a folder that exists, but the block doesn't run in it. =input()= reads nothing.
+- =:python= is ignored.
+- Every block runs in one interpreter. A block without a session gets its own variables, but modules it imports stay loaded, with any changes it made to them, until Pyodide is unloaded. A session keeps its variables until then too.
+- Pyodide loads with the first python block, which takes a second or two, and is unloaded after a minute without a python block, or 15 minutes while a session has variables. A block that is canceled, or stopped after five minutes, stops at once and ends every session.
 
 ** Compiled languages
 
@@ -507,7 +519,7 @@ for a in "$@"; do echo "[$a]"; done
 
 * Sessions
 
-=:session name= runs the block in an interpreter that stays running, so variables, functions and the working folder carry over to the next block in the same session. Sessions work for shells, Python, Ruby, JavaScript (Node, or JavaScriptCore) and R on the Mac, and for JavaScript on iOS.
+=:session name= runs the block in an interpreter that stays running, so variables, functions and the working folder carry over to the next block in the same session. Sessions work for shells, Python, Ruby, JavaScript (Node, or JavaScriptCore) and R in the Mac download version, and for JavaScript and Python (in Pyodide) on iOS and in the Mac App Store version.
 
 - =:session= with no name uses =*language*=, such as =*sh*=. =:session none= runs without one.
 - A session belongs to one folder, one interpreter and one name. Blocks in different folders, or with different names, do not share state.
@@ -860,8 +872,8 @@ Tangling stops, writes nothing and says why when:
 
 * On iOS
 
-- Only Emacs Lisp blocks, in orgstar's own interpreter, JavaScript blocks, in JavaScriptCore (see /JavaScript in JavaScriptCore/ above), and calc, sqlite, dot and mermaid blocks (see above) run. Any other language, compiled languages included, fails with "/language/ blocks need the Mac to run." (for example "C blocks need the Mac to run."), and so does a block whose =:var= refers to a block in another language.
-- JavaScript blocks can use =:session=. There are no other sessions, and no graphics other than dot and mermaid.
+- Only Emacs Lisp blocks, in orgstar's own interpreter, JavaScript blocks, in JavaScriptCore (see /JavaScript in JavaScriptCore/ above), Python blocks, in Pyodide (see /Python in Pyodide/ above), and calc, sqlite, dot and mermaid blocks (see above) run. Any other language, compiled languages included, fails with "/language/ blocks need the Mac to run." (for example "C blocks need the Mac to run."), and so does a block whose =:var= refers to a block in another language.
+- JavaScript and Python blocks can use =:session=. There are no other sessions, and no graphics other than dot and mermaid.
 - The trust prompt works the same way, with its own =trusted.json= on the device.
 - There is no cancel command.
 - Tangling works, for files in folders orgstar can write to.
@@ -871,7 +883,7 @@ See [[file:14-ios.org][iOS]] for the rest of the iOS app.
 
 * In the Mac App Store version
 
-- Only Emacs Lisp blocks, in the same interpreter as on iOS, JavaScript blocks, in JavaScriptCore, and calc, sqlite, dot and mermaid blocks run. Any other language, compiled languages included, fails with "/language/ blocks don't run in this version of orgstar." A block whose =:var=, =:post= or noweb reference runs a block in another language runs nothing: "This block needs a /language/ block, and /language/ blocks don't run in this version of orgstar; nothing was run."
-- JavaScript blocks can use =:session=. There are no other sessions, and no graphics other than dot and mermaid.
+- Only Emacs Lisp blocks, in the same interpreter as on iOS, JavaScript blocks, in JavaScriptCore, Python blocks, in Pyodide, and calc, sqlite, dot and mermaid blocks run. Any other language, compiled languages included, fails with "/language/ blocks don't run in this version of orgstar." A block whose =:var=, =:post= or noweb reference runs a block in another language runs nothing: "This block needs a /language/ block, and /language/ blocks don't run in this version of orgstar; nothing was run."
+- JavaScript and Python blocks can use =:session=. There are no other sessions, and no graphics other than dot and mermaid.
 - The trust prompt works the same way.
 - Tangling works as in the download version, =:shebang= included. A target outside your folders needs access to its folder first: orgstar asks with Grant Access…, as described in [[file:../install.org][Install]]. So does a =:file= result outside them.

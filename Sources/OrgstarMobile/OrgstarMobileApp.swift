@@ -18,6 +18,7 @@ struct OrgstarMobileApp: App {
         PDFExport.mathJaxURL = OrgMathJax.script
         DiagramBlocks.vizURL = OrgMathJax.viz
         DiagramBlocks.mermaidURL = OrgMathJax.mermaid
+        PythonBlocks.folder = OrgMathJax.pyodide
         // Debug builds, and runs from Xcode, whose scheme sets ORGSTAR_PERF.
         #if DEBUG
         Perf.watchMainThread()

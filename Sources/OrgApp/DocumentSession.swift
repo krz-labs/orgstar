@@ -1319,13 +1319,16 @@ public final class DocumentSession {
         guard let entry = current else { return "No file is open." }
         let directory = URL(fileURLWithPath: entry.path).deletingLastPathComponent()
         let programs = Self.runner
-        /// A program through `programs`; without it, Emacs Lisp in `Elisp` and js in
-        /// JavaScriptCore, and nothing else.
+        /// A program through `programs`; without it, Emacs Lisp in `Elisp`, js in
+        /// JavaScriptCore, python in Pyodide when the app has it, and nothing else.
         func run(_ job: BabelJob) async throws -> BabelOutput {
             if let output = job.known { return output }
             if let programs { return try await programs.runBabel(job, fileDirectory: directory) }
             #if canImport(JavaScriptCore)
             if let output = try await JavaScriptBlocks.run(job, directory: directory) { return output }
+            #endif
+            #if canImport(WebKit)
+            if let output = try await PythonBlocks.run(job, directory: directory) { return output }
             #endif
             if job.calc != nil { return try TableReason.calcBlock(job) }
             #if canImport(SQLite3)
@@ -1417,7 +1420,13 @@ public final class DocumentSession {
     }
 
     /// The languages that run without programs.
-    static let inProcess: Set<String> = ["emacs-lisp", "elisp", "js", "javascript", "calc", "sqlite", "dot", "mermaid"]
+    static var inProcess: Set<String> {
+        var languages: Set<String> = ["emacs-lisp", "elisp", "js", "javascript", "calc", "sqlite", "dot", "mermaid"]
+        #if canImport(WebKit)
+        if PythonBlocks.folder != nil { languages.insert("python") }
+        #endif
+        return languages
+    }
 
     /// Where a block's `:file` result goes: relative to `:dir`, itself relative to `directory`.
     static func resultFile(_ name: String, job: BabelJob, directory: URL) -> URL {

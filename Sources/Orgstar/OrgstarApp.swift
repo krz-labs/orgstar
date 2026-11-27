@@ -521,6 +521,7 @@ struct OrgstarApp: App {
         DiagramBlocks.vizURL = OrgMathJax.viz
         DiagramBlocks.mermaidURL = OrgMathJax.mermaid
         #if APPSTORE
+        PythonBlocks.folder = OrgMathJax.pyodide
         AgendaSnapshot.useGroupContainer = true
         EmacsFallback.offered = false
         _ = FolderGrants.shared
