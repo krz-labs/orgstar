@@ -1370,6 +1370,10 @@ struct ContentView: View {
         if (try? HabitSnapshot(habits: await days.habits(open: open), theme: theme).write()) == true {
             WidgetCenter.shared.reloadTimelines(ofKind: "sh.krz.orgstar.habits")
         }
+        let cards = await FlashcardReview.cards(workspace: workspace, session: session)
+        if (try? FlashcardSnapshot(cards: cards.map(\.card)).write()) == true {
+            WidgetCenter.shared.reloadTimelines(ofKind: "sh.krz.orgstar.flashcards")
+        }
         if (try? snapshot.write(to: file)) == true { WidgetCenter.shared.reloadAllTimelines() }
     }
 
@@ -1586,6 +1590,8 @@ struct ContentView: View {
             openWindow(id: "clock-report")
         case "app.board":
             openWindow(id: "board")
+        case "app.flashcards.review":
+            openWindow(id: "flashcards")
         case "app.node.graph":
             openWindow(id: "graph")
         case "app.sidebar-agenda":

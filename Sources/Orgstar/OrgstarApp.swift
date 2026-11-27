@@ -172,6 +172,7 @@ final class AppCommands {
             switch link {
             case .agenda: run("app.agenda")
             case .clock: run("app.clock.goto")
+            case .review: run("app.flashcards.review")
             case .entry(let path, let offset): jump(path: path, offset: offset)
             case .capture(let template):
                 captureSerial += 1
@@ -601,6 +602,13 @@ struct OrgstarApp: App {
             }
         }
         .defaultSize(width: 900, height: 700)
+        Window("Review Flashcards", id: "flashcards") {
+            if case .success(let model) = workspace {
+                FlashcardWindow(workspace: model, session: session, commands: commands)
+                    .tint(ConfigSync.shared.theme.color("accent"))
+            }
+        }
+        .defaultSize(width: 640, height: 560)
         Window("Lint All Folders", id: "lint-folders") {
             if case .success(let model) = workspace {
                 FolderLintWindow(workspace: model, session: session, commands: commands)
@@ -953,6 +961,7 @@ struct AgendaMenuItem: View {
         Button("Board") { openWindow(id: "board") }
             .keyboardShortcut("b", modifiers: [.command, .shift])
         Button("Graph") { if ProAccess.shared.allows(.roam) { openWindow(id: "graph") } }
+        Button("Review Flashcards") { openWindow(id: "flashcards") }
     }
 }
 

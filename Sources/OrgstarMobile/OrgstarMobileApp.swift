@@ -318,9 +318,15 @@ struct RootView: View {
                 tab = .folders
                 model.addingFolder = true
             },
-            board: { showingBoard = true }, clock: clock))
+            board: { showingBoard = true }, flashcards: { model.reviewRequested = true }, clock: clock))
         .fullScreenCover(isPresented: $showingBoard) {
             BoardScreen(workspace: workspace, session: session) { showingBoard = false }
+        }
+        .fullScreenCover(isPresented: Binding(get: { model.reviewRequested }, set: { model.reviewRequested = $0 })) {
+            FlashcardScreen(workspace: workspace, session: session) { path, offset in
+                model.reviewRequested = false
+                if let path { model.openRequest = .offset(path, offset) }
+            }
         }
         // A removed folder's row goes from the sidebar.
         .onChange(of: workspace.rootPaths) {
@@ -566,6 +572,8 @@ struct RootView: View {
             clock("app.clock.goto")
         case .capture(let template):
             capture = CaptureRequest(template: template)
+        case .review:
+            model.reviewRequested = true
         }
     }
 

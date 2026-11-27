@@ -121,6 +121,7 @@ public enum EditorCommands {
         EditorCommand(id: "app.agenda", title: "Agenda", action: .app),
         EditorCommand(id: "app.capture", title: "Capture…", action: .app),
         EditorCommand(id: "app.board", title: "Board", action: .app),
+        EditorCommand(id: "app.flashcards.review", title: "Review Flashcards", action: .app),
         EditorCommand(id: "app.clock.in", title: "Clock In", action: .app),
         EditorCommand(id: "app.clock.in-recent", title: "Clock In to Recent Entry…", action: .app),
         EditorCommand(id: "app.clock.in-last", title: "Clock In to Last Entry", action: .app),

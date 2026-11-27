@@ -232,6 +232,12 @@ public enum OrgPreferences {
     public static func citeGlobalBibliography(_ defaults: UserDefaults = .standard) -> [String] {
         string("citeGlobalBibliography", defaults).split(separator: ":").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
     }
+    /// `org-fc-review-history-file`: relative to the configuration folder unless absolute;
+    /// empty for `org-fc-reviews.tsv` there.
+    public static func fcReviewHistoryFile(_ defaults: UserDefaults = .standard) -> URL {
+        let path = OrgPaths.expandingTilde(string("fcReviewHistoryFile", defaults).nonEmpty ?? "org-fc-reviews.tsv")
+        return path.hasPrefix("/") ? URL(fileURLWithPath: path) : UserConfig.directory.appendingPathComponent(path)
+    }
     /// `org-yank-image-save-method`: "attach", or the folder pasted images go in.
     public static func yankImageSaveMethod(_ defaults: UserDefaults = .standard) -> String {
         string("yankImageSaveMethod", defaults).nonEmpty ?? "attach"

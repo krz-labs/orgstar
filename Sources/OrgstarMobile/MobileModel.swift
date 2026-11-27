@@ -41,6 +41,8 @@ final class MobileModel {
     var captureRequest: CaptureRequest?
     /// Folders shows its folder picker, from File ▸ Add Folder… in the menu bar.
     var addingFolder = false
+    /// The flashcard review shows, from the agenda, the menu bar, a command or the widget.
+    var reviewRequested = false
     /// Calendar's events for the agenda, with `calendar-events`.
     let calendarEvents = CalendarEvents()
     /// Captures the watch sent, for the root view to pick up from the inbox.
@@ -361,7 +363,11 @@ final class MobileModel {
             if AgendaSnapshot.reloadsWidgets(locked: true, wasLocked: wasLocked, snapshotChanged: false) { WidgetCenter.shared.reloadAllTimelines() }
             return
         }
-        WatchLink.shared.send(WatchAgenda(groups: groups, today: days.today, clock: clock.running, lastClocked: clock.history.first?.title, generated: Date()))
+        let cards = await FlashcardReview.cards(workspace: workspace, session: session)
+        var watch = WatchAgenda(groups: groups, today: days.today, clock: clock.running, lastClocked: clock.history.first?.title, generated: Date())
+        watch.cards = WatchAgenda.Card.review(Flashcards.due(cards, at: Date()))
+        WatchLink.shared.send(watch)
+        if (try? FlashcardSnapshot(cards: cards.map(\.card)).write()) == true { WidgetCenter.shared.reloadTimelines(ofKind: "sh.krz.orgstar.flashcards") }
         await updateBadge(OverdueBadge.counts(groups, today: days.today, days: AgendaSnapshot.dayCount))
         if (try? HabitSnapshot(habits: await days.habits(open: session.openTexts), theme: theme).write()) == true { WidgetCenter.shared.reloadTimelines(ofKind: "sh.krz.orgstar.habits") }
         _ = try? TemplateList(templates: CaptureTemplates.load().templates.map { .init(key: $0.key, name: $0.name) }).write()

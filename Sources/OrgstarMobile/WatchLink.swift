@@ -52,6 +52,10 @@ final class WatchLink: NSObject, WCSessionDelegate {
             components.queryItems = [URLQueryItem(name: "body", value: text)]
             if let link = components.url?.absoluteString { try? model.inbox?.add(link) }
             model.watchCaptures += 1
+        case .rate(let path, let card, let position, let rating):
+            if let rating = Flashcards.Rating(rawValue: rating) {
+                _ = FlashcardReview.rate(path: path, card: card, position: position, rating: rating, seconds: 0, session: model.session)
+            }
         }
         await model.updateWidgets()
     }

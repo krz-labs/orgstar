@@ -218,6 +218,7 @@ struct AgendaScreen: View, Equatable {
                     Button("Select", systemImage: "checkmark.circle") { selecting = true }
                     Divider()
                     Button("Board", systemImage: "rectangle.split.3x1") { showingBoard = true }
+                    Button("Review Flashcards", systemImage: "rectangle.on.rectangle.angled") { model.reviewRequested = true }
                     Button("Print…", systemImage: "printer") { printAgenda() }
                 } label: {
                     Label("Views", systemImage: "list.bullet.rectangle")
@@ -637,6 +638,7 @@ struct AgendaScreen: View, Equatable {
             CommandRow(id: "agenda.filter", title: String(localized: "Filter…")),
             CommandRow(id: "agenda.select", title: String(localized: "Select")),
             CommandRow(id: "agenda.board", title: CommandTitle.localized("Board")),
+            CommandRow(id: "app.flashcards.review", title: CommandTitle.localized("Review Flashcards")),
             CommandRow(id: "agenda.print", title: CommandTitle.localized("Print…")),
             CommandRow(id: "app.capture", title: CommandTitle.localized("Capture…")),
         ]
@@ -658,6 +660,7 @@ struct AgendaScreen: View, Equatable {
         case "agenda.filter": showingFilter = true
         case "agenda.select": selecting = true
         case "agenda.board": showingBoard = true
+        case "app.flashcards.review": model.reviewRequested = true
         case "agenda.print": printAgenda()
         case "app.capture": model.captureRequest = CaptureRequest()
         default: _ = MobileClock.run(id, model: model, workspace: workspace) { message = $0 }

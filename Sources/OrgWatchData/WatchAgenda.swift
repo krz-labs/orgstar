@@ -65,6 +65,37 @@ public struct WatchAgenda: Codable, Equatable, Sendable {
         }
     }
 
+    /// A flashcard position due for review: a normal or double card's two sides as text.
+    public struct Card: Codable, Equatable, Sendable, Identifiable {
+        public var path: String
+        /// The card's ID.
+        public var card: String
+        public var position: String
+        /// The front's title; nil while it is hidden.
+        public var title: String?
+        public var front: String
+        public var backTitle: String
+        public var back: String
+
+        public var id: String { path + "\n" + card + "\n" + position }
+
+        public init(path: String, card: String, position: String, title: String?, front: String, backTitle: String, back: String) {
+            self.path = path
+            self.card = card
+            self.position = position
+            self.title = title
+            self.front = front
+            self.backTitle = backTitle
+            self.back = back
+        }
+
+        /// The action rating it `rating` (`again`, `hard`, `good` or `easy`).
+        public func rate(_ rating: String) -> WatchAction { .rate(path: path, card: card, position: position, rating: rating) }
+    }
+
+    /// Flashcard positions due, in review order; nil from a phone without them.
+    public var cards: [Card]?
+
     public var generated: Date
     /// Midnight starting today.
     public var day: Date
@@ -112,6 +143,14 @@ public struct WatchAgenda: Codable, Equatable, Sendable {
     public func openCount(at now: Date, calendar: Calendar = .current) -> Int {
         guard calendar.isDate(day, inSameDayAs: now) else { return 0 }
         return (rows + overdue).filter { !$0.isDone && !$0.isEvent && $0.todo != nil }.count
+    }
+
+    /// `card` rated here before the phone sends the agenda again: gone, or with Again, last.
+    public func rating(_ card: Card, again: Bool) -> WatchAgenda {
+        var copy = self
+        copy.cards?.removeAll { $0.id == card.id }
+        if again { copy.cards?.append(card) }
+        return copy
     }
 
     /// `entry` marked done here before the phone sends the agenda again.
@@ -181,6 +220,8 @@ public enum WatchAction: Codable, Equatable, Sendable {
     case clockInLast
     /// Dictated text for the capture inbox.
     case capture(text: String)
+    /// Rates a flashcard position, found by its card's ID.
+    case rate(path: String, card: String, position: String, rating: String)
 
     /// The user info key an action travels under.
     public static let key = "action"

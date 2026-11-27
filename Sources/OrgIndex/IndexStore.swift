@@ -403,6 +403,19 @@ public final class IndexStore: Sendable {
         }
     }
 
+    /// Files with a heading tagged `tag` itself, not by inheritance: org-fc's flashcards for
+    /// `fc`. Unsaved buffers' in place of their files'.
+    public func files(withLocalTag tag: String, overlay: [String: FileRecord] = [:]) throws -> [String] {
+        let indexed = try database.read { db in
+            try String.fetchAll(db, sql: """
+                SELECT DISTINCT f.path FROM tags t JOIN headings h ON h.id = t.heading_id JOIN files f ON f.id = h.file_id
+                WHERE t.tag = ? AND t.inherited = 0 ORDER BY f.path
+                """, arguments: [tag])
+        }
+        let live = overlay.values.filter { $0.headings.contains { $0.tags.contains { $0.name == tag && !$0.inherited } } }.map(\.path)
+        return (indexed.filter { overlay[$0] == nil } + live).sorted()
+    }
+
     public func headings(withID id: String, overlay: [String: FileRecord] = [:]) throws -> [HeadingLocation] {
         let indexed = try database.read { db in
             try Row.fetchAll(

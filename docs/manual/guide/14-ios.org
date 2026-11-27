@@ -290,7 +290,7 @@ See [[file:07-agenda.org][The agenda]] for the rows, the views and matches, and 
 
 ** Widgets
 
-orgstar has four widgets. Add them as any widget: touch and hold the Home Screen or the Lock Screen, and choose orgstar in the widget gallery.
+orgstar has five widgets. Add them as any widget: touch and hold the Home Screen or the Lock Screen, and choose orgstar in the widget gallery.
 
 | Widget | Sizes                                        | Shows                                                                                       |
 |--------+----------------------------------------------+---------------------------------------------------------------------------------------------|
@@ -298,6 +298,7 @@ orgstar has four widgets. Add them as any widget: touch and hold the Home Screen
 | Up Next | Rectangular, inline and circular (Lock Screen) | The next entry's time or status and title (rectangular, inline), or the count of open entries today (circular, and inline when nothing is left) |
 | Habits  | Small, medium and large (Home Screen)        | Each habit (=STYLE: habit=) in your agenda files that isn't done, with its consistency graph, as the agenda draws it: the last week (small, 3 habits), or the last three weeks and the next one (medium, 4 habits; large, 9), and how many were done today. |
 | Capture | Circular and rectangular (Lock Screen)       | A button that opens the capture sheet with the template you choose when you edit the widget, or the first template. |
+| Flashcards | Small (Home Screen), circular and inline (Lock Screen) | How many flashcards are due; tapping it starts a review. See [[file:16-flashcards.org][Flashcards]]. |
 
 What's left of today is today's entries and calendar events that aren't done, without timed ones that have ended (or started, when they have no end), followed by the overdue entries. The open count is today's entries not done, overdue ones included, without calendar events. The widgets use the theme's colours for the status, the keyword, the priority and the category.
 
@@ -328,6 +329,7 @@ The widgets and the Live Activity open the app with these links, which also work
 |----------------------------------------+--------------------------------------------|
 | =orgstar://agenda=                     | The Agenda tab                             |
 | =orgstar://clock=                      | The entry of the running clock             |
+| =orgstar://review=                     | Review Flashcards                          |
 | ~orgstar://entry?path=/path/file.org&offset=N~ | The file in the reader, at offset N |
 
 * Apple Watch
@@ -337,6 +339,8 @@ The watch app shows today's agenda from your iPhone, marks entries done, shows a
 - Clocked In :: the running clock's heading and its time so far, with Clock Out. Without a running clock, Clock In to /heading/ clocks in to the entry clocked last (=org-clock-in-last=).
 - Capture :: dictate or scribble text, then Done. It goes to orgstar on iPhone, which opens the capture sheet with it as =%i=, with the first template, as text from the share sheet does; see Capture below.
 - Overdue, then today :: as the agenda lists them, with the time or status, the title and the keyword. Keywords are red when open, blue for work under way (NEXT and the like), yellow for work on hold (WAIT and the like), green when done and grey when cancelled; an overdue status is red and one due soon orange. Tap an open TODO entry to mark it done: it takes its sequence's first done keyword, as the agenda's Done does. The entry shows done at once; the iPhone changes the file, unless the heading changed since the agenda was sent.
+
+- Flashcards :: when normal or double flashcards are due, Review /n/ cards shows each one's front, then with Show Answer its back and Again, Hard, Good and Easy. The iPhone writes the rating to the card's file. See [[file:16-flashcards.org][Flashcards]].
 
 What the watch asks for runs on your iPhone, which iOS wakes for it when orgstar isn't open; while the iPhone is out of reach, the requests wait and run when it is back.
 

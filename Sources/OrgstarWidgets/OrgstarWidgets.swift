@@ -19,6 +19,7 @@ struct OrgstarWidgets: WidgetBundle {
         TodayWidget()
         HabitsWidget()
         UpNextWidget()
+        FlashcardWidget()
         #if os(iOS)
         CaptureWidget()
         ClockActivityWidget()

@@ -229,6 +229,7 @@ These settings have no control in the Settings window. Some are in the View menu
 | =notes-package=, =denote-directory=, =denote-file-type=, =denote-prompts=, =denote-silo-directories=, =denote-sequence-scheme=, =denote-journal-directory=, =denote-journal-keyword=, =denote-journal-interval=, =denote-journal-title-format= | |
 | =org-attach-id-dir=, =org-attach-use-inheritance= |              |
 | =org-cite-global-bibliography=   |                            |
+| =org-fc-review-history-file=     |                            |
 | =org-yank-image-save-method=, =org-yank-dnd-method= |            |
 | =org-crypt-tag-matcher=, =org-crypt-use-before-save-magic= | |
 | =org-agenda-start-on-weekday=    |                            |
@@ -302,6 +303,7 @@ A key you remove from the file goes back to its default. A key that isn't in the
 | =org-attach-id-dir= | string | ="data/"= | The folder ID-based attachment folders go in, relative to the org file's folder unless absolute. See [[file:04-outlines.org][Outlines]]. Mirrors =org-attach-id-dir=. |
 | =org-attach-use-inheritance= | string | ="selective"= | Whether attachment folders come from an ancestor's =DIR= or =ID=: =selective=, ="t"= or ="nil"=. Mirrors =org-attach-use-inheritance=. |
 | =org-cite-global-bibliography= | string | =""= | Bibliography files, =.bib= or CSL-JSON =.json=, that every file's citations use after its own =#+bibliography:= files, separated by =:=. =~= is your home folder. Insert Citation…, key completion, following citations and export read them. See [[file:09-links.org][Links]]. Mirrors =org-cite-global-bibliography=. |
+| =org-fc-review-history-file= | string | =""= | The file flashcard ratings are added to, in org-fc's format; relative to the configuration folder unless absolute, =~= for your home folder; empty for =org-fc-reviews.tsv= in the configuration folder. See [[file:16-flashcards.org][Flashcards]]. Mirrors =org-fc-review-history-file=. |
 | =org-yank-image-save-method= | string | ="attach"= | Where a pasted image goes: =attach= for the entry's attachment folder, or a folder, relative to the org file's folder unless absolute. See [[file:09-links.org][Links]]. Mirrors =org-yank-image-save-method=. |
 | =org-yank-dnd-method= | string | ="ask"= | What dropping files on the editor does: =ask=, =attach=, =open= or =file-link=. See [[file:09-links.org][Links]]. Mirrors =org-yank-dnd-method=. |
 | =org-crypt-tag-matcher= | string | ="crypt"= | The tag Encrypt Tagged Entries… encrypts. A single tag. See [[file:04-outlines.org][Outlines]]. Mirrors =org-crypt-tag-matcher=. |

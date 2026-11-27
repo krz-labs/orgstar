@@ -359,6 +359,8 @@ public enum Commands {
         InsertDrawer(), DragElement(forward: true), DragElement(forward: false), CycleBullet(previous: false), CycleBullet(previous: true),
         Emphasize(), Emphasize(marker: "*"), Emphasize(marker: "/"), Emphasize(marker: "_"), Emphasize(marker: "="), Emphasize(marker: "~"), Emphasize(marker: "+"),
         ExpandSnippet(), InsertSnippet(),
+        MakeFlashcard(.normal), MakeFlashcard(.double), MakeFlashcard(.cloze), MakeFlashcard(.textInput), UpdateFlashcard(),
+        SuspendFlashcard(), SuspendFlashcard(suspend: false),
     ]
 
     public static var everything: [any OrgCommand] { all + TableCommand.Action.allCases.map(TableCommand.init) }

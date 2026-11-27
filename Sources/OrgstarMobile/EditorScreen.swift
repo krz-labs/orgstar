@@ -587,6 +587,8 @@ struct EditorScreen: View {
                 sheet = .rename(kind, context.map { kind.initial(text: $0.text, caret: $0.caret, keywords: $0.tree.settings.todoKeywordNames) } ?? "")
             } else if id == "app.lint-folders" {
                 sheet = .lintFolders
+            } else if id == "app.flashcards.review" {
+                model.reviewRequested = true
             } else if id == "app.lint" {
                 if FileLint.applies(to: path) { sheet = .lint } else { message = String(localized: "Lint File works on Org files", comment: "Lint File in a file that isn't Org") }
             } else if id == "app.working-copy.sync" {
@@ -1164,6 +1166,7 @@ struct CommandPalette: View {
         ("app.toggle-markup", "Show or Hide Markup"), ("app.word-count", "Word Count"),
         ("org.snippet.next-field", "Next Snippet Field"), ("org.snippet.previous-field", "Previous Snippet Field"),
         ("app.recovery", "Recovery Versions…"), ("app.sync-conflicts", "Resolve Sync Conflicts…"), ("app.lint", "Lint File"), ("app.lint-folders", "Lint All Folders"),
+        ("app.flashcards.review", "Review Flashcards"),
         ("app.working-copy.sync", "Sync with Working Copy"),
         ("app.cite.insert", "Insert Citation…"),
         ("org.toggle-inline-images", "Show or Hide Inline Images"), ("org.toggle-inline-images-linked", "Show or Hide Inline Images, Including Described Links"), ("org.latex-preview", "Show or Hide LaTeX Previews"), ("editor.toggle-truncate-lines", "Truncate or Wrap Long Lines"), ("editor.toggle-auto-fill", "Turn Auto Fill On or Off"),

@@ -1,6 +1,20 @@
 import Foundation
+import OrgCore
 import OrgPresentation
 import OrgWatchData
+
+extension WatchAgenda.Card {
+    /// The first `limit` of `items` that are positions of normal and double cards, which the
+    /// watch reviews, with their text cut to `length` characters.
+    public static func review(_ items: [Flashcards.Item], limit: Int = 30, length: Int = 400) -> [WatchAgenda.Card] {
+        func cut(_ text: String) -> String { text.count > length ? String(text.prefix(length)) + "…" : text }
+        return items.lazy.filter { [.normal, .double].contains($0.card.cardType) }.compactMap { item -> WatchAgenda.Card? in
+            guard let face = Flashcards.face(item.card, position: item.position) else { return nil }
+            return WatchAgenda.Card(path: item.path, card: item.card.id, position: item.position, title: face.front.title.map(cut), front: cut(face.front.text),
+                                    backTitle: cut(face.back.title ?? ""), back: cut(face.back.text))
+        }.prefix(limit).map { $0 }
+    }
+}
 
 extension WatchAgenda {
     /// Today's group of the agenda, for the watch, with the running clock and the entry

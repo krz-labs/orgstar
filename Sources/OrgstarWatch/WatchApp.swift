@@ -53,6 +53,10 @@ final class PhoneLink: NSObject, WCSessionDelegate {
             sentCaptures += 1
         case .clockInLast:
             break
+        case .rate(_, _, _, let rating):
+            if let agenda, let card = agenda.cards?.first(where: { $0.rate(rating) == action }) {
+                store(agenda.rating(card, again: rating == "again"))
+            }
         }
         let session = WCSession.default
         guard session.activationState == .activated else { return }
@@ -145,6 +149,13 @@ struct AgendaList: View {
             } footer: {
                 Text("orgstar files it with a template when you next open it on iPhone.")
             }
+            if let cards = link.agenda?.cards, !cards.isEmpty {
+                Section("Flashcards") {
+                    NavigationLink { CardReview(link: link) } label: {
+                        Label("Review \(cards.count) cards", systemImage: "rectangle.on.rectangle.angled")
+                    }
+                }
+            }
             if let agenda = link.agenda {
                 if !agenda.overdue.isEmpty {
                     Section("Overdue") { ForEach(agenda.overdue) { EntryRow(entry: $0, link: link) } }
@@ -156,6 +167,53 @@ struct AgendaList: View {
             }
         }
         .navigationTitle("Today")
+    }
+}
+
+/// Normal and double flashcards due, from the phone: the front, Show Answer, the back and
+/// org-fc's four ratings. The phone writes each rating to the card's file.
+struct CardReview: View {
+    let link: PhoneLink
+    @State private var flipped = false
+
+    var body: some View {
+        if let card = link.agenda?.cards?.first {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(flipped ? card.backTitle : card.title ?? "[…]").font(.headline)
+                        .foregroundStyle(flipped || card.title != nil ? .primary : .secondary)
+                    let text = flipped ? card.back : card.front
+                    if !text.isEmpty { Text(text).font(.body) }
+                    if flipped {
+                        Grid(horizontalSpacing: 6, verticalSpacing: 6) {
+                            GridRow {
+                                rate(card, "again", "Again", .red)
+                                rate(card, "hard", "Hard", .orange)
+                            }
+                            GridRow {
+                                rate(card, "good", "Good", .green)
+                                rate(card, "easy", "Easy", .blue)
+                            }
+                        }
+                        .padding(.top, 4)
+                    } else {
+                        Button("Show Answer") { flipped = true }.padding(.top, 4)
+                    }
+                }
+            }
+            .navigationTitle("\(link.agenda?.cards?.count ?? 0) left")
+        } else {
+            Text("Nothing else is due.").foregroundStyle(.secondary).navigationTitle("Flashcards")
+        }
+    }
+
+    private func rate(_ card: WatchAgenda.Card, _ rating: String, _ title: LocalizedStringKey, _ tint: Color) -> some View {
+        Button(title) {
+            flipped = false
+            link.send(card.rate(rating))
+        }
+        .tint(tint)
+        .buttonStyle(.borderedProminent)
     }
 }
 

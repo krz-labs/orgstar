@@ -537,7 +537,7 @@ final class MobileEditor: NSObject, DocumentBuffer {
         case "app.crypt.encrypt-entry": return onAppCommand != nil && OrgCrypt.heading(context.text, at: context.caret) != nil && OrgCrypt.encryptedRange(context.text, at: context.caret) == nil
         case "app.crypt.open-entry", "app.crypt.decrypt-entry": return onAppCommand != nil && OrgCrypt.encryptedRange(context.text, at: context.caret) != nil
         case "app.table-export", "app.table-export.tsv", "app.plot": return onAppCommand != nil && ImportTable.exportText(context.text, at: context.caret, path: "") != nil
-        case "app.word-count", "app.recovery", "app.sync-conflicts", "app.lint", "app.lint-folders", "app.attach.photo", "app.attach.camera", "app.attach.scan",
+        case "app.word-count", "app.recovery", "app.sync-conflicts", "app.lint", "app.lint-folders", "app.flashcards.review", "app.attach.photo", "app.attach.camera", "app.attach.scan",
              "app.rename-tag", "app.rename-todo-keyword": return onAppCommand != nil
         case _ where id.hasPrefix(NamedMacros.commandPrefix): return true
         case "app.refile", "app.refile.copy", "app.archive": return onAppCommand != nil && Presentation.heading(containing: context.caret, in: context.tree) != nil

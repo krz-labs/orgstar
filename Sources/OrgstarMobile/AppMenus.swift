@@ -9,6 +9,7 @@ struct WindowActions {
     var capture: () -> Void
     var addFolder: () -> Void
     var board: () -> Void
+    var flashcards: () -> Void
     var clock: (String) -> Void
 }
 
@@ -80,6 +81,7 @@ struct AppMenus: SwiftUI.Commands {
                 .keyboardShortcut("a", modifiers: [.command, .shift])
             Button("Board") { window?.board() }
                 .keyboardShortcut("b", modifiers: [.command, .shift])
+            Button("Review Flashcards") { window?.flashcards() }
             Button("Folders") { window?.show(.folders) }
             Button("Settings") { window?.show(.settings) }
                 .keyboardShortcut(",")

@@ -69,6 +69,30 @@ public struct HabitSnapshot: WidgetData {
     }
 }
 
+/// When the flashcard positions a review would show fall due, for the Flashcards widget to
+/// count at each of its times.
+public struct FlashcardSnapshot: WidgetData {
+    public static let name = "flashcards.json"
+
+    public var due: [Date]
+
+    public init(due: [Date]) {
+        self.due = due.sorted()
+    }
+
+    public init(cards: [Flashcards.Card]) {
+        self.init(due: cards.flatMap(Flashcards.dueDates))
+    }
+
+    /// Positions due before `date`.
+    public func count(at date: Date) -> Int { due.prefix { $0 < date }.count }
+
+    /// The times after `date` the count goes up, at most `limit` of them.
+    public func changes(after date: Date, limit: Int = 24) -> [Date] {
+        Array(Set(due.filter { $0 >= date }.map { $0.addingTimeInterval(1) })).sorted().prefix(limit).map { $0 }
+    }
+}
+
 /// The running clock and the entry Clock In Last would clock into, for the clock control.
 public struct ClockSnapshot: WidgetData {
     public static let name = "clock.json"

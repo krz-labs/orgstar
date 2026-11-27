@@ -1,0 +1,121 @@
+#+TITLE: Flashcards
+#+DESCRIPTION: Spaced repetition with org-fc's cards: making cards, reviewing them on the Mac, iPhone, iPad and Apple Watch, and the due count widget.
+#+LEDE: orgstar reviews flashcards written in org-fc's format, so the same cards and their schedule work in Emacs.
+
+* Overview
+
+A flashcard is a heading. orgstar reads and writes the format of [[https://github.com/l3kn/org-fc][org-fc]], an Emacs package, so a card made in either one can be reviewed in the other, and a review in either one moves the card's schedule for both. A card is a heading with:
+
+- the tag =fc=;
+- the properties =FC_CREATED= (when it was made), =FC_TYPE= (its type), =FC_ALGO= (=sm2=), and an =ID=;
+- a =REVIEW_DATA= drawer after the property drawer, with a table row for each side or hole that is reviewed (a /position/): its ease, box, interval in days and when it is next due.
+
+#+begin_src org
+,* Capital of France                                                    :fc:
+:PROPERTIES:
+:FC_CREATED: 2026-11-18T11:06:40Z
+:FC_TYPE:  normal
+:FC_ALGO:  sm2
+:ID:       0F3C2A1E-6B8D-4E3A-9B4F-2D1C0A9E8B7F
+:END:
+:REVIEW_DATA:
+| position | ease | box | interval | due                  |
+|----------+------+-----+----------+----------------------|
+| front    | 2.50 |   0 |     0.00 | 2026-11-18T11:06:40Z |
+:END:
+Paris
+#+end_src
+
+Times are in UTC, as org-fc writes them. You don't write any of this by hand: the commands below add it to a heading.
+
+* Making cards
+
+Put the caret in a heading and run one of these commands from the command palette (=⇧⌘P=) on the Mac, or Commands in the editor on iOS. Each does what the org-fc command of the same name does.
+
+| Command                      | org-fc                          | The card                                                                                     |
+|------------------------------+---------------------------------+----------------------------------------------------------------------------------------------|
+| Make Normal Flashcard        | =org-fc-type-normal-init=       | The heading is the question, the text under it the answer. One position, =front=.             |
+| Make Double Flashcard        | =org-fc-type-double-init=       | Reviewed both ways: the heading asks for the text, and the text for the heading. Positions =front= and =back=. |
+| Make Cloze Flashcard…        | =org-fc-type-cloze-init=        | Holes in the text, each reviewed on its own. Asks for the cloze type.                          |
+| Make Text-Input Flashcard    | =org-fc-type-text-input-init=   | You type the answer, which is compared with the first line of the text. One position.          |
+| Update Flashcard             | =org-fc-update=                 | A cloze card's new holes get numbers and review data; holes removed lose theirs.               |
+| Suspend Flashcard            | =org-fc-suspend-card=           | Tags the card =suspended=, which leaves it out of reviews.                                     |
+| Unsuspend Flashcard          | =org-fc-unsuspend-card=         | Removes the =suspended= tag.                                                                   |
+
+A heading that is already a card is refused, and so is a text-input card with nothing to compare with (a heading followed directly by a subheading).
+
+** The back of a card
+
+A subheading titled =Back= holds the answer instead of the text under the heading. With one, the front of a normal card shows the heading and its text, and the back adds the =Back= subheading. A double card's back position shows the =Back= text as the question.
+
+#+begin_src org
+,* Two sided                                                             :fc:
+...
+Front text
+,** Back
+Back text
+#+end_src
+
+** Cloze holes
+
+A hole is ={{text}}=, or ={{text}{hint}}= with a hint shown while it is hidden. Make Cloze Flashcard… and Update Flashcard number the holes: ={{text}@0}=, ={{text}{hint}@1}=. Holes may contain LaTeX between =$= signs. The cloze type decides which other holes are hidden while one is reviewed:
+
+| Type        | While one hole is reviewed                              | Positions reviewed in one session |
+|-------------+---------------------------------------------------------+-----------------------------------|
+| deletion    | the other holes show                                    | one                               |
+| enumeration | the holes before it show, the ones after it are hidden  | every due one                     |
+| context     | the holes next to it show, the others are hidden        | one                               |
+| single      | every other hole is hidden                              | every due one                     |
+
+A hidden hole shows as =...=; the one being reviewed as =[...]=, or =[...hint]=.
+
+* Reviewing
+
+Review Flashcards shows the positions due across all your folders, one at a time, in random order (=org-fc-review= with =org-fc-shuffle-positions=). As in org-fc, suspended cards are left out, and of a normal or double card, or a deletion or context cloze card, only one position is shown per review.
+
+- On the Mac: Window ▸ Review Flashcards, or Review Flashcards in the command palette.
+- On iPhone and iPad: Review Flashcards in the agenda's Views menu or in Commands, Go ▸ Review Flashcards in the iPad menu bar, or the Flashcards widget.
+
+Each card shows its front. Show Answer flips it; a text-input card has a field for your answer and Check instead, then shows whether it matched. Then rate how well you knew it:
+
+| Button | Key on the Mac | Means                     |
+|--------+----------------+---------------------------|
+| Again  | =a=            | You didn't know it        |
+| Hard   | =h=            | You knew it with effort   |
+| Good   | =g=            | You knew it               |
+| Easy   | =e=            | You knew it at once       |
+
+Return also shows the answer. A card rated Again comes back at the end of the review. The menu at the top of the card has Open in Editor, which shows the card's heading, and Suspend Card, which tags it =suspended= and takes its other positions out of the review.
+
+Rating writes the position's new row into the card's =REVIEW_DATA= table. In a file that is open, the change is an edit like any other, which Undo takes back; a file that isn't open is saved at once.
+
+** Scheduling
+
+orgstar schedules as org-fc does by default (=org-fc-algorithm= =sm2-v1=, a variant of SM-2):
+
+- A new position starts in box 0 with ease 2.50, due at once.
+- Again sends a position back to box 0. Every other rating moves it up one box; Easy in box 0 moves it straight to box 2.
+- Boxes 0 to 3 have fixed intervals: 0, 0.01, 1 and 6 days.
+- From box 2 on, each rating changes the ease, by −0.30 (Again), −0.15 (Hard), 0 (Good) or +0.15 (Easy), kept between 1.30 and 5.00.
+- From box 4 on, the interval is the ease times the last interval, multiplied by a random factor between 0.9 and 1.1 so that cards made together don't stay together.
+
+** The review history
+
+Each rating is also added as a line to the review history, in the tab-separated format org-fc writes to =org-fc-review-history-file=: the time, the file, the card's ID, the position, its ease, box and interval before the rating, the rating, the seconds the card was shown, and =sm2-v1=. orgstar writes it to =org-fc-reviews.tsv= in the configuration folder; set =org-fc-review-history-file= in =config.toml= to use another file, such as the one Emacs writes (see [[file:13-configuration.org][Configuration]]). The history is only written; orgstar doesn't show statistics from it.
+
+* Widgets and Apple Watch
+
+The Flashcards widget shows how many positions are due, counting as a review would, and goes up by itself as cards fall due. It comes in small on the Home Screen and the Mac desktop, and circular and inline on the Lock Screen. Tapping it starts a review. Like the other widgets it needs orgstar+, and it counts what the app last wrote: when files or edits change while orgstar is open and when you return to it. See [[file:14-ios.org][iPhone and iPad]].
+
+The watch app reviews normal and double cards. When any are due, its list has Review /n/ cards above today's agenda: tap it for the first card's front, Show Answer for the back, then Again, Hard, Good or Easy. The iPhone writes the rating to the card's file, as a review on the iPhone does. The watch gets up to 30 due positions with the agenda; cloze and text-input cards are left to the iPhone and the Mac.
+
+Reviewing cards is free. The widget and the watch app need orgstar+, as all widgets and the watch app do.
+
+* Differences from org-fc
+
+- Only org-fc's default SM2 algorithm with its default parameters is used. Cards with =FC_ALGO= set to another algorithm (=fsrs=, =noop=) are refused when rated; the =FC_SM2_*= properties that change the parameters for a card or a subtree are not read, and =org-fc-algorithm= =sm2-v2= is not supported.
+- Review covers every folder you added; there are no review contexts (=org-fc-custom-contexts=), filters, =org-fc-directories= or =org-fc-review-early=.
+- The card is shown on a review screen, not in the file: drawers and planning lines are hidden, the rest shows as written. The =noheading= and =notitle= tags, =org-fc-drawer-whitelist= and LaTeX previews in cards are not supported.
+- A text-input answer is compared as a whole, not character by character as =org-fc-diff= does.
+- There is no dashboard, no audio (=org-fc-audio=), no vocab cards, no =org-fc-cloze-dwim= and no Edit/Skip during a review; Open in Editor leaves the review where it was.
+- Unsuspend Flashcard acts on the card the caret is in, from any of its subheadings, as Suspend Flashcard does; org-fc's acts on the heading at point.

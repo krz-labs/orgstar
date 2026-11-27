@@ -272,6 +272,8 @@ public enum AppLink: Equatable, Sendable {
     case clock
     /// The capture sheet, with a template's key or the first template.
     case capture(template: String?)
+    /// The flashcard review.
+    case review
 
     public static let scheme = "orgstar"
 
@@ -283,6 +285,8 @@ public enum AppLink: Equatable, Sendable {
             components.host = "agenda"
         case .clock:
             components.host = "clock"
+        case .review:
+            components.host = "review"
         case .capture(let template):
             components.host = "capture"
             if let template { components.queryItems = [URLQueryItem(name: "template", value: template)] }
@@ -299,6 +303,7 @@ public enum AppLink: Equatable, Sendable {
         switch components.host {
         case "agenda": self = .agenda
         case "clock": self = .clock
+        case "review": self = .review
         case "capture": self = .capture(template: query("template"))
         case "entry":
             guard let path = query("path"), let offset = query("offset").flatMap(Int.init) else { return nil }
