@@ -30,6 +30,6 @@ public enum OrgOnlyCommands {
         "app.node.insert", "app.node.rename", "app.node.rename-from-front-matter",
         "app.node.sequence-convert", "app.node.sequence-link", "app.node.sequence-rename-as-parent", "app.node.sequence-reparent",
         "app.node.sequence-reparent-recursive", "app.node.sequence-new-child-of-current", "app.node.sequence-new-sibling-of-current",
-        "app.publish.current-file",
+        "app.publish.current-file", "app.present",
     ]
 }

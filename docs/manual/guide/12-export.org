@@ -1,6 +1,6 @@
 #+TITLE: Export
-#+DESCRIPTION: Exporting Org files from orgstar to HTML, Markdown, PDF, Word, RTF, plain text, ODT, iCalendar, LaTeX and ASCII, and to PDF through LaTeX with Emacs; copying as rich text.
-#+LEDE: orgstar exports HTML, Markdown, PDF, Word, RTF, plain text, ODT, iCalendar, LaTeX and ASCII itself, and the Mac download version hands LaTeX-made PDF to Emacs.
+#+DESCRIPTION: Exporting Org files from orgstar to HTML, Markdown, PDF, Word, RTF, plain text, ODT, iCalendar, LaTeX, ASCII and reveal.js slides, and to PDF through LaTeX with Emacs; copying as rich text; presenting a file as slides.
+#+LEDE: orgstar exports HTML, Markdown, PDF, Word, RTF, plain text, ODT, iCalendar, LaTeX, ASCII and reveal.js slides itself, and the Mac download version hands LaTeX-made PDF to Emacs.
 
 * Exporting a file
 
@@ -21,32 +21,34 @@ Export works on the file in the current editor, using its text as it is now, sav
 | LaTeX              | Export to LaTeX                  | =C-c C-e l l= | =C-c C-e l l=                 | no          |
 | ODT                | Export to ODT                    | =C-c C-e o o= | =C-c C-e o o=                 | no          |
 | ASCII text         | Export to Plain Text (ASCII)     | =C-c C-e t u= | =C-c C-e t u=                 | no          |
+| reveal.js slides   | Export to reveal.js              | =C-c C-e v v= | =C-c C-e v v=                 | no          |
+| reveal.js slides, then open them | Export to reveal.js and Open | =C-c C-e v b= | =C-c C-e v b=   | no          |
 | iCalendar          | Export to iCalendar              | =C-c C-e c f= | =C-c C-e c f=                 | no          |
 | iCalendar, every agenda file | Export Agenda Files to iCalendar | =C-c C-e c a= | =C-c C-e c a=       | no          |
 | iCalendar, agenda files in one | Combine Agenda Files into iCalendar | =C-c C-e c c= | =C-c C-e c c=  | no          |
 
 The keys follow Emacs's export dispatcher (=org-export-dispatch=). =C-c C-e= on its own is only a prefix: pause after it and the key hints list the formats. The =SPC m e= keys work in normal state; the =C-c C-e= keys work in every Doom state. The Mac preset has no keys for the single formats; its =⇧⌘E= opens the export dialog.
 
-All fourteen commands are in File ▸ Export and in the command palette. They write the export beside the Org file, with the same name and the format's extension: =.html=, =.md=, =.pdf=, =.docx=, =.rtf=, =.tex=, =.odt=, =.txt= or =.ics=. The two agenda-file commands are the exceptions; see [[*iCalendar export][iCalendar export]]. =#+EXPORT_FILE_NAME:= names it instead, as in Org: relative to the Org file's folder (or absolute, or starting with =~=), with its extension replaced by the format's, so =#+EXPORT_FILE_NAME: out/report= writes =out/report.html=. A file already there is replaced. The message area shows "Exported to /name/", or "Exported the subtree to /name/", "Exported the body to /name/" or "Exported the subtree's body to /name/" when the export was not the whole file as a whole document.
+All sixteen commands are in File ▸ Export and in the command palette. They write the export beside the Org file, with the same name and the format's extension: =.html=, =.md=, =.pdf=, =.docx=, =.rtf=, =.tex=, =.odt=, =.txt= or =.ics= (=.html= for reveal.js). The two agenda-file commands are the exceptions; see [[*iCalendar export][iCalendar export]]. =#+EXPORT_FILE_NAME:= names it instead, as in Org: relative to the Org file's folder (or absolute, or starting with =~=), with its extension replaced by the format's, so =#+EXPORT_FILE_NAME: out/report= writes =out/report.html=. A file already there is replaced. The message area shows "Exported to /name/", or "Exported the subtree to /name/", "Exported the body to /name/" or "Exported the subtree's body to /name/" when the export was not the whole file as a whole document.
 
-The twelve commands that export the current file export the whole file as a whole document, unless the file is set otherwise. Two commands set it, as =C-s= and =C-b= do in Org's dispatcher:
+The fourteen commands that export the current file export the whole file as a whole document, unless the file is set otherwise. Two commands set it, as =C-s= and =C-b= do in Org's dispatcher:
 
 | Command                         | Emacs preset and Doom | Effect on the file's export commands                              |
 |---------------------------------+-----------------------+-------------------------------------------------------------------|
 | Turn Subtree Export On or Off   | =C-c C-e C-s=         | They export the subtree at the caret; see /Scope/ below.          |
 | Turn Body-Only Export On or Off | =C-c C-e C-b=         | They leave out the title and the page; see /Body only/ below.     |
 
-Both are in the command palette, and the message area says what is now on. The choice is kept for the file, and it is the same one the export dialog shows as /Scope/ and /Body only/, so setting it in the dialog sets it for the commands too. With subtree export on and the caret before the first heading, a command says "Not in a subtree" and writes nothing. With body-only export on, a command for PDF, Word, RTF, plain text, ODT or iCalendar says "This format has no body-only export. Turn body-only export off for this file first." and writes nothing. The two agenda-file commands follow neither.
+Both are in the command palette, and the message area says what is now on. The choice is kept for the file, and it is the same one the export dialog shows as /Scope/ and /Body only/, so setting it in the dialog sets it for the commands too. With subtree export on and the caret before the first heading, a command says "Not in a subtree" and writes nothing. With body-only export on, a command for PDF, Word, RTF, plain text, ODT, iCalendar or reveal.js says "This format has no body-only export. Turn body-only export off for this file first." and writes nothing. The two agenda-file commands follow neither.
 
-The [[file:../install.org][Mac App Store version]] has the thirteen commands that don't need Emacs; File ▸ Export, the export dialog and the command palette leave out Export to PDF with Emacs, and a key bound to it runs Export to PDF. When the export file, or an =#+INCLUDE:= or =#+SETUPFILE:=, is outside your folders, orgstar first asks for access to its folder; for the export file, Save Elsewhere… instead picks another place. See [[file:../install.org][Install]].
+The [[file:../install.org][Mac App Store version]] has the fifteen commands that don't need Emacs; File ▸ Export, the export dialog and the command palette leave out Export to PDF with Emacs, and a key bound to it runs Export to PDF. When the export file, or an =#+INCLUDE:= or =#+SETUPFILE:=, is outside your folders, orgstar first asks for access to its folder; for the export file, Save Elsewhere… instead picks another place. See [[file:../install.org][Install]].
 
 ** The export dialog
 
 *Export…* in the command palette, or =⇧⌘E= in the Mac preset, opens a dialog. The Emacs and Doom presets have no key for it; bind =app.export-dialog= in =keymap.toml= if you want one (see [[file:03-keys.org][Keys and commands]]). The dialog has:
 
-- *Format*: HTML, Markdown, PDF, Word, Rich Text (RTF), Plain text, PDF via LaTeX (Emacs), ODT, LaTeX, Plain text, ASCII or iCalendar. The App Store version lists LaTeX and Plain text, ASCII last.
+- *Format*: HTML, Markdown, PDF, Word, Rich Text (RTF), Plain text, PDF via LaTeX (Emacs), ODT, LaTeX, Plain text, ASCII, iCalendar or reveal.js slides. The App Store version lists LaTeX, Plain text, ASCII and reveal.js slides last.
 - *Scope*: the whole file, or the subtree at the caret (Org's =C-s= in the dispatcher). A subtree is exported as a document of its own: its heading is the title, its text the body, and its child headings move up a level. iCalendar is the exception: there the subtree's heading is an entry like any other. The file's =#+= keywords still apply, and the heading's =EXPORT_TITLE=, =EXPORT_AUTHOR=, =EXPORT_DATE=, =EXPORT_EMAIL=, =EXPORT_OPTIONS=, =EXPORT_SELECT_TAGS=, =EXPORT_EXCLUDE_TAGS=, =EXPORT_HTML_HEAD= and =EXPORT_HTML_HEAD_EXTRA= properties override them. Its planning line and property drawer are left out. The choice is available when the caret is under a heading.
-- *Body only*: leave out the title and the page around the text (Org's =C-b=). HTML is then the table of contents, the text and the footnotes, without =<html>=, =<head>= or the title; Markdown has no title heading; ASCII has no title block or table of contents. Not available for PDF, Word, RTF, plain text, ODT and iCalendar.
+- *Body only*: leave out the title and the page around the text (Org's =C-b=). HTML is then the table of contents, the text and the footnotes, without =<html>=, =<head>= or the title; Markdown has no title heading; ASCII has no title block or table of contents. Not available for PDF, Word, RTF, plain text, ODT, iCalendar and reveal.js slides.
 - *Destination*: where =#+EXPORT_FILE_NAME:= says, or the subtree's =EXPORT_FILE_NAME= property for a subtree, else beside the Org file. *Choose…* picks another place and name. Changing the format changes the extension.
 - *Margins*, *Font* and *Page numbers*, for PDF: see /PDF export/.
 - *Open after export*: opens the file in its default app when the export finishes.
@@ -55,9 +57,9 @@ The dialog keeps the format, scope, body-only and *Open after export* settings f
 
 ** On iOS
 
-The Export menu offers HTML, Markdown, PDF, Word, Rich Text (RTF), Plain Text, ODT, iCalendar, LaTeX and Plain Text (ASCII), and Copy as Rich Text. It is under More in the editor, and in the toolbar in the reader. Choosing one opens the share sheet with the exported file, named after the Org file or its =#+EXPORT_FILE_NAME:=. Send it to another app, or use Save to Files to keep it. The export is the same as on the Mac, except that LaTeX, ODT and ASCII have no author unless the file has =#+AUTHOR:=. PDF through LaTeX is not available on iOS.
+The Export menu offers HTML, Markdown, PDF, Word, Rich Text (RTF), Plain Text, ODT, iCalendar, LaTeX, Plain Text (ASCII) and reveal.js, and Copy as Rich Text. It is under More in the editor, and in the toolbar in the reader. Choosing one opens the share sheet with the exported file, named after the Org file or its =#+EXPORT_FILE_NAME:=. Send it to another app, or use Save to Files to keep it. The export is the same as on the Mac, except that LaTeX, ODT and ASCII have no author unless the file has =#+AUTHOR:=. PDF through LaTeX is not available on iOS.
 
-Body Only in the Export menu leaves out the title and the page around the text, as in the Mac's export dialog, and is kept for each file. While it is on, PDF, Word, Rich Text (RTF), Plain Text, ODT and iCalendar say "This format has no body-only export. Turn body-only export off for this file first." Turn Body-Only Export On or Off, in Commands or on =C-c C-e C-b= with a hardware keyboard, changes the same setting. Export Subtree…, in the editor's Export menu, lists the formats for the subtree at the caret, and follows Body Only too. There is no subtree setting on iOS: the menu's formats always export the whole file.
+Body Only in the Export menu leaves out the title and the page around the text, as in the Mac's export dialog, and is kept for each file. While it is on, PDF, Word, Rich Text (RTF), Plain Text, ODT, iCalendar and reveal.js say "This format has no body-only export. Turn body-only export off for this file first." Turn Body-Only Export On or Off, in Commands or on =C-c C-e C-b= with a hardware keyboard, changes the same setting. Export Subtree…, in the editor's Export menu, lists the formats for the subtree at the caret, and follows Body Only too. There is no subtree setting on iOS: the menu's formats always export the whole file.
 
 Print… in the Export menu prints the file; see [[*Printing][Printing]]. The Export menu also has Export Agenda Files to iCalendar and Combine Agenda Files into iCalendar (see [[*iCalendar export][iCalendar export]]). Export to HTML and Open, in Commands or on =C-c C-e h o= with a hardware keyboard, shows the HTML export in Quick Look, with the file's images in the page; nothing is written beside the Org file; it follows Body Only. Copy as Rich Text is in Commands too.
 
@@ -219,6 +221,74 @@ Comments, drawers, property drawers, planning lines, clock lines and keywords ar
 
 HTML and Markdown export handle citations the same way; see Citations below.
 
+* reveal.js export
+
+Export to reveal.js writes a slide deck for [[https://revealjs.com][reveal.js]], as Emacs's org-re-reveal package writes one (=org-re-reveal-export-to-html=), without Emacs, on the Mac and iOS. It writes a =.html= file, like HTML export, so the two replace each other unless =#+EXPORT_FILE_NAME:= tells them apart. Like PDF export, it needs [[file:../install.org][orgstar+]].
+
+The deck is one file that works without a network connection: reveal.js 6.0.2, its stylesheet, the theme and the plugins come with orgstar and are put in the page, and so are the images the file links to and the slides' background images. Open it in a browser and share it as it is. With =#+REVEAL_ROOT:=, the deck links to reveal.js there instead, as org-re-reveal does, and images stay links: =#+REVEAL_ROOT: https://cdn.jsdelivr.net/npm/reveal.js@6.0.2= uses a CDN, and a relative path a copy of reveal.js beside the deck. The files are read from reveal.js 6's =dist= folder (=dist/reveal.js=, =dist/theme/black.css=, =dist/plugin/notes.js=).
+
+The slides:
+
+- A title slide first, with the title, =#+SUBTITLE:=, the author and the date (=#+OPTIONS: author:nil= and the rest leave them out).
+- A table of contents slide, as for HTML export; =#+OPTIONS: toc:nil= leaves it out, as most decks do. Section numbers are as for HTML export; =num:nil= leaves them out.
+- A slide for each heading down to =H= (3 unless =#+OPTIONS: H:n= says otherwise). First-level headings go across; their children go down from them, as reveal.js's vertical slides. =#+REVEAL_HLEVEL: 2= puts second-level headings across too. Deeper headings are part of their slide, as HTML export writes them.
+- Text before the first heading, other than keywords, on a slide of its own after the title.
+- The footnotes on a last slide.
+
+Inside a slide, everything is as HTML export writes it: lists, tables, colored code, images, links, math (MathJax, put in the page when reveal.js is), and =#+BEGIN_EXPORT html= and =@@html:…@@= with their =reveal= forms. Headings tagged =noexport= and COMMENT headings are left out.
+
+| In the file | Effect |
+|-------------+--------|
+| =#+BEGIN_NOTES= … =#+END_NOTES= | Speaker notes, which reveal.js shows on =S=. |
+| =#+ATTR_REVEAL: :frag appear= | The next paragraph, list, table or block appears on its own step; any reveal.js fragment style, or =t= for =#+REVEAL_DEFAULT_FRAG_STYLE:= (plain =fragment= without one). |
+| =#+ATTR_REVEAL: :frag (appear)= | Before a list: each item on its own step. Several styles, =(grow shrink none)=, go to the items in order, the last one for the rest; =none= is no step. |
+| =:frag_idx 2=, =:frag_idx (3 2 1)= | The step's =data-fragment-index=; =-= is none. |
+| =#+REVEAL: split= | Starts a new slide with the same heading's settings. |
+| =#+REVEAL_HTML: …= | HTML put in the slide as written. |
+| =#+REVEAL_ROOT:= | Links to reveal.js there instead of putting it in the page. |
+| =#+REVEAL_THEME:= | One of reveal.js's themes (=black=, the default, =white=, =league=, =beige=, =night=, =serif=, =simple=, =sky=, =solarized=, =blood=, =moon=, =dracula=, =black-contrast=, =white-contrast=), or a stylesheet's path or URL ending in =.css=. |
+| =#+REVEAL_TRANS:=, =#+REVEAL_SPEED:= | The transition (=convex= by default) and its speed. |
+| =#+REVEAL_PLUGINS:= | The plugins, as a list: =(notes search zoom)= is the default. In a deck with reveal.js in the page, notes, search, zoom and math are available; others (markdown, highlight) need =#+REVEAL_ROOT:=. |
+| =#+REVEAL_INIT_OPTIONS:= | Options for =Reveal.initialize=, as JavaScript: =width: 1200, height: 800, margin: 0.1=. Several lines add up; they win over the defaults. |
+| =#+REVEAL_MARGIN:=, =#+REVEAL_MIN_SCALE:=, =#+REVEAL_MAX_SCALE:= | The same reveal.js options, as numbers. |
+| =#+REVEAL_TITLE_SLIDE:= | =nil= for no title slide, or HTML with =%t= (title), =%s= (subtitle), =%a= (author), =%e= (email, with =email:t=), =%d= (date), =%A= (=#+REVEAL_ACADEMIC_TITLE:=), =%m= (=#+REVEAL_MISCINFO:=) and =%%=. =#+OPTIONS: reveal_title_slide:nil= leaves it out too. |
+| =#+REVEAL_TITLE_SLIDE_BACKGROUND:= | Its background: a color, an image or a URL; =_SIZE=, =_POSITION=, =_REPEAT= and =_TRANSITION= variants as in org-re-reveal. |
+| =#+REVEAL_EXTRA_CSS:= | A stylesheet of one's own, put in the page when it can be read, else linked. |
+| =#+REVEAL_HEAD_PREAMBLE:=, =#+REVEAL_PREAMBLE:=, =#+REVEAL_POSTAMBLE:= | HTML in the head, before the slides and after them. |
+| =#+OPTIONS: reveal_control:nil= | Also =reveal_progress=, =reveal_history=, =reveal_center=, =reveal_slide_number= (=nil=, =t= or a format such as =c/t=), =reveal_rolling_links=, =reveal_keyboard=, =reveal_mousewheel=, =reveal_fragmentinurl=, =reveal_overview= and =reveal_pdfseparatefragments=, with org-re-reveal's defaults. |
+
+A heading's properties set its slide: =REVEAL_BACKGROUND= (a color, an image or a URL), =REVEAL_BACKGROUND_SIZE=, =REVEAL_BACKGROUND_POSITION=, =REVEAL_BACKGROUND_REPEAT=, =REVEAL_BACKGROUND_TRANS=, =REVEAL_BACKGROUND_OPACITY=, =REVEAL_BACKGROUND_IFRAME=, =REVEAL_BACKGROUND_VIDEO=, =REVEAL_DATA_TRANSITION=, =REVEAL_DATA_STATE=, =HTML_CONTAINER_CLASS= (its =class=) and =REVEAL_EXTRA_ATTR= (attributes as written).
+
+Code keeps the editor theme's colors: the dark ones on a dark reveal.js theme (black, league, night, moon, blood, dracula, black-contrast), the light ones on the others.
+
+On the Mac, Export to reveal.js (=C-c C-e v v= in the Emacs preset and Doom) and Export to reveal.js and Open (=C-c C-e v b=) are in File ▸ Export and the command palette, and the export dialog has /reveal.js slides/. On iOS, reveal.js is in the Export menu. Publishing writes decks with =publishing-function = "org-re-reveal-publish-to-reveal"=.
+
+Differences from org-re-reveal:
+
+- Without =#+REVEAL_ROOT:= the deck has reveal.js in it, where org-re-reveal links to =./reveal.js= (or puts it in the page with =reveal_single_file:t=).
+- The files linked under =#+REVEAL_ROOT:= are reveal.js 6's (=dist/plugin/notes.js=), not reveal.js 4's (=plugin/notes/notes.js=).
+- The default plugins are notes, search and zoom; org-re-reveal's list also has markdown.
+- Slide ids are =slide-= and the heading's id as HTML export makes it (=slide-introduction=), not =slide-org…= ids that change with each export. Links to headings go to their slides.
+- Headings below =H= are headings, as in orgstar's HTML export, not list items.
+- Not read: =#+REVEAL_EXTRA_JS:=, =#+REVEAL_SLIDE_HEADER:= and =#+REVEAL_SLIDE_FOOTER:=, =#+REVEAL_INIT_SCRIPT:=, =#+REVEAL_HIGHLIGHT_CSS:=, =#+REVEAL_MULTIPLEX_…=, =#+REVEAL_TOC_SLIDE_…=, =:code_attribs= and other =#+ATTR_REVEAL= attributes than =:frag= and =:frag_idx=, and =org-re-reveal='s customizable variables.
+
+* Presenting
+
+Present shows the file one heading at a time, full screen, as org-present and org-tree-slide show it in Emacs. Each slide is a heading's line, without its stars and tags, and its text, in the editor's theme at a size that fills the screen; its children are the slides after it. A title slide comes first when the file has =#+TITLE:=, =#+AUTHOR:= or =#+DATE:=, or text before the first heading. Planning lines, drawers, keywords and comments don't show; image links on lines of their own show as images; =#+BEGIN_NOTES= blocks are the slide's notes. Headings tagged =noexport= and COMMENT headings are left out, with their children. A slide too long for the screen scrolls. Present needs no orgstar+, and nothing is written.
+
+On the Mac, View ▸ Present (=⌃⌘P=), also in the command palette, opens the slides in a full-screen window at the heading the caret is in.
+
+| Key | Does |
+|-----+------|
+| =→=, =↓=, Space, Page Down, Return | Next slide |
+| =←=, =↑=, Delete, Page Up | Previous slide |
+| Home, End | First and last slide |
+| Escape | Leave, as Done does |
+
+On iOS, Present is in the editor's Commands, starting at the caret's heading, and in the reader's, starting at the beginning. Tap the right two thirds of the screen or swipe left for the next slide, tap the left third or swipe right for the previous one, and tap Done to leave. With a hardware keyboard the keys above work too.
+
+On an iPad with an external display and Stage Manager off, the slide shows on the display, and the iPad shows the next slide, the current slide's notes, the slide number, Previous and Next. With Stage Manager on, the display is an extended desktop and shows windows, not the slide.
+
 * PDF export
 
 Export to PDF makes the HTML export into a PDF, laid out and split into pages by the system's web engine as printing does. It needs neither Emacs nor TeX, and works on iOS. The PDF has what the HTML export has: the title, the byline, the table of contents, colored code, tables, images and math (MathJax, which comes with orgstar and needs no network connection). For the page:
@@ -347,7 +417,7 @@ Differences from Org: diary sexps (=%%(…)= lines and =<%%(…)>= timestamps) a
 
 * Publishing
 
-Publishing (=org-publish=) exports a folder of Org files to a folder of HTML, Markdown, LaTeX, ODT or plain text files, copies other files beside them, and can write a sitemap. Projects are =[[publish]]= tables in =config.toml=, as =org-publish-project-alist= entries are in Emacs:
+Publishing (=org-publish=) exports a folder of Org files to a folder of HTML, Markdown, LaTeX, ODT, plain text or reveal.js files, copies other files beside them, and can write a sitemap. Projects are =[[publish]]= tables in =config.toml=, as =org-publish-project-alist= entries are in Emacs:
 
 #+BEGIN_SRC toml
 [[publish]]
@@ -380,7 +450,7 @@ components = "notes static"
 | =recursive=            | Files in subfolders too                                                                     | =false=                     |
 | =exclude=              | An Emacs regexp on the file's path under =base-directory=; matching files are left out      |                             |
 | =include=              | More files, relative to =base-directory=, separated by spaces                              |                             |
-| =publishing-function=  | =org-html-publish-to-html=, =org-md-publish-to-md=, =org-latex-publish-to-latex=, =org-odt-publish-to-odt=, =org-ascii-publish-to-ascii= or =org-publish-attachment= (copied as they are), several separated by spaces | =org-html-publish-to-html= |
+| =publishing-function=  | =org-html-publish-to-html=, =org-md-publish-to-md=, =org-latex-publish-to-latex=, =org-odt-publish-to-odt=, =org-ascii-publish-to-ascii=, =org-re-reveal-publish-to-reveal= or =org-publish-attachment= (copied as they are), several separated by spaces | =org-html-publish-to-html= |
 | =body-only=            | The export's body only                                                                      | =false=                     |
 | =auto-sitemap=         | Write a sitemap into =base-directory= and publish it with the rest                          | =false=                     |
 | =sitemap-filename=     | The sitemap's name                                                                          | ="sitemap.org"=             |

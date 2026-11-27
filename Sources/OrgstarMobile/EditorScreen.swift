@@ -69,6 +69,8 @@ struct EditorScreen: View {
     @State private var attachingPhotos = false
     @State private var takingPhoto = false
     @State private var scanning = false
+    /// Present: the file's slides, full screen.
+    @State private var deck: SlideDeck?
     @State private var photos: [PhotosPickerItem] = []
     /// A file shown in Quick Look.
     @State private var previewed: URL?
@@ -321,6 +323,9 @@ struct EditorScreen: View {
             }
             .ignoresSafeArea()
         }
+        .fullScreenCover(isPresented: Binding(get: { deck != nil }, set: { if !$0 { deck = nil } })) {
+            if let deck { PresentationScreen(deck: deck, theme: model.theme, options: session.options) }
+        }
         .fullScreenCover(isPresented: $scanning) {
             DocumentScanner { data in
                 scanning = false
@@ -520,6 +525,13 @@ struct EditorScreen: View {
                 exportSubtree()
             } else if Printing.commands.contains(id) {
                 printFile(id)
+            } else if id == "app.present" {
+                if let document = session.document(of: path),
+                   let deck = SlideDeck(tree: document.tree, path: path, settings: document.defaults, caret: self.editor?.editContext().caret ?? 0) {
+                    self.deck = deck
+                } else {
+                    message = String(localized: "Nothing to present")
+                }
             } else if id == "app.share-subtree" {
                 if let caret = self.editor?.editContext().caret, let refusal = session.refusesSubtreeShare(path, at: caret) {
                     message = refusal
@@ -1142,7 +1154,8 @@ struct CommandPalette: View {
         ("app.clock.default", "Mark as Default Clock Task"), ("app.clock.resolve", "Resolve Open Clocks…"),
         ("app.refile", "Refile…"), ("app.refile.copy", "Copy to Refile Target…"), ("app.refile.goto", "Go to Refile Target…"),
         ("app.archive", "Archive Subtree"), ("app.export-dialog", "Export…"), ("app.export-subtree-dialog", "Export Subtree…"),
-        ("app.share-subtree", "Share Subtree…"),
+        ("app.share-subtree", "Share Subtree…"), ("app.print", "Print…"), ("app.print-subtree", "Print Subtree…"), ("app.print-selection", "Print Selection…"),
+        ("app.present", "Present"),
         ("app.copy-rich-text", "Copy as Rich Text"), ("app.export.html-open", "Export to HTML and Open"),
         ("app.export-body-only", "Turn Body-Only Export On or Off"),
         ("app.export.icalendar-agenda", "Export Agenda Files to iCalendar"), ("app.export.icalendar-combined", "Combine Agenda Files into iCalendar"),

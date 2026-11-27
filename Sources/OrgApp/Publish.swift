@@ -15,7 +15,7 @@ import OrgCore
 /// Other keys: `base-extension` (an Emacs regexp, or `any`), `exclude` (a regexp on the path
 /// under the base directory), `include` (file names separated by spaces), `publishing-function`
 /// (`org-html-publish-to-html`, `org-md-publish-to-md`, `org-odt-publish-to-odt`,
-/// `org-publish-attachment`, separated by spaces), `sitemap-filename`, `sitemap-title`, `sitemap-style` (`tree` or `list`),
+/// `org-re-reveal-publish-to-reveal`, `org-publish-attachment`, separated by spaces), `sitemap-filename`, `sitemap-title`, `sitemap-style` (`tree` or `list`),
 /// `sitemap-sort-files` (`alphabetically`, `chronologically`, `anti-chronologically`, `nil`),
 /// `sitemap-sort-folders` (`ignore`, `first`, `last`, `nil`), `sitemap-ignore-case`,
 /// `body-only`, and `components` (project names separated by spaces) for a project of projects.
@@ -40,7 +40,7 @@ public struct PublishProject: Sendable, Equatable {
 
     public init(name: String) { self.name = name }
 
-    public static let functions = ["org-html-publish-to-html", "org-md-publish-to-md", "org-latex-publish-to-latex", "org-odt-publish-to-odt", "org-ascii-publish-to-ascii", "org-publish-attachment"]
+    public static let functions = ["org-html-publish-to-html", "org-md-publish-to-md", "org-latex-publish-to-latex", "org-odt-publish-to-odt", "org-ascii-publish-to-ascii", "org-re-reveal-publish-to-reveal", "org-publish-attachment"]
 }
 
 public enum Publish {
@@ -285,7 +285,7 @@ public enum Publish {
         return report
     }
 
-    /// What `function` makes of `text`, the file at `path`: HTML, Markdown, LaTeX or plain text,
+    /// What `function` makes of `text`, the file at `path`: HTML, Markdown, LaTeX, plain text or a reveal.js deck,
     /// with `settings` and the file's setup files. The `export` of `publish` on every platform.
     public static func export(
         _ function: String, text: String, path: String, bodyOnly: Bool, settings: OrgSettings, codeStyle: HTMLCodeStyle?,
@@ -308,6 +308,8 @@ public enum Publish {
             } catch let error as ASCIIExport.Unsupported {
                 throw ASCIIExport.Unsupported(reason: "Can't export \(name) to plain text: \(error.reason)")
             }
+        case "org-re-reveal-publish-to-reveal":
+            return RevealExport.document(text, fallbackTitle: (name as NSString).deletingPathExtension, settings: settings, path: path, codeStyle: codeStyle, language: language)
         default:
             let base = (name as NSString).deletingPathExtension
             return HTMLExport.page(text, fallbackTitle: base, settings: settings, path: path, bodyOnly: bodyOnly, codeStyle: codeStyle, language: language)

@@ -131,6 +131,7 @@ These come from the menu bar and work in every preset. In the Doom preset, keys 
 | View | Close Pane | =⌃⌘0= |
 | View | Close Other Panes | =⌃⌘1= |
 | View | Next Pane | =⌥⌘`= |
+| View | Present | =⌃⌘P= |
 | View | Show Outline | =⌥⌘O= |
 | View | Show Inspector | =⌥⌘I= |
 | Window | Agenda | =⇧⌘A= |
@@ -1077,6 +1078,8 @@ When a key appears in several rows, it runs the command whose condition holds at
 | Export to LaTeX (=app.export.latex=) | =C-c C-e l l= | — | — | Exports to LaTeX without Emacs, as =org-latex-export-to-latex= does. |
 | Export to ODT (=app.export.odt=) | =C-c C-e o o= | — | — | Exports to OpenDocument text without Emacs, as =org-odt-export-to-odt= does. |
 | Export to Plain Text (ASCII) (=app.export.text=) | =C-c C-e t u= | — | — | Exports to plain text without Emacs, as =org-ascii-export-to-ascii= does. |
+| Export to reveal.js (=app.export.reveal=) | =C-c C-e v v= | — | — | Exports a reveal.js slide deck, as =org-re-reveal-export-to-html= does. See [[file:12-export.org][Export]]. |
+| Export to reveal.js and Open (=app.export.reveal-open=) | =C-c C-e v b= | — | — | Exports the slide deck and opens it (=org-re-reveal-export-to-html-and-browse=). |
 | Export to iCalendar (=app.export.icalendar=) | =C-c C-e c f= | — | — | Exports to an =.ics= calendar (=org-icalendar-export-to-ics=). |
 | Export Agenda Files to iCalendar (=app.export.icalendar-agenda=) | =C-c C-e c a= | — | — | Writes an =.ics= beside each agenda file (=org-icalendar-export-agenda-files=). |
 | Combine Agenda Files into iCalendar (=app.export.icalendar-combined=) | =C-c C-e c c= | — | — | Writes the agenda files' entries to one calendar (=org-icalendar-combine-agenda-files=). |
@@ -1220,6 +1223,7 @@ No preset binds these. Run them from the palette or a menu, or bind them in =key
 | Show or Hide Outline (=app.toggle-outline=) | Shows or hides the outline pane. View ▸ Show Outline, =⌥⌘O=. |
 | Show or Hide Backlinks (=app.toggle-backlinks=) | Shows or hides the backlinks pane. View ▸ Show Backlinks. |
 | Show or Hide Inspector (=app.toggle-inspector=) | Shows or hides the inspector, with column view and clocked time. View ▸ Show Inspector, =⌥⌘I=. |
+| Present (=app.present=) | Shows the file one heading at a time, full screen, as org-present does. View ▸ Present, =⌃⌘P=. See Presenting in [[file:12-export.org][Export]]. |
 | Show or Hide Markup (=app.toggle-markup=) | Shows or hides link brackets and emphasis markers. View ▸ Show Markup, =⇧⌘M=. |
 | Show or Hide Line Numbers (=app.toggle-line-numbers=) | Shows or hides line numbers. View ▸ Show Line Numbers, =⇧⌘L=. |
 | Show or Hide Tab Bar (=app.toggle-tab-bar=) | Shows or hides the tab bar. View ▸ Show Tab Bar. |

@@ -69,6 +69,18 @@ cat > "$app/Info.plist" <<PLIST
     <dict>
         <key>UIApplicationSupportsMultipleScenes</key>
         <true/>
+        <key>UISceneConfigurations</key>
+        <dict>
+            <key>UIWindowSceneSessionRoleExternalDisplayNonInteractive</key>
+            <array>
+                <dict>
+                    <key>UISceneConfigurationName</key>
+                    <string>External Display</string>
+                    <key>UISceneDelegateClassName</key>
+                    <string>ExternalDisplaySceneDelegate</string>
+                </dict>
+            </array>
+        </dict>
     </dict>
     <key>UISupportedInterfaceOrientations</key>
     <array>

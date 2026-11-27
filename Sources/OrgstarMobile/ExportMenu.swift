@@ -6,12 +6,12 @@ import OrgPresentation
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// A file exported as HTML, Markdown, PDF, Word, RTF, plain text, ODT, iCalendar, LaTeX or ASCII,
+/// A file exported as HTML, Markdown, PDF, Word, RTF, plain text, ODT, iCalendar, LaTeX, ASCII or reveal.js,
 /// written when the share sheet takes it.
 struct OrgExport: Transferable {
     enum Format: CaseIterable {
         case html, markdown, pdf, docx, rtf, plainText, odt, icalendar
-        case latex, ascii
+        case latex, ascii, reveal
 
         /// Whether it needs Pro now: every format but HTML and Markdown, until Pro is unlocked.
         @MainActor var locked: Bool { self != .html && self != .markdown && !ProAccess.shared.isUnlocked }
@@ -28,6 +28,7 @@ struct OrgExport: Transferable {
             case .icalendar: "iCalendar"
             case .latex: "LaTeX"
             case .ascii: "Plain Text (ASCII)"
+            case .reveal: "reveal.js"
             }
         }
 
@@ -46,6 +47,7 @@ struct OrgExport: Transferable {
             case .icalendar: "ics"
             case .latex: "tex"
             case .ascii: "txt"
+            case .reveal: "html"
             }
         }
     }
@@ -74,7 +76,7 @@ struct OrgExport: Transferable {
 
     static var transferRepresentation: some TransferRepresentation {
         FileRepresentation(exportedContentType: .html) { try await $0.write() }
-            .exportingCondition { $0.format == .html }
+            .exportingCondition { $0.format == .html || $0.format == .reveal }
         FileRepresentation(exportedContentType: UTType(filenameExtension: "md") ?? .plainText) { try await $0.write() }
             .exportingCondition { $0.format == .markdown }
         FileRepresentation(exportedContentType: .pdf) { try await $0.write() }
@@ -137,6 +139,9 @@ struct OrgExport: Transferable {
                 throw error
             }
             try content.write(to: url, atomically: true, encoding: .utf8)
+        case .reveal:
+            try RevealExport.document(text, fallbackTitle: base, settings: settings, path: path, codeStyle: codeStyle, language: OrgPreferences.exportLanguage())
+                .write(to: url, atomically: true, encoding: .utf8)
         case .odt:
             try ODTExport.document(text, settings: settings, path: path, language: OrgPreferences.exportLanguage())
                 .write(to: url, options: .atomic)

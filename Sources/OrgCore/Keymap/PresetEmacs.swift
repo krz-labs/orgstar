@@ -528,6 +528,12 @@ extension KeymapPreset {
         keys = "C-c C-e t u"
         command = "app.export.text"
         [[bind]]
+        keys = "C-c C-e v v"
+        command = "app.export.reveal"
+        [[bind]]
+        keys = "C-c C-e v b"
+        command = "app.export.reveal-open"
+        [[bind]]
         keys = "C-c C-e c f"
         command = "app.export.icalendar"
         [[bind]]

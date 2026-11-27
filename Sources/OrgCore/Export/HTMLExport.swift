@@ -161,6 +161,8 @@ final class HTMLRenderer {
     var inTitle = false
     /// Colors for source blocks; plain without.
     var codeStyle: HTMLCodeStyle?
+    /// A reveal.js deck being exported: headings become slides, `#+ATTR_REVEAL` fragments.
+    var reveal: RevealSlides?
 
     enum FootnoteContent {
         case definition(String)
@@ -206,6 +208,7 @@ final class HTMLRenderer {
         rendering(tree, text) {
             for child in tree.root.children { out += element(child) }
         }
+        if let reveal { return out + reveal.close() }
         out += footnoteSection()
         return out
     }
@@ -233,7 +236,7 @@ final class HTMLRenderer {
         }
     }
 
-    private func footnoteSection() -> String {
+    func footnoteSection() -> String {
         guard !footnoteOrder.isEmpty else { return "" }
         var out = "<section class=\"footnotes\" aria-label=\"\(ExportDictionary.translate("Footnotes", language: language, encoding: .html))\">\n<hr>\n<ol>\n"
         for (index, note) in footnoteOrder.enumerated() {
@@ -248,8 +251,13 @@ final class HTMLRenderer {
         return out + "</ol>\n</section>\n"
     }
 
+    /// How deep in `blocks` rendering is: the document's own text at 0.
+    private var nested = 0
+
     /// Org text rendered as elements, for block and footnote contents.
     func blocks(_ text: String) -> String {
+        nested += 1
+        defer { nested -= 1 }
         let tree = OrgParser.parse(text, defaults: settings)
         var out = ""
         rendering(tree, text) {
@@ -299,7 +307,9 @@ final class HTMLRenderer {
         switch node.kind {
         case .section:
             guard let heading = node.firstChild(.heading) else { fallthrough }
-            switch Self.sectionExport(heading, options: options, selected: selected) {
+            let export = Self.sectionExport(heading, options: options, selected: selected)
+            if export != .nothing, let slide = reveal?.section(node, heading: heading, all: export == .all, renderer: self) { return slide }
+            switch export {
             case .nothing: return ""
             case .heading: return self.heading(heading)
             case .all: break
@@ -310,6 +320,7 @@ final class HTMLRenderer {
         case .zerothSection, .document:
             var out = ""
             for child in node.children { out += element(child) }
+            if node.kind == .zerothSection, let reveal, nested == 0 { return reveal.preamble(out) }
             return out
         case .heading:
             return heading(node)
@@ -320,15 +331,17 @@ final class HTMLRenderer {
             }
             return ""
         case .paragraph:
-            return paragraph(node)
+            return fragment(paragraph(node))
         case .keyword where citations != nil && node.text.range(of: "^[ \\t]*#\\+print_bibliography:", options: [.regularExpression, .caseInsensitive]) != nil:
             return citations!.bibliography.map { "<p>" + render($0) + "</p>\n" }.joined()
         case .plainList:
-            return list(node)
+            return fragment(list(node), list: true)
         case .table:
-            return table(node)
+            return fragment(table(node))
         case .block:
-            return block(node)
+            return fragment(block(node))
+        case .keyword where reveal != nil:
+            return reveal!.keyword(node.text)
         case .horizontalRule:
             return "<hr>\n"
         case .inlineTask:
@@ -468,7 +481,13 @@ final class HTMLRenderer {
         return out + "</ul>\n</div>\n</div>\n"
     }
 
-    private func heading(_ node: SyntaxNode) -> String {
+    /// `html` as a reveal.js fragment when `#+ATTR_REVEAL` asks.
+    private func fragment(_ html: String, list: Bool = false) -> String {
+        guard let reveal, let attributes = affiliated["ATTR_REVEAL"] else { return html }
+        return reveal.fragment(html, attributes: attributes, list: list)
+    }
+
+    func heading(_ node: SyntaxNode) -> String {
         let tokens = node.tokens
         let level = tokens.first { $0.kind == .stars }?.text.count ?? 1
         let title = node.firstChild(.title)
@@ -687,9 +706,12 @@ final class HTMLRenderer {
             }
             return "<p class=\"verse\">\n" + rendered.joined(separator: "<br>\n") + "\n</p>\n"
         case "export":
-            return parameters.lowercased().hasPrefix("html") ? text + "\n" : ""
+            let backend = parameters.lowercased()
+            return backend.hasPrefix("html") || (reveal != nil && backend.split(separator: " ").first == "reveal") ? text + "\n" : ""
         case "comment":
             return ""
+        case "notes" where reveal != nil:
+            return "<aside class=\"notes\">\n\(blocks(text))</aside>\n"
         default:
             return "<div class=\"\(Self.escape(type))\">\n\(blocks(text))</div>\n"
         }
@@ -844,7 +866,7 @@ final class HTMLRenderer {
         case .statisticsCookie: return Self.escape(node.text)
         // `org-html-export-snippet`: only HTML snippets.
         case .exportSnippet:
-            guard node.tokens.first?.text == "@@html:" else { return "" }
+            guard node.tokens.first?.text == "@@html:" || (reveal != nil && node.tokens.first?.text == "@@reveal:") else { return "" }
             return node.tokens.filter { $0.kind != .marker }.map(\.text).joined()
         case .citation:
             if inTitle { return "" }

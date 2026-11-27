@@ -515,6 +515,8 @@ struct OrgstarApp: App {
 
     init() {
         PDFExport.mathJaxURL = OrgMathJax.script
+        RevealExport.library = OrgMathJax.reveal
+        RevealExport.mathJax = OrgMathJax.script
         #if !APPSTORE
         Printing.saveTo = DevelopmentHooks.printTo
         #endif
@@ -710,6 +712,10 @@ struct OrgstarApp: App {
                     .keyboardShortcut("1", modifiers: [.command, .control])
                 Button("Next Pane") { commands.run("app.pane-next") }
                     .keyboardShortcut("`", modifiers: [.command, .option])
+                Divider()
+                Button("Present") { commands.run("app.present") }
+                    .keyboardShortcut("p", modifiers: [.command, .control])
+                    .disabled(!session.isOrg)
                 Divider()
                 ViewMenuToggles(commands: commands)
                 Divider()

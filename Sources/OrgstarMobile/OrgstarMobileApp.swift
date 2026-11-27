@@ -16,6 +16,8 @@ struct OrgstarMobileApp: App {
 
     init() {
         PDFExport.mathJaxURL = OrgMathJax.script
+        RevealExport.library = OrgMathJax.reveal
+        RevealExport.mathJax = OrgMathJax.script
         DiagramBlocks.vizURL = OrgMathJax.viz
         DiagramBlocks.mermaidURL = OrgMathJax.mermaid
         PythonBlocks.folder = OrgMathJax.pyodide

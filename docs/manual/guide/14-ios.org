@@ -182,7 +182,7 @@ Commands, in the key bar and in the toolbar of the editor, the reader and the ag
 
 Named keyboard macros are listed by name under Edit, and Next Snippet Field and Previous Snippet Field under Text with the other snippet commands. In the editor, a command that doesn't apply at the caret is listed greyed, with the reason, such as =Not in a list= or =No table at point=, so a search finds everything the editor can do. With a hardware keyboard attached, each command shows its Emacs key.
 
-The editor's list has Export…, Export Subtree…, Print…, Print Subtree… and Print Selection… under Export. The reader's list has Find, Outline, Export…, Show or Hide Markup, Capture… and the clock commands that need no caret. The agenda's has its views, Tags and Properties…, Search…, Save as View…, Today, Earlier, Later, Go to Date…, Log Mode, Filter…, Select, Board, Print…, Capture… and the same clock commands.
+The editor's list has Export…, Export Subtree…, Print…, Print Subtree… and Print Selection… under Export, and Present under View. The reader's list has Find, Outline, Export…, Present, Show or Hide Markup, Capture… and the clock commands that need no caret. The agenda's has its views, Tags and Properties…, Search…, Save as View…, Today, Earlier, Later, Go to Date…, Log Mode, Filter…, Select, Board, Print…, Capture… and the same clock commands.
 
 When a command asks a question, a sheet opens:
 
@@ -413,7 +413,7 @@ The app icon's badge counts the entries in the agenda's Overdue section that are
 
 * Export
 
-Export (in the editor's toolbar on iPad, and Export… in the Commands of the editor and the reader) offers HTML, Markdown, PDF, Word, Rich Text (RTF), Plain Text, ODT, iCalendar, LaTeX and Plain Text (ASCII), and Copy as Rich Text. Each opens the share sheet with a file named after the org file, which you can send to another app or keep with Save to Files. The export reads the file's setup files and follows its export keywords, as the Mac's export does. For a file the LaTeX or ASCII export can't write as Emacs would, the share sheet stops and "Can't export to LaTeX: " or "Can't export to plain text: " and the reason show at the bottom of the screen.
+Export (in the editor's toolbar on iPad, and Export… in the Commands of the editor and the reader) offers HTML, Markdown, PDF, Word, Rich Text (RTF), Plain Text, ODT, iCalendar, LaTeX, Plain Text (ASCII) and reveal.js, and Copy as Rich Text. Each opens the share sheet with a file named after the org file, which you can send to another app or keep with Save to Files. The export reads the file's setup files and follows its export keywords, as the Mac's export does. For a file the LaTeX or ASCII export can't write as Emacs would, the share sheet stops and "Can't export to LaTeX: " or "Can't export to plain text: " and the reason show at the bottom of the screen.
 
 PDF export follows =pdf-margin=, =pdf-font= and =pdf-page-numbers= in =config.toml=, and Word files get heading styles and the file's images, as on the Mac. PDF through LaTeX isn't available on iOS.
 
@@ -426,6 +426,12 @@ Share Subtree…, in the editor's Commands under Export, shares the entry at the
 The Export menu also has Export Agenda Files to iCalendar, which writes an =.ics= beside each agenda file, and Combine Agenda Files into iCalendar, which shares one calendar of them all. Commands has these, Copy as Rich Text, and Export to HTML and Open, which shows the HTML export in Quick Look. Without orgstar+, the Export menu's items that need it end in "(orgstar+)" and open the orgstar+ screen.
 
 Publishing works from Commands as on the Mac, with the =[[publish]]= projects in =config.toml=. A project that publishes outside your folders asks for a folder the first time, and uses it from then on. See [[file:12-export.org][Export]].
+
+** Presenting
+
+Present, in the Commands of the editor and the reader, shows the file one heading at a time, full screen, in the editor's theme: from the caret's heading in the editor, from the beginning in the reader. Tap the right two thirds of the screen or swipe left for the next slide, tap the left third or swipe right for the previous one, and tap Done to leave. With a hardware keyboard, =→=, =↓=, Space, Page Down and Return go on, =←=, =↑=, Delete and Page Up go back, Home and End go to the first and last slide, and Escape leaves.
+
+On an iPad with an external display and Stage Manager off, the slide shows on the display while presenting, and the iPad shows the next slide, the notes from the slide's =#+BEGIN_NOTES= blocks, the slide number, Previous and Next. Otherwise the display mirrors the iPad. See Presenting in [[file:12-export.org][Export]].
 
 * Code blocks and tables
 

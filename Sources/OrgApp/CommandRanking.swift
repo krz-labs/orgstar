@@ -96,7 +96,7 @@ public enum CommandGroups {
         Group(title: String(localized: "Export", comment: "Commands list section"), prefixes: ["app.export", "app.copy-rich-text", "app.print", "app.publish", "app.share-subtree"]),
         Group(title: String(localized: "File", comment: "Commands list section"), prefixes: ["app.save", "app.word-count", "app.recovery", "app.sync-conflicts", "app.lint", "app.working-copy"]),
         Group(title: String(localized: "Edit", comment: "Commands list section"), prefixes: ["edit.", "macro."]),
-        Group(title: String(localized: "View", comment: "Commands list section"), prefixes: ["app.toggle-markup", "editor.", "app.split-", "app.pane-"]),
+        Group(title: String(localized: "View", comment: "Commands list section"), prefixes: ["app.toggle-markup", "editor.", "app.split-", "app.pane-", "app.present"]),
     ]
 
     /// The index in `groups` of the group `id` belongs to, or nil for none.

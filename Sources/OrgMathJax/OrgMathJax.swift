@@ -9,4 +9,6 @@ public enum OrgMathJax {
     public static var mermaid: URL? { Bundle.module.url(forResource: "mermaid.min", withExtension: "js", subdirectory: "Diagrams") }
     /// The folder of Pyodide 314.0.8's core files, for python blocks in the App Store builds.
     public static var pyodide: URL? { Bundle.module.url(forResource: "Pyodide", withExtension: nil) }
+    /// reveal.js 6.0.2's `dist` files: `reveal.js`, its stylesheets and themes, and the notes, search, zoom and math plugins.
+    public static var reveal: URL? { Bundle.module.url(forResource: "Reveal", withExtension: nil) }
 }

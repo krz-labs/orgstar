@@ -708,7 +708,7 @@ struct ContentView: View {
         let url = URL(fileURLWithPath: path)
         let base = url.deletingPathExtension()
         let defaults = Preferences.orgSettings.resolvingSetupFiles(in: text, path: path, read: OrgSettings.readFile)
-        let open = open || format == "html-open"
+        let open = open || format == "html-open" || format == "reveal-open"
         let caret = commands.editor?.context().caret ?? 0
         let whole = text
         if subtree {
@@ -740,6 +740,25 @@ struct ContentView: View {
                 try FileManager.default.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
                 try content.write(to: target, atomically: true, encoding: .utf8)
                 commands.show(ExportSettings.exported(target.lastPathComponent, subtree: subtree, bodyOnly: bodyOnly))
+                if open { NSWorkspace.shared.open(target) }
+            } catch {
+                commands.show(String(localized: "Can't write \(target.lastPathComponent): \(error.localizedDescription)"))
+            }
+        case "reveal", "reveal-open":
+            let name = ExportScope.fileName(whole, subtreeAt: subtree ? caret : nil, settings: defaults)
+            guard let target = destination ?? writable(ExportScope.output(for: url, name: name, extension: "html")) else { return }
+            let render = {
+                RevealExport.document(text, fallbackTitle: base.lastPathComponent, settings: defaults, path: path,
+                                      codeStyle: HTMLCodeStyle(highlighter: PaneView.highlighter, theme: theme), language: OrgPreferences.exportLanguage())
+            }
+            var deck = render()
+            // Images go into the deck; offer access to those it couldn't read, then read them.
+            let unread = PDFExport.imageFiles(deck, directory: url.deletingLastPathComponent()).filter(WorkspaceModel.isThere)
+            if !unread.isEmpty, reach(unread) { deck = render() }
+            do {
+                try FileManager.default.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
+                try deck.write(to: target, atomically: true, encoding: .utf8)
+                commands.show(ExportSettings.exported(target.lastPathComponent, subtree: subtree, bodyOnly: false))
                 if open { NSWorkspace.shared.open(target) }
             } catch {
                 commands.show(String(localized: "Can't write \(target.lastPathComponent): \(error.localizedDescription)"))
@@ -1597,6 +1616,12 @@ struct ContentView: View {
             copyRichText()
         case "app.print", "app.print-subtree", "app.print-selection":
             printFile(id)
+        case "app.present":
+            guard let path = session.path, let document = session.document else { return commands.show(String(localized: "No file is open")) }
+            guard let deck = SlideDeck(tree: document.tree, path: path, settings: document.defaults, caret: commands.editor?.context().caret ?? 0) else {
+                return commands.show(String(localized: "Nothing to present"))
+            }
+            PresentationWindow.show(deck, theme: theme, options: options)
         case "app.print-agenda":
             commands.agendaPrintRequested = true
             openWindow(id: "agenda")

@@ -16,9 +16,9 @@ public struct ExportSettings: Codable, Equatable, Sendable {
 
     public init() {}
 
-    /// PDF, Word, RTF, plain text, ODT and iCalendar are whole documents.
+    /// PDF, Word, RTF, plain text, ODT, iCalendar and reveal.js decks are whole documents.
     public static func allowsBodyOnly(_ format: String) -> Bool {
-        !["pdf", "print-pdf", "odt", "docx", "rtf", "plain-text", "icalendar"].contains(format)
+        !["pdf", "print-pdf", "odt", "docx", "rtf", "plain-text", "icalendar", "reveal", "reveal-open"].contains(format)
     }
 
     /// The settings kept for the file at `path`. Without any: the format and open-after choice
