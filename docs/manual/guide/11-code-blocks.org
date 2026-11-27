@@ -133,7 +133,8 @@ In the Mac App Store version and on iOS, =python= blocks run in Pyodide 314.0.8,
 
 What differs from =python3=:
 
-- Only the standard library is there. =numpy=, =matplotlib= and other packages are not, and can't be installed: =import numpy= fails with =ModuleNotFoundError=. A block with =:results graphics= fails with "Python blocks can't draw graphics in this version of orgstar: matplotlib isn't included." A =:file= result that is the block's value or output is written as for any other language.
+- Only the standard library is there. =numpy=, =matplotlib= and other packages are not, and orgstar doesn't install them: =import numpy= fails with =ModuleNotFoundError=. Loading a package from the network with =pyodide_js.loadPackage= and its URL works, but isn't supported. A block with =:results graphics= fails with "Python blocks can't draw graphics in this version of orgstar: matplotlib isn't included." A =:file= result that is the block's value or output is written as for any other language.
+- The block can reach the network, as a web page can: =urllib.request=, =js.fetch= and =pyodide.http= work.
 - The block can't see your files or start programs. It runs in Pyodide's own file system, in =/home/pyodide=, and files it writes there are not kept. =:dir= must name a folder that exists, but the block doesn't run in it. =input()= reads nothing.
 - =:python= is ignored.
 - Every block runs in one interpreter. A block without a session gets its own variables, but modules it imports stay loaded, with any changes it made to them, until Pyodide is unloaded. A session keeps its variables until then too.

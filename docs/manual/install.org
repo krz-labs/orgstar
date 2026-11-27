@@ -77,7 +77,7 @@ A block in another language reports "/language/ blocks don't run in this version
 orgstar." An Emacs Lisp block that uses more than the interpreter has reports "This block uses
 Emacs Lisp that runs only in Emacs." A JavaScript block that uses something only node has
 reports "This block uses /name/, which runs only in node." A Python block runs in Pyodide, with
-the standard library only. A table whose formulas need Emacs is recalculated up to
+the standard library only, and can reach the network. A table whose formulas need Emacs is recalculated up to
 the first formula that needs it, which the message names with the reason; the fields
 before it stay and the rest are unchanged. The Emacs exports are
 not in the File ▸ Export menu, the export dialog or the command palette; a key bound to

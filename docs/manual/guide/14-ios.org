@@ -452,6 +452,8 @@ On iOS, only Emacs Lisp, JavaScript, Python, calc, sqlite, dot and mermaid block
 - Python with =:results graphics=: "Python blocks can't draw graphics in this version of orgstar: matplotlib isn't included."
 - A calc or sqlite block orgstar can't run as Emacs would: "This calc block can't be calculated here: /reason/." or "This sqlite block can't run here: /reason/."
 
+Python blocks can reach the network: =urllib.request=, =js.fetch= and =pyodide.http= work. Only the standard library is built in; loading a package from the network with =pyodide_js.loadPackage= and its URL works, but isn't supported.
+
 Table formulas that orgstar computes itself work on iOS. In a table whose formulas need Emacs, orgstar applies the formulas up to the first one that needs it and stops there, as Emacs does when a formula fails: the fields written before it stay and the rest are unchanged. The message is "The table was recalculated up to /formula/, which needs Emacs on the Mac", with the formula's left-hand side and the reason. When nothing was written, it is "This table needs Emacs, which runs on the Mac", with the reason, and the table is unchanged.
 
 Tangling (=C-c C-v t=, in Commands) works on iOS and writes the tangled files next to the org file, or where =:tangle= says.
