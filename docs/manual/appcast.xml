@@ -4,6 +4,28 @@
     <title>orgstar</title>
     <link>https://gitbay.org/krz/orgstar</link>
     <item>
+      <title>orgstar 1.4.0</title>
+      <link>https://krz.sh/apps/orgstar/</link>
+      <sparkle:version>908</sparkle:version>
+      <sparkle:shortVersionString>1.4.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+      <pubDate>Thu, 26 Nov 2026 23:40:43 -0600</pubDate>
+      <description><![CDATA[<h2>orgstar 1.4.0</h2>
+<ul>
+<li>View ▸ Present shows a file one heading at a time, full screen, and File ▸ Export writes a reveal.js deck.</li>
+<li>Flashcards in org-fc's format: make, update and suspend cards, review them from the Window menu, and see due cards in a widget.</li>
+<li>File ▸ Print… prints the file, a subtree or the selection, and the agenda.</li>
+<li>Markdown and plain-text files open with highlighting, heading folds and an outline, and search finds them.</li>
+<li>Denote notes in Markdown and plain text, with front matter, renaming, links and backlinks.</li>
+<li>File ▸ Import ▸ Markdown Files… and Obsidian Vault… convert them to org files.</li>
+<li>Citations: Insert Citation… from your bibliography, key completion after @, following a citation to its entry, and Zotero links.</li>
+<li>org-roam: aliases, refs, excluded nodes, tags in the node chooser, and capture templates for new nodes and daily notes.</li>
+<li>Settings ▸ Appearance ▸ Size enlarges the agenda and the sidebars as well as the editor.</li>
+</ul>
+<p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
+      <enclosure url="https://files.krz.sh/orgstar/orgstar-1.4.0.dmg" type="application/octet-stream" sparkle:edSignature="lkARLhVmSqS3DIYMhB8IL7/545tlSgEcn62yWQf+0XH1TukVD3NGTKUsJJ1shvM4dlXAu33pGLy/Bx+gKqILBw==" length="72078483"/>
+    </item>
+    <item>
       <title>orgstar 1.3.1</title>
       <link>https://krz.sh/apps/orgstar/</link>
       <sparkle:version>889</sparkle:version>
