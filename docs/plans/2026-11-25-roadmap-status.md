@@ -16,6 +16,8 @@ Where the milestone work stands, so a session can pick it up at any point. Read 
 - Also merged: 505 (Xcode's recommended project settings), 508 (snapshot runs skip the Keychain prompt for the clock title key), 513 (this document). Filed to the Backlog: #241 (inline math in export), #242 (backlinks pane titles a Denote text note by its file name), #243 (presentation mode text on iPad stays at body size).
 - After milestones 6 and 7 (2026-11-26, `main` at 801e496): `swift test`, both Xcode builds and every gate pass (1 MB open 92 ms at load average 4; one earlier run at load 7 missed a gate). #168 and #160 add index migrations v5 and v6; existing indexes re-read their files once. #240 (`CryptSaverTests.closedFilesKeepNothingAfterTheirWrite`) fails about 1 run in 3 when run alone.
 - App size: Pyodide adds 13.6 MB installed to the iOS and Mac App Store apps (not the download build or extensions); reveal.js adds 2.7 MB to every app.
+- Milestone 8 (Automation and extension), 2026-11-27: merge requests 522 (#173 review: `docs/plans/2026-11-27-user-commands.md`), 523 (#175 x-callback-url) and 524 (#174 `orgstar` command-line tool). Open: #244 → #245 (JavaScript command host, then `commands.toml` and API 1), #246, #247, #248 (after #245), and #249 (watch item: whether python blocks in Pyodide reach the network; research and test before the next release that ships Pyodide). `main` at cf1c2de passes `swift test`, both Xcode builds and the gates (1 MB open 91 ms at load 5; 126 ms on a run at load 6.6).
+- Before the next release: #249; the Homebrew cask needs `binary "#{appdir}/orgstar.app/Contents/Helpers/orgstar"`; notarize a build with the helper in `Contents/Helpers`.
 - Released: 1.3.0 (milestones 1, 4 and 5) and 1.3.1 (an unchanged entry keeps its message after Decrypt Entry in File, the iOS passphrase sheet as a form with navigation bar buttons, What's New shows a skipped version's notes, no compiler warnings in `Sources/`). Download, appcast, cask and krz.sh are live; App Store builds 884 (1.3.0) and 890 (1.3.1) are uploaded, and submitting for review is the owner's call. The 1 MB open gate measured 92–117 ms with Plex running and was skipped for both releases at the owner's word; run releases on a quiet Mac.
 - Milestone 6 (Formats, import and export): 4 of 6 issues closed, merge requests 509 (#166 printing), 510 (#161 Markdown and Obsidian import), 511 (#159 Markdown and plain-text editing) and 512 (#160 Denote in Markdown and text). Open: #164 and #90, both waiting on the owner (see open questions).
 - Milestone 7 (Notes and knowledge): 2 of 3 issues closed, merge requests 506 (#168 org-roam gaps) and 507 (#170 citations and Zotero). Open: #172, waiting on the owner.
@@ -31,7 +33,7 @@ Where the milestone work stands, so a session can pick it up at any point. Read 
 | 5 Sync and files | 0 | 10 |
 | 6 Formats, import and export | 0 | 6 |
 | 7 Notes and knowledge | 0 | 3 |
-| 8 Automation and extension | 3 | 0 |
+| 8 Automation and extension | 6 | 3 |
 | Backlog | 45 | 0 |
 
 #109 (code scanning) has no milestone and stays out of scope.
@@ -149,6 +151,11 @@ gitbay milestone list
 8. #164 (owner's choice: presentation mode and reveal.js, no Beamer): reveal.js export needs orgstar+ and writes one self-contained `.html` (linked to `#+REVEAL_ROOT` when set); presentation mode (⌃⌘P, iOS Present) is free, one heading per slide, with the iPad showing next slide and notes while an external display shows the slide.
 9. #172 (owner's choice: org-fc): flashcards are free (widget and watch keep their existing gates); SM2 `sm2-v1` only, other `FC_ALGO` values refused when rated; review covers every added folder; history goes to `org-fc-review-history-file` (default `org-fc-reviews.tsv` in the config folder).
 
+10. #173: user commands in JavaScript in a WebKit worker (as Pyodide runs), declared in `commands.toml`, code in `commands/*.js`; free (not orgstar+); 2 s default and 30 s maximum timeouts; hooks (#248) wanted.
+11. #175: write actions (capture without the sheet, clock in/out) and reads (agenda, clock status) need orgstar+, as the Shortcuts actions do, and ask Allow once per source (`x-source` plus its callback schemes). Callbacks open only other apps' schemes, never `http(s)`, `file`, `orgstar` or `org-protocol`.
+12. #174: the command-line tool is download-only, reads the same config and folders, writes through the app's saver and recovery store, reads but never writes `clock.json`; PDF from the command line needs TeX. Settings code moved into a UI-free `OrgConfig` library.
+13. #115: natural-language parsing is a per-template capture option, with one default template using it. #122: snooze moves the notification by default; a setting rewrites the timestamp instead. #129: org-ql syntax (sexp and plain), common predicates, in views.toml and `org-ql` dynamic blocks. #229: no size limit; warn before opening files over 5 MB, dismissable forever.
+
 ## Device checks owed
 
 ### From milestones 6 and 7
@@ -159,6 +166,8 @@ gitbay milestone list
 - #161: File ▸ Import with a real vault, including the Mac App Store sandbox's access to the source and destination folders.
 - #90: a python block in the sandboxed Mac App Store app; start-up time and memory on a real iPhone (simulator: 4.1 s first run, 121 MB).
 - #164: the iPad external display; hardware keys on iOS; the reveal.js speaker view; a `#+REVEAL_ROOT` deck against a reveal.js 6 CDN.
+- #174: Settings ▸ Install Command-Line Tool… in the running app; the app adopting a clock in or out from the command line; `orgstar open` launching the app; PDF through real TeX.
+- #175: the Mac approval alert and a callback opening another Mac app.
 - #172: the Flashcards widget's count and tap; watch review and its rating reaching the file; the Mac desktop widget; iPad layout and hardware-keyboard rating; the text-input card flow; the history file at an Emacs path from the sandboxed builds.
 - #159, #160: Markdown and text notes on a device; Insert Node Link and Rename Note on iOS (the simulator stopped at the orgstar+ paywall); following a link to a Markdown note from the iOS reader still opens Quick Look.
 
@@ -226,18 +235,7 @@ By the owner's rule, an issue closes on merge and its device checks are tracked 
 
 ## Open questions before the next milestones
 
-Milestones 4 and 5's questions are settled. Still open:
-
-
-From the handoff, still unanswered:
-
-- #115: an option on capture templates, or a separate quick-add field?
-- #122: does snooze move only the notification, or rewrite the timestamp?
-- #129: how closely to follow org-ql's syntax.
-
-New:
-
-- #229: is 10 MB a supported file size?
+None. The owner's answers for #115, #122, #129, #164, #172, #229 and #90 are under the decisions above and on the issues.
 
 ## Estimated effort, relative to milestone 1
 
