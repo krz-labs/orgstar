@@ -52,6 +52,12 @@ Everyone who downloaded orgstar before orgstar+ keeps all of it.
 
 ## What's New
 
+- Timeline: a day or week by time, with drag to move or resize entries and to schedule undated TODOs; a month grid with drag to reschedule.
+- Triage your inbox one entry at a time, and a weekly review view.
+- org-ql queries in agenda views and org-ql blocks.
+- Mark Done, snooze or clock in from a reminder; configurable swipe actions on agenda rows.
+- Check off entries and habits from widgets and Apple Watch.
+- Birthdays and other dates from Contacts in the agenda, if you turn it on.
 - All Settings: every config.toml option in one searchable list, with a control for each, an explanation of what it does, and reset to the default.
 - Your own commands: write them in JavaScript in commands.toml; they appear in the Commands list and key bar, can run orgstar's own commands, and can run after a TODO changes or before a capture is filed.
 - orgstar:// links with x-callback-url, so Shortcuts and other apps can capture, open a file, clock in and out, and read your agenda.
@@ -131,6 +137,13 @@ org-mode,emacs,outline,todo,agenda,plain text,notes,tasks,gtd,planner,kanban,org
 
 ### What's New
 
+- Timeline: a day or week by time, with drag to move or resize entries and to schedule undated TODOs; a month grid with drag to reschedule.
+- Triage your inbox one entry at a time, and a weekly review view.
+- org-ql queries in agenda views and org-ql blocks.
+- The running clock in the menu bar, today's entries with Done and Clock In, and a capture field.
+- Mark Done, snooze or clock in from a reminder; Mark Done, Reschedule and Refile in an agenda row's menu.
+- Check off entries and habits from desktop widgets.
+- Birthdays and other dates from Contacts in the agenda, if you turn it on.
 - Settings ▸ All Settings: every config.toml option in one searchable list, with a control for each, an explanation of what it does, and reset to the default.
 - Your own commands: write them in JavaScript in commands.toml; they appear in the command palette, can be bound to keys, run orgstar's own commands, and can run after a TODO changes or before a capture is filed.
 - orgstar:// links with x-callback-url, so Shortcuts and other apps can capture, open a file, clock in and out, and read your agenda.
