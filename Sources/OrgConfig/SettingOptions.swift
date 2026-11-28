@@ -210,5 +210,7 @@ extension UserConfig {
         "orgstar.completion-auto-delay": "Milliseconds after typing stops before the completion list opens by itself. Emacs's corfu-auto-delay is in seconds.",
         "orgstar.ignored-folders": "Folder names never listed or searched, separated by spaces. The default leaves out version control, build and cache folders such as .git, node_modules and .venv.",
         "orgstar.global-capture-hotkey": "⌃⌥Space opens Capture from any app on the Mac. Templates go in capture.toml.",
+        "orgstar.menu-bar-clock": "What the Mac menu bar item shows beside the clock symbol while a clock runs. heading: the time and the heading, as Org's mode line shows them, such as [0:25] (Write the report), with the entry's clocked total and its Effort when it has one; time: the time since clocking in, such as 0:25; none: the symbol only.",
+        "orgstar.menu-bar-capture-template": "The key, in capture.toml, of the template the menu bar's capture field files with when Return is pressed. A template with prompts opens the capture window instead. \"\" uses the first template.",
     ]
 }

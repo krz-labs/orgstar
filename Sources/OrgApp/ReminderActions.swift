@@ -121,22 +121,20 @@ public struct ReminderActions {
         }
         guard let line = reminder.headingLine, let near = reminder.headingOffset,
               let start = session.locateHeading(path: reminder.path, line: line, near: near) else { return .notFound }
+        let entry = EntryActions(session: session, clock: clock, paths: paths)
         let outcome: ReminderActionOutcome
         switch action {
         case .done:
             guard let keyword = reminder.doneKeyword else { return .notFound }
             outcome = session.markDone(EntryDone(path: reminder.path, offset: start, headingLine: line, keyword: keyword), now: now)
         case .clockIn:
-            // Questions about dangling clocks go unanswered, which leaves those clocks alone.
-            let result = await clock.clockIn(session, target: .entry(path: reminder.path, offset: start), paths: paths(), ask: { _ in nil }, now: { now })
-            let message = result.messages.last ?? ""
-            outcome = message.hasPrefix("Clock starts") || message.hasPrefix("Clock continues") ? .changed : .failed(message)
+            outcome = await entry.clockIn(path: reminder.path, at: start, now: now)
         case .snoozeTenMinutes, .snoozeHour, .snoozeTomorrow:
             let marker = start + reminder.offset - near
             outcome = Self.outcome(session.perform(ShiftTimestampBy(minutes: action.snoozeMinutes ?? 0), path: reminder.path, at: marker,
                                                    expect: (start, line), now: now))
         }
-        for path in session.dirtyPaths { _ = session.save(path) }
+        entry.saveChanged()
         return outcome
     }
 
@@ -186,5 +184,34 @@ public struct ReminderActions {
         }
         return Reminder(id: "sh.krz.orgstar.reminder-notice", fireDate: now.addingTimeInterval(1), eventDate: now,
                         title: reminder.title, body: body, path: reminder.path, offset: 0)
+    }
+}
+
+/// Clock In on an entry from outside the editor (a notification's action, the menu bar item),
+/// as the agenda does it, through `ClockModel`. Mark Done is `DocumentSession.markDone`.
+@MainActor
+public struct EntryActions {
+    public let session: DocumentSession
+    public let clock: ClockModel
+    /// The org files whose dangling clocks Clock In looks for.
+    public var paths: () -> [String]
+
+    public init(session: DocumentSession, clock: ClockModel, paths: @escaping () -> [String] = { [] }) {
+        self.session = session
+        self.clock = clock
+        self.paths = paths
+    }
+
+    /// Clocks in to the heading at `start` in `path`. Questions about dangling clocks go
+    /// unanswered, which leaves those clocks alone.
+    public func clockIn(path: String, at start: Int, now: Date = Date()) async -> ReminderActionOutcome {
+        let result = await clock.clockIn(session, target: .entry(path: path, offset: start), paths: paths(), ask: { _ in nil }, now: { now })
+        let message = result.messages.last ?? ""
+        return message.hasPrefix("Clock starts") || message.hasPrefix("Clock continues") ? .changed : .failed(message)
+    }
+
+    /// Saves the changed files at once.
+    public func saveChanged() {
+        for path in session.dirtyPaths { _ = session.save(path) }
     }
 }

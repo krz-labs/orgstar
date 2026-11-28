@@ -315,11 +315,31 @@ An existing drawer of that name always takes the new line.
 While a clock runs, orgstar shows it in two places, refreshed every 30 seconds:
 
 - the main window's toolbar, with a clock symbol, the heading and the elapsed time: =Write the report 0:42=;
-- the macOS menu bar, with the clock symbol and the elapsed time.
+- the macOS menu bar, with the clock symbol, the time and the heading, as Org's mode line shows them: =[0:42] (Write the report)=.
 
-The time shown is the time since you clocked in, not the entry's total. Each of them opens a menu with Clock Out, Cancel Clock and Go to Clocked Entry. The toolbar's menu also has Clock In to Recent Entry…, Go to Recent Clocked Entry… and the recent entries. The menu bar item also has Clock In to Recent Entry…, Clock Report and a Recent Entries section. Choosing a recent entry clocks in to it.
+The toolbar's time is the time since you clocked in, not the entry's total. In the menu bar, an entry with an =Effort= shows its clocked total, this clock included, over the Effort, as Org does: =[1:10/2:00] (Write the report)=; without one, the time since you clocked in. Headings longer than 30 characters are cut short with "…". Settings ▸ General ▸ Menu bar clock (=menu-bar-clock=) chooses what the menu bar shows: the time and the heading (=heading=, the default), the time since you clocked in (=time=), or the clock symbol only (=none=).
 
-With Settings ▸ General ▸ Keep orgstar in the menu bar (=menu-bar-item=), the menu bar item stays when no clock runs, as a star, and its menu starts with Capture…, Agenda and today's agenda entries that aren't done, overdue ones first; choosing an entry shows it in the main window. It is there while orgstar is running.
+Each of them opens a menu with Clock Out, Cancel Clock and Go to Clocked Entry. The toolbar's menu also has Clock In to Recent Entry…, Go to Recent Clocked Entry… and the recent entries. The menu bar item also has Clock In to Recent Entry…, Clock Report and a Recent Entries section. Choosing a recent entry clocks in to it.
+
+*** The menu bar item
+
+With Settings ▸ General ▸ Keep orgstar in the menu bar (=menu-bar-item=), the menu bar item stays when no clock runs, as a star. It is there while orgstar is running. Its menu starts with:
+
+- a capture field. Type and press Return to file the text with the template =menu-bar-capture-template= names in =config.toml= (the first template in =capture.toml= when it is empty), without opening the capture window. The text is the template's =%i=, and the template's =capture-before-finalize= hooks run. A template with prompts, one that makes a Denote note or asks for a date tree's day, and an empty field open the capture window instead, on that template with the text filled in;
+- Capture With, to file the field's text with another template;
+- Capture…, which opens the capture window;
+- Agenda;
+- Today: today's agenda entries that aren't done, overdue ones first, at most 12, then a line that opens the agenda. The entry being clocked has a clock symbol.
+
+Each of today's entries has a submenu:
+
+| Item      | Does                                                                                  |
+|-----------+---------------------------------------------------------------------------------------|
+| Open      | shows the entry in the main window                                                    |
+| Mark Done | sets the entry's first done keyword, for entries with a TODO keyword                  |
+| Clock In  | clocks in to the entry; on the entry being clocked, Clock Out instead                 |
+
+Mark Done, Clock In and Clock Out, and capture from the field, don't bring orgstar forward. They change the file as the agenda does, so a repeater moves the date, =org-log-done= adds its line (a note it asks for is left empty), TODO hooks run, and in a file that's open the change can be undone. The file is saved at once. Clock In leaves dangling clocks alone instead of asking about them. When the entry has changed since the agenda was read, orgstar comes forward with its file open; any other failure brings orgstar forward with the reason in the echo area. Calendar events, reminders and contact dates have no submenu.
 
 ** Recent entries
 

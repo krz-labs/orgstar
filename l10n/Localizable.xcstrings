@@ -10387,6 +10387,40 @@
         }
       }
     },
+    "Capture With": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erfassen mit"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capturar con"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capturer avec"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テンプレートでキャプチャ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capturar com"
+          }
+        }
+      }
+    },
     "Capture a note (⇧⌘N)": {
       "localizations": {
         "de": {
@@ -12418,6 +12452,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Iniciar registro em %1$@ em %2$@"
+          }
+        }
+      }
+    },
+    "Clock symbol only": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur das Uhrsymbol"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solo el símbolo del reloj"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Symbole d'horloge seul"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "時計の記号のみ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Só o símbolo do relógio"
           }
         }
       }
@@ -30408,6 +30476,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fórmulas matemáticas em PDFs"
+          }
+        }
+      }
+    },
+    "Menu bar clock": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeiterfassung in der Menüleiste"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reloj en la barra de menús"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chronomètre dans la barre des menus"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メニューバーのクロック"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Relógio na barra de menus"
           }
         }
       }
@@ -53509,6 +53611,41 @@
         }
       }
     },
+    "The key, in capture.toml, of the template the menu bar's capture field files with when Return is pressed. A template with prompts opens the capture window instead. \"\" uses the first template.": {
+      "comment": "Help for a config.toml setting",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Schlüssel der Vorlage in capture.toml, mit der das Erfassen-Feld der Menüleiste beim Drücken des Zeilenschalters ablegt. Eine Vorlage mit Abfragen öffnet stattdessen das Erfassen-Fenster. \"\" nimmt die erste Vorlage."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La clave, en capture.toml, de la plantilla con la que archiva el campo de captura de la barra de menús al pulsar Retorno. Una plantilla con preguntas abre en su lugar la ventana de captura. \"\" usa la primera plantilla."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La clé, dans capture.toml, du modèle avec lequel le champ de capture de la barre des menus classe quand on appuie sur Retour. Un modèle avec des questions ouvre plutôt la fenêtre de capture. \"\" utilise le premier modèle."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メニューバーのキャプチャ欄でReturnを押したときに使う、capture.toml内のテンプレートのキー。入力を求めるテンプレートでは代わりにキャプチャウインドウが開きます。\"\"で最初のテンプレートを使います。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A chave, em capture.toml, do modelo com que o campo de captura da barra de menus arquiva ao pressionar Return. Um modelo com perguntas abre a janela de captura em vez disso. \"\" usa o primeiro modelo."
+          }
+        }
+      }
+    },
     "The list offers words from open files and folders": {
       "localizations": {
         "de": {
@@ -55129,6 +55266,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Horário"
+          }
+        }
+      }
+    },
+    "Time and heading": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeit und Überschrift"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hora y encabezado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heure et titre"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "時間と見出し"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Horário e título"
           }
         }
       }
@@ -57546,6 +57717,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "O que concluir uma entrada registra: nil não registra nada, time adiciona um carimbo de data CLOSED, note adiciona o carimbo e pede uma nota."
+          }
+        }
+      }
+    },
+    "What the Mac menu bar item shows beside the clock symbol while a clock runs. heading: the time and the heading, as Org's mode line shows them, such as [0:25] (Write the report), with the entry's clocked total and its Effort when it has one; time: the time since clocking in, such as 0:25; none: the symbol only.": {
+      "comment": "Help for a config.toml setting",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Was das Menüleistenobjekt auf dem Mac während einer Zeiterfassung neben dem Uhrsymbol zeigt. heading: Zeit und Überschrift, wie Orgs Modezeile sie zeigt, etwa [0:25] (Bericht schreiben), mit der erfassten Gesamtzeit des Eintrags und seinem Effort, wenn er einen hat; time: die Zeit seit Beginn der Erfassung, etwa 0:25; none: nur das Symbol."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lo que muestra el elemento de la barra de menús del Mac junto al símbolo del reloj mientras hay un registro de tiempo. heading: la hora y el encabezado, como los muestra la línea de modo de Org, por ejemplo [0:25] (Escribir el informe), con el total registrado de la entrada y su Effort si lo tiene; time: el tiempo desde que empezó el registro, por ejemplo 0:25; none: solo el símbolo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce que l'élément de la barre des menus du Mac affiche à côté du symbole d'horloge pendant un chronométrage. heading : l'heure et le titre, comme la ligne de mode d'Org les affiche, par exemple [0:25] (Rédiger le rapport), avec le total chronométré de l'entrée et son Effort s'il en a un ; time : le temps depuis le début du chronométrage, par exemple 0:25 ; none : le symbole seul."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クロック実行中にMacのメニューバー項目が時計の記号の横に表示する内容。heading: Orgのモードラインと同じく時間と見出し(例: [0:25] (報告書を書く))。エントリにEffortがあれば、記録済みの合計とEffortを表示。time: クロックイン後の時間(例: 0:25)。none: 記号のみ。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O que o item da barra de menus do Mac mostra ao lado do símbolo do relógio enquanto um registro de tempo está em andamento. heading: o horário e o título, como a linha de modo do Org os mostra, por exemplo [0:25] (Escrever o relatório), com o total registrado da entrada e seu Effort, se tiver; time: o tempo desde o início do registro, por exemplo 0:25; none: só o símbolo."
           }
         }
       }
@@ -67689,6 +67895,41 @@
         }
       }
     },
+    "the key of the template the menu bar's capture field files with; \"\" for the first template": {
+      "comment": "A config.toml setting, as its comment in the file describes it",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "der Schlüssel der Vorlage, mit der das Erfassen-Feld der Menüleiste ablegt; \"\" für die erste Vorlage"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "la clave de la plantilla con la que archiva el campo de captura de la barra de menús; \"\" para la primera plantilla"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "la clé du modèle avec lequel le champ de capture de la barre des menus classe ; \"\" pour le premier modèle"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メニューバーのキャプチャ欄が使うテンプレートのキー。\"\"で最初のテンプレート"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "a chave do modelo com que o campo de captura da barra de menus arquiva; \"\" para o primeiro modelo"
+          }
+        }
+      }
+    },
     "the keyword journal entries have": {
       "comment": "A config.toml setting, as its comment in the file describes it",
       "localizations": {
@@ -67790,6 +68031,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "a lista que abre sozinha oferece palavras dos seus buffers e pastas onde o Org não oferece nada"
+          }
+        }
+      }
+    },
+    "the menu bar while a clock runs: heading (time and heading, as Org's mode line), time, or none (the clock symbol only)": {
+      "comment": "A config.toml setting, as its comment in the file describes it",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "die Menüleiste während einer Zeiterfassung: heading (Zeit und Überschrift, wie in Orgs Modezeile), time oder none (nur das Uhrsymbol)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "la barra de menús mientras hay un registro de tiempo: heading (hora y encabezado, como la línea de modo de Org), time o none (solo el símbolo del reloj)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "la barre des menus pendant un chronométrage : heading (heure et titre, comme la ligne de mode d'Org), time ou none (le symbole d'horloge seul)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クロック実行中のメニューバー: heading(Orgのモードラインのように時間と見出し)、time、またはnone(時計の記号のみ)"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "a barra de menus enquanto um registro de tempo está em andamento: heading (horário e título, como a linha de modo do Org), time ou none (só o símbolo do relógio)"
           }
         }
       }

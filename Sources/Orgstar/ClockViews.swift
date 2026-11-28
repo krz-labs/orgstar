@@ -17,8 +17,26 @@ struct ClockMenuState: Equatable {
     let history: [ClockTask]
     /// `menu-bar-item`: the item stays when no clock runs.
     var always = false
-    /// Today's agenda, overdue entries first.
-    var today: [AgendaSnapshot.Row] = []
+    /// Today's entries not done, overdue ones first.
+    var today: [MenuBarAgenda.Entry] = []
+    /// `menu-bar-clock`.
+    var clockTitle = MenuBarAgenda.ClockTitle.heading
+}
+
+/// The menu bar's capture field. Its menu has no Edit menu to send the editing keys, so the
+/// field handles them.
+private final class CaptureField: NSTextField {
+    override func performKeyEquivalent(with event: NSEvent) -> Bool {
+        guard event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command, let key = event.charactersIgnoringModifiers else {
+            return super.performKeyEquivalent(with: event)
+        }
+        let actions: [String: Selector] = [
+            "x": #selector(NSText.cut(_:)), "c": #selector(NSText.copy(_:)), "v": #selector(NSText.paste(_:)),
+            "a": #selector(NSText.selectAll(_:)), "z": Selector(("undo:")),
+        ]
+        guard let action = actions[key] else { return super.performKeyEquivalent(with: event) }
+        return NSApp.sendAction(action, to: nil, from: self)
+    }
 }
 
 /// `org-user-idle-seconds` on macOS: time since the last keyboard or mouse input anywhere.
@@ -66,26 +84,36 @@ struct ClockMenu: View {
     }
 }
 
-/// The menu bar item: while a clock runs, the elapsed time and the clock commands; with
-/// `always`, there all the time, with capture, the agenda and today's entries too.
+/// The menu bar item: while a clock runs, the clock in its title and the clock commands; with
+/// `always`, there all the time, with a capture field, the agenda and today's entries too.
 @MainActor
-final class ClockStatusItem: NSObject {
+final class ClockStatusItem: NSObject, NSMenuDelegate {
     /// Today's entries the menu lists before "more".
     static let rowLimit = 12
 
     private var item: NSStatusItem?
     private var timer: Timer?
     private var running: ClockModel.Running?
-    private let run: (String) -> Void
-    private let jump: (String, Int) -> Void
+    private var effort: (effort: Int, clocked: Int)?
+    private var clockTitle = MenuBarAgenda.ClockTitle.heading
+    private var field: NSTextField?
+    private let commands: AppCommands
+    private let actions: MenuBarActions
+    /// After an action changed a file: today's entries are read again.
+    private let changed: () -> Void
 
-    init(run: @escaping (String) -> Void, jump: @escaping (String, Int) -> Void) {
-        self.run = run
-        self.jump = jump
+    init(commands: AppCommands, actions: MenuBarActions, changed: @escaping () -> Void) {
+        self.commands = commands
+        self.actions = actions
+        self.changed = changed
     }
 
-    func update(_ state: ClockMenuState) {
+    /// `effort`: the running clock's Effort and the time clocked on its entry before, from
+    /// `ClockModel.effort`.
+    func update(_ state: ClockMenuState, effort: (effort: Int, clocked: Int)?) {
         running = state.running
+        self.effort = effort
+        clockTitle = state.clockTitle
         guard state.running != nil || state.always else {
             timer?.invalidate()
             timer = nil
@@ -100,21 +128,17 @@ final class ClockStatusItem: NSObject {
             }
         }
         let menu = NSMenu()
+        menu.delegate = self
+        field = nil
         if state.always {
-            add(String(localized: "Capture…"), "app.capture", to: menu)
+            addCapture(to: menu)
             add(String(localized: "Agenda"), "app.agenda", to: menu)
             menu.addItem(.separator())
             menu.addItem(NSMenuItem.sectionHeader(title: String(localized: "Today")))
-            let rows = state.today.filter { !$0.isDone }
-            if rows.isEmpty { menu.addItem(withTitle: String(localized: "Nothing scheduled"), action: nil, keyEquivalent: "") }
-            for row in rows.prefix(Self.rowLimit) {
-                let title = [row.gutter, row.todo ?? "", row.title].filter { !$0.isEmpty }.joined(separator: "  ")
-                let entry = NSMenuItem(title: title, action: row.link == nil ? nil : #selector(open(_:)), keyEquivalent: "")
-                entry.target = self
-                entry.representedObject = row.link
-                menu.addItem(entry)
-            }
-            if rows.count > Self.rowLimit { add(String(localized: "\(rows.count - Self.rowLimit) more…"), "app.agenda", to: menu) }
+            if state.today.isEmpty { menu.addItem(withTitle: String(localized: "Nothing scheduled"), action: nil, keyEquivalent: "") }
+            let clocked = state.running == nil ? nil : actions.clock.entry(actions.session)
+            for entry in state.today.prefix(Self.rowLimit) { menu.addItem(item(for: entry, clocked: entry.isClocked(clocked))) }
+            if state.today.count > Self.rowLimit { add(String(localized: "\(state.today.count - Self.rowLimit) more…"), "app.agenda", to: menu) }
             menu.addItem(.separator())
         }
         var commands = [("Clock In to Recent Entry…", "app.clock.in-recent"), ("Clock Report", "app.clock.report")]
@@ -140,6 +164,67 @@ final class ClockStatusItem: NSObject {
         refresh()
     }
 
+    /// The capture field, which files with `menu-bar-capture-template` on Return; Capture With
+    /// to file with another template; Capture… for the window.
+    private func addCapture(to menu: NSMenu) {
+        let field = CaptureField(frame: NSRect(x: 20, y: 3, width: 260, height: 22))
+        field.placeholderString = String(localized: "Capture")
+        field.setAccessibilityLabel(String(localized: "Capture"))
+        field.target = self
+        field.action = #selector(captureDefault(_:))
+        let view = NSView(frame: NSRect(x: 0, y: 0, width: 296, height: 28))
+        view.addSubview(field)
+        let row = NSMenuItem()
+        row.view = view
+        menu.addItem(row)
+        self.field = field
+        let templates = actions.templates()
+        if !templates.isEmpty {
+            let with = NSMenuItem(title: String(localized: "Capture With"), action: nil, keyEquivalent: "")
+            let submenu = NSMenu()
+            for template in templates {
+                let choice = NSMenuItem(title: "\(template.key)  \(template.name)", action: #selector(captureWith(_:)), keyEquivalent: "")
+                choice.target = self
+                choice.representedObject = template.key
+                submenu.addItem(choice)
+            }
+            with.submenu = submenu
+            menu.addItem(with)
+        }
+        add(String(localized: "Capture…"), "app.capture", to: menu)
+    }
+
+    /// An entry of today's agenda, with Open, Mark Done and Clock In or Out.
+    private func item(for entry: MenuBarAgenda.Entry, clocked: Bool) -> NSMenuItem {
+        let row = NSMenuItem(title: entry.label, action: nil, keyEquivalent: "")
+        if clocked {
+            row.state = .on
+            row.onStateImage = NSImage(systemSymbolName: "clock", accessibilityDescription: String(localized: "Clocked in"))
+        }
+        guard entry.link != nil else { return row }
+        let submenu = NSMenu()
+        func add(_ title: String, _ action: Selector) {
+            let choice = NSMenuItem(title: title, action: action, keyEquivalent: "")
+            choice.target = self
+            choice.representedObject = Box(entry)
+            submenu.addItem(choice)
+        }
+        add(String(localized: "Open"), #selector(open(_:)))
+        if entry.canBeDone { add(String(localized: "Mark Done"), #selector(markDone(_:))) }
+        if clocked {
+            add(String(localized: "Clock Out"), #selector(clockOut(_:)))
+        } else if entry.canClockIn {
+            add(String(localized: "Clock In"), #selector(clockIn(_:)))
+        }
+        row.submenu = submenu
+        return row
+    }
+
+    private final class Box: NSObject {
+        let entry: MenuBarAgenda.Entry
+        init(_ entry: MenuBarAgenda.Entry) { self.entry = entry }
+    }
+
     private func add(_ title: String, _ id: String, to menu: NSMenu) {
         let entry = NSMenuItem(title: title, action: #selector(choose(_:)), keyEquivalent: "")
         entry.target = self
@@ -152,24 +237,91 @@ final class ClockStatusItem: NSObject {
         if let running {
             button.image = NSImage(systemSymbolName: "clock", accessibilityDescription: String(localized: "Clocked in"))
             button.imagePosition = .imageLeading
-            button.title = clockElapsed(running, now: Date())
+            button.title = MenuBarAgenda.clockTitle(running, effort: effort, style: clockTitle, now: Date())
         } else {
             button.image = NSImage(systemSymbolName: "star", accessibilityDescription: "orgstar")
             button.title = ""
         }
     }
 
+    /// The capture field takes the keys as the menu opens.
+    func menuWillOpen(_ menu: NSMenu) {
+        guard let field else { return }
+        RunLoop.main.perform(inModes: [.eventTracking, .default]) {
+            MainActor.assumeIsolated { _ = field.window?.makeFirstResponder(field) }
+        }
+    }
+
+    @objc private func captureDefault(_ sender: NSTextField) {
+        capture(template: nil)
+    }
+
+    @objc private func captureWith(_ sender: NSMenuItem) {
+        capture(template: sender.representedObject as? String)
+    }
+
+    private func capture(template: String?) {
+        let text = field?.stringValue ?? ""
+        item?.menu?.cancelTracking()
+        Task {
+            switch await actions.capture(text, template: template) {
+            case .filed(let key, _):
+                field?.stringValue = ""
+                let chosen = actions.templates().first { $0.key == key }
+                commands.show("Captured to \(chosen.map(CaptureView.target) ?? key)")
+                changed()
+            case .window(let key):
+                field?.stringValue = ""
+                NSApp.activate()
+                commands.capture(template: key, initial: text)
+            case .failed(let message):
+                NSApp.activate()
+                commands.show(message)
+            }
+        }
+    }
+
+    @objc private func markDone(_ sender: NSMenuItem) {
+        guard let entry = (sender.representedObject as? Box)?.entry else { return }
+        report(actions.markDone(entry), entry)
+    }
+
+    @objc private func clockIn(_ sender: NSMenuItem) {
+        guard let entry = (sender.representedObject as? Box)?.entry else { return }
+        Task { report(await actions.clockIn(entry), entry) }
+    }
+
+    @objc private func clockOut(_ sender: NSMenuItem) {
+        commands.show(actions.clockOut())
+        changed()
+    }
+
+    /// An action that couldn't be done brings orgstar forward: at the entry's file when the
+    /// entry moved, else with the reason in the echo area.
+    private func report(_ outcome: ReminderActionOutcome, _ entry: MenuBarAgenda.Entry) {
+        switch outcome {
+        case .changed, .snoozed:
+            changed()
+        case .notFound:
+            NSApp.activate()
+            if let path = entry.path { commands.jump(path: path, offset: 0) }
+        case .failed(let message):
+            NSApp.activate()
+            commands.show(message)
+        }
+    }
+
     @objc private func choose(_ sender: NSMenuItem) {
         if let id = sender.representedObject as? String {
             NSApp.activate()
-            run(id)
+            commands.run(id)
         }
     }
 
     @objc private func open(_ sender: NSMenuItem) {
-        if case .entry(let path, let offset)? = sender.representedObject as? AppLink {
+        if case .entry(let path, let offset)? = (sender.representedObject as? Box)?.entry.link {
             NSApp.activate()
-            jump(path, offset)
+            commands.jump(path: path, offset: offset)
         }
     }
 
