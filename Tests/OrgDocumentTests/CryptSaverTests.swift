@@ -44,7 +44,9 @@ struct CryptSaverTests {
         #expect(files.text == Self.theirs)
     }
 
-    @Test func closedFilesKeepNothingAfterTheirWrite() async throws {
+    /// On the main actor, as `DocumentSession` saves: the vault drops a closed file's passphrase
+    /// on the main queue once the save's own reads are done.
+    @MainActor @Test func closedFilesKeepNothingAfterTheirWrite() async throws {
         let files = FaultyFileSystem("a\n")
         let recovery = MemoryRecovery()
         let (saver, vault) = saver(files, recovery)
@@ -53,8 +55,8 @@ struct CryptSaverTests {
         try doc.apply([TextEdit(range: 2..<2, replacement: "* S :crypt:\nsecret\n")], baseRevision: 0)
         #expect(try saver.save(&doc, to: url) == .saved)
         #expect(files.text?.contains("secret") == false)
-        await MainActor.run {}
-        try await Task.sleep(for: .milliseconds(50))
+        #expect(vault.keepsAnything(for: url.path))
+        await withCheckedContinuation { done in DispatchQueue.main.async { done.resume() } }
         #expect(!vault.keepsAnything(for: url.path))
         // Only open files keep sealing after the setting goes off.
         vault.encryptsTaggedEntries = false
