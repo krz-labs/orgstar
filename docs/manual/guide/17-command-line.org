@@ -20,7 +20,7 @@ The command reads the files the app reads and changes them the way the app does:
 - The folders added in the app (File ▸ Add Folder…), from the app's data folder, =~/Library/Application Support/Orgstar=. =org-agenda-files= in =config.toml= chooses the agenda files as in the app.
 - Each file's own settings and =#+SETUPFILE:=.
 
-It doesn't need the app to be running. Choices kept only in the app are not read: folders hidden from the agenda, Calendar events and Reminders in the agenda, and each file's export choices.
+It doesn't need the app to be running. Choices kept only in the app are not read: folders hidden from the agenda, Calendar events, Reminders and Contacts' dates in the agenda, and each file's export choices.
 
 | Variable              | What it sets                                                                                         |
 |-----------------------+------------------------------------------------------------------------------------------------------|

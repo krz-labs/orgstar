@@ -282,7 +282,7 @@ The Agenda tab shows the agenda over all your folders, with the span and start d
 
 Commands from the agenda change the file directly when it isn't open, and through the editor when it is. If the heading changed since the agenda was built, nothing runs.
 
-With =calendar-events= on, the agenda also shows events from the Calendar app, and with =agenda-reminders= on, reminders from the Reminders app; see Settings below. Tap an event to edit it; an entry's Add to Calendar… adds it to a calendar. See [[file:07-agenda.org][The agenda]].
+With =calendar-events= on, the agenda also shows events from the Calendar app, with =agenda-reminders= on, reminders from the Reminders app, and with =agenda-contact-dates= on, birthdays and other dates from the Contacts app; see Settings below. Tap an event to edit it; an entry's Add to Calendar… adds it to a calendar. See [[file:07-agenda.org][The agenda]].
 
 See [[file:07-agenda.org][The agenda]] for the rows, the views and matches, and the differences from the Mac.
 
@@ -524,7 +524,7 @@ With a configuration folder, settings and structure templates are written to its
 
 Folders from =org-directory= and =org-agenda-files= name the Mac's paths, so the screen lists them under Folders on This Device. Tap each one and choose the folder on this device that holds the same files, such as its synced copy in iCloud Drive. Import adds the chosen folders to the Folders tab; folders not chosen aren't added, and the summary says so. =org-agenda-files= entries in a chosen folder point to the same files in the folder chosen for it, and entries in folders not chosen are left out. Relative entries are kept as written and count from the first folder, as Emacs counts them from =org-directory=; they add no folder of their own. With a configuration folder, =config.toml= keeps the Mac's entries as well, beside the device's; each device skips the files it doesn't have.
 
-Besides All Settings and Import from Emacs, the Agenda, TODO Dependencies, Calendar and Reminders sections change settings:
+Besides All Settings and Import from Emacs, the Agenda, TODO Dependencies, Calendar, Reminders and Contacts sections change settings:
 
 - Show days without entries :: turns =org-agenda-show-all-dates= on or off.
 - Habits only today :: turns =org-habit-show-habits-only-for-today= on or off.
@@ -534,6 +534,7 @@ Besides All Settings and Import from Emacs, the Agenda, TODO Dependencies, Calen
 - Show events from Calendar :: turns on =calendar-events=, and asks for access to your calendars. iOS asks for full access, as Calendar has no read-only level; orgstar changes a calendar only when you edit an event or add an entry. While access is missing the section shows Allow Access to Calendars…; if you declined, allow it in the Settings app under Privacy & Security ▸ Calendars.
 - The calendars :: tap one to show or hide its events (=calendar-event-calendars=). With every calendar checked the setting is empty, so calendars added later show too.
 - Show reminders from Reminders :: turns on =agenda-reminders= and asks for access to your reminders; Allow Access to Reminders… shows while it is missing. Tap a list to show or hide its reminders (=agenda-reminder-lists=).
+- Show birthdays and dates from Contacts :: turns on =agenda-contact-dates= and asks for access to your contacts; Allow Access to Contacts… shows while it is missing. orgstar only reads the contacts' names and dates; with limited access, only the chosen contacts' dates show.
 
 These write =config.toml= in the configuration folder, as the Mac's Settings window does, so the Mac sees the change too. Without a configuration folder they are kept on the device.
 
@@ -561,7 +562,7 @@ These settings from =config.toml= apply on iOS:
 - =org-use-speed-commands=, with a hardware keyboard
 - =electric-pair-mode=, =spell-check=, =auto-fill-mode=
 - =org-agenda-span=, =org-agenda-start-day=, =org-agenda-start-on-weekday=, =org-deadline-warning-days=, =agenda-include-subfolders=, =agenda-exclude-archives=, =org-agenda-show-all-dates=, =org-agenda-skip-scheduled-if-done=, =org-agenda-skip-deadline-if-done=, =org-habit-show-habits-only-for-today=, =org-agenda-search-view-always-boolean=, =org-agenda-search-view-force-full-words=, =org-agenda-log-mode-items=, the =org-agenda-todo-ignore-= settings, =org-agenda-tags-todo-honor-ignore-options=
-- =calendar-events=, =calendar-event-calendars=, =agenda-reminders=, =agenda-reminder-lists=
+- =calendar-events=, =calendar-event-calendars=, =agenda-reminders=, =agenda-reminder-lists=, =agenda-contact-dates=
 - =reminders=, =appt-message-warning-time=
 - =org-clock-history-length=, =org-clock-into-drawer=, =org-clock-rounding-minutes=, =org-clock-out-remove-zero-time-clocks=, =org-clock-in-switch-to-state=, =org-clock-out-when-done=, =org-clock-idle-time=
 - =org-icalendar-combined-agenda-file= (its name) and the other =org-icalendar-= settings, =[[publish]]=

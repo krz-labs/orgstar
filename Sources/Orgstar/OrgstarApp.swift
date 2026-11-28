@@ -1082,6 +1082,8 @@ struct SettingsView: View {
     @AppStorage("agendaReminders") private var agendaReminders = false
     @AppStorage("agendaReminderLists") private var agendaReminderLists = ""
     @State private var reminderLists: [(id: String, title: String, color: RGBA?)] = []
+    @AppStorage("agendaContactDates") private var agendaContactDates = false
+    @State private var contactsAllowed = ContactDates.isAuthorized
     @AppStorage("reminders") private var reminders = true
     @AppStorage("reminderLead") private var reminderLead = 12
     @AppStorage("clockIdleTime") private var clockIdleTime = 0
@@ -1488,6 +1490,21 @@ struct SettingsView: View {
             .task(id: agendaReminders) {
                 let allowed = agendaReminders ? await CalendarAccess.reminders.requestAccess() : false
                 reminderLists = allowed ? CalendarAccess.reminders.lists() : []
+            }
+            Section {
+                Toggle("Show birthdays and dates from Contacts", isOn: $agendaContactDates)
+                    .disabled(!ProAccess.shared.isUnlocked && !agendaContactDates)
+                    .help(ProAccess.shared.isUnlocked ? "" : "Needs orgstar+")
+                if agendaContactDates, !contactsAllowed {
+                    Text("Allow orgstar to read your contacts in System Settings ▸ Privacy & Security ▸ Contacts.")
+                        .foregroundStyle(.secondary)
+                }
+            } footer: {
+                Text("Birthdays, anniversaries and other dates on your contacts show in the agenda read-only, with the years since when the year is known; double-click one to open the contact.")
+                    .settingsFooter()
+            }
+            .task(id: agendaContactDates) {
+                contactsAllowed = agendaContactDates ? await CalendarAccess.contacts.requestAccess() : ContactDates.isAuthorized
             }
             Section {
                 Toggle("Notify before timed agenda entries", isOn: $reminders)

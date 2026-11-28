@@ -1,4 +1,5 @@
 #if os(iOS)
+import Contacts
 import OrgApp
 import OrgCore
 import OrgDocument
@@ -340,11 +341,15 @@ struct AgendaScreen: View, Equatable {
                 if Days.absolute(now, calendar: .current) != agenda.today { tick += 1 }
             }
         }
-        // Calendar and Reminders access are asked for when calendar-events and
-        // agenda-reminders are turned on.
+        // Calendar, Reminders and Contacts access are asked for when calendar-events,
+        // agenda-reminders and agenda-contact-dates are turned on.
         .task(id: model.settingsVersion) {
             if OrgPreferences.calendarEvents(), !CalendarEvents.isAuthorized, await model.calendarEvents.requestAccess() { tick += 1 }
             if OrgPreferences.agendaReminders(), !ReminderLists.isAuthorized, await model.reminderLists.requestAccess() { tick += 1 }
+            if OrgPreferences.agendaContactDates(), !ContactDates.isAuthorized, await model.contactDates.requestAccess() { tick += 1 }
+        }
+        .task {
+            for await _ in NotificationCenter.default.notifications(named: .CNContactStoreDidChange) where OrgPreferences.agendaContactDates() { tick += 1 }
         }
         .background { Refresher(workspace: workspace, session: session, agenda: agenda, model: model, tick: tick, logMode: logMode) }
     }
@@ -799,7 +804,7 @@ struct AgendaScreen: View, Equatable {
                     .tint(.primary)
             } else if let item = row.item, let path = item.path, let offset = item.headingOffset ?? item.markerOffset {
                 NavigationLink(value: ReaderRoute.offset(path, offset)) { AgendaRowView(row: row, day: day, theme: theme, dark: isDark) }
-            } else if let event = row.event {
+            } else if let event = row.event, !event.isContact {
                 // An event opens for editing; a reminder opens in Reminders.
                 Button {
                     if event.isReminder {
@@ -833,7 +838,7 @@ struct AgendaScreen: View, Equatable {
             }
         }
         .contextMenu {
-            if let event = row.event, !event.isReminder {
+            if let event = row.event, !event.isReminder, !event.isContact {
                 Button("Edit Event…", systemImage: "pencil") { eventRequest = EventRequest(draft: EventDraft(event), event: event) }
                 // Calendar can't be asked for one event by URL; it opens on the event's day.
                 Button("Show in Calendar", systemImage: "calendar") {

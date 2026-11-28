@@ -180,6 +180,7 @@ struct AgendaSidebar: View {
         agenda.calendarNames = OrgPreferences.calendarEventCalendars()
         agenda.reminderLists = pro && OrgPreferences.agendaReminders() && ReminderLists.isAuthorized ? CalendarAccess.reminders : nil
         agenda.reminderListNames = OrgPreferences.agendaReminderLists()
+        agenda.contactDates = pro && OrgPreferences.agendaContactDates() && ContactDates.isAuthorized ? CalendarAccess.contacts : nil
         await agenda.refresh(open: session.openTexts)
     }
 }

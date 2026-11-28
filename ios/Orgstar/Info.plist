@@ -52,6 +52,8 @@
 	<string>public.app-category.productivity</string>
 	<key>NSCalendarsFullAccessUsageDescription</key>
 	<string>The agenda shows your calendar events alongside your Org entries. orgstar changes your calendars only when you edit an event or add an entry to one.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>The agenda shows birthdays and other dates from your contacts alongside your Org entries. orgstar only reads them.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Photos you take and documents you scan from the editor are saved with your notes and linked where the caret is.</string>
 	<key>NSFaceIDUsageDescription</key>

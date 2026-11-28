@@ -264,6 +264,31 @@ Only incomplete reminders with a due date show, in the day, week and month view:
 
 Completing or editing a reminder is done in Reminders. On the Mac, double-click a reminder, or press =RET=, to open it in Reminders; its context menu has Show in Reminders. On iOS, tap it.
 
+* Birthdays and dates from Contacts
+
+The agenda can also show birthdays, anniversaries and other dates from the Contacts app, read-only, as =org-anniversary= entries would. Nothing is written to your files. It needs orgstar+, as Calendar events do, and is off by default. To turn it on:
+
+- On the Mac, turn on Settings ▸ Agenda ▸ Show birthdays and dates from Contacts.
+- On iOS, turn on Settings ▸ Contacts ▸ Show birthdays and dates from Contacts.
+- Or set the key in =config.toml=:
+
+#+BEGIN_SRC toml
+[orgstar]
+agenda-contact-dates = true
+#+END_SRC
+
+The first time it is turned on, orgstar asks for access to your contacts. If you declined, allow it in System Settings ▸ Privacy & Security ▸ Contacts on the Mac, or in the Settings app on iOS. orgstar reads only the contacts' names, birthdays and dates. The agenda, its widgets and the watch app show them, as they show Calendar events; nothing sends them anywhere else. On iOS, with access to some contacts only, only theirs show.
+
+Each date shows every year in the day, week and month view:
+
+- The row is all day, with the date's label (Birthday, Anniversary or the label set in Contacts) as its category and the contact's name as its title.
+- When the date has a year, the title adds the years since, as =%d= does in =%%(org-anniversary 1990 12 10) Ada (%d)=: =Ada Lovelace (36)=. Before that year nothing shows, and in the year itself only the name. A date saved without a year shows only the name.
+- 29 February shows on 1 March in other years, as =org-anniversary= does.
+- Dates in another calendar system, such as a lunar birthday, aren't shown.
+- Filters don't hide them.
+
+The dates are read once and again whenever Contacts changes. On the Mac, double-click one, or press =RET=, to open the contact in Contacts; its context menu has Show in Contacts. On iOS the row doesn't open anything.
+
 * Done keywords the agenda doesn't know
 
 A keyword that isn't in =org-todo-keywords= or the file's =#+TODO= lines is not a keyword to orgstar, as to Org: it is part of the title. A heading such as =SKIPPED Call the bank= with a =SCHEDULED= date last week is therefore an open entry, and shows as overdue. To make such a word a done state, add it after the ~|~:

@@ -166,6 +166,8 @@ ${feed_keys}
     <string>The agenda shows your calendar events alongside your Org entries. orgstar changes your calendars only when you edit an event or add an entry to one.</string>
     <key>NSRemindersFullAccessUsageDescription</key>
     <string>The agenda shows your reminders alongside your Org entries. orgstar only reads them.</string>
+    <key>NSContactsUsageDescription</key>
+    <string>The agenda shows birthdays and other dates from your contacts alongside your Org entries. orgstar only reads them.</string>
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>NSPrincipalClass</key>
@@ -260,7 +262,8 @@ done
 # shellcheck disable=SC2086
 codesign --force --sign "$sign" $sign_flags --identifier sh.krz.orgstar.cli "$app/Contents/Helpers/orgstar"
 
-# The hardened runtime needs Calendar access declared for the agenda's events.
+# The hardened runtime needs Calendar and Contacts access declared for the agenda's events and
+# contacts' dates.
 keychain=""
 if [ -n "${ORGSTAR_PROFILE:-}" ]; then
     [ "$sign" != "-" ] || { echo "ORGSTAR_PROFILE needs ORGSTAR_SIGN." >&2; exit 1; }
@@ -280,6 +283,8 @@ cat > "$work/app.entitlements" <<PLIST
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>com.apple.security.personal-information.addressbook</key>
+    <true/>
     <key>com.apple.security.personal-information.calendars</key>
     <true/>$keychain
 </dict>

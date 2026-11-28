@@ -260,6 +260,8 @@ public enum OrgPreferences {
     public static func agendaReminderLists(_ defaults: UserDefaults = .standard) -> [String] {
         string("agendaReminderLists", defaults).split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
     }
+    /// `agenda-contact-dates`: birthdays and other dates from Contacts show in the agenda.
+    public static func agendaContactDates(_ defaults: UserDefaults = .standard) -> Bool { bool("agendaContactDates", defaults) }
     public static func reminders(_ defaults: UserDefaults = .standard) -> Bool { bool("reminders", defaults) }
     /// `appt-message-warning-time`, in minutes.
     public static func reminderLead(_ defaults: UserDefaults = .standard) -> Int { integer("reminderLead", defaults) }

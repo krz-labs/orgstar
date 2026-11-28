@@ -69,6 +69,9 @@ public final class AgendaModel {
     /// in `reminderListNames` (all when empty), among the events.
     public var reminderLists: ReminderLists?
     public var reminderListNames: [String] = []
+    /// Birthdays and other dates from Contacts over the days shown, from `contactDates` (nil
+    /// reads none), among the events.
+    public var contactDates: ContactDates?
     /// Today and the calendar of the last refresh.
     public private(set) var today = Days.absolute(Date(), calendar: .current)
     @ObservationIgnored private var calendar = Calendar.current
@@ -115,6 +118,7 @@ public final class AgendaModel {
         }
         let provider = calendarEvents
         let names = calendarNames
+        let contacts = contactDates
         let all = await sources(open: open)
         let agendaEnd = jobs.filter { if case .agenda = $0.mode { true } else { false } }.map { $0.first + $0.span }.max()
         var reminders: [AgendaEvent] = []
@@ -132,6 +136,9 @@ public final class AgendaModel {
                         result.events = provider.events(from: from, to: Self.date(job.first + job.span, calendar: calendar), chosen: names)
                     }
                     result.events += reminders
+                    if let contacts {
+                        result.events += contacts.events(first: job.first, days: job.span, calendar: calendar)
+                    }
                 case .todo(let keywords):
                     result.list = Agenda.todoList(all, keywords: keywords, options: job.options, today: today)
                 case .match(let match, let todoOnly):

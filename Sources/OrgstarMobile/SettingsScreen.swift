@@ -168,6 +168,7 @@ struct SettingsScreen: View {
             }
             calendarSection
             reminderSection
+            contactSection
             Section {
                 if badges == true {
                     LabeledContent("Overdue count on icon", value: String(localized: "On"))
@@ -313,6 +314,34 @@ struct SettingsScreen: View {
                  : "Show reminders from Reminders in the agenda, read-only.")
         }
         .task(id: on) { loadReminderLists() }
+    }
+
+    /// `agenda-contact-dates`, written to config.toml.
+    private var contactSection: some View {
+        let _ = model.settingsVersion
+        let on = OrgPreferences.agendaContactDates()
+        return Section {
+            Toggle("Show birthdays and dates from Contacts", isOn: Binding {
+                on
+            } set: { value in
+                guard !value || ProAccess.shared.allows(.calendar) else { return }
+                model.set("agendaContactDates", to: .bool(value))
+                if value { Task { await requestContacts() } }
+            })
+            if on, !ContactDates.isAuthorized {
+                Button("Allow Access to Contacts…") { Task { await requestContacts() } }
+            }
+        } header: {
+            Text("Contacts")
+        } footer: {
+            Text(on ? "Birthdays, anniversaries and other dates on your contacts show in the agenda, read-only, with the years since when the year is known."
+                 : "Show birthdays and other dates from Contacts in the agenda, read-only.")
+        }
+    }
+
+    private func requestContacts() async {
+        _ = await model.contactDates.requestAccess()
+        model.reloadConfig()
     }
 
     private func requestReminders() async {

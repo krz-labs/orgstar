@@ -1406,6 +1406,7 @@ struct ContentView: View {
         days.calendarNames = OrgPreferences.calendarEventCalendars()
         days.reminderLists = ProAccess.shared.isUnlocked && OrgPreferences.agendaReminders() && ReminderLists.isAuthorized ? CalendarAccess.reminders : nil
         days.reminderListNames = OrgPreferences.agendaReminderLists()
+        days.contactDates = ProAccess.shared.isUnlocked && OrgPreferences.agendaContactDates() && ContactDates.isAuthorized ? CalendarAccess.contacts : nil
         let open = session.openTexts
         await days.refresh(open: open)
         guard !Task.isCancelled else { return }

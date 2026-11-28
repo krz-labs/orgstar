@@ -149,6 +149,7 @@ org-mode,emacs,outline,todo,agenda,plain text,notes,tasks,gtd,planner,kanban,org
 - com.apple.security.network.client: remote images in documents, attaching a file from a URL, and the App Store.
 - com.apple.security.files.user-selected.executable: tangling writes source blocks to files in folders the user chose. A block with a :shebang header, such as a shell script, gets the executable bit (mode 0755), as Org mode sets it. The app never runs these files.
 - com.apple.security.personal-information.calendars: Calendar events and reminders in the agenda, after the system asks.
+- com.apple.security.personal-information.addressbook: birthdays and other dates from Contacts in the agenda, read-only, after the system asks.
 - com.apple.security.application-groups: the widgets read the agenda from the app group.
 - To try it: on the first launch, click Choose Folder… and pick any folder, or New Folder in iCloud Drive… to make one with a notes file. orgstar+ is in Settings (Command-comma) ▸ orgstar+, with Restore Purchases and the tips.
 
