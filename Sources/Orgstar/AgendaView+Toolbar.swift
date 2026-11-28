@@ -47,6 +47,10 @@ extension AgendaView {
                 .pickerStyle(.segmented)
                 .labelsHidden()
                 .help("Show a day, week or month (v d, v w, v m)")
+                if spanKind == .month {
+                    Button(monthGrid ? LocalizedStringKey("Show as List") : "Show as Grid", systemImage: monthGrid ? "list.bullet" : "calendar") { monthGrid.toggle() }
+                        .help("Show the month as a grid or as a list of days")
+                }
                 ControlGroup {
                     Button("Earlier", systemImage: "chevron.left") { move(forward: false) }
                         .help("Previous days (b)")

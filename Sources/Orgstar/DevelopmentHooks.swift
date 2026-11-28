@@ -8,6 +8,7 @@ import OrgEditorAppKit
 /// - `ORGSTAR_ROOT`: a folder to add at launch.
 /// - `ORGSTAR_WINDOW`: a window to open at launch (`agenda`, `settings`); the snapshot renders it.
 ///   `menubar` renders the menu bar item with its menu open instead.
+/// - `ORGSTAR_AGENDA_SPAN`: `day`, `week` or `month`, for the agenda window when it opens.
 /// - `ORGSTAR_COMMAND`: commands to run at launch, separated by commas (`app.import-emacs`); a
 ///   sheet or prompt they open is what the snapshot renders.
 /// - `ORGSTAR_ANSWERS`: answers to the prompts those commands ask, in order, separated by commas;
@@ -25,6 +26,7 @@ enum DevelopmentHooks {
     static var fileToOpen: String? { ProcessInfo.processInfo.environment["ORGSTAR_OPEN"] }
     static var rootToAdd: String? { ProcessInfo.processInfo.environment["ORGSTAR_ROOT"] }
     static var windowToOpen: String? { ProcessInfo.processInfo.environment["ORGSTAR_WINDOW"] }
+    static var agendaSpan: AgendaSpan? { ProcessInfo.processInfo.environment["ORGSTAR_AGENDA_SPAN"].flatMap(AgendaSpan.init(rawValue:)) }
     static var commandToRun: String? { ProcessInfo.processInfo.environment["ORGSTAR_COMMAND"] }
     static var urlToOpen: String? { ProcessInfo.processInfo.environment["ORGSTAR_URL"] }
     /// `ORGSTAR_SNAPSHOT` is set: the run renders a window and quits.

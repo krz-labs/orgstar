@@ -254,6 +254,34 @@ extension AgendaView {
         }
     }
 
+    /// Drops dragged entries on `day`: each moves its deadline, schedule or timestamp there.
+    func drop(_ payloads: [String], on day: Int) -> Bool {
+        let groups = isBlocks ? agenda.blocks.filter(\.isAgenda).flatMap { agenda.groups($0, showAllDates: true, filter: filter) }
+            : agenda.groups(showAllDates: true, filter: filter)
+        let items = payloads.compactMap(AgendaDrag.init(payload:)).compactMap { drag in drag.row(in: groups)?.item.map { ($0, drag.day) } }
+        for (item, from) in items { reschedule(item, from: from, to: day) }
+        return !items.isEmpty
+    }
+
+    /// Moves `item`, shown on `from`, to `day`, asking for a note when the log settings want one.
+    func reschedule(_ item: AgendaItem, from: Int, to day: Int, answers: [String: String] = [:]) {
+        switch session.reschedule(item, shownOn: from, to: day, answers: answers) {
+        case nil: return
+        case .prompt(let request):
+            ask(request) { answer in
+                reschedule(item, from: from, to: day, answers: answers.merging([request.key: answer]) { $1 })
+            }
+        case .failed(let text):
+            message = text
+            tick += 1
+        case .external:
+            message = "Not available from the agenda"
+        case .commit:
+            message = nil
+            tick += 1
+        }
+    }
+
     /// Runs `command` on the selected entry, at its heading or, with `atMarker`, at the
     /// timestamp the entry is listed for.
     func run(_ command: any OrgCommand, atMarker: Bool = false, answers: [String: String] = [:], itemID: String? = nil) {

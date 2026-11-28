@@ -41,6 +41,9 @@ struct AgendaScreen: View, Equatable {
     @State private var jumping = false
     @State private var rescheduling: AgendaRow?
     @AppStorage("agendaOverdueExpanded") private var overdueExpanded = true
+    /// The month shows as a grid, with the picked day's entries under it.
+    @AppStorage("agendaMonthGrid") private var monthGrid = true
+    @State private var gridDay: Int?
     @State private var done = 0
     @State private var moved = 0
     /// `org-agenda-log-mode`: closed entries and clocked time on each day.
@@ -124,8 +127,13 @@ struct AgendaScreen: View, Equatable {
             if workspace.rootPaths.isEmpty {
             } else if case .agenda = agenda.mode {
                 let _ = model.settingsVersion
-                ForEach(Perf.measure("agenda.groups") { agenda.groups(showAllDates: OrgPreferences.agendaShowAllDates(), filter: filter) }) { group in
-                    dayGroup(group)
+                if showsMonthGrid {
+                    // The picked day; the grid is above the list.
+                    if let group = agenda.groups(showAllDates: true, filter: filter).first(where: { $0.day == gridPicked }) { dayGroup(group) }
+                } else {
+                    ForEach(Perf.measure("agenda.groups") { agenda.groups(showAllDates: OrgPreferences.agendaShowAllDates(), filter: filter) }) { group in
+                        dayGroup(group)
+                    }
                 }
             } else if case .blocks = agenda.mode {
                 // A block's title over its days, or over its entries.
@@ -176,6 +184,10 @@ struct AgendaScreen: View, Equatable {
             }
         }
         .message($message)
+        // Above the list, not in it: a list's rows don't take drops.
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if showsMonthGrid { monthGridView }
+        }
         .safeAreaInset(edge: .bottom) {
             if !workspace.rootPaths.isEmpty {
                 if selecting { bulkBar } else { bottomBar }
@@ -525,6 +537,27 @@ struct AgendaScreen: View, Equatable {
 
     // MARK: - Days
 
+    private var showsMonthGrid: Bool {
+        guard case .agenda = agenda.mode else { return false }
+        return range == .month && monthGrid && !workspace.rootPaths.isEmpty
+    }
+
+    /// The day whose entries the list shows under the month grid: the one tapped, else today
+    /// while the month holds it, else the first.
+    private var gridPicked: Int {
+        let (first, span) = shown
+        return gridDay.flatMap { (first..<(first + span)).contains($0) ? $0 : nil } ?? (todayShown ? agenda.today : first)
+    }
+
+    private var monthGridView: some View {
+        let (first, span) = shown
+        let grid = MonthGrid(groups: agenda.groups(showAllDates: true, filter: filter), first: first, last: first + span - 1, today: agenda.today,
+                             weekStart: agenda.startOnWeekday ?? 1)
+        return AgendaMonthGrid(grid: grid, picked: Binding { gridPicked } set: { gridDay = $0 }, theme: theme, dark: isDark, drop: drop(_:on:))
+            .padding(.horizontal, 16)
+            .background(.bar)
+    }
+
     /// A day under its header. On today, the entries from earlier days come first, in a group
     /// of their own headed Overdue.
     @ViewBuilder
@@ -821,6 +854,9 @@ struct AgendaScreen: View, Equatable {
                             ForEach(SpanRange.allCases) { Text($0.title).tag(Optional($0)) }
                             Text("\(agenda.span) Days").tag(SpanRange?.none)
                         }
+                        if range == .month {
+                            Toggle("Month as Grid", systemImage: "calendar", isOn: $monthGrid)
+                        }
                         Toggle("Log Mode", systemImage: "clock.arrow.circlepath", isOn: $logMode)
                     } label: {
                         (range.map { Text($0.title) } ?? Text("\(agenda.span) Days"))
@@ -945,6 +981,7 @@ struct AgendaScreen: View, Equatable {
                 }
             }
         }
+        .modifier(RowDrag(drag: dragsDays ? AgendaDrag(row, day: day) : nil))
     }
 
     // MARK: - Actions
@@ -968,6 +1005,37 @@ struct AgendaScreen: View, Equatable {
                 EmptyView()
             }
         }
+    }
+
+    /// Rows drag onto the month grid, except while selecting; a list's rows don't take drops.
+    private var dragsDays: Bool { showsMonthGrid && !selecting }
+
+    /// Drops dragged entries on `day`: each moves its deadline, schedule or timestamp there.
+    private func drop(_ payloads: [String], on day: Int) -> Bool {
+        let groups = agenda.groups(showAllDates: true, filter: filter)
+        let items = payloads.compactMap(AgendaDrag.init(payload:)).compactMap { drag in drag.row(in: groups)?.item.map { ($0, drag.day) } }
+        for (item, from) in items { move(item, from: from, to: day) }
+        if !items.isEmpty { moved += 1 }
+        return !items.isEmpty
+    }
+
+    /// Moves `item`, shown on `from`, to `day`, asking for a note when the log settings want one.
+    private func move(_ item: AgendaItem, from: Int, to day: Int, answers: [String: String] = [:]) {
+        switch session.reschedule(item, shownOn: from, to: day, answers: answers) {
+        case nil: return
+        case .prompt(let request):
+            prompt = EditorScreen.PromptRequest(prompt: request) { answer in
+                guard let answer else { return }
+                move(item, from: from, to: day, answers: answers.merging([request.key: answer]) { $1 })
+            }
+        case .failed(let text):
+            message = text
+        case .external(let request):
+            message = MobileEditor.unavailable(request, title: MoveTimestampDays(days: 0).title)
+        case .commit:
+            message = nil
+        }
+        tick += 1
     }
 
     /// Moves the row's deadline (on a deadline row) or schedule to `day`, keeping its time and
