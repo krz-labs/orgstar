@@ -38,6 +38,10 @@ public enum WhatsNew {
 
     /// Newest first. A version without an entry shows nothing.
     public static let releases: [ReleaseNotes] = [
+        ReleaseNotes(version: "1.6.0", items: [
+            .init("slider.horizontal.3", "All Settings",
+                  "Every config.toml option in one searchable list, with a control for each, an explanation of what it does, and reset to the default."),
+        ]),
         ReleaseNotes(version: "1.5.0", items: [
             .init("curlybraces", "Your own commands",
                   "Write commands in JavaScript in commands.toml. They appear with orgstar's own commands, can run them, and can run after a TODO changes or before a capture is filed."),

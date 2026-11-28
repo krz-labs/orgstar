@@ -19070,6 +19070,40 @@
         }
       }
     },
+    "Every config.toml option in one searchable list, with a control for each, an explanation of what it does, and reset to the default.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle Optionen von config.toml in einer durchsuchbaren Liste, mit einem Bedienelement für jede, einer Erklärung, was sie bewirkt, und dem Zurücksetzen auf den Standardwert."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todas las opciones de config.toml en una lista con búsqueda, con un control para cada una, una explicación de lo que hace y la opción de restablecer el valor predeterminado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toutes les options de config.toml dans une liste avec recherche, avec une commande pour chacune, une explication de ce qu’elle fait et la réinitialisation à la valeur par défaut."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "config.toml のすべてのオプションを検索できる一覧に表示します。各オプションの操作、説明、デフォルトに戻す機能があります。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todas as opções do config.toml em uma lista com busca, com um controle para cada uma, uma explicação do que ela faz e a opção de voltar ao padrão."
+          }
+        }
+      }
+    },
     "Every screen has the same Commands list, and you can choose the keys on the bar above the keyboard.": {
       "localizations": {
         "de": {
