@@ -13,6 +13,8 @@ public enum AgendaMode: Hashable, Sendable {
     case search(String, todoOnly: Bool)
     /// `org-agenda-list-stuck-projects`; nil uses the `org-stuck-projects` setting.
     case stuck(StuckProjects?)
+    /// An org-ql query (`OrgQL`), sorted by org-ql's `:sort` keys.
+    case query(String, sort: [String])
     /// A block agenda: several views one after the other.
     case blocks([AgendaBlock])
 
@@ -22,7 +24,7 @@ public enum AgendaMode: Hashable, Sendable {
         switch self {
         case .agenda: "agenda"
         case .todo: "todo"
-        case .match, .stuck: "tags"
+        case .match, .stuck, .query: "tags"
         case .search: "search"
         case .blocks: "agenda"
         }
@@ -80,6 +82,7 @@ extension AgendaMode {
         case .match(let match, let todoOnly): (todoOnly ? "TODO entries" : "Entries") + " matching \(match)"
         case .search(let string, let todoOnly): (todoOnly ? "TODO entries" : "Entries") + " containing \(string)"
         case .stuck: "Stuck projects"
+        case .query(let query, _): "Query: \(query)"
         case .blocks: "Block agenda"
         }
     }
@@ -117,13 +120,14 @@ public struct AgendaViewDefinition: Hashable, Sendable, Identifiable {
 /// ```toml
 /// [[view]]
 /// name = "Work"
-/// type = "match"        # agenda, todo, match, todo-match, search or todo-search
+/// type = "match"        # agenda, todo, match, todo-match, search, todo-search, stuck or query
 /// match = "+work-boss"
 /// ```
 ///
 /// `agenda` views take `span` and `start` (days from today), `todo` views `keywords`
-/// (`WAIT|HOLD`); a `search` view's `match` is its search string. `stuck` views take
-/// `match`, `keywords`, `tags` and `regexp` as `[org-stuck-projects]` does, each defaulting
+/// (`WAIT|HOLD`); a `search` view's `match` is its search string. `query` views take an org-ql
+/// `query`, in the sexp or the plain form, and `sort` (org-ql's keys separated by spaces).
+/// `stuck` views take `match`, `keywords`, `tags` and `regexp` as `[org-stuck-projects]` does, each defaulting
 /// to that setting. Any view can set
 /// `prefix-format` and `sorting-strategy` (keys separated by spaces) for itself.
 @MainActor
@@ -220,6 +224,8 @@ public enum AgendaViewLoader {
             toml += line("type", todoOnly ? "todo-search" : "search") + line("match", string)
         case .stuck(nil):
             toml += line("type", "stuck")
+        case .query(let query, let sort):
+            toml += line("type", "query") + line("query", query) + line("sort", sort.isEmpty ? nil : sort.joined(separator: " "))
         case .stuck, .blocks:
             return nil
         }
@@ -262,6 +268,19 @@ public enum AgendaViewLoader {
                 return nil
             }
             return type.hasSuffix("match") ? .match(match, todoOnly: type == "todo-match") : .search(match, todoOnly: type == "todo-search")
+        case "query":
+            guard let query = table.values["query"]?.string else {
+                problems.append("views.toml line \(table.line): \(name) needs a query")
+                return nil
+            }
+            do {
+                _ = try OrgQL.parse(query)
+                let sort = try OrgQL.sortKeys((table.values["sort"]?.string ?? "").split(whereSeparator: \.isWhitespace).map(String.init))
+                return .query(query, sort: sort)
+            } catch {
+                problems.append("views.toml line \(table.line): \(name): \(error.description)")
+                return nil
+            }
         case "stuck":
             if ["match", "keywords", "tags", "regexp"].allSatisfy({ table.values[$0] == nil }) { return .stuck(nil) }
             var definition = OrgPreferences.stuckProjects(defaults)

@@ -40536,6 +40536,40 @@
         }
       }
     },
+    "Query…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abfrage …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consulta…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Requête…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クエリ…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consulta…"
+          }
+        }
+      }
+    },
     "Quick Open…": {
       "comment": "Command title",
       "localizations": {
@@ -63665,6 +63699,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "org-enforce-todo-dependencies e org-enforce-todo-checkbox-dependencies."
+          }
+        }
+      }
+    },
+    "org-ql query: todo:NEXT tags:work": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "org-ql-Abfrage: todo:NEXT tags:work"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consulta org-ql: todo:NEXT tags:work"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Requête org-ql : todo:NEXT tags:work"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "org-ql クエリ：todo:NEXT tags:work"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consulta org-ql: todo:NEXT tags:work"
+          }
+        }
+      }
+    },
+    "org-ql query: todo:NEXT tags:work, or (and (todo \"NEXT\") (tags \"work\"))": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "org-ql-Abfrage: todo:NEXT tags:work oder (and (todo \"NEXT\") (tags \"work\"))"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consulta org-ql: todo:NEXT tags:work, o (and (todo \"NEXT\") (tags \"work\"))"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Requête org-ql : todo:NEXT tags:work, ou (and (todo \"NEXT\") (tags \"work\"))"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "org-ql クエリ：todo:NEXT tags:work、または (and (todo \"NEXT\") (tags \"work\"))"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consulta org-ql: todo:NEXT tags:work, ou (and (todo \"NEXT\") (tags \"work\"))"
           }
         }
       }

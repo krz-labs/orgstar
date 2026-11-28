@@ -414,7 +414,7 @@ Tables and dynamic blocks (see [[file:10-tables.org][Tables]] and [[file:06-date
 
 - Formulas outside orgstar's own calculator go to Emacs in the Mac download version, and are refused in the Mac App Store version and on iOS.
 - Clock tables ignore =:formatter= and refuse scopes given as functions.
-- Dynamic blocks other than =clocktable=, =columnview= and denote-org's aren't supported. A column view of another file doesn't write its summaries into that file.
+- Dynamic blocks other than =clocktable=, =columnview=, =org-ql= and denote-org's aren't supported. =org-ql= blocks and query views read the predicates listed in [[file:07-agenda.org::*Queries][Queries]]; org-ql's others are refused. A column view of another file doesn't write its summaries into that file.
 
 Other:
 

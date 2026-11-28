@@ -147,6 +147,8 @@ public final class AgendaModel {
                     result.list = Agenda.textSearch(all, string: string, todoOnly: todoOnly, options: job.options)
                 case .stuck(let definition):
                     result.list = Agenda.stuckProjects(all, definition ?? job.options.stuckProjects, now: now, calendar: calendar, options: job.options)
+                case .query(let query, let sort):
+                    result.list = Agenda.query(all, query: query, sort: sort, today: today, options: job.options) ?? []
                 case .blocks:
                     break
                 }

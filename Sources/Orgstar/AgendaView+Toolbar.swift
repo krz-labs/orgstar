@@ -18,6 +18,7 @@ extension AgendaView {
                 Button(Self.todoMatch) { viewName = Self.todoMatch }
                 Button(Self.search) { viewName = Self.search }
                 Button(Self.todoSearch) { viewName = Self.todoSearch }
+                Button(Self.query) { viewName = Self.query }
                 Divider()
                 Button("Save as View…") { saveView() }
                     .disabled(!canSaveView)
@@ -25,7 +26,11 @@ extension AgendaView {
                 Label(viewName, systemImage: "calendar").labelStyle(.titleAndIcon)
             }
             .help("What the agenda shows")
-            if isMatch || isSearch {
+            if isQuery {
+                TextField("org-ql query: todo:NEXT tags:work", text: $matchText)
+                    .frame(minWidth: 220)
+                    .onSubmit { applyView() }
+            } else if isMatch || isSearch {
                 TextField(isSearch ? "Phrase or +word -word {regexp}" : "+work-boss|LEVEL>2/!TODO", text: $matchText)
                     .frame(minWidth: 220)
                     .onSubmit { applyView() }
@@ -225,11 +230,11 @@ extension AgendaView {
         return agenda.viewSettings[agenda.mode]?.header ?? agenda.mode.title
     }
 
-    /// A typed match or search is showing, which isn't a named view yet.
+    /// A typed match, search or query is showing, which isn't a named view yet.
     var canSaveView: Bool {
-        guard isMatch || isSearch else { return false }
+        guard isMatch || isSearch || isQuery else { return false }
         switch agenda.mode {
-        case .match, .search: return true
+        case .match, .search, .query: return true
         default: return false
         }
     }
@@ -283,6 +288,14 @@ extension AgendaView {
         case Self.search, Self.todoSearch:
             guard matchText.contains(where: { !$0.isWhitespace }) else { return }
             agenda.mode = .search(matchText, todoOnly: viewName == Self.todoSearch)
+        case Self.query:
+            guard matchText.contains(where: { !$0.isWhitespace }) else { return }
+            do {
+                _ = try OrgQL.parse(matchText)
+            } catch {
+                return message = error.description
+            }
+            agenda.mode = .query(matchText, sort: [])
         default:
             if let view = views.first(where: { $0.name == viewName }) { agenda.mode = view.mode }
         }

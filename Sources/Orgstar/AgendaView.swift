@@ -97,6 +97,7 @@ struct AgendaView: View {
     static let todoMatch = "TODO Match…"
     static let search = "Search…"
     static let todoSearch = "TODO Search…"
+    static let query = "Query…"
 
     init(workspace: WorkspaceModel, session: DocumentSession, commands: AppCommands, scheduler: ReminderScheduler?, clock: ClockModel) {
         self.workspace = workspace
@@ -219,6 +220,7 @@ struct AgendaView: View {
 
     var isMatch: Bool { viewName == Self.match || viewName == Self.todoMatch }
     var isSearch: Bool { viewName == Self.search || viewName == Self.todoSearch }
+    var isQuery: Bool { viewName == Self.query }
 
     @Environment(\.orgTheme) private var theme
 
