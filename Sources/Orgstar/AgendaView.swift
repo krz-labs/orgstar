@@ -64,10 +64,14 @@ struct AgendaView: View {
     @State var showingDatePicker = false
     @State var pickedDate = Date()
     @AppStorage("agendaOverdueExpanded") private var overdueShown = true
-    @State private var hovered: String?
+    /// The month shows as a grid rather than a list of days.
+    @AppStorage("agendaMonthGrid") var monthGrid = true
+    /// The day a dragged entry is over.
+    @State var dropDay: Int?
+    @State var hovered: String?
     @Environment(\.textScale) private var scale
     private var gutterWidth: CGFloat { AgendaRowView.gutterWidth * scale }
-    @FocusState private var focused: Bool
+    @FocusState var focused: Bool
     @AppStorage("agendaSpan") var span = 10
     @AppStorage("agendaStartOffset") var startOffset = 0
     @AppStorage("agendaStartOnWeekday") private var startOnWeekday = "1"
@@ -224,8 +228,9 @@ struct AgendaView: View {
     var isMatch: Bool { viewName == Self.match || viewName == Self.todoMatch }
     var isSearch: Bool { viewName == Self.search || viewName == Self.todoSearch }
     var isQuery: Bool { viewName == Self.query }
+    var showsMonthGrid: Bool { isAgenda && spanKind == .month && monthGrid }
 
-    @Environment(\.orgTheme) private var theme
+    @Environment(\.orgTheme) var theme
 
     // MARK: - Lines
 
@@ -269,7 +274,7 @@ struct AgendaView: View {
 
     private func dayLines(_ groups: [AgendaDayGroup], prefix: String) -> [Line] {
         groups.flatMap { group in
-            (overdueShown ? group.overdue.enumerated().map { dayLine(group, $0.offset, prefix: prefix, overdue: true) } : [])
+            (overdueShown || showsMonthGrid ? group.overdue.enumerated().map { dayLine(group, $0.offset, prefix: prefix, overdue: true) } : [])
                 + group.rows.indices.map { dayLine(group, $0, prefix: prefix) }
         }
     }
@@ -293,55 +298,9 @@ struct AgendaView: View {
     }
 
     var body: some View {
-        let groups = self.groups
         _ = tick
-        return ScrollViewReader { proxy in
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
-                    if linksTriage { triageLink }
-                    if isBlocks {
-                        ForEach(Array(agenda.blocks.enumerated()), id: \.offset) { k, block in
-                            Section {
-                                if block.isAgenda {
-                                    ForEach(agenda.groups(block, showAllDates: showAllDates, filter: filter)) { group in
-                                        dayHeader(group)
-                                        dayRows(group, prefix: "b\(k):")
-                                    }
-                                } else {
-                                    ForEach(Array(rows(block.list).enumerated()), id: \.offset) { index, row in
-                                        rowView(Line(id: "b\(k):list:\(index)", row: row, day: agenda.today), showsGutter: false)
-                                    }
-                                }
-                            } header: {
-                                header { Text(block.header).font(.scaled(.body, scale).weight(.semibold)) }
-                            }
-                        }
-                    } else if isAgenda {
-                        ForEach(groups) { group in
-                            Section {
-                                dayRows(group)
-                            } header: {
-                                dayHeader(group).id("day\(group.day)")
-                            }
-                        }
-                    } else {
-                        Section {
-                            ForEach(Array(listRows.enumerated()), id: \.offset) { index, row in
-                                rowView(Line(id: "list:\(index)", row: row, day: agenda.today), showsGutter: false)
-                            }
-                        } header: {
-                            header { Text(listTitle).font(.scaled(.body, scale).weight(.semibold)) }
-                        }
-                    }
-                }
-                .padding(.bottom, 12)
-            }
-            .onChange(of: selection) {
-                if let selection { proxy.scrollTo(line(selection)?.viewID ?? selection) }
-            }
-            .onChange(of: agenda.days.first?.day) {
-                if groups.contains(where: \.isToday) { proxy.scrollTo("day\(agenda.today)", anchor: .top) }
-            }
+        return Group {
+            if showsMonthGrid { monthGridView } else { list }
         }
         .background(theme.color("agenda-background") ?? Color(nsColor: .textBackgroundColor))
         .focusable()
@@ -405,6 +364,9 @@ struct AgendaView: View {
         }
         .task {
             loadViews()
+            #if !APPSTORE
+            if let span = DevelopmentHooks.agendaSpan { setSpan(span) }
+            #endif
             // The now line moves each minute; a new day refreshes the statuses.
             while !Task.isCancelled {
                 let next = Calendar.current.nextDate(after: Date(), matching: DateComponents(second: 0), matchingPolicy: .nextTime) ?? Date().addingTimeInterval(60)
@@ -415,6 +377,59 @@ struct AgendaView: View {
         }
         .task {
             for await _ in NotificationCenter.default.notifications(named: .CNContactStoreDidChange) where contactDatesOn { tick += 1 }
+        }
+    }
+
+    /// The days, or the entries of a list view, one line each.
+    private var list: some View {
+        let groups = self.groups
+        return ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
+                    if linksTriage { triageLink }
+                    if isBlocks {
+                        ForEach(Array(agenda.blocks.enumerated()), id: \.offset) { k, block in
+                            Section {
+                                if block.isAgenda {
+                                    ForEach(agenda.groups(block, showAllDates: showAllDates, filter: filter)) { group in
+                                        dayHeader(group)
+                                        dayRows(group, prefix: "b\(k):")
+                                    }
+                                } else {
+                                    ForEach(Array(rows(block.list).enumerated()), id: \.offset) { index, row in
+                                        rowView(Line(id: "b\(k):list:\(index)", row: row, day: agenda.today), showsGutter: false)
+                                    }
+                                }
+                            } header: {
+                                header { Text(block.header).font(.scaled(.body, scale).weight(.semibold)) }
+                            }
+                        }
+                    } else if isAgenda {
+                        ForEach(groups) { group in
+                            Section {
+                                dayRows(group)
+                            } header: {
+                                dayHeader(group).id("day\(group.day)")
+                            }
+                        }
+                    } else {
+                        Section {
+                            ForEach(Array(listRows.enumerated()), id: \.offset) { index, row in
+                                rowView(Line(id: "list:\(index)", row: row, day: agenda.today), showsGutter: false)
+                            }
+                        } header: {
+                            header { Text(listTitle).font(.scaled(.body, scale).weight(.semibold)) }
+                        }
+                    }
+                }
+                .padding(.bottom, 12)
+            }
+            .onChange(of: selection) {
+                if let selection { proxy.scrollTo(line(selection)?.viewID ?? selection) }
+            }
+            .onChange(of: agenda.days.first?.day) {
+                if groups.contains(where: \.isToday) { proxy.scrollTo("day\(agenda.today)", anchor: .top) }
+            }
         }
     }
 
@@ -436,7 +451,7 @@ struct AgendaView: View {
 
     // MARK: - Days
 
-    private var todayColor: Color { theme.color("agenda-today") ?? .accentColor }
+    var todayColor: Color { theme.color("agenda-today") ?? .accentColor }
 
     @ViewBuilder
     private func dayRows(_ group: AgendaDayGroup, prefix: String = "") -> some View {
@@ -523,6 +538,8 @@ struct AgendaView: View {
             .foregroundStyle(group.isToday ? todayColor : .secondary)
             .help("Capture an entry scheduled on this day (k)")
         }
+        .overlay { if dropDay == group.day { Rectangle().fill(todayColor.opacity(0.15)).allowsHitTesting(false) } }
+        .modifier(AgendaDropTarget(day: group.day, target: $dropDay, drop: drop(_:on:)))
     }
 
     private func overdueHeader(count: Int) -> some View {
@@ -583,10 +600,12 @@ struct AgendaView: View {
             focused = true
         })
         .contextMenu { menu(line) }
+        .modifier(AgendaDragSource(drag: showsGutter ? AgendaDrag(line.row, day: line.day) : nil))
+        .modifier(AgendaDropTarget(day: showsGutter ? line.day : nil, target: $dropDay, drop: drop(_:on:)))
     }
 
     @ViewBuilder
-    private func menu(_ line: Line) -> some View {
+    func menu(_ line: Line) -> some View {
         if let event = line.row.event {
             Button(event.isReminder ? "Show in Reminders" : event.isContact ? "Show in Contacts" : "Show in Calendar") { openEvent(event) }
             if !event.isReminder, !event.isContact {
