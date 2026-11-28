@@ -1,7 +1,7 @@
 import AppKit
 import Testing
 
-/// Spike for windows and panes (docs/plans/2026-10-10-windows-and-panes.md, Task 0): two
+/// Spike for windows and panes: two
 /// `NSTextView`s, each with its own `NSTextLayoutManager`, on one `NSTextContentStorage`.
 /// Findings are the test names. Two more: the layout manager's delegate must be in place before
 /// its first layout (`invalidateLayout(for:)` afterwards kept the old fragments here), and IME

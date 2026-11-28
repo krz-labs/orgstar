@@ -9,7 +9,7 @@ for the Simulator and for a device signed with your own team, and go to TestFlig
 [[https://apps.apple.com/us/app/orgstar-org-mode-agenda/id6821552018][App Store]] with =scripts/release-ios.sh=. Owed: the M1 Air gate run (issue 2) and the VoiceOver
 passes on the Mac and iOS (issues 3 and 4).
 
-=docs/design.md= is the design; =docs/plans/= has one plan per piece of work.
+=docs/design.md= is the design.
 
 * Build and run
 
