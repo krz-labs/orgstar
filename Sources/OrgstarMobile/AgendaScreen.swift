@@ -44,6 +44,12 @@ struct AgendaScreen: View, Equatable {
     /// The month shows as a grid, with the picked day's entries under it.
     @AppStorage("agendaMonthGrid") private var monthGrid = true
     @State private var gridDay: Int?
+    /// A day (and on the iPad a week) shows as a timeline.
+    @AppStorage("agendaTimeline") private var timelineShown = false
+    @AppStorage("agendaTimelineSnap") private var timelineSnap = 15
+    @AppStorage("agendaTimelineDefaultLength") private var timelineLength = 60
+    @AppStorage("agendaTimelineSecondZone") private var timelineSecondZone = ""
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var done = 0
     @State private var moved = 0
     /// `org-agenda-log-mode`: closed entries and clocked time on each day.
@@ -108,6 +114,7 @@ struct AgendaScreen: View, Equatable {
         var hidden: Set<String>
         var settings: Int
         var logMode: Bool
+        var unscheduled: Bool
     }
 
     /// The same models: the root redrawing for navigation leaves the list alone.
@@ -119,48 +126,8 @@ struct AgendaScreen: View, Equatable {
     private var theme: ThemeSpec { model.theme }
 
     var body: some View {
-        List {
-            // With no folders the empty state stands alone, not over a column of empty days.
-            if !workspace.rootPaths.isEmpty, linksTriage {
-                Section { triageLink }
-            }
-            if workspace.rootPaths.isEmpty {
-            } else if case .agenda = agenda.mode {
-                let _ = model.settingsVersion
-                if showsMonthGrid {
-                    // The picked day; the grid is above the list.
-                    if let group = agenda.groups(showAllDates: true, filter: filter).first(where: { $0.day == gridPicked }) { dayGroup(group) }
-                } else {
-                    ForEach(Perf.measure("agenda.groups") { agenda.groups(showAllDates: OrgPreferences.agendaShowAllDates(), filter: filter) }) { group in
-                        dayGroup(group)
-                    }
-                }
-            } else if case .blocks = agenda.mode {
-                // A block's title over its days, or over its entries.
-                ForEach(Array(agenda.blocks.enumerated()), id: \.offset) { _, block in
-                    if block.isAgenda {
-                        Section { } header: { Text(block.header).font(.headline) }
-                        ForEach(agenda.groups(block, showAllDates: OrgPreferences.agendaShowAllDates(), filter: filter)) { group in
-                            dayGroup(group)
-                        }
-                    } else {
-                        Section {
-                            let rows = block.list.filter(filter.keeps).compactMap { AgendaRow(item: $0, day: agenda.today, today: agenda.today) }
-                            if rows.isEmpty, !agenda.isComputing { Text("No entries").foregroundStyle(.secondary) }
-                            ForEach(rows) { item in Deferred { row(item, day: agenda.today) } }
-                        } header: {
-                            Text(block.header).font(.headline)
-                        }
-                    }
-                }
-            } else {
-                let rows = agenda.list.filter(filter.keeps).compactMap { AgendaRow(item: $0, day: agenda.today, today: agenda.today) }
-                if rows.isEmpty, !agenda.isComputing { Text("No entries").foregroundStyle(.secondary) }
-                ForEach(rows) { item in Deferred { row(item, day: agenda.today) } }
-            }
-            if let reminderStatus {
-                Section { } footer: { Text(reminderStatus) }
-            }
+        Group {
+            if showsTimeline { timelineView } else { list }
         }
         .listStyle(.insetGrouped)
         .listSectionSpacing(.compact)
@@ -382,10 +349,59 @@ struct AgendaScreen: View, Equatable {
         .task {
             for await _ in NotificationCenter.default.notifications(named: .CNContactStoreDidChange) where OrgPreferences.agendaContactDates() { tick += 1 }
         }
-        .background { Refresher(workspace: workspace, session: session, agenda: agenda, model: model, tick: tick, logMode: logMode) }
+        .background {
+            Refresher(workspace: workspace, session: session, agenda: agenda, model: model, tick: tick, logMode: logMode, unscheduled: showsTimeline && !compact)
+        }
     }
 
     /// Shows or hides each folder's files; folders the Focus hides stay hidden.
+    /// The days, or the entries of a list view, in a list.
+    private var list: some View {
+        List {
+            // With no folders the empty state stands alone, not over a column of empty days.
+            if !workspace.rootPaths.isEmpty, linksTriage {
+                Section { triageLink }
+            }
+            if workspace.rootPaths.isEmpty {
+            } else if case .agenda = agenda.mode {
+                let _ = model.settingsVersion
+                if showsMonthGrid {
+                    // The picked day; the grid is above the list.
+                    if let group = agenda.groups(showAllDates: true, filter: filter).first(where: { $0.day == gridPicked }) { dayGroup(group) }
+                } else {
+                    ForEach(Perf.measure("agenda.groups") { agenda.groups(showAllDates: OrgPreferences.agendaShowAllDates(), filter: filter) }) { group in
+                        dayGroup(group)
+                    }
+                }
+            } else if case .blocks = agenda.mode {
+                // A block's title over its days, or over its entries.
+                ForEach(Array(agenda.blocks.enumerated()), id: \.offset) { _, block in
+                    if block.isAgenda {
+                        Section { } header: { Text(block.header).font(.headline) }
+                        ForEach(agenda.groups(block, showAllDates: OrgPreferences.agendaShowAllDates(), filter: filter)) { group in
+                            dayGroup(group)
+                        }
+                    } else {
+                        Section {
+                            let rows = block.list.filter(filter.keeps).compactMap { AgendaRow(item: $0, day: agenda.today, today: agenda.today) }
+                            if rows.isEmpty, !agenda.isComputing { Text("No entries").foregroundStyle(.secondary) }
+                            ForEach(rows) { item in Deferred { row(item, day: agenda.today) } }
+                        } header: {
+                            Text(block.header).font(.headline)
+                        }
+                    }
+                }
+            } else {
+                let rows = agenda.list.filter(filter.keeps).compactMap { AgendaRow(item: $0, day: agenda.today, today: agenda.today) }
+                if rows.isEmpty, !agenda.isComputing { Text("No entries").foregroundStyle(.secondary) }
+                ForEach(rows) { item in Deferred { row(item, day: agenda.today) } }
+            }
+            if let reminderStatus {
+                Section { } footer: { Text(reminderStatus) }
+            }
+        }
+    }
+
     private var foldersMenu: some View {
         let hidden = HiddenFolders.shared
         let hides = !hidden.all.isDisjoint(with: workspace.rootPaths)
@@ -424,16 +440,20 @@ struct AgendaScreen: View, Equatable {
         let model: MobileModel
         let tick: Int
         let logMode: Bool
+        /// The timeline's TODO list shows.
+        let unscheduled: Bool
 
         var body: some View {
             Color.clear
                 .task(id: Key(files: workspace.files.count, changed: workspace.changedFile?.version, edits: session.editVersion, tick: tick,
                               mode: agenda.mode, start: agenda.start, span: agenda.span, startOffset: agenda.startOffset,
-                              subfolders: agenda.includeSubfolders, hidden: HiddenFolders.shared.all, settings: model.settingsVersion, logMode: logMode)) {
+                              subfolders: agenda.includeSubfolders, hidden: HiddenFolders.shared.all, settings: model.settingsVersion, logMode: logMode,
+                              unscheduled: unscheduled)) {
                     // Changes come in bursts (a folder scan, typing); a newer one cancels this wait.
                     try? await Task.sleep(for: .milliseconds(150))
                     guard !Task.isCancelled else { return }
                     agenda.options.logMode = logMode
+                    agenda.listsUnscheduled = unscheduled
                     agenda.hiddenFolders = HiddenFolders.shared.all
                     await agenda.refresh(open: session.openTexts)
                 }
@@ -536,6 +556,113 @@ struct AgendaScreen: View, Equatable {
     }
 
     // MARK: - Days
+
+    private var compact: Bool { sizeClass == .compact }
+
+    /// The day, or on the iPad the week, as a timeline; the iPhone shows a week as a list.
+    private var showsTimeline: Bool {
+        guard case .agenda = agenda.mode, timelineShown, !workspace.rootPaths.isEmpty else { return false }
+        return range == .day || (range == .week && !compact)
+    }
+
+    /// The timeline, with the TODO entries without a date beside it on the iPad. A tap opens an
+    /// entry; a long press then a move drags it.
+    private var timelineView: some View {
+        let groups = agenda.groups(showAllDates: true, filter: filter)
+        let (first, span) = shown
+        let timeline = Timeline(groups: groups, first: first, count: span, today: agenda.today, defaultLength: timelineLength, calendar: .current)
+        let todos = compact ? [] : agenda.unscheduled.filter(filter.keeps).compactMap { AgendaRow(item: $0, day: agenda.today, today: agenda.today) }
+        let style = AgendaTimelineStyle(
+            today: todayColor, foreground: themed(theme.color("foreground", dark: isDark), .primary),
+            selection: themed(theme.color("selection", dark: isDark), Color.accentColor.opacity(0.25))
+        ) { [theme, isDark] row in
+            row.event.flatMap { theme.eventColor($0, dark: isDark)?.swiftUI } ?? (row.isEvent ? .purple : theme.categoryColor(row.category, dark: isDark).swiftUI)
+        }
+        return AgendaTimelineView(
+            timeline: timeline, todos: compact ? nil : todos, style: style, step: timelineSnap, secondZone: TimeZone(identifier: timelineSecondZone),
+            now: now, isSelected: { _, _ in false },
+            tap: { row, _ in openRow(row) }, open: { row, _ in openRow(row) },
+            move: { row, from, to, start, end in retime(row, from: from, to: to, start: start, end: end) },
+            drop: { payloads, day, start in
+                let drops = AgendaTimelineDrop.resolve(payloads, groups: groups, todos: todos, start: start, step: timelineSnap)
+                for drop in drops {
+                    switch drop {
+                    case .move(let row, let from, let start?, let end): retime(row, from: from, to: day, start: start, end: end)
+                    case .move(let row, let from, nil, _): if let item = row.item { move(item, from: from, to: day) }
+                    case .schedule(let item, let start): schedule(item, on: day, at: start)
+                    }
+                }
+                return !drops.isEmpty
+            },
+            showDay: { show(.day, around: $0) },
+            menu: { row, day in timelineMenu(row, day: day) }
+        )
+    }
+
+    /// A tap on the timeline: an entry opens in its sheet, an event for editing, a reminder in
+    /// Reminders.
+    private func openRow(_ row: AgendaRow) {
+        if let item = row.item, item.path != nil, item.headingLine != nil, item.headingOffset != nil {
+            editing = item
+        } else if let event = row.event, !event.isContact {
+            if event.isReminder {
+                if let url = URL(string: "x-apple-reminderkit://REMCDReminder/\(event.id)") { openURL(url) }
+            } else {
+                eventRequest = EventRequest(draft: EventDraft(event), event: event)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func timelineMenu(_ row: AgendaRow, day: Int) -> some View {
+        if let event = row.event, !event.isReminder, !event.isContact {
+            Button("Edit Event…", systemImage: "pencil") { eventRequest = EventRequest(draft: EventDraft(event), event: event) }
+        } else if let item = row.item, item.path != nil {
+            if item.markDone != nil {
+                Button("Mark Done", systemImage: "checkmark") { markDone(item) }
+            }
+            Button("Schedule…", systemImage: "calendar") { run("org.schedule", on: item) }
+            Button("Deadline…", systemImage: "calendar.badge.exclamationmark") { run("org.deadline", on: item) }
+            Button("Clock In", systemImage: "stopwatch") {
+                if let (path, offset) = locate(item) { clockIn(path, offset) }
+            }
+        }
+    }
+
+    /// Gives `row`'s entry, shown on `from`, the time `start` to `end` on `day`, asking for a
+    /// note when the log settings want one.
+    private func retime(_ row: AgendaRow, from: Int, to day: Int, start: Int, end: Int?, answers: [String: String] = [:]) {
+        report(session.retime(row, shownOn: from, to: day, start: start, end: end, answers: answers), title: MoveTimestampTime(start: 0, end: nil).title) { answer in
+            retime(row, from: from, to: day, start: start, end: end, answers: answers.merging(answer) { $1 })
+        }
+        moved += 1
+    }
+
+    /// Schedules a TODO entry without a date on `day` at `start`.
+    private func schedule(_ item: AgendaItem, on day: Int, at start: Int, answers: [String: String] = [:]) {
+        report(session.schedule(item, on: day, at: start, answers: answers), title: SetPlanning(deadline: false).title) { answer in
+            schedule(item, on: day, at: start, answers: answers.merging(answer) { $1 })
+        }
+    }
+
+    /// Shows what a timeline change did; a prompt asks and `again` runs with the answer.
+    private func report(_ step: CommandStep?, title: String, again: @escaping ([String: String]) -> Void) {
+        switch step {
+        case nil: return
+        case .prompt(let request)?:
+            prompt = EditorScreen.PromptRequest(prompt: request) { answer in
+                guard let answer else { return }
+                again([request.key: answer])
+            }
+        case .failed(let text)?:
+            message = text
+        case .external(let request)?:
+            message = MobileEditor.unavailable(request, title: title)
+        case .commit?:
+            message = nil
+        }
+        tick += 1
+    }
 
     private var showsMonthGrid: Bool {
         guard case .agenda = agenda.mode else { return false }
@@ -856,6 +983,9 @@ struct AgendaScreen: View, Equatable {
                         }
                         if range == .month {
                             Toggle("Month as Grid", systemImage: "calendar", isOn: $monthGrid)
+                        }
+                        if range == .day || (range == .week && !compact) {
+                            Toggle("Timeline", systemImage: "calendar.day.timeline.left", isOn: $timelineShown)
                         }
                         Toggle("Log Mode", systemImage: "clock.arrow.circlepath", isOn: $logMode)
                     } label: {
