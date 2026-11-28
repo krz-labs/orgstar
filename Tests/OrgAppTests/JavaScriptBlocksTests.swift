@@ -5,7 +5,7 @@ import OrgDocument
 import Testing
 @testable import OrgApp
 
-/// js blocks in JavaScriptCore, compared with node and with Emacs running node.
+/// js blocks without node, compared with node and with Emacs running node.
 struct JavaScriptBlocksTests {
     static let oracle = ProcessInfo.processInfo.environment["ORGSTAR_SKIP_ORACLE"] == nil
     static let nodeInstalled = (try? node("1", in: FileManager.default.temporaryDirectory))?.status == 0
@@ -289,6 +289,48 @@ struct JavaScriptBlocksTests {
         #expect(ContinuousClock.now - start < .milliseconds(500))
         Thread.sleep(forTimeInterval: 2)
         #expect(try JavaScriptBlocks.runHere(spin)?.stdout.contains("7") == true)
+    }
+
+    /// `fetch`, `XMLHttpRequest` and `WebSocket` reach the network, and a run waits for them as
+    /// node's event loop does. A session's block can't wait, so it can't start one.
+    @Test func reachesTheNetwork() async throws {
+        let folder = FileManager.default.temporaryDirectory
+        let listener = try await Listener(reply: "hello")
+        func run(_ header: String, _ body: String) async throws -> BabelOutput? {
+            try await JavaScriptBlocks.run(Self.plan("#+begin_src js\(header)\n\(body)\n#+end_src\n"), directory: folder)
+        }
+        let fetched = try await run(" :results output", "fetch('\(listener.url)').then(r => r.text()).then(t => console.log(t, 1), e => console.log(String(e)))")
+        #expect(fetched == BabelOutput(stdout: "hello 1\n"), "\(String(describing: fetched))")
+        #expect(try await run(" :results output", """
+            const r = new XMLHttpRequest(); r.onload = () => console.log(r.status, r.responseText); r.open('GET', '\(listener.url)'); r.send()
+            """) == BabelOutput(stdout: "200 hello\n"))
+        let before = listener.connections
+        let socket = listener.url.replacingOccurrences(of: "http:", with: "ws:")
+        #expect(try await run(" :results output", "const s = new WebSocket('\(socket)'); s.onclose = () => console.log('closed')") == BabelOutput(stdout: "closed\n"))
+        #expect(listener.connections > before)
+        await #expect(throws: Babel.Failure.message("This block uses fetch in a session, which runs only in node.")) {
+            try await run(" :session net", "fetch('\(listener.url)')")
+        }
+    }
+
+    /// A block that never ends is stopped at the timeout or a cancel, and its worker with it: a
+    /// session's variables are gone. The next block runs.
+    @Test func anEndlessBlockIsStopped() async throws {
+        let folder = try Folder()
+        func run(_ header: String, _ body: String, timeout: Duration = .seconds(300)) async throws -> BabelOutput? {
+            try await JavaScriptBlocks.run(Self.plan("#+begin_src js\(header)\n\(body)\n#+end_src\n"), directory: folder.url, timeout: timeout)
+        }
+        await #expect(throws: JavaScriptBlocks.Stopped.self) { try await run("", "while (true) {}", timeout: .milliseconds(300)) }
+        #expect(try await run("", "return 6 * 7")?.stdout == "42")
+        let endless = try Self.plan("#+begin_src js\nwhile (true) {}\n#+end_src\n"), url = folder.url
+        let task = Task { try await JavaScriptBlocks.run(endless, directory: url) }
+        try await Task.sleep(for: .milliseconds(300))
+        task.cancel()
+        await #expect(throws: CancellationError.self) { try await task.value }
+        #expect(try await run("", "return 6 * 7")?.stdout == "42")
+        #expect(try await run(" :session loop", "var kept = 1; kept")?.resultFile == "1")
+        await #expect(throws: JavaScriptBlocks.Stopped.self) { try await run(" :session loop", "for (;;) {}", timeout: .milliseconds(300)) }
+        #expect(try await run(" :session loop", "typeof kept")?.resultFile == "'undefined'")
     }
 
     /// `org-sbe` on js blocks in a table formula, as Emacs runs them with node.

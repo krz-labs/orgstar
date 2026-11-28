@@ -443,7 +443,7 @@ On an iPad with an external display and Stage Manager off, the slide shows on th
 
 =C-c C-c= on a source block asks whether to run it (yes, no, or always for this block), as on the Mac.
 
-On iOS, only Emacs Lisp, JavaScript, Python, calc, sqlite, dot and mermaid blocks run. orgstar evaluates Emacs Lisp with its own interpreter, which covers a subset of the language, JavaScript in JavaScriptCore, as =node= would run it, sessions included, Python in Pyodide (CPython 3.14 built into the app) with the standard library only, as =python3= would run it, sessions included, calc with its own Calc, sqlite with the SQLite library, as =sqlite3= would, and dot and mermaid with Graphviz and mermaid built in, as SVG or PNG; see [[file:11-code-blocks.org][Code blocks]]. Other results:
+On iOS, only Emacs Lisp, JavaScript, Python, calc, sqlite, dot and mermaid blocks run. orgstar evaluates Emacs Lisp with its own interpreter, which covers a subset of the language, JavaScript in WebKit, as =node= would run it, sessions included, with =fetch= and the web's other network APIs, Python in Pyodide (CPython 3.14 built into the app) with the standard library only, as =python3= would run it, sessions included, calc with its own Calc, sqlite with the SQLite library, as =sqlite3= would, and dot and mermaid with Graphviz and mermaid built in, as SVG or PNG; see [[file:11-code-blocks.org][Code blocks]]. Other results:
 
 - A block in another language: "/language/ blocks need the Mac to run."
 - A block whose =:var=, =:post= or noweb reference runs a block in another language: "This block needs a /language/ block, and /language/ blocks need the Mac to run; nothing was run."

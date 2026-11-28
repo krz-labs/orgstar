@@ -13,8 +13,8 @@ public struct Programs: ProgramRunning {
     }
 
     public func runBabel(_ job: BabelJob, fileDirectory: URL) async throws -> BabelOutput {
-        // js in JavaScriptCore when node (or `:cmd`) isn't installed. A `:cmd` with arguments runs
-        // as written, since JavaScriptCore can't take node's options.
+        // js in a web view when node (or `:cmd`) isn't installed. A `:cmd` with arguments runs
+        // as written, since the web view can't take node's options.
         switch job.runner {
         case .process(let executable, _) where job.language == "js" || job.language == "javascript":
             let words = BabelRunner.words(executable)

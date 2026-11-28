@@ -25657,6 +25657,74 @@
         }
       }
     },
+    "JavaScript stopped: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JavaScript wurde beendet: %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JavaScript se detuvo: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JavaScript s'est arrêté : %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JavaScriptが停止しました：%@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O JavaScript parou: %@"
+          }
+        }
+      }
+    },
+    "JavaScript stopped: the process running it ended.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JavaScript wurde beendet: Der Prozess, in dem es lief, wurde beendet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JavaScript se detuvo: el proceso que lo ejecutaba terminó."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JavaScript s'est arrêté : le processus qui l'exécutait s'est terminé."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JavaScriptが停止しました：実行していたプロセスが終了しました。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O JavaScript parou: o processo que o executava terminou."
+          }
+        }
+      }
+    },
     "Kanban": {
       "localizations": {
         "de": {

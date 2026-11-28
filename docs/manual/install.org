@@ -16,7 +16,7 @@ There are two versions of the Mac app. Both edit the same files in the same way;
 differ in where they come from, how orgstar+ is bought, and what they can run.
 
 - The Mac App Store version runs in the App Sandbox and starts no other programs. Emacs
-  Lisp blocks run in orgstar's own interpreter, JavaScript blocks in JavaScriptCore, and calc,
+  Lisp blocks run in orgstar's own interpreter, JavaScript blocks in WebKit, and calc,
   sqlite, dot and mermaid blocks built in, as on iOS; other languages, Emacs and gnuplot are not used. orgstar+ is an in-app purchase shared
   with the iPhone and iPad app.
 - The download version, from Homebrew or files.krz.sh, is signed with a Developer ID and

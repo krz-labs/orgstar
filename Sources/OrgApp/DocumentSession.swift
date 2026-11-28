@@ -1330,7 +1330,7 @@ public final class DocumentSession {
         let directory = URL(fileURLWithPath: entry.path).deletingLastPathComponent()
         let programs = Self.runner
         /// A program through `programs`; without it, Emacs Lisp in `Elisp`, js in
-        /// JavaScriptCore, python in Pyodide when the app has it, and nothing else.
+        /// a web view, python in Pyodide when the app has it, and nothing else.
         func run(_ job: BabelJob) async throws -> BabelOutput {
             if let output = job.known { return output }
             if let programs { return try await programs.runBabel(job, fileDirectory: directory) }

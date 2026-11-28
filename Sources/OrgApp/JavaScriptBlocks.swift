@@ -2,15 +2,25 @@
 import Foundation
 import JavaScriptCore
 import OrgCore
+import WebKit
 
-/// js and javascript blocks in JavaScriptCore, as `node` runs them, for builds that can't start
-/// node. Node's `require('util')`, `require('process')`, `console` and timers are written in
-/// JavaScript below; a block that uses anything else of Node's, or prints a value whose text
-/// can't be made the same as Node's, is refused rather than given a different result.
+/// js and javascript blocks as `node` runs them, for builds that can't start node. Node's
+/// `require('util')`, `require('process')`, `console` and timers are written in JavaScript below;
+/// a block that uses anything else of Node's, or prints a value whose text can't be made the same
+/// as Node's, is refused rather than given a different result.
 ///
-/// The public JavaScriptCore API can't stop a running script. A run that is canceled or times
-/// out ends at once, but a script that never finishes keeps its thread busy until the app quits.
+/// A block runs in a web worker of a hidden web view, where the web's `fetch`, `XMLHttpRequest`
+/// and `WebSocket` reach the network. A block without a session gets a new worker, which ends
+/// with the run; a session keeps its own worker. A run that is canceled or times out ends its
+/// worker, and with it the session. The web view goes after a minute without a run, or 15
+/// minutes while a session exists.
+///
+/// `runHere`, for table formulas, runs in JavaScriptCore on a thread of its own instead, since
+/// its caller waits. JavaScriptCore can't stop a running script, so a script that never finishes
+/// keeps its thread busy until the app quits.
 public enum JavaScriptBlocks {
+    static let scheme = "orgstar-js"
+
     /// Runs `job` when it is a js block, in `directory` or its `:dir`; nil for other languages.
     /// `:cmd` is ignored.
     public static func run(_ job: BabelJob, directory: URL, timeout: Duration = .seconds(300)) async throws -> BabelOutput? {
@@ -19,18 +29,11 @@ public enum JavaScriptBlocks {
         switch job.runner {
         case .process:
             guard FileManager.default.fileExists(atPath: folder.path) else { throw Babel.Failure.message("No folder \(folder.path) for :dir.") }
-            return try await evaluate(timeout: timeout) { run in try Engine().main(job.script ?? job.input, run: run) }
+            return try await evaluate(job.script ?? job.input, session: "", value: false, timeout: timeout)
         case .session(let name, _, .node):
             guard FileManager.default.fileExists(atPath: folder.path) else { throw Babel.Failure.message("No folder \(folder.path) for :dir.") }
-            // One context per file folder and session name; a stopped run's context is dropped.
-            let key = folder.path + "\u{1}" + name
-            let engine = sessions.engine(key)
-            do {
-                return try await evaluate(timeout: timeout) { run in try engine.session(job.input, value: !job.finish.output, run: run) }
-            } catch let error where error is CancellationError || error is Stopped {
-                sessions.drop(key, engine)
-                throw error
-            }
+            // One worker per file folder and session name; a stopped run's worker is ended.
+            return try await evaluate(job.input, session: folder.path + "\u{1}" + name, value: !job.finish.output, timeout: timeout)
         default:
             return nil
         }
@@ -94,22 +97,100 @@ public enum JavaScriptBlocks {
         let description: String
     }
 
-    /// Runs `body` on a thread of its own, which a cancel or the timeout leaves behind.
-    private static func evaluate(timeout: Duration, _ body: @escaping @Sendable (Run) throws -> BabelOutput) async throws -> BabelOutput {
+    /// The block's output, or the refusal of what it used.
+    static func output(stdout: String, stderr: String, result: String?, error: String?, refused: String) throws -> BabelOutput {
+        if !refused.isEmpty { throw Babel.Failure.message("This block uses \(refused), which runs only in node.") }
+        guard let error else { return BabelOutput(stdout: stdout, resultFile: result, stderr: stderr) }
+        return BabelOutput(stdout: stdout, resultFile: result, stderr: stderr + error + "\n", status: 1)
+    }
+
+    @MainActor static var host: Host?
+    @MainActor private static var runs = 0
+
+    /// Runs `source` in a new worker, or in `session`'s, ending the worker when the run is
+    /// canceled or passes `timeout`. A cancel or the timeout ends the run without waiting for the
+    /// main actor.
+    static func evaluate(_ source: String, session: String, value: Bool, timeout: Duration) async throws -> BabelOutput {
         let run = Run()
-        let thread = Thread { run.end(Result { try body(run) }) }
-        thread.stackSize = 8 << 20
-        thread.start()
         let limit = Task {
             try await Task.sleep(for: timeout)
             run.end(.failure(Stopped(description: "The block took longer than \(timeout) and was stopped.")))
         }
         defer { limit.cancel() }
-        return try await withTaskCancellationHandler {
-            try await withCheckedThrowingContinuation { run.wait($0) }
-        } onCancel: {
-            run.end(.failure(CancellationError()))
+        do {
+            return try await withTaskCancellationHandler {
+                try await withCheckedThrowingContinuation { continuation in
+                    run.wait(continuation)
+                    Task { @MainActor in await send(source, session: session, value: value, run: run) }
+                }
+            } onCancel: {
+                run.end(.failure(CancellationError()))
+            }
+        } catch let error as Babel.Failure {
+            throw error
+        } catch let error where error is CancellationError || error is Stopped {
+            Task { @MainActor in run.stopWorker?() }
+            throw error
+        } catch {
+            if (error as? WKError)?.code == .webContentProcessTerminated {
+                throw Babel.Failure.message(String(localized: "JavaScript stopped: the process running it ended."))
+            }
+            throw Babel.Failure.message(String(localized: "JavaScript stopped: \(error.localizedDescription)"))
         }
+    }
+
+    /// Gives the block to the page, starting the web view when there is none, and ends `run` with
+    /// the reply.
+    @MainActor
+    private static func send(_ source: String, session: String, value: Bool, run: Run) async {
+        guard !run.stopped else { return }
+        let host = self.host ?? Host()
+        self.host = host
+        host.idle?.cancel()
+        if !session.isEmpty { host.sessions = true }
+        runs += 1
+        let id = runs
+        host.runs[id] = run
+        defer {
+            host.runs[id] = nil
+            if self.host === host, host.runs.isEmpty { host.scheduleIdle() }
+        }
+        do {
+            try await host.loaded.value
+            guard !run.stopped else { return }
+            // Sent before the session's next block can be. Not awaited: a page whose process has
+            // stopped answering would never reply.
+            run.stopWorker = { [weak host] in
+                host?.webView.callAsyncJavaScript("stop(id);", arguments: ["id": id], in: nil, in: .page)
+            }
+            let reply = try await host.webView.callAsyncJavaScript(
+                "return await run(id, source, session, value);",
+                arguments: ["id": id, "source": source, "session": session, "value": value],
+                contentWorld: .page
+            )
+            run.end(Result { try parse(reply as? String ?? "") })
+        } catch {
+            run.end(.failure(error))
+            if self.host === host { stop() }
+        }
+    }
+
+    /// The worker's reply: what the block wrote, its value, and its error or refusal.
+    static func parse(_ reply: String) throws -> BabelOutput {
+        guard let object = try? JSONSerialization.jsonObject(with: Data(reply.utf8)) as? [String: Any] else {
+            throw Babel.Failure.message(String(localized: "JavaScript stopped: \(reply)"))
+        }
+        if object["stopped"] != nil { throw Stopped(description: "The session was stopped.") }
+        if let failure = object["failure"] as? String { throw Babel.Failure.message(String(localized: "JavaScript stopped: \(failure)")) }
+        return try output(stdout: object["stdout"] as? String ?? "", stderr: object["stderr"] as? String ?? "", result: object["result"] as? String,
+                          error: object["error"] as? String, refused: object["refused"] as? String ?? "")
+    }
+
+    /// Ends the web view, every worker and every session.
+    @MainActor
+    static func stop() {
+        host?.close()
+        host = nil
     }
 
     /// A run, which ends once: with the script's output, a cancel or the timeout.
@@ -121,6 +202,8 @@ public enum JavaScriptBlocks {
         private let done = DispatchSemaphore(value: 0)
 
         var stopped: Bool { lock.withLock { result != nil } }
+        /// Ends the run's worker, once the page has the run; used only on the main actor.
+        nonisolated(unsafe) var stopWorker: (@MainActor () -> Void)?
 
         func end(_ outcome: Result<BabelOutput, Error>) {
             let (first, waiting) = lock.withLock { () -> (Bool, CheckedContinuation<BabelOutput, Error>?) in
@@ -158,108 +241,245 @@ public enum JavaScriptBlocks {
         }
     }
 
-    private static let sessions = Sessions()
+    /// The hidden web view, whose page starts the workers.
+    @MainActor
+    final class Host: NSObject, WKNavigationDelegate {
+        let webView: WKWebView
+        var runs: [Int: Run] = [:]
+        var sessions = false
+        var idle: Task<Void, Never>?
+        private(set) var loaded: Task<Void, Error>!
+        private var loading: CheckedContinuation<Void, Error>?
 
-    final class Sessions: @unchecked Sendable {
-        private let lock = NSLock()
-        private var engines: [String: Engine] = [:]
-
-        func engine(_ key: String) -> Engine {
-            lock.withLock {
-                if let engine = engines[key] { return engine }
-                let engine = Engine(session: true)
-                engines[key] = engine
-                return engine
+        override init() {
+            let configuration = WKWebViewConfiguration()
+            configuration.setURLSchemeHandler(Files(), forURLScheme: JavaScriptBlocks.scheme)
+            configuration.websiteDataStore = .nonPersistent()
+            webView = WKWebView(frame: .zero, configuration: configuration)
+            super.init()
+            webView.navigationDelegate = self
+            loaded = Task {
+                try await withCheckedThrowingContinuation { continuation in
+                    loading = continuation
+                    webView.load(URLRequest(url: URL(string: "\(JavaScriptBlocks.scheme)://blocks/index.html")!))
+                }
             }
         }
 
-        func drop(_ key: String, _ engine: Engine) {
-            lock.withLock { if engines[key] === engine { engines[key] = nil } }
+        func scheduleIdle() {
+            let wait: Duration = sessions ? .seconds(900) : .seconds(60)
+            idle = Task { [weak self] in
+                guard (try? await Task.sleep(for: wait)) != nil, let self else { return }
+                if JavaScriptBlocks.host === self { JavaScriptBlocks.stop() }
+            }
+        }
+
+        func close() {
+            idle?.cancel()
+            for run in runs.values { run.end(.failure(WKError(.webContentProcessTerminated))) }
+            webView.stopLoading()
+            webView.navigationDelegate = nil
+            finishLoading(.failure(CancellationError()))
+        }
+
+        private func finishLoading(_ result: Result<Void, Error>) {
+            loading?.resume(with: result)
+            loading = nil
+        }
+
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) { finishLoading(.success(())) }
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) { finishLoading(.failure(error)) }
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) { finishLoading(.failure(error)) }
+        func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+            if JavaScriptBlocks.host === self { JavaScriptBlocks.stop() }
         }
     }
 
-    /// A context with Node's globals, and what its scripts wrote.
+    /// Serves the page and the worker, and nothing else.
+    @MainActor
+    final class Files: NSObject, WKURLSchemeHandler {
+        func webView(_ webView: WKWebView, start task: any WKURLSchemeTask) {
+            guard let url = task.request.url, url.host == "blocks" else { return task.didFailWithError(URLError(.fileDoesNotExist)) }
+            let file: (String, String)?
+            switch url.path {
+            case "/index.html": file = (Self.page, "text/html")
+            case "/host.js": file = (Self.host, "text/javascript")
+            case "/worker.js": file = (Self.worker, "text/javascript")
+            default: file = nil
+            }
+            guard let (text, type) = file else { return task.didFailWithError(URLError(.fileDoesNotExist)) }
+            let data = Data(text.utf8)
+            task.didReceive(HTTPURLResponse(url: url, statusCode: 200, httpVersion: "HTTP/1.1",
+                                            headerFields: ["Content-Type": type, "Content-Length": String(data.count), "Cache-Control": "no-store"])!)
+            task.didReceive(data)
+            task.didFinish()
+        }
+
+        func webView(_ webView: WKWebView, stop task: any WKURLSchemeTask) {}
+
+        static let page = "<!doctype html><meta charset=\"utf-8\"><script src=\"host.js\"></script>"
+
+        /// `run` gives a block to a new worker, ending it after the run, or to its session's
+        /// worker; a worker is started ahead for the next block without a session. `stop` ends
+        /// the run's worker, and with a session's every run waiting on it.
+        static let host = """
+            "use strict";
+            let ready = null;
+            const sessions = new Map();
+            const runs = new Map();
+            function start() {
+              const worker = new Worker("worker.js");
+              worker.onmessage = e => {
+                const run = runs.get(e.data && e.data.id);
+                if (run && run.worker === worker) finish(e.data.id, e.data);
+              };
+              worker.onerror = e => {
+                e.preventDefault();
+                for (const [id, run] of runs) if (run.worker === worker) finish(id, { failure: e.message || "The worker didn't start." });
+              };
+              return worker;
+            }
+            function finish(id, reply) {
+              const run = runs.get(id);
+              runs.delete(id);
+              if (!run.session) run.worker.terminate();
+              run.resolve(JSON.stringify(reply));
+            }
+            function run(id, source, session, value) {
+              let worker = sessions.get(session);
+              if (!session) {
+                worker = ready || start();
+                ready = start();
+              } else if (!worker) {
+                worker = start();
+                sessions.set(session, worker);
+              }
+              return new Promise(resolve => {
+                runs.set(id, { worker, session, resolve });
+                worker.postMessage({ id, source, session: session !== "", value });
+              });
+            }
+            function stop(id) {
+              const run = runs.get(id);
+              if (!run) return;
+              if (!run.session) return finish(id, { stopped: true });
+              run.worker.terminate();
+              if (sessions.get(run.session) === run.worker) sessions.delete(run.session);
+              for (const [other, r] of runs) if (r.worker === run.worker) finish(other, { stopped: true });
+            }
+            """
+
+        /// Keeps what it needs of the worker's globals, hides the rest from `for…in`, and runs each
+        /// block given to it after the one before: as node runs a file, then its timers and requests
+        /// until none is left, or in the session's global scope.
+        static let worker = """
+            (() => {
+              "use strict";
+              const post = self.postMessage.bind(self), listen = self.addEventListener.bind(self), timer = self.setTimeout.bind(self);
+              const web = { fetch: self.fetch.bind(self), Headers, Request, Response, XMLHttpRequest, WebSocket };
+              const channel = new MessageChannel(), turns = [];
+              channel.port1.onmessage = () => turns.shift()();
+              // A turn of the event loop, after every promise callback waiting now.
+              const turn = () => new Promise(resolve => { turns.push(resolve); channel.port2.postMessage(null); });
+              let waiting = null;
+              web.changed = () => { const w = waiting; waiting = null; if (w) w(); };
+              const sleep = ms => new Promise(resolve => { waiting = resolve; if (ms >= 0) timer(resolve, ms); });
+              // The worker's own names stay, but only node's are enumerable.
+              for (let o = self; o && o !== Object.prototype; o = Object.getPrototypeOf(o)) {
+                for (const key of Reflect.ownKeys(o)) {
+                  const d = Object.getOwnPropertyDescriptor(o, key);
+                  if (d.enumerable && d.configurable) Object.defineProperty(o, key, { ...d, enumerable: false });
+                }
+              }
+              const output = { stdout: "", stderr: "" };
+              const write = (fd, text) => { if (fd === 1) output.stdout += text; else output.stderr += text; };
+              // A session's block runs by direct eval in a function its previous block declared, so it
+              // sees that block's declarations, `let` and `const` included, and the block's value is
+              // its completion value.
+              const step = "try { return [false, eval(arguments[0]), typeof __orgstar_next === 'function' ? __orgstar_next : null]; } " +
+                "catch (error) { return [true, error, typeof __orgstar_next === 'function' ? __orgstar_next : null]; }";
+              let next = new Function(step);
+              const script = source => {
+                const [failed, value, after] = next(source + "\\n;function __orgstar_next() { " + step + " }");
+                if (after) next = after;
+                return [failed, value];
+              };
+              let node = null, queue = null;
+              listen("error", e => {
+                e.preventDefault();
+                if (node) node.uncaught(e.error);
+                web.changed();
+              });
+              async function handle(m) {
+                output.stdout = output.stderr = "";
+                node ??= \(Engine.shim)(write, script, m.session, web);
+                if (m.session) {
+                  node.session(m.source, m.value);
+                  await turn();
+                  node.settle();
+                } else {
+                  node.main(m.source);
+                  for (;;) {
+                    await turn();
+                    const wait = node.tick();
+                    if (wait === 0) continue;
+                    if (wait < 0 && node.busy === 0) break;
+                    await sleep(wait);
+                  }
+                }
+                const result = m.session ? node.result : undefined;
+                post({ id: m.id, stdout: output.stdout, stderr: output.stderr, result: typeof result === "string" ? result : null,
+                       error: node.error === undefined ? null : String(node.error), refused: node.refused });
+              }
+              listen("message", e => {
+                const before = queue;
+                queue = (async () => {
+                  await before;
+                  try { await handle(e.data); } catch (error) { post({ id: e.data.id, failure: String(error && error.message || error) }); }
+                })();
+              });
+            })();
+            """
+    }
+
+    /// A JavaScriptCore context with Node's globals, and what its script wrote.
     final class Engine: @unchecked Sendable {
         private final class Output {
             var stdout = ""
             var stderr = ""
-            var exception: JSValue?
         }
 
         private let context: JSContext
         private let node: JSValue
         private let output: Output
-        private let lock = NSLock()
 
-        /// A session's context has `require`, `module` and the rest of a module's names as
-        /// globals, as `node -e` has them.
-        init(session: Bool = false) {
+        init() {
             let output = Output()
             self.output = output
             context = JSContext()
             let write: @convention(block) (Int32, String) -> Void = { fd, text in
                 if fd == 1 { output.stdout += text } else { output.stderr += text }
             }
-            // Runs a session's script as a script of its own, which the caller's call holds back
-            // the promise callbacks of: whether it threw, and its error or completion value.
-            let script: @convention(block) (String) -> JSValue = { source in
-                let context = JSContext.current()!
-                output.exception = nil
-                let completion = context.evaluateScript(source)
-                let result = JSValue(newArrayIn: context)!
-                result.setValue(output.exception != nil, at: 0)
-                result.setValue(output.exception ?? completion, at: 1)
-                output.exception = nil
-                return result
-            }
-            context.exceptionHandler = { _, exception in output.exception = exception }
-            node = context.evaluateScript(Self.shim).call(withArguments: [write, script, session])
+            node = context.evaluateScript(Self.shim).call(withArguments: [write, NSNull(), false])
         }
 
         /// Runs `source` as node runs a script file, as Emacs runs it, then its timers.
         func main(_ source: String, run: Run) throws -> BabelOutput {
             node.invokeMethod("main", withArguments: [source])
-            runTimers(run)
-            return try finish(result: nil)
-        }
-
-        /// Runs `source` where the session's earlier scripts ran, as `vm.runInThisContext` does;
-        /// with `value`, the result is its completion value as `util.inspect` prints it. A block
-        /// that leaves a timer, or a promise callback that prints or throws, is refused.
-        func session(_ source: String, value: Bool, run: Run) throws -> BabelOutput {
-            try lock.withLock {
-                output.stdout = ""
-                output.stderr = ""
-                output.exception = nil
-                node.invokeMethod("session", withArguments: [source, value])
-                // node's session returns before its timers and promise callbacks run, and they print later.
-                node.invokeMethod("settle", withArguments: [])
-                let result = node.forProperty("result")
-                return try finish(result: result?.isString == true ? result?.toString() : nil)
-            }
-        }
-
-        private func runTimers(_ run: Run) {
             while !run.stopped, let wait = node.invokeMethod("tick", withArguments: [])?.toDouble(), wait >= 0 {
                 if wait > 0 { run.sleep(milliseconds: wait) }
             }
-        }
-
-        private func finish(result: String?) throws -> BabelOutput {
-            if let refused = node.forProperty("refused")?.toString(), !refused.isEmpty {
-                throw Babel.Failure.message("This block uses \(refused), which runs only in node.")
-            }
-            guard let error = node.forProperty("error"), !error.isUndefined else {
-                return BabelOutput(stdout: output.stdout, resultFile: result, stderr: output.stderr)
-            }
-            return BabelOutput(stdout: output.stdout, resultFile: result, stderr: output.stderr + (error.toString() ?? "") + "\n", status: 1)
+            let error = node.forProperty("error").flatMap { $0.isUndefined ? nil : $0.toString() }
+            return try JavaScriptBlocks.output(stdout: output.stdout, stderr: output.stderr, result: nil, error: error,
+                                               refused: node.forProperty("refused")?.toString() ?? "")
         }
 
         /// Node's globals and modules; `util.inspect` and `util.format` are ported from Node 26's
         /// lib/internal/util/inspect.js (MIT License, Node.js contributors). It returns the
-        /// runner's controls.
+        /// runner's controls. `script` runs a session's block; `web`, in a worker, has the web's
+        /// network APIs.
         static let shim = #"""
-            (function shim(write, script, session) {
+            (function shim(write, script, session, web) {
               'use strict';
               const functionToString = Function.prototype.toString;
               const state = { dead: false, error: undefined, refused: '', timers: [], seq: 0, now: Date.now(), draining: false, result: undefined };
@@ -1401,6 +1621,42 @@ public enum JavaScriptBlocks {
                 value: { then(onFulfilled, onRejected) { return then.call(this, late(onFulfilled), late(onRejected)); } }.then,
                 writable: true, configurable: true,
               });
+              // The web's network APIs, in a worker. A request keeps the run going until it ends, as node's
+              // event loop does; a session's block can't wait for one, so starting one there is refused.
+              let requests = 0;
+              if (web) {
+                const begin = (what) => { if (session) refuse(`${what} in a session`); };
+                const ended = () => { requests--; web.changed(); };
+                const track = (promise) => { requests++; then.call(promise, ended, ended); return promise; };
+                globals.fetch = function fetch(...args) { begin('fetch'); return track(web.fetch(...args)); };
+                for (const name of ['arrayBuffer', 'blob', 'bytes', 'formData', 'json', 'text']) {
+                  const method = web.Response.prototype[name];
+                  if (typeof method === 'function') web.Response.prototype[name] = { [name](...args) { return track(method.apply(this, args)); } }[name];
+                }
+                const request = web.XMLHttpRequest.prototype, xhrOpen = request.open, xhrSend = request.send;
+                const asynchronous = new WeakSet();
+                request.open = function open(...args) {
+                  if (args.length < 3 || args[2]) asynchronous.add(this); else asynchronous.delete(this);
+                  return xhrOpen.apply(this, args);
+                };
+                request.send = function send(...args) {
+                  if (!asynchronous.has(this)) return xhrSend.apply(this, args);
+                  begin('XMLHttpRequest');
+                  xhrSend.apply(this, args);
+                  requests++;
+                  this.addEventListener('loadend', ended, { once: true });
+                };
+                globals.WebSocket = new RealProxy(web.WebSocket, {
+                  construct(target, args, newTarget) {
+                    begin('WebSocket');
+                    const socket = Reflect.construct(target, args, newTarget);
+                    requests++;
+                    socket.addEventListener('close', ended, { once: true });
+                    return socket;
+                  },
+                });
+                Object.assign(globals, { Headers: web.Headers, Request: web.Request, Response: web.Response, XMLHttpRequest: web.XMLHttpRequest });
+              }
               // Node's enumerable globals, in node's order; `node -e` adds a module's names after them.
               const enumerable = [
                 'global', 'clearImmediate', 'setImmediate', 'clearInterval', 'clearTimeout', 'setInterval', 'setTimeout',
@@ -1420,7 +1676,7 @@ public enum JavaScriptBlocks {
               for (const [name, value] of Object.entries(globals)) {
                 if (!enumerable.includes(name)) Object.defineProperty(globalThis, name, { value, writable: true, configurable: true, enumerable: false });
               }
-              // Node 26's other globals that JavaScriptCore lacks.
+              // Node 26's other globals that JavaScriptCore lacks; in a worker, the web's, but for the network's.
               for (const name of [
                 'AbortController', 'AbortSignal', 'AsyncDisposableStack', 'atob', 'Blob', 'BroadcastChannel', 'btoa', 'Buffer',
                 'ByteLengthQueuingStrategy', 'clearImmediate', 'CloseEvent', 'CompressionStream', 'CountQueuingStrategy', 'Crypto',
@@ -1435,7 +1691,7 @@ public enum JavaScriptBlocks {
                 'TransformStreamDefaultController', 'URL', 'URLPattern', 'URLSearchParams', 'WebSocket', 'WritableStream',
                 'WritableStreamDefaultController', 'WritableStreamDefaultWriter'
               ]) {
-                if (!(name in globalThis)) {
+                if (web ? !Object.prototype.hasOwnProperty.call(globals, name) && !enumerable.includes(name) : !(name in globalThis)) {
                   Object.defineProperty(globalThis, name, { get() { refuse(name); }, configurable: true });
                 }
               }
@@ -1565,6 +1821,9 @@ public enum JavaScriptBlocks {
                 },
                 get error() { return state.error; },
                 get refused() { return state.refused; },
+                // Requests not yet ended, unless the run has.
+                get busy() { return state.dead ? 0 : requests; },
+                uncaught,
               };
             })
             """#

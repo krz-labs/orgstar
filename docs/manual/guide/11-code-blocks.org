@@ -91,7 +91,7 @@ On the Mac, orgstar starts each interpreter outside a =:session= through =/bin/s
 | =python=                                                         | =python3=, or the program in =:python=              |
 | =emacs-lisp=, =elisp=                                            | =emacs -Q --batch=, or the interpreter; see below    |
 | =ruby=                                                           | =ruby=, or the program in =:ruby=                   |
-| =js=, =javascript=                                               | =node FILE=, the program written to a file, or JavaScriptCore without node; see below |
+| =js=, =javascript=                                               | =node FILE=, the program written to a file, or WebKit without node; see below |
 | =R=                                                              | =Rscript -=                                         |
 | =awk=                                                            | =awk -f=, the program written to a file             |
 | =calc=                                                           | orgstar's Calc, or =emacs -Q --batch=; see below    |
@@ -103,29 +103,32 @@ For =js=, =javascript= and =R=, =:cmd= names a different program. Since it runs 
 
 Any other language is refused with "No way to run /language/ blocks yet."
 
-A run that takes longer than five minutes is stopped. Runs in a =:session= have no time limit, except in JavaScriptCore and Pyodide.
+A run that takes longer than five minutes is stopped. Runs in a =:session= have no time limit, except JavaScript in WebKit and Python in Pyodide.
 
 The [[file:../install.org][Mac App Store version]] starts no programs, so only Emacs Lisp, JavaScript, Python, calc, sqlite, dot and mermaid blocks run there; see /In the Mac App Store version/ below.
 
-** JavaScript in JavaScriptCore
+** JavaScript in WebKit
 
-In the Mac App Store version and on iOS, =js= and =javascript= blocks run in JavaScriptCore, the JavaScript engine built into macOS and iOS. The download version uses it when =node=, or the program in =:cmd= after =/bin/sh= expands it, isn't installed; a =:cmd= with options, such as =node --no-warnings=, or with a command substitution, such as =$(which node)=, never runs in JavaScriptCore. A block runs as Emacs runs it, with =node= reading it from a file as a CommonJS module, where =this= is =module.exports= and top-level =var= declarations stay in the block. Its output and result are what node gives:
+In the Mac App Store version and on iOS, =js= and =javascript= blocks run in a web worker of a hidden WebKit web view, with JavaScriptCore, the JavaScript engine built into macOS and iOS. The download version uses it when =node=, or the program in =:cmd= after =/bin/sh= expands it, isn't installed; a =:cmd= with options, such as =node --no-warnings=, or with a command substitution, such as =$(which node)=, never runs in WebKit. A block runs as Emacs runs it, with =node= reading it from a file as a CommonJS module, where =this= is =module.exports= and top-level =var= declarations stay in the block. Its output and result are what node gives:
 
 - =console.log=, =console.info= and =console.debug= write to the output, =console.warn= and =console.error= to the error output, and =console.dir= prints with =util.inspect=. =process.stdout.write= and =process.stderr.write= write text.
 - =require('util')= has =inspect=, =format= and =formatWithOptions=, which print values as Node 26 prints them. =require('process')= has =stdout= and =stderr=.
 - =setTimeout=, =setInterval=, their =clear= functions and =queueMicrotask= work. Timers run after the program, in the order node runs them, and the run ends when none is left. In a =:session=, a block that leaves a timer set, or whose promise callbacks print or throw, is refused, since node's session returns before they run and they print later.
+- =fetch=, =XMLHttpRequest= and =WebSocket= reach the network, as they do in a web page, and the run waits for a request or an open socket to end, as node does. To read a response from another site, the server must allow it (CORS). In a =:session=, a block can't wait, so starting a request there is refused; a synchronous =XMLHttpRequest= works.
 - An uncaught error ends the run with status 1 and writes its name and message to the error output, such as "ReferenceError: hline is not defined".
 - =require= of any other module fails as it does for a module node can't find: "Error: Cannot find module 'fs'".
 
-A block that uses something only node has fails with "This block uses /name/, which runs only in node.", rather than giving a different result. That covers other members of =process=, =util=, =console=, =require= and =module= (=process.env=, =console.table=, =require.resolve=, =module.id=) and listing their members; Node's other globals (=Buffer=, =fetch=, =URL=, =TextEncoder=, =setImmediate=, =structuredClone=, =SharedArrayBuffer=, =Temporal=, =ReadableStream=); top-level =await=, =import= or =export= statements, which node runs as an ES module, and =import()=; =__filename= and =__dirname=, which name Emacs's temporary file; listing the global object's properties with =Object.getOwnPropertyNames= or =Reflect.ownKeys=, and in a =:session= with =Object.keys= or =for…in=; the source text of a built-in function; an error's =stack=, =Error.stackTraceLimit=, =Error.captureStackTrace= and listing an error's own properties; and printing an =Error=, a =Promise=, an iterator or the global object with =util.inspect=, whose text in node comes from its own engine. There is no access to files, the network or other programs.
+A block that uses something only node has fails with "This block uses /name/, which runs only in node.", rather than giving a different result. That covers other members of =process=, =util=, =console=, =require= and =module= (=process.env=, =console.table=, =require.resolve=, =module.id=) and listing their members; Node's other globals (=Buffer=, =URL=, =TextEncoder=, =setImmediate=, =structuredClone=, =SharedArrayBuffer=, =Temporal=, =ReadableStream=); top-level =await=, =import= or =export= statements, which node runs as an ES module, and =import()=; =__filename= and =__dirname=, which name Emacs's temporary file; listing the global object's properties with =Object.getOwnPropertyNames= or =Reflect.ownKeys=, and in a =:session= with =Object.keys= or =for…in=; the source text of a built-in function; an error's =stack=, =Error.stackTraceLimit=, =Error.captureStackTrace= and listing an error's own properties; and printing an =Error=, a =Promise=, an iterator or the global object with =util.inspect=, whose text in node comes from its own engine. There is no access to files or other programs.
 
 Some things still differ from node:
 
 - Error messages written by the engine itself, such as a =TypeError='s, are JavaScriptCore's, as a block that prints =e.message= shows. Only an uncaught =ReferenceError= is written in node's words.
 - A promise rejection nothing handles is not reported, and the run does not stop for it.
+- The web worker's own globals, such as =self=, =importScripts= and =XMLHttpRequest=, are there too.
+- In a =:session=, a block's top-level declarations carry over to later blocks, but =var= and function declarations don't become properties of the global object.
 - =:cmd= is ignored.
 
-JavaScriptCore has no way to stop a running program. A block that is canceled, or stopped after five minutes, ends at once, but if its program never finishes it keeps running in the background, on one processor core, until orgstar quits. Cancelling a block in a =:session= discards the session.
+Each block without a session runs in a new worker, and each session in a worker of its own. A block that is canceled, or that runs for five minutes, a program that never finishes included, is stopped at once with its worker; for a block in a =:session=, that ends the session. The web view is unloaded after a minute without a JavaScript block, or 15 minutes while a session exists, which ends every session.
 
 ** Python in Pyodide
 
@@ -245,7 +248,7 @@ What "value" means depends on the language:
 | =ruby=, =js= in a =:session= | The value of the last expression, read as without a session.                            |
 | Emacs Lisp              | The value of the last form.                                                                   |
 | =ruby=                  | The value of the body, run as a lambda; strings as they are, other values as =inspect= prints them, arrays read as tables with =nil= rows as rules. =:results pp= prints it with =pp=. |
-| =js=, =javascript=      | What the body returns, as =util.inspect= prints it (in JavaScriptCore, orgstar's copy of it), arrays read as tables; it runs as a function, so it needs =return=. |
+| =js=, =javascript=      | What the body returns, as =util.inspect= prints it (without node, orgstar's copy of it), arrays read as tables; it runs as a function, so it needs =return=. |
 | =awk=                   | Standard output, read as a table as for shells.                                               |
 | =R=                     | Standard output, always.                                                                      |
 | C, C++, D               | Standard output without its common indentation, read as a table as for shells.                |
@@ -527,7 +530,7 @@ for a in "$@"; do echo "[$a]"; done
 - A session starts in the block's =:dir=, or the file's folder, the first time it is used.
 - A shell session's output is what the block prints. =:results value= gives the exit status of the last command.
 - A Python session runs the block at top level. Its value is the value of the last expression, so =return= is not used.
-- A Ruby session runs each block in the same binding, and a JavaScript session in Node's global context or one JavaScriptCore context, so local variables and =var= and =let= declarations carry over. Their value is the value of the last expression, written as without a session (=inspect=, =util.inspect=); =return= is not used. Errors go to the block's error output and leave the session running.
+- A Ruby session runs each block in the same binding, and a JavaScript session in Node's global context or one web worker, so local variables and =var= and =let= declarations carry over. Their value is the value of the last expression, written as without a session (=inspect=, =util.inspect=); =return= is not used. Errors go to the block's error output and leave the session running.
 - An R session runs each block with =source(…, print.eval = TRUE)= in one =R --slave= process; its result is the output, as without a session.
 
 Emacs runs these with packages beyond Org: inf-ruby for Ruby, ESS for R, and js-comint or skewer for JavaScript; with plain =node=, ob-js refuses sessions. orgstar's sessions don't need them, and their results can differ in detail from those packages' echoed output.
@@ -873,7 +876,7 @@ Tangling stops, writes nothing and says why when:
 
 * On iOS
 
-- Only Emacs Lisp blocks, in orgstar's own interpreter, JavaScript blocks, in JavaScriptCore (see /JavaScript in JavaScriptCore/ above), Python blocks, in Pyodide (see /Python in Pyodide/ above), and calc, sqlite, dot and mermaid blocks (see above) run. Any other language, compiled languages included, fails with "/language/ blocks need the Mac to run." (for example "C blocks need the Mac to run."), and so does a block whose =:var= refers to a block in another language.
+- Only Emacs Lisp blocks, in orgstar's own interpreter, JavaScript blocks, in WebKit (see /JavaScript in WebKit/ above), Python blocks, in Pyodide (see /Python in Pyodide/ above), and calc, sqlite, dot and mermaid blocks (see above) run. Any other language, compiled languages included, fails with "/language/ blocks need the Mac to run." (for example "C blocks need the Mac to run."), and so does a block whose =:var= refers to a block in another language.
 - JavaScript and Python blocks can use =:session=. There are no other sessions, and no graphics other than dot and mermaid.
 - The trust prompt works the same way, with its own =trusted.json= on the device.
 - There is no cancel command.
@@ -884,7 +887,7 @@ See [[file:14-ios.org][iOS]] for the rest of the iOS app.
 
 * In the Mac App Store version
 
-- Only Emacs Lisp blocks, in the same interpreter as on iOS, JavaScript blocks, in JavaScriptCore, Python blocks, in Pyodide, and calc, sqlite, dot and mermaid blocks run. Any other language, compiled languages included, fails with "/language/ blocks don't run in this version of orgstar." A block whose =:var=, =:post= or noweb reference runs a block in another language runs nothing: "This block needs a /language/ block, and /language/ blocks don't run in this version of orgstar; nothing was run."
+- Only Emacs Lisp blocks, in the same interpreter as on iOS, JavaScript blocks, in WebKit, Python blocks, in Pyodide, and calc, sqlite, dot and mermaid blocks run. Any other language, compiled languages included, fails with "/language/ blocks don't run in this version of orgstar." A block whose =:var=, =:post= or noweb reference runs a block in another language runs nothing: "This block needs a /language/ block, and /language/ blocks don't run in this version of orgstar; nothing was run."
 - JavaScript and Python blocks can use =:session=. There are no other sessions, and no graphics other than dot and mermaid.
 - The trust prompt works the same way.
 - Tangling works as in the download version, =:shebang= included. A target outside your folders needs access to its folder first: orgstar asks with Grant Access…, as described in [[file:../install.org][Install]]. So does a =:file= result outside them.

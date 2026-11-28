@@ -19,14 +19,21 @@ final class Listener: @unchecked Sendable {
         func add() { lock.withLock { count += 1 } }
     }
 
-    init() async throws {
+    /// With `reply`, answers each request with it as text, allowed to any origin.
+    init(reply: String? = nil) async throws {
         let parameters = NWParameters.tcp
         parameters.requiredLocalEndpoint = .hostPort(host: "127.0.0.1", port: .any)
         let listener = try NWListener(using: parameters)
         let counter = counter
         listener.newConnectionHandler = { connection in
             counter.add()
-            connection.cancel()
+            guard let reply else { return connection.cancel() }
+            connection.start(queue: .global())
+            connection.receive(minimumIncompleteLength: 1, maximumLength: 65536) { _, _, _, _ in
+                let response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nAccess-Control-Allow-Origin: *\r\n"
+                    + "Content-Length: \(reply.utf8.count)\r\nConnection: close\r\n\r\n\(reply)"
+                connection.send(content: Data(response.utf8), completion: .contentProcessed { _ in connection.cancel() })
+            }
         }
         let ready = AsyncStream<UInt16> { continuation in
             listener.stateUpdateHandler = { state in
