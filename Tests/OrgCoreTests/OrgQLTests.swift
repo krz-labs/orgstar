@@ -188,6 +188,35 @@ struct OrgQLTests {
         #expect(try Self.titles("(ts :type active :on -1)") == [])
     }
 
+    @Test func closedAndClocked() throws {
+        #expect(try OrgQL.parse("closed:from=-7") == .planning(.closed, OrgQL.DateRange(from: .days(-7))))
+        #expect(try OrgQL.parse("(clocked :on today)") == .clocked(OrgQL.DateRange(from: .days(0), to: .days(0))))
+        #expect(throws: OrgQL.QueryError("closed takes :from, :to, :on and :with-time, not 7")) { try OrgQL.parse("(closed 7)") }
+        #expect(try Self.titles("closed:") == ["Paid the bills"])
+        #expect(try Self.titles("(closed :on -1)") == ["Paid the bills"])
+        #expect(try Self.titles("(closed :to -2)") == [])
+        #expect(try Self.titles("(closed :from \"2026-11-27 18:01\")") == [])
+
+        let clocks = AgendaSource(path: "/c.org", text: """
+            * Overnight
+            :LOGBOOK:
+            CLOCK: [2026-11-20 Fri 23:00]--[2026-11-21 Sat 01:00] =>  2:00
+            :END:
+            * Running
+            CLOCK: [2026-11-28 Sat 08:00]
+            * Child clocks aren't the parent's
+            ** Child
+            CLOCK: [2026-11-25 Wed 10:00]--[2026-11-25 Wed 11:00] =>  1:00
+            * Never
+            """)
+        #expect(try Self.titles("clocked:", sources: [clocks]) == ["Overnight", "Running", "Child"])
+        #expect(try Self.titles("(clocked :on \"2026-11-21\")", sources: [clocks]) == ["Overnight"])
+        // A clock overlapping the range counts: Overnight ended on day -7.
+        #expect(try Self.titles("(clocked :from -7)", sources: [clocks]) == ["Overnight", "Running", "Child"])
+        #expect(try Self.titles("(clocked :from -6)", sources: [clocks]) == ["Running", "Child"])
+        #expect(try Self.titles("(clocked :to -8)", sources: [clocks]) == ["Overnight"])
+    }
+
     @Test func headingsPropertiesLevelsPathsAndHabits() throws {
         #expect(try Self.titles("heading:rent") == ["Pay rent", "Notes on Rent"])
         #expect(try Self.titles("heading:pay,rent") == ["Pay rent"])

@@ -825,10 +825,10 @@ struct AgendaCommandTests {
         type = "match"
         """)
         let loaded = AgendaViewLoader.load(userFile: file)
-        #expect(loaded.views.map(\.name) == ["Agenda", "TODO List", "Stuck Projects", "Work", "Week", "Waiting"])
-        #expect(loaded.views[3].mode == .match("+work", todoOnly: false))
-        #expect(loaded.views[4].mode == .agenda(span: 7, startOffset: -1))
-        #expect(loaded.views[5].mode == .todo(keywords: "WAIT|HOLD"))
+        #expect(loaded.views.map(\.name) == ["Agenda", "TODO List", "Stuck Projects", "Weekly Review", "Work", "Week", "Waiting"])
+        #expect(loaded.views[4].mode == .match("+work", todoOnly: false))
+        #expect(loaded.views[5].mode == .agenda(span: 7, startOffset: -1))
+        #expect(loaded.views[6].mode == .todo(keywords: "WAIT|HOLD"))
         #expect(loaded.problems == ["views.toml line 13: Broken needs a match"])
     }
 
@@ -844,7 +844,7 @@ struct AgendaCommandTests {
         """)
         let loaded = AgendaViewLoader.load(userFile: file)
         #expect(loaded.problems == ["views.toml line 1: unknown sorting key bogus"])
-        #expect(loaded.views[3].settings == AgendaViewSettings(prefixFormat: "%e", sortingStrategy: ["alpha-up"]))
+        #expect(loaded.views[4].settings == AgendaViewSettings(prefixFormat: "%e", sortingStrategy: ["alpha-up"]))
         let model = try WorkspaceModel(directory: nil)
         try await model.addRoot(notes.url)
         let agenda = AgendaModel(workspace: model)
@@ -886,7 +886,7 @@ struct AgendaCommandTests {
         sort = "size"
         """)
         let loaded = AgendaViewLoader.load(userFile: file)
-        #expect(loaded.views.dropFirst(3).map(\.mode) == [.query("todo: tags:work", sort: ["priority"]), .query("(or (priority \"A\") (done))", sort: [])])
+        #expect(loaded.views.dropFirst(4).map(\.mode) == [.query("todo: tags:work", sort: ["priority"]), .query("(or (priority \"A\") (done))", sort: [])])
         #expect(loaded.problems == [
             "views.toml line 10: Rifle: Words without a predicate search with org-ql's rifle predicate, which isn't supported: rent. Use heading:rent to search headings.",
             "views.toml line 14: No query needs a query",
@@ -895,10 +895,10 @@ struct AgendaCommandTests {
         let model = try WorkspaceModel(directory: nil)
         try await model.addRoot(notes.url)
         let agenda = AgendaModel(workspace: model)
-        agenda.mode = loaded.views[3].mode
+        agenda.mode = loaded.views[4].mode
         await agenda.refresh(open: [:])
         #expect(agenda.list.map(\.text) == ["TODO [#B] Report"])
-        agenda.mode = loaded.views[4].mode
+        agenda.mode = loaded.views[5].mode
         await agenda.refresh(open: [:])
         #expect(agenda.list.map(\.text) == ["TODO [#A] Rent", "DONE Old"])
     }
@@ -917,16 +917,16 @@ struct AgendaCommandTests {
         """)
         let loaded = AgendaViewLoader.load(userFile: file)
         #expect(loaded.problems.isEmpty)
-        #expect(loaded.views[3].mode == .stuck(nil))
-        guard case .stuck(let definition?) = loaded.views[4].mode else { Issue.record("no definition"); return }
+        #expect(loaded.views[4].mode == .stuck(nil))
+        guard case .stuck(let definition?) = loaded.views[5].mode else { Issue.record("no definition"); return }
         #expect(definition.todo == ["TODO", "WAIT"] && definition.match == "+LEVEL=2/-DONE")
         let model = try WorkspaceModel(directory: nil)
         try await model.addRoot(notes.url)
         let agenda = AgendaModel(workspace: model)
-        agenda.mode = loaded.views[3].mode
+        agenda.mode = loaded.views[4].mode
         await agenda.refresh(open: [:])
         #expect(agenda.list.map(\.text) == ["Garden"])
-        agenda.mode = loaded.views[4].mode
+        agenda.mode = loaded.views[5].mode
         await agenda.refresh(open: [:])
         #expect(agenda.list.isEmpty)
     }

@@ -106,12 +106,15 @@ public struct AgendaViewDefinition: Hashable, Sendable, Identifiable {
     public let name: String
     public let mode: AgendaMode
     public var settings: AgendaViewSettings
+    /// `triage = true`: the view links to Triage.
+    public var triage: Bool
     public var id: String { name }
 
-    public init(name: String, mode: AgendaMode, settings: AgendaViewSettings = AgendaViewSettings()) {
+    public init(name: String, mode: AgendaMode, settings: AgendaViewSettings = AgendaViewSettings(), triage: Bool = false) {
         self.name = name
         self.mode = mode
         self.settings = settings
+        self.triage = triage
     }
 }
 
@@ -129,16 +132,79 @@ public struct AgendaViewDefinition: Hashable, Sendable, Identifiable {
 /// `query`, in the sexp or the plain form, and `sort` (org-ql's keys separated by spaces).
 /// `stuck` views take `match`, `keywords`, `tags` and `regexp` as `[org-stuck-projects]` does, each defaulting
 /// to that setting. Any view can set
-/// `prefix-format` and `sorting-strategy` (keys separated by spaces) for itself.
+/// `prefix-format` and `sorting-strategy` (keys separated by spaces) for itself, and
+/// `triage = true` to link to Triage. A view named like a built-in one replaces it.
 @MainActor
 public enum AgendaViewLoader {
     public static var userFile: URL { UserConfig.file("views.toml") }
 
-    public static let builtIn = [
-        AgendaViewDefinition(name: "Agenda", mode: .agenda(span: nil, startOffset: nil)),
-        AgendaViewDefinition(name: "TODO List", mode: .todo(keywords: nil)),
-        AgendaViewDefinition(name: "Stuck Projects", mode: .stuck(nil)),
-    ]
+    public static var builtIn: [AgendaViewDefinition] { builtIn(.standard) }
+
+    /// Agenda, TODO List, Stuck Projects and the Weekly Review, whose waiting-for block lists
+    /// `weekly-review-waiting`.
+    public static func builtIn(_ defaults: UserDefaults) -> [AgendaViewDefinition] {
+        [
+            AgendaViewDefinition(name: "Agenda", mode: .agenda(span: nil, startOffset: nil)),
+            AgendaViewDefinition(name: "TODO List", mode: .todo(keywords: nil)),
+            AgendaViewDefinition(name: "Stuck Projects", mode: .stuck(nil)),
+        ] + weeklyReview(defaults)
+    }
+
+    /// The Weekly Review, read once for each keyword.
+    private static var weeklyReviews: [String: [AgendaViewDefinition]] = [:]
+
+    private static func weeklyReview(_ defaults: UserDefaults) -> [AgendaViewDefinition] {
+        let waiting = OrgPreferences.weeklyReviewWaiting(defaults)
+        if let views = weeklyReviews[waiting] { return views }
+        let views = parse(weeklyReview(waiting: waiting), defaults: defaults).views
+        weeklyReviews[waiting] = views
+        return views
+    }
+
+    public static let weeklyReviewName = "Weekly Review"
+
+    /// The built-in Weekly Review as `views.toml` writes it.
+    public static func weeklyReview(waiting: String) -> String {
+        let waiting = waiting.isEmpty ? "WAITING" : waiting
+        return """
+            [[view]]
+            name = "\(weeklyReviewName)"
+            triage = true
+
+            [[view.block]]
+            type = "stuck"
+            header = "Stuck projects"
+
+            [[view.block]]
+            type = "query"
+            header = "Scheduled in the past"
+            query = '(and (scheduled :to -1) (not (done)))'
+            sort = "scheduled"
+
+            [[view.block]]
+            type = "query"
+            header = "Deadlines up to a week ahead"
+            query = '(and (deadline :to 7) (not (done)))'
+            sort = "deadline"
+
+            [[view.block]]
+            type = "todo"
+            header = "Waiting for"
+            keywords = \(UserConfig.format(.string(waiting)))
+
+            [[view.block]]
+            type = "query"
+            header = "Completed in the last 7 days"
+            query = '(closed :from -7)'
+            sort = "closed"
+
+            [[view.block]]
+            type = "query"
+            header = "Clocked in the last 7 days"
+            query = '(clocked :from -7)'
+
+            """
+    }
 
     /// The views' settings by mode; the first view with a mode wins.
     public static func settings(_ views: [AgendaViewDefinition]) -> [AgendaMode: AgendaViewSettings] {
@@ -147,17 +213,28 @@ public enum AgendaViewLoader {
         return settings
     }
 
-    /// The built-in views followed by the user's, and the problems found in the file. Stuck
-    /// views start from the `[org-stuck-projects]` settings in `defaults`.
+    /// The built-in views followed by the user's, and the problems found in the file. A view
+    /// of the file named like a built-in one takes its place. Stuck views start from the
+    /// `[org-stuck-projects]` settings in `defaults`.
     public static func load(userFile: URL = userFile, defaults: UserDefaults = .standard) -> (views: [AgendaViewDefinition], problems: [String]) {
         let interval = Perf.begin("views.load")
         defer { interval.end() }
-        guard let text = try? String(contentsOf: userFile, encoding: .utf8) else { return (builtIn, []) }
+        var views = builtIn(defaults)
+        guard let text = try? String(contentsOf: userFile, encoding: .utf8) else { return (views, []) }
+        let parsed = parse(text, defaults: defaults)
+        for view in parsed.views {
+            if let index = views.firstIndex(where: { $0.name == view.name }) { views[index] = view } else { views.append(view) }
+        }
+        return (views, parsed.problems)
+    }
+
+    /// The views in the text of a `views.toml`, and its problems.
+    static func parse(_ text: String, defaults: UserDefaults) -> (views: [AgendaViewDefinition], problems: [String]) {
         let tables: [TOML.Table]
         do {
             tables = try TOML.parse(text)
         } catch {
-            return (builtIn, ["views.toml: \(error)"])
+            return ([], ["views.toml: \(error)"])
         }
         var problems: [String] = []
         // Each [[view]] with the [[view.block]] tables after it.
@@ -181,12 +258,13 @@ public enum AgendaViewLoader {
             }
             parsed.append((name, table, []))
         }
-        var views = builtIn
+        var views: [AgendaViewDefinition] = []
         for (name, table, blockTables) in parsed {
             guard let settings = settings(table, &problems) else { continue }
+            let triage = table.values["triage"]?.bool ?? false
             if blockTables.isEmpty {
                 guard let mode = mode(table, name: name, defaults: defaults, &problems) else { continue }
-                views.append(AgendaViewDefinition(name: name, mode: mode, settings: settings))
+                views.append(AgendaViewDefinition(name: name, mode: mode, settings: settings, triage: triage))
                 continue
             }
             var blocks: [AgendaBlock] = []
@@ -198,7 +276,9 @@ public enum AgendaViewLoader {
                 }
                 blocks.append(AgendaBlock(mode: mode, settings: settings.merged(own)))
             }
-            if !blocks.isEmpty { views.append(AgendaViewDefinition(name: name, mode: .blocks(blocks), settings: AgendaViewSettings(header: settings.header))) }
+            if !blocks.isEmpty {
+                views.append(AgendaViewDefinition(name: name, mode: .blocks(blocks), settings: AgendaViewSettings(header: settings.header), triage: triage))
+            }
         }
         return (views, problems)
     }

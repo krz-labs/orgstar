@@ -604,6 +604,41 @@
         }
       }
     },
+    "%@ changed since, so the last action can't be undone.": {
+      "comment": "Triage's Undo, when a file it would restore changed; the argument is the file's name",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ wurde seitdem geändert, daher kann die letzte Aktion nicht widerrufen werden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ha cambiado desde entonces, así que la última acción no se puede deshacer."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ a changé depuis ; la dernière action ne peut pas être annulée."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ はその後変更されたため、最後の操作を取り消せません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ mudou desde então, por isso a última ação não pode ser desfeita."
+          }
+        }
+      }
+    },
     "%@ changed while %@ ran; its changes weren't made.": {
       "comment": "An after-todo-state-change hook's edits refused because its file changed",
       "localizations": {
@@ -1956,6 +1991,41 @@
         }
       }
     },
+    "%@; u undoes it": {
+      "comment": "After Triage deleted an entry",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@; u widerruft es"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@; u lo deshace"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ; u l'annule"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@。u で取り消せます"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@; u desfaz"
+          }
+        }
+      }
+    },
     "%c category, %t time, %s scheduled/deadline, %e effort, %l level, %b outline path; %-12 pads": {
       "comment": "A config.toml setting, as its comment in the file describes it",
       "localizations": {
@@ -2300,6 +2370,41 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "%lld entries left": {
+      "comment": "Triage: how many entries are left, for VoiceOver",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch %lld Einträge"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quedan %lld entradas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld entrées restantes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "残り %lld 件"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld entradas restantes"
           }
         }
       }
@@ -9626,6 +9731,41 @@
         }
       }
     },
+    "Can't Triage": {
+      "comment": "Triage when its source can't be read",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Triage nicht möglich"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede revisar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tri impossible"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トリアージできません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível triar"
+          }
+        }
+      }
+    },
     "Can't add to the review history: %@": {
       "comment": "Flashcard review",
       "localizations": {
@@ -9831,6 +9971,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "Não é possível exportar: %@"
+          }
+        }
+      }
+    },
+    "Can't find %@ any more.": {
+      "comment": "A refile target that went away; the argument is its path",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ist nicht mehr zu finden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ya no se encuentra %@."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de trouver %@."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ が見つからなくなりました。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é mais possível encontrar %@."
+          }
+        }
+      }
+    },
+    "Can't find the capture target ID %@.": {
+      "comment": "Triage, when the default capture template's ID target can't be found",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Erfassungsziel mit der ID %@ wurde nicht gefunden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se encuentra el destino de captura con ID %@."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de trouver la cible de capture d'ID %@."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キャプチャ先の ID %@ が見つかりません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível encontrar o destino de captura com ID %@."
           }
         }
       }
@@ -16660,6 +16870,41 @@
         }
       }
     },
+    "Deleted": {
+      "comment": "Triage, after an entry was deleted",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gelöscht"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eliminada"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimée"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "削除しました"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Excluída"
+          }
+        }
+      }
+    },
     "Delete…": {
       "localizations": {
         "de": {
@@ -19409,6 +19654,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Os eventos aparecem na agenda; clique duas vezes em um para abri-lo no Calendário ou escolha Editar Evento… no menu de contexto. Novos calendários aparecem enquanto todos os calendários estiverem marcados."
+          }
+        }
+      }
+    },
+    "Every captured entry has been dealt with.": {
+      "comment": "Triage with no entries left",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle erfassten Einträge sind erledigt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todas las entradas capturadas están atendidas."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toutes les entrées capturées ont été traitées."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キャプチャしたエントリはすべて処理済みです。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todas as entradas capturadas foram tratadas."
           }
         }
       }
@@ -23059,6 +23339,41 @@
         }
       }
     },
+    "Go through captured entries one at a time": {
+      "comment": "Help for the agenda's Triage button",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erfasste Einträge einzeln durchgehen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisar las entradas capturadas de una en una"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parcourir les entrées capturées une à une"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キャプチャしたエントリを1件ずつ処理します"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Percorrer as entradas capturadas uma a uma"
+          }
+        }
+      }
+    },
     "Go to Clocked Entry": {
       "comment": "Command title",
       "localizations": {
@@ -25398,6 +25713,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "Em:"
+          }
+        }
+      }
+    },
+    "Inbox": {
+      "comment": "The row at the top of the Weekly Review that opens Triage",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eingang"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bandeja de entrada"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boîte de réception"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "受信箱"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Caixa de entrada"
+          }
+        }
+      }
+    },
+    "Inbox: %lld entries to triage": {
+      "comment": "The row at the top of the Weekly Review that opens Triage",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eingang: %lld Einträge zu sichten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bandeja de entrada: %lld entradas por revisar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boîte de réception : %lld entrées à trier"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "受信箱：トリアージするエントリ %lld 件"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Caixa de entrada: %lld entradas para triar"
           }
         }
       }
@@ -34821,6 +35206,41 @@
         }
       }
     },
+    "No view is named %@; triage-view in config.toml names the view Triage goes through.": {
+      "comment": "Triage, when triage-view names a view that doesn't exist",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Ansicht heißt %@; triage-view in config.toml nennt die Ansicht, die Triage durchgeht."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ninguna vista se llama %@; triage-view en config.toml indica la vista que recorre Triaje."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune vue ne s'appelle %@ ; triage-view dans config.toml nomme la vue que parcourt le Tri."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ という名前のビューはありません。config.toml の triage-view に、トリアージで順に見るビューを指定します。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhuma visão se chama %@; triage-view no config.toml indica a visão que a Triagem percorre."
+          }
+        }
+      }
+    },
     "Node Graph": {
       "localizations": {
         "de": {
@@ -35193,6 +35613,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Não é um arquivo Org"
+          }
+        }
+      }
+    },
+    "Not available from the agenda": {
+      "comment": "A command run from the agenda that needs something only the editor has",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In der Agenda nicht verfügbar"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No disponible desde la agenda"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indisponible depuis l'agenda"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アジェンダからは使えません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indisponível na agenda"
           }
         }
       }
@@ -35986,6 +36441,41 @@
         }
       }
     },
+    "Nothing to Triage": {
+      "comment": "Triage with no entries left",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nichts zu sichten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada que revisar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien à trier"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トリアージするものはありません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada para triar"
+          }
+        }
+      }
+    },
     "Nothing to do here": {
       "comment": "Why a command is greyed in the Commands list",
       "localizations": {
@@ -36086,6 +36576,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nada para buscar"
+          }
+        }
+      }
+    },
+    "Nothing to triage.": {
+      "comment": "Triage, when an action is asked for with no entry left",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nichts zu sichten."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada que revisar."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien à trier."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トリアージするものはありません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada para triar."
+          }
+        }
+      }
+    },
+    "Nothing to undo": {
+      "comment": "Triage's Undo with no action to take back",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nichts zu widerrufen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada que deshacer"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien à annuler"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取り消すものはありません"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada para desfazer"
           }
         }
       }
@@ -51139,6 +51699,41 @@
         }
       }
     },
+    "TODO State": {
+      "comment": "Triage action that sets the entry's TODO keyword",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TODO-Status"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estado TODO"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "État TODO"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TODOの状態"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estado TODO"
+          }
+        }
+      }
+    },
     "TODO State…": {
       "localizations": {
         "de": {
@@ -52477,6 +53072,41 @@
         }
       }
     },
+    "The TODO keyword the built-in Weekly Review lists as waiting for someone, such as WAIT. A Weekly Review defined in views.toml replaces the built-in one and its blocks.": {
+      "comment": "Help for a config.toml setting",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das TODO-Schlüsselwort, das das eingebaute Weekly Review als wartend auf jemanden auflistet, etwa WAIT. Ein in views.toml definiertes Weekly Review ersetzt das eingebaute samt seinen Blöcken."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La palabra clave TODO que el Weekly Review integrado lista como en espera de alguien, como WAIT. Un Weekly Review definido en views.toml reemplaza al integrado y sus bloques."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le mot-clé TODO que le Weekly Review intégré liste comme en attente de quelqu'un, par exemple WAIT. Un Weekly Review défini dans views.toml remplace celui intégré et ses blocs."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "組み込みの Weekly Review が誰かを待っているものとして一覧する TODO キーワード（例：WAIT）。views.toml で定義した Weekly Review は、組み込みのものとそのブロックを置き換えます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A palavra-chave TODO que o Weekly Review embutido lista como à espera de alguém, como WAIT. Um Weekly Review definido no views.toml substitui o embutido e seus blocos."
+          }
+        }
+      }
+    },
     "The TODO keywords of files without a #+TODO line, in #+TODO syntax: active keywords, then |, then done keywords, such as \"TODO NEXT | DONE\". Separate several sequences with \\\n. A letter in parentheses after a keyword, as in TODO(t), turns on fast selection with that key. Read at launch.": {
       "comment": "Help for a config.toml setting",
       "localizations": {
@@ -53133,6 +53763,41 @@
         }
       }
     },
+    "The entry changed elsewhere and was skipped.": {
+      "comment": "Triage, when the entry was changed in another app or window",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Eintrag wurde anderswo geändert und übersprungen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La entrada cambió en otro lugar y se omitió."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'entrée a été modifiée ailleurs et a été ignorée."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "エントリがほかの場所で変更されたため、スキップしました。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A entrada mudou em outro lugar e foi pulada."
+          }
+        }
+      }
+    },
     "The entry is encrypted already": {
       "localizations": {
         "de": {
@@ -53406,6 +54071,41 @@
         }
       }
     },
+    "The first capture template files to the running clock; set triage-view in config.toml to triage a view.": {
+      "comment": "Triage, when the default capture template's target is the running clock",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die erste Erfassungsvorlage legt unter der laufenden Uhr ab; setze triage-view in config.toml, um eine Ansicht durchzugehen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La primera plantilla de captura guarda en el reloj en marcha; define triage-view en config.toml para revisar una vista."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le premier modèle de capture classe sous l'horloge en cours ; définissez triage-view dans config.toml pour trier une vue."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最初のキャプチャテンプレートは計測中のエントリに保存します。ビューをトリアージするには config.toml で triage-view を設定してください。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O primeiro modelo de captura arquiva no relógio em andamento; defina triage-view no config.toml para triar uma visão."
+          }
+        }
+      }
+    },
     "The folder and its files stay on disk.": {
       "localizations": {
         "de": {
@@ -53504,6 +54204,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "As pastas que a agenda mostra"
+          }
+        }
+      }
+    },
+    "The heading and every line under it are removed from the file. Undo puts them back.": {
+      "comment": "Triage's confirmation before it deletes an entry",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Überschrift und alle Zeilen darunter werden aus der Datei entfernt. Widerrufen stellt sie wieder her."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El encabezado y todas las líneas debajo se eliminan del archivo. Deshacer los restaura."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le titre et toutes les lignes en dessous sont retirés du fichier. Annuler les remet."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "見出しとその下のすべての行がファイルから削除されます。取り消すと元に戻ります。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O título e todas as linhas abaixo dele são removidos do arquivo. Desfazer os devolve."
           }
         }
       }
@@ -53676,6 +54411,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "A lista oferece palavras de arquivos abertos e pastas"
+          }
+        }
+      }
+    },
+    "The name of a view, from views.toml or built in, whose entries Triage goes through in its order. \"\" goes through the entries in the default capture template's target: the children of its headline or outline path, the top-level entries of its file, or the entries in its date tree.": {
+      "comment": "Help for a config.toml setting",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Name einer Ansicht, aus views.toml oder eingebaut, deren Einträge Triage in ihrer Reihenfolge durchgeht. \"\" geht die Einträge im Ziel der Standard-Erfassungsvorlage durch: die Unterpunkte ihrer Überschrift oder ihres Gliederungspfads, die Einträge der obersten Ebene ihrer Datei oder die Einträge in ihrem Datumsbaum."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El nombre de una vista, de views.toml o integrada, cuyas entradas recorre Triaje en su orden. \"\" recorre las entradas del destino de la plantilla de captura predeterminada: los hijos de su encabezado o ruta de esquema, las entradas de primer nivel de su archivo o las entradas de su árbol de fechas."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le nom d'une vue, de views.toml ou intégrée, dont le Tri parcourt les entrées dans son ordre. \"\" parcourt les entrées de la cible du modèle de capture par défaut : les enfants de son titre ou de son chemin de plan, les entrées de premier niveau de son fichier, ou les entrées de son arbre de dates."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トリアージがその順に処理する、views.toml または組み込みのビューの名前。\"\" はデフォルトのキャプチャテンプレートの保存先のエントリを処理します：見出しまたはアウトラインパスの子、ファイルの最上位のエントリ、または日付ツリー内のエントリです。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O nome de uma visão, do views.toml ou embutida, cujas entradas a Triagem percorre na sua ordem. \"\" percorre as entradas do destino do modelo de captura padrão: os filhos do seu título ou caminho de estrutura, as entradas de nível superior do seu arquivo ou as entradas da sua árvore de datas."
           }
         }
       }
@@ -54467,6 +55237,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Já existe uma visualização chamada %@."
+          }
+        }
+      }
+    },
+    "There is no capture template to triage.": {
+      "comment": "Triage, with no capture template",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Es gibt keine Erfassungsvorlage, deren Einträge Triage durchgehen könnte."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay ninguna plantilla de captura que revisar en Triaje."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il n'y a aucun modèle de capture à trier."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トリアージするキャプチャテンプレートがありません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não há modelo de captura para triar."
           }
         }
       }
@@ -55927,6 +56732,76 @@
         }
       }
     },
+    "Triage": {
+      "comment": "Opens Triage, which goes through captured entries one at a time",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sichten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Triaje"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tri"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トリアージ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Triagem"
+          }
+        }
+      }
+    },
+    "Triage…": {
+      "comment": "Opens Triage from the Weekly Review's inbox row",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sichten …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Triaje…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trier…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トリアージ…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Triagem…"
+          }
+        }
+      }
+    },
     "Truncate Long Lines": {
       "comment": "View menu toggle",
       "localizations": {
@@ -56373,6 +57248,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Desfazer"
+          }
+        }
+      }
+    },
+    "Undone": {
+      "comment": "Triage, after Undo",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widerrufen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deshecho"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Annulé"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取り消しました"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desfeito"
           }
         }
       }
@@ -66951,6 +67861,41 @@
         }
       }
     },
+    "the TODO keyword of the Weekly Review's waiting-for entries": {
+      "comment": "A config.toml setting, as its comment in the file describes it",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "das TODO-Schlüsselwort der wartenden Einträge im Weekly Review"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "la palabra clave TODO de las entradas en espera del Weekly Review"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "le mot-clé TODO des entrées en attente du Weekly Review"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weekly Review で待ち状態として一覧するエントリの TODO キーワード"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "a palavra-chave TODO das entradas em espera do Weekly Review"
+          }
+        }
+      }
+    },
     "the TODO list": {
       "comment": "A config.toml setting, as its comment in the file describes it",
       "localizations": {
@@ -68171,6 +69116,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "a etiqueta das entradas que Criptografar Entradas Etiquetadas criptografa"
+          }
+        }
+      }
+    },
+    "the view whose entries Triage goes through; \"\" for those in the default capture template's target": {
+      "comment": "A config.toml setting, as its comment in the file describes it",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "die Ansicht, deren Einträge Triage durchgeht; \"\" für die im Ziel der Standard-Erfassungsvorlage"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "la vista cuyas entradas recorre Triaje; \"\" para las del destino de la plantilla de captura predeterminada"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "la vue dont le Tri parcourt les entrées ; \"\" pour celles de la cible du modèle de capture par défaut"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トリアージで順に見るエントリのビュー。\"\" はデフォルトのキャプチャテンプレートの保存先のエントリ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "a visão cujas entradas a Triagem percorre; \"\" para as do destino do modelo de captura padrão"
           }
         }
       }

@@ -27,7 +27,7 @@ public enum OrgQL {
 
     public enum TagScope: Sendable { case both, local, inherited }
     public enum StampType: Sendable { case both, active, inactive }
-    public enum Planning: Sendable { case deadline, scheduled }
+    public enum Planning: Sendable { case deadline, scheduled, closed }
 
     /// A `:from`, `:to` or `:on` value: days from today, or a day with an optional time
     /// (seconds into the day).
@@ -58,6 +58,8 @@ public enum OrgQL {
         /// `(deadline auto)`: deadlines within their warning period, or past.
         case deadlineWarning
         case ts(StampType, DateRange)
+        /// A clock line in the entry whose time overlaps the range.
+        case clocked(DateRange)
         case heading([String])
         case property(String, value: String?, inherit: Bool?)
         case level(Int, Int)
@@ -68,14 +70,14 @@ public enum OrgQL {
     /// The predicate names read, aliases included.
     public static let supported: Set<String> = [
         "todo", "done", "tags", "tags-all", "tags&", "tags-local", "local-tags", "tags-l", "ltags", "tags-inherited", "inherited-tags",
-        "tags-i", "itags", "priority", "deadline", "scheduled", "ts", "ts-active", "ts-a", "ts-inactive", "ts-i", "heading", "h",
+        "tags-i", "itags", "priority", "deadline", "scheduled", "closed", "clocked", "ts", "ts-active", "ts-a", "ts-inactive", "ts-i", "heading", "h",
         "property", "level", "path", "habit",
     ]
 
     /// org-ql's other predicate names.
     static let unsupported: Set<String> = [
         "blocked", "category", "c", "effort", "heading-regexp", "h*", "link", "outline-path", "olp", "outline-path-segment", "olps",
-        "planning", "closed", "clocked", "regexp", "r", "rifle", "smart", "src", "tags-regexp", "tags*", "ancestors", "parent",
+        "planning", "regexp", "r", "rifle", "smart", "src", "tags-regexp", "tags*", "ancestors", "parent",
         "children", "descendants",
     ]
 
@@ -223,6 +225,10 @@ public enum OrgQL {
             return .planning(.deadline, try range(name, args, positional: true).range)
         case "scheduled":
             return .planning(.scheduled, try range(name, args, positional: true).range)
+        case "closed":
+            return .planning(.closed, try range(name, args, positional: false).range)
+        case "clocked":
+            return .clocked(try range(name, args, positional: false).range)
         case "ts", "ts-active", "ts-a", "ts-inactive", "ts-i":
             var (range, type) = try range(name, args, positional: false)
             if ["ts-active", "ts-a"].contains(name) { type = .active }
@@ -433,6 +439,21 @@ public enum OrgQL {
         }
     }
 
+    static let clockRegex = try! NSRegularExpression(pattern: "^[ \\t]*CLOCK:[ \\t]*\\[([^\\]\\n]+)\\](?:--\\[([^\\]\\n]+)\\])?", options: .anchorsMatchLines)
+
+    /// The clock lines in the entry of heading `index`, to the next heading: when each started
+    /// and ended. A running clock ends where it started.
+    static func clocks(_ source: AgendaSource, _ index: Int) -> [(start: Instant, end: Instant)] {
+        let ns = source.text as NSString
+        let start = source.headings[index].start
+        let end = index + 1 < source.headings.count ? source.headings[index + 1].start : ns.length
+        return clockRegex.matches(in: source.text, range: NSRange(location: start, length: end - start)).compactMap { m in
+            guard let begin = instant(ns.substring(with: m.range(at: 1))) else { return nil }
+            let finish = m.range(at: 2).location == NSNotFound ? nil : instant(ns.substring(with: m.range(at: 2)))
+            return (begin, finish ?? begin)
+        }
+    }
+
     /// The heading's text without stars, TODO keyword and tags (`org-get-heading t t`).
     static func headingText(_ heading: AgendaSource.Heading) -> String {
         var text = heading.head
@@ -472,8 +493,19 @@ public enum OrgQL {
             if let comparator, let letter = letters.first { return comparator.test(priorityValue(priority), priorityValue(letter)) }
             return letters.isEmpty || letters.contains(priority)
         case .planning(let kind, let range):
-            guard let raw = (kind == .deadline ? heading.deadline : heading.scheduled)?.raw, let instant = instant(raw) else { return false }
+            let raw: String? = switch kind {
+            case .deadline: heading.deadline?.raw
+            case .scheduled: heading.scheduled?.raw
+            case .closed: heading.planning["CLOSED"].map { String($0.dropFirst().dropLast()) }
+            }
+            guard let raw, let instant = instant(raw) else { return false }
             return inRange(instant, range, today: context.today)
+        case .clocked(let range):
+            return clocks(source, index).contains { clock in
+                if let from = range.from, clock.end.seconds < Self.from(from, today: context.today) { return false }
+                if let to = range.to, clock.start.seconds > Self.to(to, today: context.today) { return false }
+                return true
+            }
         case .deadlineWarning:
             guard let raw = heading.deadline?.raw, let day = Days.absolute(of: raw) else { return false }
             return day - Days.warningDays(raw, delay: false, defaultDays: context.deadlineWarningDays) <= context.today

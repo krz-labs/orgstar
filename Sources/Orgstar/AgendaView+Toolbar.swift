@@ -72,6 +72,8 @@ extension AgendaView {
                 }
             }
             if workspace.rootPaths.count > 1 || hidesFolders { foldersMenu }
+            Button("Triage", systemImage: "tray.and.arrow.down") { openTriage() }
+                .help("Go through captured entries one at a time")
             Menu {
                 Button("Filter…") { askFilter("/") }
                 Button("By Tag…") { askFilter("\\") }
@@ -252,6 +254,43 @@ extension AgendaView {
                 message = "\(error)"
             }
         }
+    }
+
+    // MARK: - Triage
+
+    /// The view shown has `triage = true`, as the Weekly Review does.
+    var linksTriage: Bool { views.first { $0.name == viewName }?.triage == true }
+
+    /// The row a view with `triage = true` starts with: what is waiting, and Triage.
+    var triageLink: some View {
+        Button { openTriage() } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "tray.and.arrow.down")
+                if let triage, triage.problem == nil {
+                    Text("Inbox: \(triage.remaining) entries to triage")
+                } else {
+                    Text("Inbox")
+                }
+                Spacer()
+                Text("Triage…").foregroundStyle(Color.accentColor)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .help("Go through captured entries one at a time")
+    }
+
+    func loadTriage() async {
+        let queue = triage ?? TriageModel(session: session, workspace: workspace)
+        triage = queue
+        await queue.load(views: views, templates: CaptureTemplates.load().templates, agenda: agenda)
+    }
+
+    func openTriage() {
+        Task { await loadTriage() }
+        showingTriage = true
     }
 
     func loadViews() {
