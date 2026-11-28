@@ -61,6 +61,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions options: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         UNUserNotificationCenter.current().delegate = self
+        SystemReminderCenter.registerCategories()
         return true
     }
 
@@ -72,10 +73,15 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
         return [.banner, .sound, .list]
     }
 
+    /// A tap opens the entry. An action runs in the background; when it can't be done, a
+    /// notification says why, and tapping that opens the file.
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
-        let info = response.notification.request.content.userInfo
-        guard let path = info["path"] as? String, let offset = info["offset"] as? Int else { return }
-        await MainActor.run { model?.openRequest = .offset(path, offset) }
+        guard case let (reminder, action)? = SystemReminderCenter.reminder(of: response) else { return }
+        guard let action else {
+            await MainActor.run { model?.openRequest = .offset(reminder.path, reminder.offset) }
+            return
+        }
+        await MobileModel.shared.runReminderAction(action, on: reminder)
     }
 }
 

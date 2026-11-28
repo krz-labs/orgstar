@@ -333,6 +333,22 @@ final class MobileModel {
         await scheduler.reconcile(reminders)
     }
 
+    /// A reminder notification's action, which may run with the app in the background. iOS
+    /// can't bring the app forward from there, so when the entry is gone a notification offers
+    /// its file instead.
+    func runReminderAction(_ action: ReminderAction, on reminder: Reminder) async {
+        let center = SystemReminderCenter()
+        var actions = ReminderActions(center: center, session: session, clock: clock)
+        actions.paths = { [weak self] in self?.workspace?.files.filter { $0.kind == .org }.map(\.path) ?? [] }
+        let outcome = await actions.run(action, on: reminder)
+        if let notice = ReminderActions.notice(outcome, for: reminder) { try? await center.add(notice) }
+        guard outcome == .changed else { return }
+        LiveClock.publish(clock)
+        await LiveClock.sync(clock.running)
+        await updateReminders()
+        await updateWidgets()
+    }
+
     /// The widgets' agenda: today and the next days in the app group's container, with the
     /// widgets reloaded when it changed; their habits and capture templates; and the icon's
     /// overdue badge.

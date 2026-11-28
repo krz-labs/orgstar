@@ -306,7 +306,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         DockIcon.start()
-        if SystemReminderCenter.isAvailable { UNUserNotificationCenter.current().delegate = self }
+        if SystemReminderCenter.isAvailable {
+            UNUserNotificationCenter.current().delegate = self
+            SystemReminderCenter.registerCategories()
+        }
         #if !APPSTORE
         updates.start()
         #endif
@@ -333,14 +336,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         [.banner, .sound, .list]
     }
 
-    /// Clicking a reminder shows its entry.
+    /// Clicking a reminder shows its entry. Its actions run without bringing orgstar forward;
+    /// when the entry is gone, its file opens instead, and other failures post a notification.
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
-        let info = response.notification.request.content.userInfo
-        guard let path = info["path"] as? String, let offset = info["offset"] as? Int else { return }
-        await MainActor.run {
-            NSApp.activate()
-            commands?.jump(path: path, offset: offset)
-        }
+        guard case let (reminder, action)? = SystemReminderCenter.reminder(of: response) else { return }
+        if let action { await run(action, on: reminder) } else { await show(reminder.path, at: reminder.offset) }
+    }
+
+    /// Set with the main window.
+    var reminderActions: ReminderActions?
+
+    private func run(_ action: ReminderAction, on reminder: Reminder) async {
+        guard let reminderActions else { return show(reminder.path, at: reminder.offset) }
+        let outcome = await reminderActions.run(action, on: reminder)
+        if outcome == .notFound { return show(reminder.path, at: 0) }
+        if let notice = ReminderActions.notice(outcome, for: reminder) { try? await reminderActions.center.add(notice) }
+    }
+
+    private func show(_ path: String, at offset: Int) {
+        NSApp.activate()
+        commands?.jump(path: path, offset: offset)
     }
 
     /// Files opened from Finder, `open`, or a drop on the Dock icon: each opens as a buffer.
@@ -630,6 +645,11 @@ struct OrgstarApp: App {
                         session.fileWritten = { GitAutoCommit.shared.fileWritten($0) }
                         #endif
                         CaptureIntent.environment = (model, session, clock, commands)
+                        if SystemReminderCenter.isAvailable {
+                            var actions = ReminderActions(center: SystemReminderCenter(), session: session, clock: clock)
+                            actions.paths = { model.files.filter { $0.kind == .org }.map(\.path) }
+                            delegate.reminderActions = actions
+                        }
                         var runner = XCallbackRunner(workspace: model, session: session, clock: clock)
                         runner.clipboard = { NSPasteboard.general.string(forType: .string) ?? "" }
                         runner.userName = NSFullUserName()

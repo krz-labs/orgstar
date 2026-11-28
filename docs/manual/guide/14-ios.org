@@ -413,6 +413,8 @@ See [[file:06-dates-and-clocking.org][Dates and clocking]].
 
 With =reminders= on, orgstar schedules a notification before each timed agenda entry in the next week, =appt-message-warning-time= minutes ahead (or the entry's =APPT_WARNTIME=). Tap a notification to open its entry. Notifications show while the app is open too.
 
+Touch and hold a notification, or swipe it left and tap Options, for its actions: Mark Done (for an entry with a TODO keyword), Snooze 10 Minutes, Snooze 1 Hour, Snooze Until Tomorrow, and Clock In. They do what they do on the Mac (see Notifications in [[file:06-dates-and-clocking.org][Dates and clocking]]), with orgstar in the background: the file is changed and saved without the app opening. Snooze moves only the notification unless =reminders-snooze-timestamp= is on, which moves the entry's timestamp. iOS doesn't let an action open the app, so when the entry has changed or gone, or an action can't be done, a new notification says so; tap it to open the file. Notifications mirrored to an Apple Watch show the same actions, which run on your iPhone.
+
 iOS lets an app schedule at most 64 notifications, and orgstar schedules more only while it runs. It updates them when files or settings change, when you return to the app, and every hour while it is open. The agenda's status line says how far ahead notifications are set ("Notifications are set through …"), or that notifications are off for orgstar in the system Settings app.
 
 The app icon's badge counts the entries in the agenda's Overdue section that aren't done: past their scheduled day or their deadline, habits left out. An entry past both counts once. orgstar sets each of the next six midnights' counts ahead, so the badge stays right while the app is closed. If notifications were allowed before orgstar asked for badges, tap Show Overdue Count on Icon under Badge in orgstar's Settings; it adds Badges to orgstar's notification settings and opens them when they're still off. Turn the badge off there, under Badges.
@@ -563,7 +565,7 @@ These settings from =config.toml= apply on iOS:
 - =electric-pair-mode=, =spell-check=, =auto-fill-mode=
 - =org-agenda-span=, =org-agenda-start-day=, =org-agenda-start-on-weekday=, =org-deadline-warning-days=, =agenda-include-subfolders=, =agenda-exclude-archives=, =org-agenda-show-all-dates=, =org-agenda-skip-scheduled-if-done=, =org-agenda-skip-deadline-if-done=, =org-habit-show-habits-only-for-today=, =org-agenda-search-view-always-boolean=, =org-agenda-search-view-force-full-words=, =org-agenda-log-mode-items=, the =org-agenda-todo-ignore-= settings, =org-agenda-tags-todo-honor-ignore-options=
 - =calendar-events=, =calendar-event-calendars=, =agenda-reminders=, =agenda-reminder-lists=, =agenda-contact-dates=
-- =reminders=, =appt-message-warning-time=
+- =reminders=, =reminders-snooze-timestamp=, =appt-message-warning-time=
 - =org-clock-history-length=, =org-clock-into-drawer=, =org-clock-rounding-minutes=, =org-clock-out-remove-zero-time-clocks=, =org-clock-in-switch-to-state=, =org-clock-out-when-done=, =org-clock-idle-time=
 - =org-icalendar-combined-agenda-file= (its name) and the other =org-icalendar-= settings, =[[publish]]=
 

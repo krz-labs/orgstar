@@ -29,9 +29,11 @@ public final class ReminderScheduler {
     private let center: ReminderCenter
     /// What this run set; one no longer pending has fired and isn't set again.
     private var scheduled: Set<String> = []
+    private let handled: HandledReminders
 
-    public init(center: ReminderCenter) {
+    public init(center: ReminderCenter, handled: HandledReminders = HandledReminders()) {
         self.center = center
+        self.handled = handled
     }
 
     /// Adds reminders that are new, removes ours that no longer apply, leaves the rest.
@@ -42,6 +44,9 @@ public final class ReminderScheduler {
             return
         }
         let wanted = Set(reminders.map(\.id))
+        handled.keep(wanted)
+        let acted = handled.ids
+        let reminders = reminders.filter { !acted.contains($0.id) }
         let pending = Set(await center.pendingIDs().filter { $0.hasPrefix("orgstar.") })
         let stale = pending.subtracting(wanted)
         if !stale.isEmpty { center.remove(Array(stale)) }
@@ -64,6 +69,29 @@ public final class ReminderScheduler {
     }
 }
 
+/// Reminders acted on from their notification, by identifier. One isn't set again while it
+/// applies, though its notification has gone from Notification Center.
+public struct HandledReminders: @unchecked Sendable {
+    private let defaults: UserDefaults
+    private static let key = "handledReminders"
+
+    public init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+    }
+
+    public var ids: Set<String> { Set(defaults.stringArray(forKey: Self.key) ?? []) }
+
+    public func insert(_ id: String) {
+        defaults.set(Array(ids.union([id])).sorted(), forKey: Self.key)
+    }
+
+    /// Forgets the ones not in `current`.
+    func keep(_ current: Set<String>) {
+        let kept = ids.intersection(current)
+        if kept != ids { defaults.set(Array(kept).sorted(), forKey: Self.key) }
+    }
+}
+
 #if canImport(UserNotifications)
 /// `UNUserNotificationCenter`. Only usable from an app bundle.
 public struct SystemReminderCenter: ReminderCenter {
@@ -71,6 +99,24 @@ public struct SystemReminderCenter: ReminderCenter {
 
     /// The system center needs a bundle identifier; a bare debug binary has none.
     public static var isAvailable: Bool { Bundle.main.bundleIdentifier != nil }
+
+    /// Registers reminders' actions, which run in the background.
+    public static func registerCategories() {
+        let categories = [ReminderAction.todoCategory, ReminderAction.entryCategory].map { category in
+            UNNotificationCategory(identifier: category, actions: ReminderAction.actions(in: category).map {
+                UNNotificationAction(identifier: $0.rawValue, title: $0.title, options: [])
+            }, intentIdentifiers: [])
+        }
+        UNUserNotificationCenter.current().setNotificationCategories(Set(categories))
+    }
+
+    /// The reminder `response` is for, and the action chosen; nil action for a tap.
+    public static func reminder(of response: UNNotificationResponse) -> (Reminder, ReminderAction?)? {
+        let request = response.notification.request
+        guard let reminder = Reminder(identifier: request.identifier, title: request.content.title, body: request.content.body,
+                                      userInfo: request.content.userInfo) else { return nil }
+        return (reminder, ReminderAction(rawValue: response.actionIdentifier))
+    }
 
     public func authorize() async -> Bool {
         let center = UNUserNotificationCenter.current()
@@ -98,7 +144,8 @@ public struct SystemReminderCenter: ReminderCenter {
         content.title = reminder.title
         content.body = reminder.body
         content.sound = .default
-        content.userInfo = ["path": reminder.path, "offset": reminder.offset]
+        content.userInfo = reminder.userInfo
+        if let category = ReminderAction.category(for: reminder) { content.categoryIdentifier = category }
         if let folder = reminder.folder { content.filterCriteria = folder }
         let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: reminder.fireDate)
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)

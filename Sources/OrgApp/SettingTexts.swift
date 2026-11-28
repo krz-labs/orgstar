@@ -19,6 +19,7 @@ enum SettingTexts {
         String(localized: "a heading in the project with one of these tags unsticks it; * for any tag", comment: "A config.toml setting, as its comment in the file describes it"),
         String(localized: "a journal entry's title; a format-time-string format", comment: "A config.toml setting, as its comment in the file describes it"),
         String(localized: "a monospaced font family; \"\" for the system's", comment: "A config.toml setting, as its comment in the file describes it"),
+        String(localized: "a notification's Snooze moves the entry's timestamp in the file, not only the notification", comment: "A config.toml setting, as its comment in the file describes it"),
         String(localized: "a tab for each open buffer above the editor (View ▸ Show Tab Bar)", comment: "A config.toml setting, as its comment in the file describes it"),
         String(localized: "a target typed as parent/new adds the heading: t, confirm (asks first) or nil", comment: "A config.toml setting, as its comment in the file describes it"),
         String(localized: "a theme in its own file in this folder, under the colors set here; colors: see default-theme.toml", comment: "A config.toml setting, as its comment in the file describes it"),

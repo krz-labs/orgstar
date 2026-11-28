@@ -565,6 +565,14 @@ orgstar can post a macOS notification before entries that have a time of day, as
 - At most 64 notifications are pending at a time, the earliest first.
 - The notification shows the entry's text, its time, and its category. Clicking it opens the entry. Notifications also show while orgstar is the active app.
 
+A notification for an entry under a heading has actions, under its Options button or when you hold the pointer over it. They run without bringing orgstar forward:
+
+- Mark Done :: only for an entry with a TODO keyword. Sets the entry's first done keyword as the agenda's Mark Done does: a repeating entry moves to its next date, and =org-log-done=, =org-log-repeat= and the =after-todo-state-change= hooks apply. A note the logging would ask for is left empty, and a hook from a file not trusted on this Mac is skipped.
+- Snooze 10 Minutes, Snooze 1 Hour, Snooze Until Tomorrow :: the notification comes again that much later (tomorrow at the same time). The file doesn't change. With =reminders-snooze-timestamp= set to =true= under =[orgstar]=, Snooze moves the entry's timestamp instead, as =S-up= on its time would, a time range's end with it (the next day for Until Tomorrow), and a new notification follows from the new time. A date range keeps the notification-only snooze.
+- Clock In :: clocks in to the entry. Dangling clocks are left as they are; orgstar asks about them at the next clock-in from the app.
+
+A changed file is saved at once. When the entry's heading line has changed or the entry has gone, orgstar opens its file instead. When an action can't be done, a notification says why.
+
 orgstar updates the notifications a couple of seconds after you stop editing, when files change, and every hour. The agenda window shows how far ahead notifications are set. Notifications already set still arrive after you quit orgstar; changes to your files are taken into account the next time it runs.
 
 Turn notifications on or off, and set the lead time from 0 to 120 minutes, in Settings ▸ Agenda; in =config.toml= the keys are =reminders= under =[orgstar]= (default =true=) and =appt-message-warning-time=. The first time, macOS asks whether orgstar may post notifications; if you decline, the agenda says so, and you can change it in System Settings ▸ Notifications. The iOS app's notifications are described in [[file:14-ios.org][iOS]].
