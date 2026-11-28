@@ -4555,6 +4555,40 @@
         }
       }
     },
+    "A month grid of your agenda; drag an entry to another day to reschedule it.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Monatsraster Ihrer Agenda; ziehen Sie einen Eintrag auf einen anderen Tag, um ihn zu verschieben."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una cuadrícula mensual de tu agenda; arrastra una entrada a otro día para reprogramarla."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une grille mensuelle de votre agenda ; faites glisser une entrée sur un autre jour pour la replanifier."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アジェンダを月のグリッドで表示します。項目を別の日にドラッグすると日付を変更できます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uma grade mensal da sua agenda; arraste um item para outro dia para reagendá-lo."
+          }
+        }
+      }
+    },
     "A name without an extension gets .org.": {
       "localizations": {
         "de": {
@@ -5954,6 +5988,40 @@
         }
       }
     },
+    "Agenda row actions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktionen in Agenda-Zeilen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acciones en filas de la agenda"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actions des lignes de l’agenda"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アジェンダの行のアクション"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ações nas linhas da agenda"
+          }
+        }
+      }
+    },
     "Agenda shows %lld days": {
       "localizations": {
         "de": {
@@ -6184,6 +6252,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "A agenda começa hoje"
+          }
+        }
+      }
+    },
+    "Agenda views and org-ql blocks with org-ql's query syntax.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agenda-Ansichten und org-ql-Blöcke mit der Abfragesyntax von org-ql."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vistas de agenda y bloques org-ql con la sintaxis de consultas de org-ql."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vues d’agenda et blocs org-ql avec la syntaxe de requête d’org-ql."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "org-ql のクエリ構文によるアジェンダビューと org-ql ブロック。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visualizações de agenda e blocos org-ql com a sintaxe de consulta do org-ql."
           }
         }
       }
@@ -8806,6 +8908,74 @@
         }
       }
     },
+    "Birthdays": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geburtstage"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cumpleaños"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anniversaires"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "誕生日"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aniversários"
+          }
+        }
+      }
+    },
+    "Birthdays and other dates from Contacts in the agenda, if you turn it on.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geburtstage und andere Daten aus Kontakte in der Agenda, wenn Sie es einschalten."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cumpleaños y otras fechas de Contactos en la agenda, si lo activas."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anniversaires et autres dates de Contacts dans l’agenda, si vous l’activez."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オンにすると、連絡先の誕生日やその他の日付がアジェンダに表示されます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aniversários e outras datas dos Contatos na agenda, se você ativar."
+          }
+        }
+      }
+    },
     "Birthdays, anniversaries and other dates on your contacts show in the agenda read-only, with the years since when the year is known; double-click one to open the contact.": {
       "localizations": {
         "de": {
@@ -11417,6 +11587,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Verificar Ortografia ao Digitar"
+          }
+        }
+      }
+    },
+    "Check off entries and habits from widgets and Apple Watch without opening orgstar.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haken Sie Einträge und Gewohnheiten in Widgets und auf der Apple Watch ab, ohne orgstar zu öffnen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marca entradas y hábitos desde los widgets y el Apple Watch sin abrir orgstar."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cochez des entrées et des habitudes depuis les widgets et l’Apple Watch sans ouvrir orgstar."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar を開かずに、ウィジェットや Apple Watch から項目や習慣を完了にできます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marque itens e hábitos nos widgets e no Apple Watch sem abrir o orgstar."
           }
         }
       }
@@ -23409,6 +23613,40 @@
         }
       }
     },
+    "Go through your inbox one entry at a time, and review the week in one view.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gehen Sie Ihren Eingang Eintrag für Eintrag durch und blicken Sie in einer Ansicht auf die Woche zurück."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisa tu bandeja de entrada entrada por entrada y repasa la semana en una sola vista."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parcourez votre boîte de réception une entrée à la fois et passez la semaine en revue dans une seule vue."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "受信箱の項目を1件ずつ処理し、1つのビューで1週間を振り返ります。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Percorra sua caixa de entrada um item por vez e revise a semana em uma única visualização."
+          }
+        }
+      }
+    },
     "Go to Clocked Entry": {
       "comment": "Command title",
       "localizations": {
@@ -28453,6 +28691,40 @@
         }
       }
     },
+    "Lay out a day or week by time, drag entries to move or resize them, and drop undated TODOs onto it to schedule them.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ordnen Sie einen Tag oder eine Woche nach Uhrzeit an, ziehen Sie Einträge, um sie zu verschieben oder ihre Dauer zu ändern, und legen Sie TODOs ohne Datum darauf ab, um sie zu planen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Organiza un día o una semana por horas, arrastra entradas para moverlas o cambiar su duración y suelta en ella TODOs sin fecha para programarlos."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disposez une journée ou une semaine selon l’heure, faites glisser des entrées pour les déplacer ou changer leur durée, et déposez-y des TODO sans date pour les planifier."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1日または1週間を時刻順に並べ、項目をドラッグして移動や長さの変更ができます。日付のない TODO をドロップすると予定に入ります。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Organize um dia ou uma semana por horário, arraste itens para movê-los ou mudar sua duração e solte TODOs sem data nela para agendá-los."
+          }
+        }
+      }
+    },
     "Layout": {
       "comment": "Key bar settings: which list of buttons, iPhone or iPad",
       "localizations": {
@@ -30558,6 +30830,40 @@
         }
       }
     },
+    "Mark Done, snooze or clock in straight from a reminder.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Direkt aus einer Erinnerung erledigen, später erinnern oder die Zeiterfassung starten."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marca como hecho, pospón o inicia el reloj directamente desde un recordatorio."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marquez comme fait, reportez ou démarrez le chronomètre directement depuis un rappel."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リマインダーから直接、完了、スヌーズ、クロック開始ができます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marque como feito, adie ou inicie o relógio direto de um lembrete."
+          }
+        }
+      }
+    },
     "Mark Subtree": {
       "comment": "Command title",
       "localizations": {
@@ -30624,6 +30930,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Marcar como Tarefa Padrão de Registro de Tempo"
+          }
+        }
+      }
+    },
+    "Mark done, reschedule and refile from an agenda row's swipe or menu.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erledigen, verschieben und umlegen über Wischen oder das Menü einer Agenda-Zeile."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marca como hecho, reprograma y reubica desde el deslizamiento o el menú de una fila de la agenda."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marquez comme fait, replanifiez et reclassez depuis le balayage ou le menu d’une ligne de l’agenda."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アジェンダの行のスワイプやメニューから、完了、日付変更、移動ができます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marque como feito, reagende e mova pelo gesto de deslizar ou pelo menu de uma linha da agenda."
           }
         }
       }
@@ -30896,6 +31236,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fórmulas matemáticas em PDFs"
+          }
+        }
+      }
+    },
+    "Menu bar": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menüleiste"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barra de menús"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barre des menus"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メニューバー"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barra de menus"
           }
         }
       }
@@ -31274,6 +31648,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mês em grade"
+          }
+        }
+      }
+    },
+    "Month grid": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Monatsraster"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuadrícula mensual"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grille du mois"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "月のグリッド"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grade do mês"
           }
         }
       }
@@ -41437,6 +41845,40 @@
         }
       }
     },
+    "Queries": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abfragen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consultas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Requêtes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クエリ"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consultas"
+          }
+        }
+      }
+    },
     "Query…": {
       "localizations": {
         "de": {
@@ -42773,6 +43215,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Lembrete"
+          }
+        }
+      }
+    },
+    "Reminder actions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktionen in Erinnerungen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acciones de recordatorios"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actions des rappels"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リマインダーのアクション"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ações dos lembretes"
           }
         }
       }
@@ -55204,6 +55680,40 @@
         }
       }
     },
+    "The running clock in the menu bar, today's entries with Done and Clock In, and a capture field.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die laufende Zeiterfassung in der Menüleiste, die heutigen Einträge mit Erledigt und Zeiterfassung starten, und ein Erfassungsfeld."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El reloj en marcha en la barra de menús, las entradas de hoy con Hecho e Iniciar reloj, y un campo de captura."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le chronomètre en cours dans la barre des menus, les entrées du jour avec Fait et Démarrer le chronomètre, et un champ de capture."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メニューバーに実行中のクロック、完了とクロック開始ができる今日の項目、キャプチャ欄を表示します。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O relógio em andamento na barra de menus, os itens de hoje com Feito e Iniciar relógio, e um campo de captura."
+          }
+        }
+      }
+    },
     "The table was recalculated up to %@, which can't be calculated here: %@.": {
       "comment": "Table formulas orgstar calculated up to one it can't",
       "localizations": {
@@ -57139,6 +57649,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Triagem"
+          }
+        }
+      }
+    },
+    "Triage and weekly review": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sichtung und Wochenrückblick"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clasificación y revisión semanal"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tri et revue hebdomadaire"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仕分けと週次レビュー"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Triagem e revisão semanal"
           }
         }
       }
@@ -59729,6 +60273,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Desfazer Restrição"
+          }
+        }
+      }
+    },
+    "Widgets and the watch": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widgets und die Watch"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widgets y el reloj"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widgets et la montre"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ウィジェットと Apple Watch"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widgets e o relógio"
           }
         }
       }

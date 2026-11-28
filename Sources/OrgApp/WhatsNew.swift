@@ -38,6 +38,24 @@ public enum WhatsNew {
 
     /// Newest first. A version without an entry shows nothing.
     public static let releases: [ReleaseNotes] = [
+        ReleaseNotes(version: "1.7.0", items: [
+            .init("calendar.day.timeline.left", "Timeline",
+                  "Lay out a day or week by time, drag entries to move or resize them, and drop undated TODOs onto it to schedule them."),
+            .init("calendar", "Month grid",
+                  "A month grid of your agenda; drag an entry to another day to reschedule it."),
+            .init("tray.full", "Triage and weekly review",
+                  "Go through your inbox one entry at a time, and review the week in one view."),
+            .init("line.3.horizontal.decrease.circle", "Queries",
+                  "Agenda views and org-ql blocks with org-ql's query syntax."),
+            .init("bell.badge", "Reminder actions",
+                  "Mark Done, snooze or clock in straight from a reminder."),
+            .init("hand.draw", "Agenda row actions",
+                  "Mark done, reschedule and refile from an agenda row's swipe or menu."),
+            .init("checkmark.circle", "Widgets and the watch",
+                  "Check off entries and habits from widgets and Apple Watch without opening orgstar."),
+            .init("gift", "Birthdays",
+                  "Birthdays and other dates from Contacts in the agenda, if you turn it on."),
+        ] + mac17),
         ReleaseNotes(version: "1.6.0", items: [
             .init("slider.horizontal.3", "All Settings",
                   "Every config.toml option in one searchable list, with a control for each, an explanation of what it does, and reset to the default."),
@@ -141,6 +159,7 @@ public enum WhatsNew {
     ]
     private static let mac13: [ReleaseNotes.Item] = []
     private static let mac14: [ReleaseNotes.Item] = []
+    private static let mac17: [ReleaseNotes.Item] = []
     #else
     private static let ios: [ReleaseNotes.Item] = []
     private static let ios13: [ReleaseNotes.Item] = []
@@ -148,6 +167,10 @@ public enum WhatsNew {
         ReleaseNotes.Item("record.circle", "Keyboard macros",
                           "Record and replay keyboard macros in the Emacs and Mac presets; named ones are kept across restarts."),
         ReleaseNotes.Item("command", "Command palette", "Recent commands come first, and the ones you use most rank higher."),
+    ]
+    private static let mac17 = [
+        ReleaseNotes.Item("menubar.rectangle", "Menu bar",
+                          "The running clock in the menu bar, today's entries with Done and Clock In, and a capture field."),
     ]
     private static let mac14 = [
         ReleaseNotes.Item("square.and.arrow.down", "Import Markdown and Obsidian",
