@@ -41488,36 +41488,36 @@
         }
       }
     },
-    "Reporting an issue needs a gitbay account. Without one, email %@.": {
+    "Reporting an issue needs a GitHub account. Without one, email %@.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zum Melden eines Problems brauchst du ein gitbay-Konto. Ohne eins schreib an %@."
+            "value": "Zum Melden eines Problems brauchst du ein GitHub-Konto. Ohne eins schreib an %@."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Para informar de un problema necesitas una cuenta de gitbay. Si no tienes una, escribe a %@."
+            "value": "Para informar de un problema necesitas una cuenta de GitHub. Si no tienes una, escribe a %@."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Signaler un problème nécessite un compte gitbay. Sinon, écrivez à %@."
+            "value": "Signaler un problème nécessite un compte GitHub. Sinon, écrivez à %@."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "問題を報告するにはgitbayアカウントが必要です。アカウントがない場合は%@にメールしてください。"
+            "value": "問題を報告するにはGitHubアカウントが必要です。アカウントがない場合は%@にメールしてください。"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Para relatar um problema, é preciso uma conta no gitbay. Sem uma, envie um e-mail para %@."
+            "value": "Para relatar um problema, é preciso uma conta no GitHub. Sem uma, envie um e-mail para %@."
           }
         }
       }

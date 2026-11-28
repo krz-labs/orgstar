@@ -34,7 +34,7 @@ and the other way round. The same tab has tips, which unlock nothing.
 ** With Homebrew
 
 #+BEGIN_SRC sh
-brew tap krz/tap https://gitbay.org/krz/homebrew-tap.git
+brew tap krz-labs/tap
 brew install --cask orgstar
 #+END_SRC
 

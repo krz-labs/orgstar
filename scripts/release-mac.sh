@@ -1,7 +1,7 @@
 #!/bin/sh
 # Builds, signs, notarizes and publishes a Mac release: a universal orgstar.app in a DMG,
-# copied to files.krz.sh/orgstar/ (and the tag's gitbay release), and the cask in
-# krz/homebrew-tap updated.
+# copied to files.krz.sh/orgstar/ (and the tag's GitHub release), and the cask in
+# krz-labs/homebrew-tap updated.
 # Usage: scripts/release-mac.sh <version>   e.g. 0.2.0, for the tag v0.2.0 on HEAD
 #   ORGSTAR_SIGN     Developer ID Application identity (default: the keychain's only one)
 #   ORGSTAR_NOTARY   notarytool keychain profile (default: orgstar)
@@ -11,12 +11,12 @@
 #   ORGSTAR_PUBLISH  0 builds and notarizes without tagging, uploading or touching the tap
 #   ORGSTAR_NOTES    an HTML file of release notes for the appcast entry, which Sparkle's
 #                    update window shows; the platform line is added after it
-#   ORGSTAR_RELEASE_NOTES  a Markdown file of release notes for the gitbay release
+#   ORGSTAR_RELEASE_NOTES  a Markdown file of release notes for the GitHub release
 #   ORGSTAR_ED_PUBLIC_KEY  the Sparkle public key (default: the one whose private half is in the
 #                    release Mac's login keychain, from generate_keys); passed on to build-app.sh
 #
 # Updates: after the DMG is uploaded, the release goes into docs/manual/appcast.xml through a
-# merge request on main, and the manual is published, which serves the appcast.
+# pull request on main, and the manual is published, which serves the appcast.
 set -eu
 
 cd "$(dirname "$0")/.."
@@ -86,15 +86,15 @@ fi
 git tag -s "$tag" -m "orgstar $version"
 git push origin "$tag"
 if [ -n "${ORGSTAR_RELEASE_NOTES:-}" ]; then
-    { cat "$ORGSTAR_RELEASE_NOTES"; printf '\n%s\n' "$notes"; } | gitbay release create krz/orgstar "$tag" --title "orgstar $version" --file -
+    { cat "$ORGSTAR_RELEASE_NOTES"; printf '\n%s\n' "$notes"; } > "$out/release-notes.md"
 else
-    gitbay release create krz/orgstar "$tag" --title "orgstar $version" --notes "$notes"
+    printf '%s\n' "$notes" > "$out/release-notes.md"
 fi
-gitbay release asset add krz/orgstar "$tag" "orgstar-$version.dmg" < "$dmg"
+gh release create "$tag" --repo krz-labs/orgstar --verify-tag --title "orgstar $version" --notes-file "$out/release-notes.md" "$dmg"
 # The public download, which the appcast and the cask point at.
 rsync -a "$dmg" "$files/"
 
-# The appcast goes in through a merge request, as every change to main does, after the DMG
+# The appcast goes in through a pull request, as every change to main does, after the DMG
 # it points at is up; then the manual, which serves it, is published.
 branch="appcast-$version"
 git switch -q -c "$branch"
@@ -102,15 +102,15 @@ sh scripts/appcast-add.sh docs/manual/appcast.xml "$version" "$build" "$dmg" "$o
 git add docs/manual/appcast.xml
 git commit -q -m "Appcast for $version"
 git push -q -u origin "$branch"
-mr="$(gitbay mr create --source "$branch" --target main --title "Appcast for $version" --body "Sparkle entry for orgstar $version." --json | sed -n 's/.*"number":\([0-9]*\).*/\1/p')"
-gitbay mr merge "$mr" --strategy ff
+gh pr create --repo krz-labs/orgstar --base main --head "$branch" --title "Appcast for $version" --body "Sparkle entry for orgstar $version."
+gh pr merge "$branch" --repo krz-labs/orgstar --rebase
 git switch -q main
 git pull -q --ff-only
 git branch -d "$branch"
 git push -q origin --delete "$branch"
 sh scripts/publish-docs.sh
 
-# The cask goes in through a merge request, as every change to the tap's main does.
+# The cask goes in through a pull request, as every change to the tap's main does.
 branch="orgstar-$version"
 git -C "$tap" switch -q main
 git -C "$tap" pull -q --ff-only
@@ -119,10 +119,10 @@ sed -e "s/@VERSION@/$version/" -e "s/@SHA256@/$sha/" packaging/orgstar.rb > "$ta
 git -C "$tap" add Casks/orgstar.rb
 git -C "$tap" commit -q -m "orgstar $version"
 git -C "$tap" push -q -u origin "$branch"
-mr="$(cd "$tap" && gitbay mr create --source "$branch" --target main --title "orgstar $version" --body "Cask for orgstar $version." --json | sed -n 's/.*"number":\([0-9]*\).*/\1/p')"
-(cd "$tap" && gitbay mr merge "$mr" --strategy ff)
+gh pr create --repo krz-labs/homebrew-tap --base main --head "$branch" --title "orgstar $version" --body "Cask for orgstar $version."
+gh pr merge "$branch" --repo krz-labs/homebrew-tap --rebase
 git -C "$tap" switch -q main
 git -C "$tap" pull -q --ff-only
 git -C "$tap" branch -d "$branch"
 git -C "$tap" push -q origin --delete "$branch"
-echo "Released $tag; cask merged in krz/homebrew-tap!$mr"
+echo "Released $tag; cask merged in krz-labs/homebrew-tap"

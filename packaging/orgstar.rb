@@ -1,6 +1,6 @@
 # Template for krz/homebrew-tap's Casks/orgstar.rb; scripts/release-mac.sh fills in the version
 # and checksum. Install with:
-#   brew tap krz/tap https://gitbay.org/krz/homebrew-tap.git && brew install --cask orgstar
+#   brew tap krz-labs/tap && brew install --cask orgstar
 
 cask "orgstar" do
   version "@VERSION@"
