@@ -12,6 +12,14 @@ public struct Reminder: Sendable, Equatable {
     public let offset: Int
     /// The folder the entry's file is in, for Focus filters to mute.
     public var folder: String?
+    /// The entry's heading line and where it started, to find it again for the notification's
+    /// actions; nil for text outside a heading.
+    public var headingLine: String?
+    public var headingOffset: Int?
+    /// The done keyword Mark Done sets; nil when the entry has no TODO keyword.
+    public var doneKeyword: String?
+    /// The agenda item's kind (`AgendaItem.Kind`), as its raw value.
+    public var kind: String?
 
     public init(id: String, fireDate: Date, eventDate: Date, title: String, body: String, path: String, offset: Int) {
         self.id = id
@@ -48,12 +56,17 @@ public enum Reminders {
                 // `Scheduled:` reads `Scheduled` beside the time.
                 var leader = item.extra.trimmingCharacters(in: .whitespaces)
                 if leader.hasSuffix(":") { leader.removeLast() }
-                reminders.append(Reminder(
+                var reminder = Reminder(
                     id: "orgstar.\(path)|\(item.headingLine ?? item.text.trimmingCharacters(in: .whitespaces))|\(day.day)|\(time)|\(item.kind.rawValue)",
                     fireDate: fire, eventDate: event, title: item.title,
                     body: ([clockText] + (leader.isEmpty ? [] : [leader]) + [item.category]).joined(separator: " · "),
                     path: path, offset: item.markerOffset ?? item.headingOffset ?? 0
-                ))
+                )
+                reminder.headingLine = item.headingLine
+                reminder.headingOffset = item.headingOffset
+                reminder.doneKeyword = item.doneKeyword
+                reminder.kind = item.kind.rawValue
+                reminders.append(reminder)
             }
         }
         return Array(reminders.sorted { $0.fireDate < $1.fireDate }.prefix(limit))

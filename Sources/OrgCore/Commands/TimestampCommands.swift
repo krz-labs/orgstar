@@ -193,6 +193,28 @@ public struct ShiftTimestampDay: OrgCommand {
     }
 }
 
+/// Moves the timestamp at the caret later by `minutes`, a time range's end with it, as
+/// `org-timestamp-change` does with a count; whole days move the date. A reminder's snooze when
+/// it rewrites the file.
+public struct ShiftTimestampBy: OrgCommand {
+    let minutes: Int
+    public init(minutes: Int) { self.minutes = minutes }
+    public var id: String { "org.timestamp.shift-by" }
+    public var title: String { "Shift Timestamp" }
+    public func applies(in context: EditContext) -> Bool { atTimestamp(context) }
+    public func run(in context: EditContext) -> CommandStep {
+        timestampCommand(context) { buffer in
+            if minutes % 1440 == 0 {
+                try buffer.changeTimestamp(minutes / 1440, what: .day, updateClock: false)
+            } else if minutes % 60 == 0 {
+                try buffer.changeTimestamp(minutes / 60, what: .hour, updateClock: false)
+            } else {
+                try buffer.changeTimestamp(minutes, what: .minute, updateClock: false)
+            }
+        }
+    }
+}
+
 /// C-c C-y: `org-evaluate-time-range`. On a clock line, updates it; otherwise says how long the
 /// range at the caret, or the first on its line, lasts.
 public struct EvaluateTimeRange: OrgCommand {

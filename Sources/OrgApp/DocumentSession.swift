@@ -1176,7 +1176,7 @@ public final class DocumentSession {
         let ns = text as NSString
         let length = (line as NSString).length
         if offset + length <= ns.length, ns.substring(with: NSRange(location: offset, length: length)) == line,
-           offset == 0 || ns.character(at: offset - 1) == 10 {
+           offset == 0 || ns.character(at: offset - 1) == 10, offset + length == ns.length || ns.character(at: offset + length) == 10 {
             return offset
         }
         var best: Int?

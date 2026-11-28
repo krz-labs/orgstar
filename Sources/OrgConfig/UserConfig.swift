@@ -361,6 +361,8 @@ public enum UserConfig {
                 comment: "the agenda leaves out files that other agenda files archive to (#+ARCHIVE:, org-archive-location)", legacy: ""),
         Setting(section: "orgstar", key: "reminders", defaultsKey: "reminders", kind: .bool, fallback: .bool(true),
                 comment: "notify before timed entries", legacy: "agenda.reminders"),
+        Setting(section: "orgstar", key: "reminders-snooze-timestamp", defaultsKey: "remindersSnoozeTimestamp", kind: .bool, fallback: .bool(false),
+                comment: "a notification's Snooze moves the entry's timestamp in the file, not only the notification", legacy: ""),
         Setting(section: "orgstar", key: "calendar-events", defaultsKey: "calendarEvents", kind: .bool, fallback: .bool(false),
                 comment: "show events from Calendar in the agenda", legacy: ""),
         Setting(section: "orgstar", key: "calendar-event-calendars", defaultsKey: "calendarEventCalendars", kind: .string, fallback: .string(""),

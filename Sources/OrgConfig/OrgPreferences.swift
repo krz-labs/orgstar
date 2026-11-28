@@ -263,6 +263,8 @@ public enum OrgPreferences {
     /// `agenda-contact-dates`: birthdays and other dates from Contacts show in the agenda.
     public static func agendaContactDates(_ defaults: UserDefaults = .standard) -> Bool { bool("agendaContactDates", defaults) }
     public static func reminders(_ defaults: UserDefaults = .standard) -> Bool { bool("reminders", defaults) }
+    /// `reminders-snooze-timestamp`: Snooze on a notification moves the entry's timestamp.
+    public static func remindersSnoozeTimestamp(_ defaults: UserDefaults = .standard) -> Bool { bool("remindersSnoozeTimestamp", defaults) }
     /// `appt-message-warning-time`, in minutes.
     public static func reminderLead(_ defaults: UserDefaults = .standard) -> Int { integer("reminderLead", defaults) }
     /// `org-clock-idle-time` in minutes; 0 is nil (never).

@@ -30001,6 +30001,41 @@
         }
       }
     },
+    "Mark Done": {
+      "comment": "A reminder notification's action",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Als erledigt markieren"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marcar como hecho"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marquer comme terminé"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完了にする"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marcar como Feito"
+          }
+        }
+      }
+    },
     "Mark Subtree": {
       "comment": "Command title",
       "localizations": {
@@ -48650,6 +48685,111 @@
         }
       }
     },
+    "Snooze 1 Hour": {
+      "comment": "A reminder notification's action",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In 1 Stunde erinnern"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Posponer 1 hora"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Répéter dans 1 heure"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1時間後に再通知"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adiar 1 Hora"
+          }
+        }
+      }
+    },
+    "Snooze 10 Minutes": {
+      "comment": "A reminder notification's action",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In 10 Minuten erinnern"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Posponer 10 minutos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Répéter dans 10 minutes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "10分後に再通知"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adiar 10 Minutos"
+          }
+        }
+      }
+    },
+    "Snooze Until Tomorrow": {
+      "comment": "A reminder notification's action",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Morgen erinnern"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Posponer hasta mañana"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Répéter demain"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "明日再通知"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adiar até Amanhã"
+          }
+        }
+      }
+    },
     "Some plans aren't available from the App Store right now.": {
       "localizations": {
         "de": {
@@ -54163,6 +54303,76 @@
         }
       }
     },
+    "This can't be done from a notification.": {
+      "comment": "A reminder's action that needs the app",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das geht nicht aus einer Mitteilung."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esto no se puede hacer desde una notificación."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible depuis une notification."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "これは通知からは実行できません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isso não pode ser feito a partir de uma notificação."
+          }
+        }
+      }
+    },
+    "This entry isn't in %@ as it was. Tap to open the file.": {
+      "comment": "A reminder's action whose entry moved or changed",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Eintrag ist nicht mehr unverändert in %@. Tippe, um die Datei zu öffnen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta entrada ya no está en %@ como estaba. Toca para abrir el archivo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette entrée n'est plus dans %@ telle qu'elle était. Touchez pour ouvrir le fichier."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この項目は%@で変更されたか、なくなりました。タップしてファイルを開きます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta entrada não está mais em %@ como estava. Toque para abrir o arquivo."
+          }
+        }
+      }
+    },
     "This file isn't in one of your folders. Choose where the export goes.": {
       "comment": "Save panel for an export outside the sidebar's folders",
       "localizations": {
@@ -59164,6 +59374,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "uma família de fontes monoespaçada; \"\" para a do sistema"
+          }
+        }
+      }
+    },
+    "a notification's Snooze moves the entry's timestamp in the file, not only the notification": {
+      "comment": "A config.toml setting, as its comment in the file describes it",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„Später erinnern“ einer Mitteilung verschiebt den Zeitstempel des Eintrags in der Datei, nicht nur die Mitteilung"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Posponer en una notificación mueve la marca de tiempo de la entrada en el archivo, no solo la notificación"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Répéter sur une notification déplace l'horodatage de l'entrée dans le fichier, pas seulement la notification"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通知の再通知で、通知だけでなくファイル内のエントリのタイムスタンプも移動"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adiar em uma notificação move o carimbo de data da entrada no arquivo, não só a notificação"
           }
         }
       }
