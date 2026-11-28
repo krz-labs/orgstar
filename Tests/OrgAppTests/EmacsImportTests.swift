@@ -459,8 +459,8 @@ struct EmacsImportTests {
         #expect(summary.hasPrefix("Imported 48 settings, 3 capture templates, 3 key bindings, 2 structure templates, 3 agenda views."), "\(summary)")
         let views = AgendaViewLoader.load(userFile: folder.appendingPathComponent("views.toml"))
         #expect(views.problems.isEmpty, "\(views.problems)")
-        #expect(views.views.dropFirst(3).map(\.name) == ["Daily", "Work", "Stuck"])
-        if case .blocks(let blocks) = views.views[3].mode {
+        #expect(views.views.dropFirst(4).map(\.name) == ["Daily", "Work", "Stuck"])
+        if case .blocks(let blocks) = views.views[4].mode {
             #expect(blocks.map(\.mode) == [.agenda(span: 1, startOffset: nil), .todo(keywords: "NEXT"), .match("+work", todoOnly: true)])
             #expect(blocks[0].settings.header == "Today" && blocks.allSatisfy { $0.settings.prefixFormat == " %e " })
             #expect(blocks[1].settings.skip == AgendaSkip(subtree: false, conditions: [.scheduled, .deadline]))
@@ -468,9 +468,9 @@ struct EmacsImportTests {
         } else {
             Issue.record("Daily isn't a block view")
         }
-        #expect(views.views[4].mode == .match("+work-boss", todoOnly: false))
-        #expect(views.views[4].settings.skip == AgendaSkip(subtree: true, conditions: [.regexp("IGNORE")]))
-        #expect(views.views[5].mode == .stuck(nil))
+        #expect(views.views[5].mode == .match("+work-boss", todoOnly: false))
+        #expect(views.views[5].settings.skip == AgendaSkip(subtree: true, conditions: [.regexp("IGNORE")]))
+        #expect(views.views[6].mode == .stuck(nil))
         #expect(UserConfig.structureTemplates(defaults) == [.init(key: "el", type: "src emacs-lisp"), .init(key: "q", type: "QUOTE")])
         #expect(OrgPreferences.options(defaults).structureTemplates?.first { $0.key == "q" }?.type == "QUOTE")
         #expect(defaults.string(forKey: "themeFont") == "JetBrains Mono")

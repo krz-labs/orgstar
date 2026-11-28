@@ -54,6 +54,9 @@ struct AgendaView: View {
     @State var prefix: String?
     /// Entries marked for a bulk action.
     @State var marked: [EntryRef] = []
+    /// Triage's queue, for its sheet and the count a view with `triage = true` shows.
+    @State var triage: TriageModel?
+    @State var showingTriage = false
     @State var logMode = false
     @State var filter = AgendaFilter()
     /// Day, week or month chosen with `v`; nil shows the span the settings or the view give.
@@ -295,6 +298,7 @@ struct AgendaView: View {
         return ScrollViewReader { proxy in
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
+                    if linksTriage { triageLink }
                     if isBlocks {
                         ForEach(Array(agenda.blocks.enumerated()), id: \.offset) { k, block in
                             Section {
@@ -369,6 +373,15 @@ struct AgendaView: View {
                     description: Text(filter.isEmpty ? "Nothing in the agenda files matches this view." : "Nothing matches the filter.")
                 )
             }
+        }
+        .sheet(isPresented: $showingTriage, onDismiss: { tick += 1 }) {
+            if let triage {
+                TriageView(model: triage, session: session, workspace: workspace, commands: commands) { showingTriage = false }
+            }
+        }
+        .task(id: linksTriage ? "\(viewName) \(tick) \(session.editVersion) \(workspace.files.count)" : nil) {
+            guard linksTriage, !showingTriage else { return }
+            await loadTriage()
         }
         .sheet(item: $eventRequest) { request in
             EventSheet(request: request, events: CalendarAccess.events) { result in

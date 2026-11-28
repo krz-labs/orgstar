@@ -539,6 +539,8 @@ Any other key in =[theme]= is a color; see Themes below.
 | =ignored-folders=           | string  | see below     | Folder names never listed or searched, separated by spaces.                            |
 | =agenda-include-subfolders= | boolean | =false=       | The agenda reads org files in subfolders too.                                           |
 | =agenda-exclude-archives=   | boolean | =false=       | The agenda leaves out files that other agenda files archive to.                         |
+| =triage-view=               | string  | =""=          | The view whose entries Triage goes through; =""= for those in the first capture template's target. |
+| =weekly-review-waiting=     | string  | ="WAITING"=   | The TODO keyword the built-in Weekly Review lists as waiting for someone.               |
 | =reminders=                 | boolean | =true=        | Notify before timed entries.                                                            |
 | =reminders-snooze-timestamp= | boolean | =false=      | A notification's Snooze moves the entry's timestamp in the file, not only the notification. |
 | =calendar-events=           | boolean | =false=       | Show events from Calendar in the agenda.                                                |

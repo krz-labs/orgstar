@@ -519,6 +519,8 @@ todo: !tags:someday heading:"pay rent"
 | =(priority)=, =(priority "A" "B")=, =(priority '>= "B")= | =priority:=, =priority:A,B= | with a priority cookie; with one of the priorities; higher (=>=), lower (=<=) and so on than one. Entries without a cookie never match |
 | =(deadline)=, =(deadline :from … :to … :on …)=, =(deadline 7)=, =(deadline auto)= | =deadline:to=7=, =deadline:auto= | with a deadline; in the range; up to 7 days ahead; within its warning period (=org-deadline-warning-days= or the timestamp's own =-3d=) or past |
 | =(scheduled …)=                                | =scheduled:on=today=            | scheduled, with the arguments of =deadline= except =auto=                                         |
+| =(closed)=, =(closed :from … :to … :on …)=     | =closed:from=-7=                | with a =CLOSED= timestamp; in the range                                                           |
+| =(clocked)=, =(clocked :from … :to … :on …)=   | =clocked:on=today=              | with a clock line between the heading line and the next heading; whose clocked time overlaps the range. A running clock counts at its start |
 | =(ts …)=, =ts-active=, =ts-a=, =ts-inactive=, =ts-i= | =ts:from=-7,to=0=          | with a timestamp in the range anywhere from the heading line to the next heading, planning and clock lines included; =:type= is =active=, =inactive= or =both= |
 | =(heading "a" "b")=, =h=                       | =heading:a,"two words"=         | whose heading, without TODO keyword and tags, contains each string, ignoring case                |
 | =(property "P")=, =(property "P" "v")=         | =property:P=, =property:P,v=    | with the property; with exactly that value. =:inherit t= or =nil= overrides =org-use-property-inheritance= |
@@ -530,7 +532,7 @@ todo: !tags:someday heading:"pay rent"
 
 Every heading is matched, those in archived and commented trees included, as org-ql does; add =(not (tags "ARCHIVE"))= to leave archived ones out. Entries show in file order, with the rows of a tag match, unless the view sorts them (see =sort= under [[*Views][Views]]).
 
-Not supported: org-ql's other predicates (=category=, =closed=, =clocked=, =planning=, =effort=, =blocked=, =regexp=, =rifle= and =smart=, =heading-regexp=, =outline-path=, =outline-path-segment=, =tags-regexp=, =src=, =link=, =ancestors=, =parent=, =children=, =descendants=), which are refused by name; words without a predicate, which org-ql searches with =rifle=; and comparators in the plain form of =priority=. =org-ql-search= options such as =:super-groups= and =:title= aren't read.
+Not supported: org-ql's other predicates (=category=, =planning=, =effort=, =blocked=, =regexp=, =rifle= and =smart=, =heading-regexp=, =outline-path=, =outline-path-segment=, =tags-regexp=, =src=, =link=, =ancestors=, =parent=, =children=, =descendants=), which are refused by name; words without a predicate, which org-ql searches with =rifle=; and comparators in the plain form of =priority=. =org-ql-search= options such as =:super-groups= and =:title= aren't read.
 
 ** The org-ql dynamic block
 
@@ -556,7 +558,7 @@ As in org-ql, the block searches only the file it is in, column titles are the c
 
 * Views
 
-The view menu lists the built-in views, Agenda, TODO List and Stuck Projects, then the views in =views.toml=, then Match…, TODO Match…, Search…, TODO Search… and Query…, then Save as View…. Saved views mirror =org-agenda-custom-commands=, with fewer options.
+The view menu lists the built-in views, Agenda, TODO List, Stuck Projects and Weekly Review (see [[*The weekly review][The weekly review]]), then the views in =views.toml=, then Match…, TODO Match…, Search…, TODO Search… and Query…, then Save as View…. Saved views mirror =org-agenda-custom-commands=, with fewer options.
 
 Save as View… is there while a match, search or query you typed is showing. It asks for a name and adds the view to the end of =views.toml=, as a =match=, =todo-match=, =search=, =todo-search= or =query= view, making the file if it isn't there; the rest of the file is left as it is. A name another view has, the built-in ones included, is refused. To change or remove a view, edit =views.toml=.
 
@@ -619,6 +621,9 @@ sort = "deadline priority"
 | =prefix-format=    | all          | The view's =org-agenda-prefix-format=, in place of the one in =config.toml= for its kind |
 | =header=           | all          | The title over a list or block, as =org-agenda-overriding-header= |
 | =skip-entry-if=, =skip-subtree-if= | all | Entries to leave out, as =org-agenda-skip-function= set to =org-agenda-skip-entry-if= or =org-agenda-skip-subtree-if=; see below |
+| =triage=           | all          | =true= starts the view with a row that shows how many captured entries wait and opens Triage (see [[*Triage][Triage]]) |
+
+A view named like a built-in one takes its place in the menu, so a =Weekly Review= in =views.toml= replaces the built-in Weekly Review.
 
 Note that =start= is a plain integer here, while =org-agenda-start-day= in =config.toml= is a string such as ="-3d"=.
 
@@ -660,6 +665,54 @@ type = "stuck"
 Each block has its title over it: its =header=, or one for its kind such as =Day agenda= or =TODO items: NEXT=. Agenda blocks start from their own =start= (or the setting), so the arrows that move through days don't apply to them.
 
 The views load when the window opens and again on =g= or =r=. A problem in the file, such as a missing =name=, an unknown =type= or a query orgstar can't read, shows in the status line at the bottom of the window, and the remaining views still load.
+
+* The weekly review
+
+The built-in view Weekly Review is a block agenda for a weekly review: the stuck projects, open entries scheduled before today, open deadlines up to a week ahead (overdue ones included), entries waiting for someone, and the entries closed and clocked in the last seven days, today included. It starts with a row that shows how many captured entries wait in the inbox; click or tap it to open Triage (see [[*Triage][Triage]]).
+
+Its waiting-for block lists the TODO keyword =weekly-review-waiting= under =[orgstar]= in =config.toml= names, =WAITING= by default; set it to the keyword you use, such as =WAIT=. The stuck projects are those of =[org-stuck-projects]= (see [[*Stuck projects][Stuck projects]]).
+
+To change it, put a view named =Weekly Review= in =views.toml=; it replaces the built-in one. This is the built-in one, as =views.toml= writes it:
+
+#+BEGIN_SRC toml
+[[view]]
+name = "Weekly Review"
+triage = true
+
+[[view.block]]
+type = "stuck"
+header = "Stuck projects"
+
+[[view.block]]
+type = "query"
+header = "Scheduled in the past"
+query = '(and (scheduled :to -1) (not (done)))'
+sort = "scheduled"
+
+[[view.block]]
+type = "query"
+header = "Deadlines up to a week ahead"
+query = '(and (deadline :to 7) (not (done)))'
+sort = "deadline"
+
+[[view.block]]
+type = "todo"
+header = "Waiting for"
+keywords = "WAITING"
+
+[[view.block]]
+type = "query"
+header = "Completed in the last 7 days"
+query = '(closed :from -7)'
+sort = "closed"
+
+[[view.block]]
+type = "query"
+header = "Clocked in the last 7 days"
+query = '(clocked :from -7)'
+#+END_SRC
+
+The query blocks match every heading, archived ones included, as queries do (see [[*Queries][Queries]]). The Weekly Review is a view: the entries in it take the agenda's actions as in any other view.
 
 * Filters
 
@@ -774,6 +827,36 @@ Each action finds the entry again by its heading line before it changes anything
 
 On iOS, tap Select in the bar at the bottom, or Select in an entry's menu, then tap entries to mark them. The bar then shows how many are selected, Actions and Done. Actions offers the same actions: TODO State…, Add Tag…, Remove Tag…, Schedule…, Deadline…, Refile… and Archive…, which asks first. After an action, or Done, the selection ends.
 
+* Triage
+
+Triage goes through captured entries one at a time: for each, schedule it, set a deadline, tag it, set its TODO state, refile it, archive it or delete it, then go on to the next. Open it with Triage in the agenda window's toolbar, or Triage in the Views menu and in Commands on iOS, or the inbox row at the top of the Weekly Review.
+
+The entries are, by default, those in the target of the first capture template in =capture.toml= (see [[file:08-capture.org][Capture]]): the children of its =headline= or of the heading at its =olp=, the top-level entries of its file for a plain =file= or =regexp= target, the entries in its date tree, or the children of the heading with its =id=. Entries in archived or commented trees are left out. A template that captures to the running clock has no fixed place; set =triage-view= instead. =triage-view= under =[orgstar]= in =config.toml= names a view, built in or from =views.toml=, whose entries Triage goes through instead, in the order the view lists them, each once.
+
+The queue is the entries as they were when Triage opened. The count at the top says how many are left, the current one included. An entry changed or removed elsewhere since, in another app or another window, is skipped when Triage reaches it; one that only moved in its file is followed.
+
+Schedule, Deadline, Tags and TODO State change the entry and keep it current, so several can be applied to one entry; Next goes on. Refile, Archive and Delete take it out of the queue and go on to the next. The actions are the agenda's: repeaters, logging, TODO state hooks and the open buffer's undo apply, and files that aren't open are changed and saved directly. Undo takes back the last action, putting each file it changed back as it was, and returns to that entry; it is refused when one of those files has changed since.
+
+*On the Mac*, Triage opens as a sheet over the agenda window, with the entry, its tags and its text, and these keys, which are the same in every keymap preset and aren't read from =keymap.toml=:
+
+| Key                    | Does                                                    |
+|------------------------+---------------------------------------------------------|
+| =s=                    | Schedules, asking for the date as =C-c C-s= does         |
+| =d=                    | Sets a deadline                                         |
+| =:=                    | Sets tags, as =C-c C-q= does                             |
+| =t=                    | Asks for the TODO state; empty removes the keyword       |
+| =r=                    | Refiles, asking for the target                          |
+| =a=, =$=               | Archives                                                |
+| =k=, =⌫=, =⌦=          | Deletes the entry and everything under it               |
+| =n=, =SPC=, =→=        | Goes on to the next entry                               |
+| =u=                    | Undoes the last action                                  |
+| =RET=                  | Shows the entry in the main window                      |
+| =q=, =Escape=          | Closes Triage                                           |
+
+The row of keys at the bottom of the sheet runs the same actions with a click. Questions an action asks, such as the date or a state-change note, appear at the bottom of the sheet.
+
+*On iOS*, Triage opens over the agenda with the entry's row and text and a large button for each action: Schedule and Deadline (Today, Tomorrow, Next Week or Pick Date…; the time of day and repeater stay), Tags, TODO State, Refile, Archive, Delete, which asks first, and Next. Swipe the entry left to go on to the next one, or right to archive it. Undo is at the top right, Done at the top left.
+
 * Notifications
 
 orgstar can post a notification before each timed entry, as =org-agenda-to-appt= hands entries to =appt=. Notifications cover the next 7 days and include deadline, scheduled, plain timestamp and range lines that have a time of day and are not done. Overdue items and upcoming-deadline warnings don't get notifications.
@@ -861,6 +944,7 @@ The Agenda tab shows the same views from the same files, using the settings in t
 - Touch and hold an entry for Mark Done, TODO State…, Reschedule (Today, Tomorrow, Next Week, Pick Date…), Schedule…, Deadline…, Tags…, Priority…, Clock In, Add to Calendar…, Refile…, Archive… and Delete…, which removes the heading and everything under it. Next Week is next Monday.
 - Marking an entry done and rescheduling one give haptic feedback.
 - Log Mode, in the span menu, turns log mode on and off. The widgets never show log mode's entries.
+- Triage, in the Views menu and in Commands, opens Triage with buttons and swipes in place of keys (see [[*Triage][Triage]]).
 - There are no keyboard commands; bulk actions use Select instead of marks (see [[*Bulk actions][Bulk actions]]).
 - Notifications are set while the app is open. iOS allows at most 64 pending notifications and the app can't add more while it isn't running, so the agenda's footer says how far ahead they go and asks you to open orgstar to set later ones.
 

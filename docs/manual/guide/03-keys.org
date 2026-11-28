@@ -20,6 +20,8 @@ Choose a preset in Settings ▸ General ▸ Keys, or with =keymap= in the =[orgs
 
 The Mac preset binds fewer commands than the others. =⌃⌘X= is its =C-c C-c=, =⌘K= inserts a link and =⇧⌘E= opens the export sheet; the [[*Key reference][key reference]] lists the rest. It has no keys for agenda, capture or the single export formats. Run those from the Org menu, from the command palette (=⇧⌘P=), from a menu shortcut (Agenda =⇧⌘A=, Capture =⇧⌘N=), or bind them yourself in =keymap.toml=.
 
+The agenda window and its Triage sheet have single-letter keys of their own, the same in every preset: see Acting on entries and Triage in [[file:07-agenda.org][The agenda]].
+
 In the Emacs and Mac presets, and in Doom's insert state, macOS's own text keys keep working where the preset does not bind the key: =⌥←=, =⌘←=, =⇧= with arrows to select, and the Control keys the macOS text system provides (=⌃A=, =⌃E=, =⌃K= and so on). Menu shortcuts such as =⌘S= and =⌘F= work in every preset; see [[*Menu shortcuts][Menu shortcuts]].
 
 * Option as Meta

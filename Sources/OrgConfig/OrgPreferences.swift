@@ -265,6 +265,15 @@ public enum OrgPreferences {
     /// `agenda-swipe-leading` and `agenda-swipe-trailing`: what an agenda row's swipes show.
     public static func agendaSwipeLeading(_ defaults: UserDefaults = .standard) -> String { string("agendaSwipeLeading", defaults) }
     public static func agendaSwipeTrailing(_ defaults: UserDefaults = .standard) -> String { string("agendaSwipeTrailing", defaults) }
+    /// `triage-view`: the view whose entries Triage goes through; empty for the default capture
+    /// template's target.
+    public static func triageView(_ defaults: UserDefaults = .standard) -> String {
+        string("triageView", defaults).trimmingCharacters(in: .whitespaces)
+    }
+    /// `weekly-review-waiting`: the TODO keyword of the Weekly Review's waiting-for block.
+    public static func weeklyReviewWaiting(_ defaults: UserDefaults = .standard) -> String {
+        string("weeklyReviewWaiting", defaults).trimmingCharacters(in: .whitespaces)
+    }
     public static func reminders(_ defaults: UserDefaults = .standard) -> Bool { bool("reminders", defaults) }
     /// `menu-bar-capture-template`: the menu bar's capture field's template key; "" for the first.
     public static func menuBarCaptureTemplate(_ defaults: UserDefaults = .standard) -> String { string("menuBarCaptureTemplate", defaults) }

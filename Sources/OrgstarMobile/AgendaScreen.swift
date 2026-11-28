@@ -57,6 +57,9 @@ struct AgendaScreen: View, Equatable {
     @State private var chosenCommand: String?
     /// The entry open in its sheet.
     @State private var editing: AgendaItem?
+    /// Triage's queue, for its screen and the count a view with `triage = true` shows.
+    @State private var triage: TriageModel?
+    @State private var showingTriage = false
 
     /// A marked entry: its heading line, to find it again.
     private struct Mark: Hashable {
@@ -115,6 +118,9 @@ struct AgendaScreen: View, Equatable {
     var body: some View {
         List {
             // With no folders the empty state stands alone, not over a column of empty days.
+            if !workspace.rootPaths.isEmpty, linksTriage {
+                Section { triageLink }
+            }
             if workspace.rootPaths.isEmpty {
             } else if case .agenda = agenda.mode {
                 let _ = model.settingsVersion
@@ -175,6 +181,15 @@ struct AgendaScreen: View, Equatable {
                 if selecting { bulkBar } else { bottomBar }
             }
         }
+        .fullScreenCover(isPresented: $showingTriage, onDismiss: { tick += 1 }) {
+            if let triage {
+                TriageScreen(model: triage, workspace: workspace, session: session, startOnWeekday: agenda.startOnWeekday) { showingTriage = false }
+            }
+        }
+        .task(id: linksTriage ? "\(viewName) \(tick) \(session.editVersion) \(workspace.files.count)" : nil) {
+            guard linksTriage, !showingTriage else { return }
+            await loadTriage()
+        }
         .sheet(isPresented: $bulkRefiling) {
             RefileSheet(targets: workspace.refileTargets(openPath: session.path, document: session.document)) { target in
                 bulkRefiling = false
@@ -219,6 +234,7 @@ struct AgendaScreen: View, Equatable {
                     Button("Filter…", systemImage: filter.isEmpty ? "line.3.horizontal.decrease" : "line.3.horizontal.decrease.circle.fill") { showingFilter = true }
                     Button("Select", systemImage: "checkmark.circle") { selecting = true }
                     Divider()
+                    Button("Triage", systemImage: "tray.and.arrow.down") { openTriage() }
                     Button("Board", systemImage: "rectangle.split.3x1") { showingBoard = true }
                     Button("Review Flashcards", systemImage: "rectangle.on.rectangle.angled") { model.reviewRequested = true }
                     Button("Print…", systemImage: "printer") { printAgenda() }
@@ -464,6 +480,40 @@ struct AgendaScreen: View, Equatable {
         agenda.mode = definition.mode
     }
 
+    // MARK: - Triage
+
+    /// The view shown has `triage = true`, as the Weekly Review does.
+    private var linksTriage: Bool { views.first { $0.name == viewName }?.triage == true }
+
+    /// The row a view with `triage = true` starts with: what is waiting, and Triage.
+    private var triageLink: some View {
+        Button { openTriage() } label: {
+            HStack {
+                if let triage, triage.problem == nil {
+                    Label("Inbox: \(triage.remaining) entries to triage", systemImage: "tray.and.arrow.down")
+                } else {
+                    Label("Inbox", systemImage: "tray.and.arrow.down")
+                }
+                Spacer()
+                Text("Triage").foregroundStyle(Color.accentColor)
+            }
+            .frame(minHeight: 44)
+            .contentShape(Rectangle())
+        }
+        .tint(.primary)
+    }
+
+    private func loadTriage() async {
+        let queue = triage ?? TriageModel(session: session, workspace: workspace)
+        triage = queue
+        await queue.load(views: views, templates: CaptureTemplates.load().templates, agenda: agenda)
+    }
+
+    private func openTriage() {
+        Task { await loadTriage() }
+        showingTriage = true
+    }
+
     /// How far ahead notifications are set, as the design asks the agenda to show: iOS keeps
     /// at most 64, and sets no more while the app isn't opened.
     private var reminderStatus: String? {
@@ -659,6 +709,7 @@ struct AgendaScreen: View, Equatable {
         rows += [
             CommandRow(id: "agenda.filter", title: String(localized: "Filter…")),
             CommandRow(id: "agenda.select", title: String(localized: "Select")),
+            CommandRow(id: "agenda.triage", title: String(localized: "Triage")),
             CommandRow(id: "agenda.board", title: CommandTitle.localized("Board")),
             CommandRow(id: "app.flashcards.review", title: CommandTitle.localized("Review Flashcards")),
             CommandRow(id: "agenda.print", title: CommandTitle.localized("Print…")),
@@ -682,6 +733,7 @@ struct AgendaScreen: View, Equatable {
         case "agenda.log-mode": logMode.toggle()
         case "agenda.filter": showingFilter = true
         case "agenda.select": selecting = true
+        case "agenda.triage": openTriage()
         case "agenda.board": showingBoard = true
         case "app.flashcards.review": model.reviewRequested = true
         case "agenda.print": printAgenda()
