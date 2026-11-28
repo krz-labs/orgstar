@@ -173,6 +173,13 @@ final class AppCommands {
         captureRequest = (nil, [:], day, captureSerial)
     }
 
+    /// Opens the capture window on the template keyed `template`, with `initial` as `%i`.
+    func capture(template: String, initial: String) {
+        captureSerial += 1
+        captureRequest = (template, ["initial": initial], nil, captureSerial)
+        run("app.capture")
+    }
+
     /// Runs x-callback-url actions; the main window sets it.
     @ObservationIgnored var xCallbackRunner: XCallbackRunner?
     /// The x-callback-url capture the capture window shows, with its `captureRequest` serial.
@@ -1138,6 +1145,7 @@ struct SettingsView: View {
     @AppStorage("clockHistoryLength") private var clockHistoryLength = 5
     @AppStorage("globalCapture") private var globalCapture = true
     @AppStorage("menuBarItem") private var menuBarItem = false
+    @AppStorage("menuBarClock") private var menuBarClock = MenuBarAgenda.ClockTitle.heading
     @AppStorage("settingsTab") private var tab = "general"
     @AppStorage("showHiddenFiles") private var showHiddenFiles = true
     @AppStorage("themeFont") private var themeFont = ""
@@ -1315,6 +1323,11 @@ struct SettingsView: View {
                 Toggle("Show hidden files and folders", isOn: $showHiddenFiles)
                 Toggle("Keep orgstar in the menu bar", isOn: $menuBarItem)
                     .help("Capture, the agenda, today's entries and the clock, from any app. When off, the menu bar shows orgstar only while a clock runs.")
+                Picker("Menu bar clock", selection: $menuBarClock) {
+                    Text("Time and heading").tag(MenuBarAgenda.ClockTitle.heading)
+                    Text("Time").tag(MenuBarAgenda.ClockTitle.time)
+                    Text("Clock symbol only").tag(MenuBarAgenda.ClockTitle.none)
+                }
                 Picker("Option as Meta", selection: $optionAsMeta) {
                     Text("Left Option").tag(OptionAsMeta.left.rawValue)
                     Text("Right Option").tag(OptionAsMeta.right.rawValue)
@@ -1327,7 +1340,7 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(height: 330)
+        .frame(height: 360)
         .sheet(isPresented: $importing) { EmacsImportView(workspace: workspace) }
     }
 

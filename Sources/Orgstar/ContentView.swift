@@ -31,8 +31,9 @@ struct ContentView: View {
     @AppStorage("menuBarItem") private var menuBarItem = false
     /// The sidebar shows the agenda in place of the files.
     @AppStorage("sidebarAgenda") private var sidebarAgenda = false
+    @AppStorage("menuBarClock") private var menuBarClock = MenuBarAgenda.ClockTitle.heading
     /// Today's agenda for the menu bar item.
-    @State private var menuToday: [AgendaSnapshot.Row] = []
+    @State private var menuToday: [MenuBarAgenda.Entry] = []
     @State private var hour = 0
     @AppStorage("saveMode") private var saveMode = SaveMode.automatic
     @AppStorage("cryptBeforeSave") private var cryptBeforeSave = false
@@ -511,9 +512,15 @@ struct ContentView: View {
     var body: some View {
         main
         .task(id: workspace.files.count) { syncClock(paths: workspace.agendaFilePaths()) }
-        .onChange(of: ClockMenuState(running: clock.running, history: clock.history, always: menuBarItem, today: menuToday), initial: true) { _, state in
-            if statusItem == nil { statusItem = ClockStatusItem(run: { commands.run($0) }, jump: { commands.jump(path: $0, offset: $1) }) }
-            statusItem?.update(state)
+        .onChange(of: ClockMenuState(running: clock.running, history: clock.history, always: menuBarItem, today: menuToday, clockTitle: menuBarClock),
+                  initial: true) { _, state in
+            if statusItem == nil {
+                var actions = MenuBarActions(workspace: workspace, session: session, clock: clock)
+                actions.clipboard = { NSPasteboard.general.string(forType: .string) ?? "" }
+                actions.userName = NSFullUserName()
+                statusItem = ClockStatusItem(commands: commands, actions: actions) { Task { await updateWidgets() } }
+            }
+            statusItem?.update(state, effort: state.running == nil ? nil : clock.effort(session).map { ($0.effort, $0.clocked) })
         }
         .task(id: menuBarItem) { if menuBarItem { await updateWidgets() } }
         .onChange(of: globalCapture, initial: true) { _, enabled in
@@ -634,7 +641,7 @@ struct ContentView: View {
                     commands.answer(answer)
                 }
             }
-            if let id = DevelopmentHooks.windowToOpen {
+            if let id = DevelopmentHooks.windowToOpen, id != "menubar" {
                 if id == "settings" { openSettings() } else { openWindow(id: id) }
             }
             #endif
@@ -1410,8 +1417,9 @@ struct ContentView: View {
         let open = session.openTexts
         await days.refresh(open: open)
         guard !Task.isCancelled else { return }
-        let snapshot = AgendaSnapshot(groups: days.groups(), today: days.today, theme: theme, generated: Date())
-        menuToday = snapshot.days.first.map { $0.overdue + $0.rows } ?? []
+        let groups = days.groups()
+        let snapshot = AgendaSnapshot(groups: groups, today: days.today, theme: theme, generated: Date())
+        menuToday = MenuBarAgenda.today(groups, today: days.today)
         guard let file else { return }
         _ = try? WidgetActionKey(key: WidgetActionKey.current()).write()
         if (try? HabitSnapshot(habits: await days.habits(open: open), theme: theme).write()) == true {

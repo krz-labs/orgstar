@@ -383,6 +383,11 @@ public enum UserConfig {
                 comment: "⌃⌥Space opens Capture from any app; templates go in capture.toml", legacy: "capture.global-hotkey"),
         Setting(section: "orgstar", key: "menu-bar-item", defaultsKey: "menuBarItem", kind: .bool, fallback: .bool(false),
                 comment: "keep orgstar in the menu bar, with capture and today's agenda; off shows it only while a clock runs", legacy: ""),
+        Setting(section: "orgstar", key: "menu-bar-clock", defaultsKey: "menuBarClock", kind: .choice([("heading", "heading"), ("time", "time"), ("none", "none")]),
+                fallback: .string("heading"),
+                comment: "the menu bar while a clock runs: heading (time and heading, as Org's mode line), time, or none (the clock symbol only)", legacy: ""),
+        Setting(section: "orgstar", key: "menu-bar-capture-template", defaultsKey: "menuBarCaptureTemplate", kind: .string, fallback: .string(""),
+                comment: "the key of the template the menu bar's capture field files with; \"\" for the first template", legacy: ""),
     ]
 
     /// `"-3d"` as -3; nil for anything else.

@@ -266,6 +266,8 @@ public enum OrgPreferences {
     public static func agendaSwipeLeading(_ defaults: UserDefaults = .standard) -> String { string("agendaSwipeLeading", defaults) }
     public static func agendaSwipeTrailing(_ defaults: UserDefaults = .standard) -> String { string("agendaSwipeTrailing", defaults) }
     public static func reminders(_ defaults: UserDefaults = .standard) -> Bool { bool("reminders", defaults) }
+    /// `menu-bar-capture-template`: the menu bar's capture field's template key; "" for the first.
+    public static func menuBarCaptureTemplate(_ defaults: UserDefaults = .standard) -> String { string("menuBarCaptureTemplate", defaults) }
     /// `reminders-snooze-timestamp`: Snooze on a notification moves the entry's timestamp.
     public static func remindersSnoozeTimestamp(_ defaults: UserDefaults = .standard) -> Bool { bool("remindersSnoozeTimestamp", defaults) }
     /// `appt-message-warning-time`, in minutes.
