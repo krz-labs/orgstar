@@ -58,30 +58,35 @@ public enum GreenElement: Sendable, Equatable {
 }
 
 struct GreenBuilder {
-    private var stack: [(kind: SyntaxKind, children: [GreenElement])] = []
+    /// The open nodes, each with where its children start in `pending`.
+    private var stack: [(kind: SyntaxKind, start: Int)] = []
+    /// Children of every open node, innermost last. One buffer, so a node's children are
+    /// allocated once, at their final size, when it finishes.
+    private var pending: [GreenElement] = []
     private var root: GreenNode?
 
     mutating func start(_ kind: SyntaxKind) {
-        stack.append((kind, []))
+        stack.append((kind, pending.count))
     }
 
     mutating func token(_ kind: SyntaxKind, _ text: some StringProtocol) {
         guard !text.isEmpty else { return }
-        stack[stack.count - 1].children.append(.token(GreenToken(kind: kind, text: String(text))))
+        pending.append(.token(GreenToken(kind: kind, text: String(text))))
     }
 
     /// Appends an already-built node, for reuse across versions.
     mutating func node(_ green: GreenNode) {
-        stack[stack.count - 1].children.append(.node(green))
+        pending.append(.node(green))
     }
 
     mutating func finish() {
-        let (kind, children) = stack.removeLast()
-        let node = GreenNode(kind: kind, children: children)
+        let (kind, start) = stack.removeLast()
+        let node = GreenNode(kind: kind, children: Array(pending[start...]))
+        pending.removeSubrange(start...)
         if stack.isEmpty {
             root = node
         } else {
-            stack[stack.count - 1].children.append(.node(node))
+            pending.append(.node(node))
         }
     }
 
