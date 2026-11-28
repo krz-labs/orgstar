@@ -697,8 +697,17 @@ public enum UserConfig {
             guard let equals = line.firstIndex(of: "="),
                   line[..<equals].trimmingCharacters(in: .whitespaces) == key else { continue }
             let last = lastLine(of: lines, at: index, equals: equals)
-            let comment = last == index ? commentStart(line, after: equals).map { "  " + line[$0...] } ?? "" : ""
-            lines.replaceSubrange(index...last, with: [line[..<equals] + "= " + format(value) + comment])
+            guard last == index else {
+                lines.replaceSubrange(index...last, with: [line[..<equals] + "= " + format(value)])
+                return lines.joined(separator: "\n")
+            }
+            // Only the value changes: the spacing around it and the comment stay.
+            let blank: (Character) -> Bool = { $0 == " " || $0 == "\t" }
+            let lead = line[line.index(after: equals)...].prefix(while: blank)
+            let end = commentStart(line, after: equals) ?? line.endIndex
+            let gap = line[..<end].reversed().prefix(while: blank).count
+            let tail = line[line.index(end, offsetBy: -gap)...]
+            lines[index] = line[...equals] + lead + format(value) + tail
             return lines.joined(separator: "\n")
         }
         if let lastInSection {

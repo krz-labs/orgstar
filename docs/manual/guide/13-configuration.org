@@ -34,6 +34,7 @@ When you add the folder to a dotfiles repository, keep =default-theme.toml= out 
 
 - orgstar ▸ Edit Config File (=⌥⌘,=) opens =config.toml= as a buffer in the main window. The command palette has the same command as Edit Config File.
 - Settings ▸ General has three buttons for the file: Edit in orgstar, Open with Default App, and Show in Finder.
+- Settings ▸ All Settings lists every key, with a control for each; Edit as Text there opens the file as Edit in orgstar does. See All Settings below.
 
 Saving the buffer applies the file, the same as saving it from another editor.
 
@@ -50,7 +51,7 @@ A file that isn't valid TOML is reported with its parse error, and none of it ap
 
 * The Settings window
 
-Open it with orgstar ▸ Settings (=⌘,=). It has seven panes, and an eighth, Git, in the download version. The last, orgstar+, has the plans and Restore Purchases in the Mac App Store version and the license key in the download version. Each control in the others, except Encryption and Git, writes the =config.toml= key named in the tables below; the config.toml reference below gives the type and the Emacs variable.
+Open it with orgstar ▸ Settings (=⌘,=). It has eight panes, and a ninth, Git, in the download version. The last, orgstar+, has the plans and Restore Purchases in the Mac App Store version and the license key in the download version. Each control in the others, except Encryption, All Settings and Git, writes the =config.toml= key named in the tables below; the config.toml reference below gives the type and the Emacs variable.
 
 ** General
 
@@ -59,6 +60,7 @@ Open it with orgstar ▸ Settings (=⌘,=). It has seven panes, and an eighth, G
 | config.toml: Edit in orgstar               | Opens the file in the main window                                            |                                 |                  |
 | config.toml: Open with Default App         | Opens the file in the app macOS uses for =.toml=                             |                                 |                  |
 | config.toml: Show in Finder                | Selects the file in Finder                                                   |                                 |                  |
+| Every setting: All Settings                | Opens the All Settings pane                                                  |                                 |                  |
 | Folder: Choose Configuration Folder…       | Mac App Store version: reads and writes the configuration in a folder you choose |                         |                  |
 | Folder: Use Default Folder                 | Mac App Store version: goes back to the folder in the app's container       |                                 |                  |
 | Emacs: Import from Emacs…                  | Opens the import sheet; see Import from Emacs below|                                 |                  |
@@ -200,9 +202,32 @@ On iPhone and iPad, Settings ▸ Working Copy syncs folders through the Working 
 
 These are kept on the device, not in =config.toml=: the folders are at other paths on each device, and the key is kept in the Keychain. See [[file:14-ios.org::*Git folders through Working Copy][Git folders through Working Copy]].
 
+** All Settings
+
+One row for every key of =config.toml= that the config.toml reference below lists, grouped by table in the file's order: the top level, then =[org-agenda-prefix-format]= and the other tables, =[theme]= and =[orgstar]=. Each row shows the key, its comment from the file and a control for its type:
+
+| Type                        | Control                                                                  |
+|-----------------------------+--------------------------------------------------------------------------|
+| boolean                     | A switch                                                                 |
+| integer                     | A number field and a stepper                                             |
+| one of several names        | A menu of the names, such as =nil=, =time= and =note= for =org-log-done= |
+| =display-line-numbers-type= | A menu of =false=, =true=, =relative= and =visual=                       |
+| =org-agenda-start-day=      | A stepper of days, shown as ="-3d"= or ="+0d"=                           |
+| string                      | A text field, written on Return or when you leave it                     |
+
+A dot after the key marks a value that differs from the default. Reset to Default, in the row's shortcut menu and in its (i) sheet, writes the default into the key's line. The (i) button opens a sheet with what the setting does, the values it takes, its default, its line in the file, the Emacs variable it mirrors, and links to the manual's chapter about it and to the config.toml reference.
+
+The search field matches keys, the Emacs variables they mirror (for an entry of a table such as =[org-stuck-projects]=, the table's name; for =completion-auto-delay=, =corfu-auto-delay=), and the descriptions, in English and in the app's language. Every word typed must match.
+
+A change is written into =config.toml= as soon as it's made, as the other panes write theirs: the key's line keeps its place, its spacing and its comment, and only the value changes. A key that isn't in the file is added at the end of its table, and a table that isn't there is added at the end of the file. Other lines, comments and keys orgstar doesn't know are left as they are. Edits to the file show in the pane while it's open.
+
+Tables whose keys you choose, =[org-structure-template-alist]=, =[denote-templates]=, =[key-bar]=, =[[publish]]= and the theme's colours, aren't in the list. Edit as Text opens the file to change them.
+
+The descriptions and help are in the app's language; the comments written into =config.toml= stay in English. On iPhone and iPad the same list is Settings ▸ All Settings; see [[file:14-ios.org::*Settings][iPhone and iPad]].
+
 ** Settings only in config.toml
 
-These settings have no control in the Settings window. Some are in the View menu.
+These settings have no control in the Settings window's other panes; All Settings has them all. Some are in the View menu.
 
 | Key                              | Also in                    |
 |----------------------------------+----------------------------|
@@ -268,6 +293,7 @@ A key you remove from the file goes back to its default. A key that isn't in the
 | =org-tags-column=                    | integer | =-77=   | Negative: tags end at that column. =0=: one space between title and tags. Mirrors =org-tags-column=.          |
 | =org-insert-heading-respect-content= | boolean | =false= | =M-RET= adds the new heading after the current subtree. Mirrors =org-insert-heading-respect-content=.        |
 | =org-M-RET-may-split-line=           | boolean | =false= | =M-RET= in the middle of a line splits it at the caret. Mirrors the =default= entry of =org-M-RET-may-split-line=. |
+| =org-use-property-inheritance=       | string  | ="nil"= | Which properties a heading takes from its ancestors: ="nil"= none, ="t"= all, or property names that inherit, separated by spaces, such as ="STYLE"=. =ID= and =CUSTOM_ID= never inherit. Mirrors =org-use-property-inheritance=. |
 | =org-list-allow-alphabetical=        | boolean | =true=  | =a.=, =b)=, =A.= are list bullets. Mirrors =org-list-allow-alphabetical=.                                     |
 | =org-hide-emphasis-markers=          | boolean | =true=  | Your Emacs hides =*bold*= and ~=code=~ markers; orgstar hides them when markup is hidden and measures text without them. Mirrors =org-hide-emphasis-markers=. |
 | =org-pretty-entities=                | boolean | =true=  | Your Emacs shows =\alpha= as α and lowers =x_{1}=; orgstar does the same when markup is hidden. Mirrors =org-pretty-entities=. |
