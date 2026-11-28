@@ -52,6 +52,7 @@ Everyone who downloaded orgstar before orgstar+ keeps all of it.
 
 ## What's New
 
+- All Settings: every config.toml option in one searchable list, with a control for each, an explanation of what it does, and reset to the default.
 - Your own commands: write them in JavaScript in commands.toml; they appear in the Commands list and key bar, can run orgstar's own commands, and can run after a TODO changes or before a capture is filed.
 - orgstar:// links with x-callback-url, so Shortcuts and other apps can capture, open a file, clock in and out, and read your agenda.
 - Python blocks run in orgstar itself, with Python's standard library; JavaScript and Python blocks can fetch from the web.
@@ -130,6 +131,7 @@ org-mode,emacs,outline,todo,agenda,plain text,notes,tasks,gtd,planner,kanban,org
 
 ### What's New
 
+- Settings ▸ All Settings: every config.toml option in one searchable list, with a control for each, an explanation of what it does, and reset to the default.
 - Your own commands: write them in JavaScript in commands.toml; they appear in the command palette, can be bound to keys, run orgstar's own commands, and can run after a TODO changes or before a capture is filed.
 - orgstar:// links with x-callback-url, so Shortcuts and other apps can capture, open a file, clock in and out, and read your agenda.
 - Python blocks run in orgstar itself, with Python's standard library; JavaScript and Python blocks can fetch from the web.
