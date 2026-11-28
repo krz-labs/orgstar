@@ -343,7 +343,7 @@ Status, 2026-11-20: phases 1–7 are built. The Mac download is at 1.1.1 (univer
 6. **Beyond Emacs:** clock reports, habit charts, table and kanban views over properties, Doom keymap.
 7. **iOS:** same core; touch input, capture and agenda first.
 
-Plans in `docs/plans/` are ticked when their commits land, and a step that did not ship is marked in the plan. Open work is in the repository's issues.
+Open work is in the repository's issues.
 
 **Phase 1 scope**
 
