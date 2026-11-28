@@ -4,6 +4,26 @@
     <title>orgstar</title>
     <link>https://github.com/krz-labs/orgstar</link>
     <item>
+      <title>orgstar 1.7.0</title>
+      <link>https://krz.sh/apps/orgstar/</link>
+      <sparkle:version>943</sparkle:version>
+      <sparkle:shortVersionString>1.7.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+      <pubDate>Sat, 28 Nov 2026 05:21:15 -0600</pubDate>
+      <description><![CDATA[<ul>
+<li>Timeline: lay out a day or week by time, drag entries to move or resize them, and drop undated TODOs onto it to schedule them.</li>
+<li>A month grid of the agenda; drag an entry to another day to reschedule it.</li>
+<li>Triage your inbox one entry at a time, and a Weekly Review view.</li>
+<li>org-ql queries in agenda views and <code>org-ql</code> dynamic blocks.</li>
+<li>The running clock in the menu bar, today's entries with Done and Clock In, and a capture field.</li>
+<li>Mark Done, snooze or clock in from a reminder; Mark Done, Reschedule and Refile in an agenda row's menu.</li>
+<li>Check off entries and habits from desktop widgets.</li>
+<li>Birthdays and other dates from Contacts in the agenda, if you turn it on.</li>
+</ul>
+<p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
+      <enclosure url="https://files.krz.sh/orgstar/orgstar-1.7.0.dmg" type="application/octet-stream" sparkle:edSignature="oZ788NDTebaGlzzdoK0MPainF1mqSnheTB8yn9tCBZjmEygjr5V3fLfWraMUqSgtOahQ6NHGvmkg9OcO9VEQDg==" length="87223784"/>
+    </item>
+    <item>
       <title>orgstar 1.6.0</title>
       <link>https://krz.sh/apps/orgstar/</link>
       <sparkle:version>932</sparkle:version>
