@@ -13,7 +13,20 @@ public enum KeymapPreset: String, Sendable, CaseIterable {
     /// Whether the preset edits modally.
     public var isModal: Bool { self == .doom }
 
+    /// Parsed once per preset: every editor starts with one.
     public var keymap: Keymap {
+        switch self {
+        case .emacs: Self.emacsKeymap
+        case .mac: Self.macKeymap
+        case .doom: Self.doomKeymap
+        }
+    }
+
+    private static let emacsKeymap = KeymapPreset.emacs.parsedKeymap
+    private static let macKeymap = KeymapPreset.mac.parsedKeymap
+    private static let doomKeymap = KeymapPreset.doom.parsedKeymap
+
+    private var parsedKeymap: Keymap {
         var problems: [String] = []
         let map = try! Keymap(toml: toml, problems: &problems)
         precondition(problems.isEmpty, "preset \(rawValue): \(problems)")

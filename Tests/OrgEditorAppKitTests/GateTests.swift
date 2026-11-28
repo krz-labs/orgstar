@@ -132,6 +132,8 @@ struct GateTests {
         // The first text view, and the first text loaded into one, set up the text system once
         // per process; an app pays that at launch, not per file.
         NSTextView(usingTextLayoutManager: true).textStorage?.setAttributedString(NSAttributedString(string: "warm up"))
+        // The apps read the preset keymap at launch, before any file opens.
+        _ = KeymapPreset.emacs.keymap
         // Memory limits: worst-case dense markup for the synthetic files, typical for real ones.
         var inputs = [("single 1 MB section", Self.singleSection, 45.0), ("5,000-row table", Self.bigTable, 45.0), ("3,000 entries with drawers", Self.drawers, 45.0)]
         if let path = ProcessInfo.processInfo.environment["ORGSTAR_GATE_FILE"] {
