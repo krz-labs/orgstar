@@ -400,6 +400,10 @@ extension EmacsBuffer {
             try replaceDynamicBlockContent(at: mark.position, with: table, recalculate: table.range(of: "(?mi)^[ \\t]*#\\+TBLFM:", options: .regularExpression) != nil)
             return
         }
+        if name == "org-ql" {
+            try replaceDynamicBlockContent(at: begin, with: orgQLBlock(paramText: paramText))
+            return
+        }
         if DenoteBlocks.names.contains(name) {
             try replaceDynamicBlockContent(at: begin, with: denoteBlock(name, paramText: paramText))
             return

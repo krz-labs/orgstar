@@ -20,6 +20,8 @@ struct AgendaViewSaveTests {
             ("Holds", .todo(keywords: "WAIT|HOLD")),
             ("Three days", .agenda(span: 3, startOffset: -1)),
             ("Stuck", .stuck(nil)),
+            ("Next at work", .query("todo:NEXT tags:work", sort: ["date", "priority"])),
+            ("Overdue", .query("(and (todo) (deadline :to -1))", sort: [])),
         ]
         for (name, mode) in modes { try AgendaViewLoader.save(name: name, mode: mode, userFile: file) }
         let loaded = AgendaViewLoader.load(userFile: file)

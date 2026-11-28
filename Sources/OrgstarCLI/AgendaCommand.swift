@@ -80,6 +80,8 @@ enum AgendaCommand {
                 block.list = Agenda.textSearch(sources, string: string, todoOnly: todoOnly, options: job.options)
             case .stuck(let definition):
                 block.list = Agenda.stuckProjects(sources, definition ?? job.options.stuckProjects, now: now, calendar: calendar, options: job.options)
+            case .query(let query, let sort):
+                block.list = Agenda.query(sources, query: query, sort: sort, today: today, options: job.options) ?? []
             case .blocks:
                 break
             }
@@ -151,6 +153,7 @@ enum AgendaCommand {
         case .match(let match, _): return "Headlines with TAGS match: \(match)"
         case .search(let string, _): return "Search words: \(string)"
         case .stuck: return "List of stuck projects:"
+        case .query(let query, _): return "Query: \(query)"
         case .blocks: return ""
         }
     }
@@ -208,6 +211,7 @@ enum AgendaCommand {
         case .match(_, let todoOnly): todoOnly ? "todo-match" : "match"
         case .search(_, let todoOnly): todoOnly ? "todo-search" : "search"
         case .stuck: "stuck"
+        case .query: "query"
         case .blocks: "blocks"
         }
     }

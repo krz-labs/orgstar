@@ -112,6 +112,19 @@ struct AgendaTests {
         #expect(missing.status == 3)
         #expect(missing.err.contains("No agenda view named Nope"))
     }
+
+    @Test func runsAQueryViewOfViewsToml() throws {
+        let sandbox = try Sandbox()
+        try sandbox.write(Self.tasks, "tasks.org")
+        try sandbox.write("[[view]]\nname = \"Planned\"\ntype = \"query\"\nquery = \"todo: ts:\"\nsort = \"date\"\n", "views.toml", in: sandbox.config)
+        let (status, out, _) = sandbox.run("agenda", "Planned", "--json")
+        #expect(status == 0)
+        let json = try #require(try JSONSerialization.jsonObject(with: Data(out.utf8)) as? [String: Any])
+        let block = try #require((json["blocks"] as? [[String: Any]])?.first)
+        #expect(block["type"] as? String == "query")
+        #expect(block["header"] as? String == "Query: todo: ts:")
+        #expect((block["entries"] as? [[String: Any]])?.map { $0["title"] as? String } == ["TODO Write report", "TODO Pay rent"])
+    }
 }
 
 @MainActor

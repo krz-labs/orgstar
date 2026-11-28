@@ -859,6 +859,50 @@ struct AgendaCommandTests {
         #expect(agenda.list.map(\.text) == ["TODO [#A] c", "TODO b", "TODO a"])
     }
 
+    @Test func orgQLQueryViews() async throws {
+        let notes = try Folder()
+        try notes.write("a.org", "* TODO [#B] Report :work:\n* NEXT Call :work:\n* TODO [#A] Rent :home:\n* DONE Old :work:\n")
+        let file = try notes.write("views.toml", """
+        [[view]]
+        name = "Work"
+        type = "query"
+        query = "todo: tags:work"
+        sort = "priority"
+        [[view]]
+        name = "Sexp"
+        type = "query"
+        query = '(or (priority "A") (done))'
+        [[view]]
+        name = "Rifle"
+        type = "query"
+        query = "rent"
+        [[view]]
+        name = "No query"
+        type = "query"
+        [[view]]
+        name = "Bad sort"
+        type = "query"
+        query = "todo:"
+        sort = "size"
+        """)
+        let loaded = AgendaViewLoader.load(userFile: file)
+        #expect(loaded.views.dropFirst(3).map(\.mode) == [.query("todo: tags:work", sort: ["priority"]), .query("(or (priority \"A\") (done))", sort: [])])
+        #expect(loaded.problems == [
+            "views.toml line 10: Rifle: Words without a predicate search with org-ql's rifle predicate, which isn't supported: rent. Use heading:rent to search headings.",
+            "views.toml line 14: No query needs a query",
+            "views.toml line 17: Bad sort: Unknown sort key size",
+        ])
+        let model = try WorkspaceModel(directory: nil)
+        try await model.addRoot(notes.url)
+        let agenda = AgendaModel(workspace: model)
+        agenda.mode = loaded.views[3].mode
+        await agenda.refresh(open: [:])
+        #expect(agenda.list.map(\.text) == ["TODO [#B] Report"])
+        agenda.mode = loaded.views[4].mode
+        await agenda.refresh(open: [:])
+        #expect(agenda.list.map(\.text) == ["TODO [#A] Rent", "DONE Old"])
+    }
+
     @Test func stuckProjectViews() async throws {
         let notes = try Folder()
         try notes.write("a.org", "* Projects\n** Website\n*** TODO Draft\n** Garden\n*** WAIT Seeds\n")

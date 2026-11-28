@@ -75,9 +75,9 @@ struct AgendaScreen: View, Equatable {
         var id: String { rawValue }
     }
 
-    /// A match typed for the tag and property view, or a search string.
+    /// A match typed for the tag and property view, a search string or an org-ql query.
     private enum Asking: Identifiable {
-        case match, search
+        case match, search, query
         /// A name for the match or search showing, to keep it as a view.
         case save
         var id: Self { self }
@@ -210,6 +210,7 @@ struct AgendaScreen: View, Equatable {
                     }
                     Button("Tags and Properties…") { asking = .match }
                     Button("Search…") { asking = .search }
+                    Button("Query…") { asking = .query }
                     if canSaveView { Button("Save as View…") { asking = .save } }
                     Divider()
                     if case .agenda = agenda.mode {
@@ -269,6 +270,8 @@ struct AgendaScreen: View, Equatable {
                     agenda.mode = .search(answer, todoOnly: false)
                     viewName = answer
                 }
+            } else if kind == .query {
+                PromptSheet(prompt: Prompt(key: "query", message: String(localized: "org-ql query: todo:NEXT tags:work, or (and (todo \"NEXT\") (tags \"work\"))"))) { showQuery($0) }
             } else {
                 PromptSheet(prompt: Prompt(key: "match", message: String(localized: "Match: tags and properties, as +work-home or TODO=\"WAIT\""))) { answer in
                     asking = nil
@@ -422,12 +425,25 @@ struct AgendaScreen: View, Equatable {
         if let problem = loaded.problems.first { message = problem }
     }
 
-    /// A typed match or search is showing, which isn't a named view yet.
+    /// A typed match, search or query is showing, which isn't a named view yet.
     private var canSaveView: Bool {
         switch agenda.mode {
-        case .match, .search: return !views.contains { $0.mode == agenda.mode }
+        case .match, .search, .query: return !views.contains { $0.mode == agenda.mode }
         default: return false
         }
+    }
+
+    /// Shows the entries matching an org-ql query, or says why it can't be read.
+    private func showQuery(_ answer: String?) {
+        asking = nil
+        guard let answer, answer.contains(where: { !$0.isWhitespace }) else { return }
+        do {
+            _ = try OrgQL.parse(answer)
+        } catch {
+            return message = error.description
+        }
+        agenda.mode = .query(answer, sort: [])
+        viewName = answer
     }
 
     /// Adds the match or search showing to `views.toml` as `name`, then shows it as that view.
@@ -628,6 +644,7 @@ struct AgendaScreen: View, Equatable {
         rows += [
             CommandRow(id: "agenda.match", title: String(localized: "Tags and Properties…")),
             CommandRow(id: "agenda.search", title: String(localized: "Search…")),
+            CommandRow(id: "agenda.query", title: String(localized: "Query…")),
         ]
         if canSaveView { rows.append(CommandRow(id: "agenda.save", title: String(localized: "Save as View…"))) }
         if case .agenda = agenda.mode {
@@ -656,6 +673,7 @@ struct AgendaScreen: View, Equatable {
             if let index = Int(id.dropFirst("agenda.view.".count)), views.indices.contains(index) { show(views[index]) }
         case "agenda.match": asking = .match
         case "agenda.search": asking = .search
+        case "agenda.query": asking = .query
         case "agenda.save": asking = .save
         case "agenda.today": goToday()
         case "agenda.earlier": step(forward: false)
