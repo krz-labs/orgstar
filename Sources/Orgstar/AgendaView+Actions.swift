@@ -155,7 +155,7 @@ extension AgendaView {
 
     /// Refiles the selected entry, or with `marked` the marked ones, to a target chosen from a
     /// searchable list.
-    private func refile(marked bulk: Bool) {
+    func refile(marked bulk: Bool) {
         let entries = bulk ? marked : selectedEntry.map { [$0] } ?? []
         guard !entries.isEmpty else {
             message = "No entry selected"

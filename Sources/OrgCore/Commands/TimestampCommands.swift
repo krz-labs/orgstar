@@ -131,10 +131,15 @@ public struct InsertTimestamp: OrgCommand {
     }
 }
 
-/// C-c C-s and C-c C-d: `org-schedule` and `org-deadline`.
+/// C-c C-s and C-c C-d: `org-schedule` and `org-deadline`. With `keepTime`, a date answered
+/// takes the old timestamp's time of day, as the prompt pre-fills it.
 public struct SetPlanning: OrgCommand {
     let deadline: Bool
-    public init(deadline: Bool) { self.deadline = deadline }
+    let keepTime: Bool
+    public init(deadline: Bool, keepTime: Bool = false) {
+        self.deadline = deadline
+        self.keepTime = keepTime
+    }
     public var id: String { deadline ? "org.deadline" : "org.schedule" }
     public var title: String { deadline ? "Set Deadline" : "Schedule" }
     public func applies(in context: EditContext) -> Bool { entryHeading(at: context.caret, in: context.tree) != nil }
@@ -148,7 +153,10 @@ public struct SetPlanning: OrgCommand {
             return .prompt(Prompt(key: "date", message: deadline ? "DEADLINE:" : "SCHEDULED:", initial: initial,
                                   date: .init(defaultDate: buffer.dateDefault(buffer.planningDefault(kind)))))
         }
-        return timestampCommand(context) { try $0.schedule(kind, answer: answer, answers: context.answers) }
+        return timestampCommand(context) { buffer in
+            let time = keepTime ? buffer.planningDefault(kind).flatMap(EmacsBuffer.compactTimeOfDay) : nil
+            try buffer.schedule(kind, answer: time.map { answer + " " + $0 } ?? answer, answers: context.answers)
+        }
     }
 }
 
