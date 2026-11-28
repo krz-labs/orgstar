@@ -1,4 +1,5 @@
 import AppKit
+import Contacts
 import OrgApp
 import OrgDocument
 import OrgCore
@@ -10,11 +11,13 @@ enum AgendaSpan: String, CaseIterable {
     case day, week, month
 }
 
-/// The app's one reader of Calendar events and of Reminders, for the agenda and Settings.
+/// The app's one reader of Calendar events, of Reminders and of Contacts' dates, for the agenda
+/// and Settings.
 @MainActor
 enum CalendarAccess {
     static let events = CalendarEvents()
     static let reminders = ReminderLists()
+    static let contacts = ContactDates()
 }
 
 /// The agenda window: the day/week agenda, the TODO list, tag matches, text search and saved views.
@@ -72,6 +75,7 @@ struct AgendaView: View {
     @AppStorage("calendarEventCalendars") private var calendarNames = ""
     @AppStorage("agendaReminders") private var remindersOn = false
     @AppStorage("agendaReminderLists") private var reminderListNames = ""
+    @AppStorage("agendaContactDates") private var contactDatesOn = false
     @AppStorage("agendaPrefixAgenda") private var prefixAgenda = PrefixFormat.defaults["agenda"]!
     @AppStorage("agendaPrefixTodo") private var prefixTodo = PrefixFormat.defaults["todo"]!
     @AppStorage("agendaPrefixTags") private var prefixTags = PrefixFormat.defaults["tags"]!
@@ -143,7 +147,7 @@ struct AgendaView: View {
             mode: agenda.mode, start: agenda.start, span: span, startOffset: startOffset, startOnWeekday: startOnWeekday, includeSubfolders: includeSubfolders, hidden: HiddenFolders.shared.all, prefix: [prefixAgenda, prefixTodo, prefixTags],
             settings: [sortAgenda, sortTodo, sortTags, sortSearch, gridWhen, gridTimes, "\(useTimeGrid) \(showCurrentTime)", stuckMatch, stuckTodo, stuckTags, stuckRegexp, agendaFileList],
             logMode: logMode,
-            calendars: (calendarEventsOn ? [calendarNames] : []) + (remindersOn ? ["reminders", reminderListNames] : []), files: 0, changed: nil, edits: 0, path: nil, tick: tick
+            calendars: (calendarEventsOn ? [calendarNames] : []) + (remindersOn ? ["reminders", reminderListNames] : []) + (contactDatesOn ? ["contacts"] : []), files: 0, changed: nil, edits: 0, path: nil, tick: tick
         )
     }
 
@@ -169,6 +173,11 @@ struct AgendaView: View {
             agenda.reminderLists = await CalendarAccess.reminders.requestAccess() ? CalendarAccess.reminders : nil
         } else {
             agenda.reminderLists = nil
+        }
+        if contactDatesOn, ProAccess.shared.isUnlocked, isAgenda || isBlocks {
+            agenda.contactDates = await CalendarAccess.contacts.requestAccess() ? CalendarAccess.contacts : nil
+        } else {
+            agenda.contactDates = nil
         }
         await agenda.refresh(open: session.openTexts)
     }
@@ -389,6 +398,9 @@ struct AgendaView: View {
                 if Days.absolute(now, calendar: .current) != agenda.today { tick += 1 }
             }
         }
+        .task {
+            for await _ in NotificationCenter.default.notifications(named: .CNContactStoreDidChange) where contactDatesOn { tick += 1 }
+        }
     }
 
     /// File ▸ Print…: the agenda as it shows now, in the print panel, on pages laid out as PDF
@@ -561,8 +573,8 @@ struct AgendaView: View {
     @ViewBuilder
     private func menu(_ line: Line) -> some View {
         if let event = line.row.event {
-            Button(event.isReminder ? "Show in Reminders" : "Show in Calendar") { openEvent(event) }
-            if !event.isReminder {
+            Button(event.isReminder ? "Show in Reminders" : event.isContact ? "Show in Contacts" : "Show in Calendar") { openEvent(event) }
+            if !event.isReminder, !event.isContact {
                 Button("Edit Event…") { eventRequest = EventRequest(draft: EventDraft(event), event: event) }
             }
         } else if line.row.item != nil {
@@ -594,17 +606,23 @@ struct AgendaView: View {
 
     func item(_ id: String) -> AgendaItem? { line(id)?.row.item }
 
-    /// Return and double click: the entry in the main window, or the event in Calendar or Reminders.
+    /// Return and double click: the entry in the main window, or the event in Calendar, Reminders
+    /// or Contacts.
     func open(_ line: Line) {
         selection = line.id
         if let event = line.row.event { openEvent(event) } else { jump(line.id) }
     }
 
     /// Calendar shows an event from its identifier (`AgendaEvent.id` adds `@` and the start);
-    /// Reminders a reminder from its own.
+    /// Reminders a reminder from its own; Contacts a contact from its identifier.
     private func openEvent(_ event: AgendaEvent) {
         if event.isReminder {
             if let url = URL(string: "x-apple-reminderkit://REMCDReminder/\(event.id)") { NSWorkspace.shared.open(url) }
+            return
+        }
+        if event.isContact {
+            if let encoded = event.calendarID.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed),
+               let url = URL(string: "addressbook://\(encoded)") { NSWorkspace.shared.open(url) }
             return
         }
         let identifier = event.id.split(separator: "@").dropLast().joined(separator: "@")

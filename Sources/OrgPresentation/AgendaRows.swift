@@ -1,9 +1,10 @@
 import Foundation
 import OrgCore
 
-/// An event from the system Calendar or a reminder from Reminders, read-only (OrgApp's
-/// `CalendarEvents` and `ReminderLists` read them). A reminder starts and ends at its due date;
-/// one without a time is all day.
+/// An event from the system Calendar, a reminder from Reminders or a date from Contacts,
+/// read-only (OrgApp's `CalendarEvents`, `ReminderLists` and `ContactDates` read them). A
+/// reminder starts and ends at its due date; one without a time is all day. A contact's date is
+/// all day, with the contact's identifier as `calendarID` and the date's label as `calendarTitle`.
 public struct AgendaEvent: Sendable, Equatable, Identifiable {
     public let id: String
     public let title: String
@@ -16,10 +17,11 @@ public struct AgendaEvent: Sendable, Equatable, Identifiable {
     public let isAllDay: Bool
     public let location: String?
     public let isReminder: Bool
+    public let isContact: Bool
 
     public init(
         id: String, title: String, calendarID: String, calendarTitle: String, color: RGBA?, start: Date, end: Date,
-        isAllDay: Bool, location: String? = nil, isReminder: Bool = false
+        isAllDay: Bool, location: String? = nil, isReminder: Bool = false, isContact: Bool = false
     ) {
         self.id = id
         self.title = title
@@ -31,6 +33,7 @@ public struct AgendaEvent: Sendable, Equatable, Identifiable {
         self.isAllDay = isAllDay
         self.location = location
         self.isReminder = isReminder
+        self.isContact = isContact
     }
 
     /// The days (as `Days` numbers them) the event covers; an end at midnight ends the day before.
@@ -62,7 +65,7 @@ public struct AgendaRow: Sendable, Equatable, Identifiable {
     }
 
     public enum Icon: String, Sendable {
-        case scheduled, deadline, habit, event, timestamp, reminder
+        case scheduled, deadline, habit, event, timestamp, reminder, contact
     }
 
     /// Unique within a day group.
@@ -116,6 +119,7 @@ public struct AgendaRow: Sendable, Equatable, Identifiable {
         case .habit: return "repeat"
         case .event: return "circle.fill"
         case .reminder: return "circle"
+        case .contact: return "gift"
         case .timestamp: return start == nil ? "calendar" : "clock"
         }
     }
@@ -222,10 +226,10 @@ public struct AgendaRow: Sendable, Equatable, Identifiable {
         } else {
             gutter = String(localized: "Until \(Self.timeText(hhmm(event.end), nil))", bundle: .main)
         }
-        self.id = (event.isReminder ? "reminder\u{1f}" : "event\u{1f}") + event.id
+        self.id = (event.isReminder ? "reminder\u{1f}" : event.isContact ? "contact\u{1f}" : "event\u{1f}") + event.id
         self.gutter = gutter
         self.status = event.isReminder && days.lowerBound < day ? .overdue : .normal
-        self.icon = event.isReminder ? .reminder : .event
+        self.icon = event.isReminder ? .reminder : event.isContact ? .contact : .event
         self.category = event.calendarTitle
         self.title = event.title
         self.tags = []

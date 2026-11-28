@@ -83,6 +83,7 @@ enum SettingTexts {
         String(localized: "search snippets match whole words only", comment: "A config.toml setting, as its comment in the file describes it"),
         String(localized: "search strings are always +word -word {regexp} snippets, never a phrase", comment: "A config.toml setting, as its comment in the file describes it"),
         String(localized: "show LaTeX fragments as typeset math when a file opens; #+STARTUP: (no)latexpreview overrides", comment: "A config.toml setting, as its comment in the file describes it"),
+        String(localized: "show birthdays and other dates from Contacts in the agenda, read-only", comment: "A config.toml setting, as its comment in the file describes it"),
         String(localized: "show days with no entries (Emacs's default is t; orgstar hides them); today always shows", comment: "A config.toml setting, as its comment in the file describes it"),
         String(localized: "show events from Calendar in the agenda", comment: "A config.toml setting, as its comment in the file describes it"),
         String(localized: "show image links as images when a file opens; #+STARTUP: (no)inlineimages overrides", comment: "A config.toml setting, as its comment in the file describes it"),

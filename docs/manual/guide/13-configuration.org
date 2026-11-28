@@ -150,6 +150,7 @@ See Themes and Fonts below.
 | A checkbox for each calendar        | On or off              | All on       | =calendar-event-calendars=  |
 | Show reminders from Reminders       | On or off              | Off          | =agenda-reminders=          |
 | A checkbox for each list            | On or off              | All on       | =agenda-reminder-lists=     |
+| Show birthdays and dates from Contacts | On or off           | Off          | =agenda-contact-dates=      |
 | Notify before timed agenda entries  | On or off              | On           | =reminders=                 |
 | N minutes before                    | 0 to 120               | 12           | =appt-message-warning-time= |
 | Ask what to do with idle time while clocked in | On or off   | Off          | =org-clock-idle-time=       |
@@ -540,6 +541,7 @@ Any other key in =[theme]= is a color; see Themes below.
 | =calendar-event-calendars=  | string  | =""=          | The calendars whose events show, by title or identifier, separated by commas; =""= for all. |
 | =agenda-reminders=          | boolean | =false=       | Show incomplete reminders with a due date from Reminders in the agenda, read-only.      |
 | =agenda-reminder-lists=     | string  | =""=          | The Reminders lists shown, by title or identifier, separated by commas; =""= for all.  |
+| =agenda-contact-dates=      | boolean | =false=       | Show birthdays and other dates from Contacts in the agenda, read-only.                  |
 | =global-capture-hotkey=     | boolean | =true=        | =⌃⌥Space= opens Capture from any app.                                                   |
 | =menu-bar-item=             | boolean | =false=       | Keep orgstar in the menu bar, with capture and today's agenda; off shows it only while a clock runs. |
 

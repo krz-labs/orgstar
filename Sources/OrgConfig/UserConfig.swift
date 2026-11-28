@@ -369,6 +369,8 @@ public enum UserConfig {
                 comment: "show incomplete reminders with a due date from Reminders in the agenda, read-only", legacy: ""),
         Setting(section: "orgstar", key: "agenda-reminder-lists", defaultsKey: "agendaReminderLists", kind: .string, fallback: .string(""),
                 comment: "the Reminders lists shown, by title or identifier, separated by commas; \"\" for all", legacy: ""),
+        Setting(section: "orgstar", key: "agenda-contact-dates", defaultsKey: "agendaContactDates", kind: .bool, fallback: .bool(false),
+                comment: "show birthdays and other dates from Contacts in the agenda, read-only", legacy: ""),
         Setting(section: "orgstar", key: "global-capture-hotkey", defaultsKey: "globalCapture", kind: .bool, fallback: .bool(true),
                 comment: "⌃⌥Space opens Capture from any app; templates go in capture.toml", legacy: "capture.global-hotkey"),
         Setting(section: "orgstar", key: "menu-bar-item", defaultsKey: "menuBarItem", kind: .bool, fallback: .bool(false),

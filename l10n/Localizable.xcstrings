@@ -52,6 +52,41 @@
       },
       "shouldTranslate": false
     },
+    "%@ (%lld)": {
+      "comment": "A contact's name and the years since a date of theirs, in the agenda",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ (%lld)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ (%lld)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ (%lld)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@（%lld）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ (%lld)"
+          }
+        }
+      }
+    },
     "%@ (and %lld more)": {
       "comment": "A problem with the configuration, and how many more there are",
       "localizations": {
@@ -6424,6 +6459,40 @@
         }
       }
     },
+    "Allow Access to Contacts…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zugriff auf Kontakte erlauben …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permitir acceso a Contactos…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autoriser l'accès aux contacts…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連絡先へのアクセスを許可…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permitir Acesso aos Contatos…"
+          }
+        }
+      }
+    },
     "Allow Access to Reminders…": {
       "localizations": {
         "de": {
@@ -6557,6 +6626,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Permita que o orgstar leia seus calendários em Ajustes do Sistema ▸ Privacidade e Segurança ▸ Calendários."
+          }
+        }
+      }
+    },
+    "Allow orgstar to read your contacts in System Settings ▸ Privacy & Security ▸ Contacts.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erlaube orgstar in den Systemeinstellungen ▸ Datenschutz & Sicherheit ▸ Kontakte, deine Kontakte zu lesen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permite que orgstar lea tus contactos en Ajustes del Sistema ▸ Privacidad y seguridad ▸ Contactos."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autorisez orgstar à lire vos contacts dans Réglages Système ▸ Confidentialité et sécurité ▸ Contacts."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「システム設定」▸「プライバシーとセキュリティ」▸「連絡先」で、orgstarに連絡先の読み取りを許可してください。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permita que o orgstar leia seus contatos em Ajustes do Sistema ▸ Privacidade e Segurança ▸ Contatos."
           }
         }
       }
@@ -6936,6 +7039,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "A propriedade APPT_WARNTIME de uma entrada substitui a antecedência."
+          }
+        }
+      }
+    },
+    "Anniversary": {
+      "comment": "A date on a contact, in the agenda",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jahrestag"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aniversario"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anniversaire"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "記念日"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Data comemorativa"
           }
         }
       }
@@ -8489,6 +8627,109 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cobrado mensalmente"
+          }
+        }
+      }
+    },
+    "Birthday": {
+      "comment": "A contact's birthday, in the agenda",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geburtstag"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cumpleaños"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Date de naissance"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "誕生日"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aniversário"
+          }
+        }
+      }
+    },
+    "Birthdays, anniversaries and other dates on your contacts show in the agenda read-only, with the years since when the year is known; double-click one to open the contact.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geburtstage, Jahrestage und andere Daten deiner Kontakte erscheinen schreibgeschützt in der Agenda, mit den vergangenen Jahren, wenn das Jahr bekannt ist; doppelklicke eines, um den Kontakt zu öffnen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los cumpleaños, aniversarios y otras fechas de tus contactos se muestran en la agenda, de solo lectura, con los años transcurridos cuando se conoce el año; haz doble clic en uno para abrir el contacto."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les anniversaires et autres dates de vos contacts s'affichent dans l'agenda en lecture seule, avec le nombre d'années quand l'année est connue ; double-cliquez sur l'un d'eux pour ouvrir le contact."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連絡先の誕生日、記念日、その他の日付が読み出し専用でアジェンダに表示され、年がわかる場合は経過年数も表示されます。ダブルクリックすると連絡先を開きます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aniversários, datas comemorativas e outras datas dos seus contatos aparecem na agenda, somente leitura, com os anos passados quando o ano é conhecido; clique duas vezes em um para abrir o contato."
+          }
+        }
+      }
+    },
+    "Birthdays, anniversaries and other dates on your contacts show in the agenda, read-only, with the years since when the year is known.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geburtstage, Jahrestage und andere Daten deiner Kontakte erscheinen schreibgeschützt in der Agenda, mit den vergangenen Jahren, wenn das Jahr bekannt ist."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los cumpleaños, aniversarios y otras fechas de tus contactos se muestran en la agenda, de solo lectura, con los años transcurridos cuando se conoce el año."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les anniversaires et autres dates de vos contacts s'affichent dans l'agenda, en lecture seule, avec le nombre d'années quand l'année est connue."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連絡先の誕生日、記念日、その他の日付が読み出し専用でアジェンダに表示され、年がわかる場合は経過年数も表示されます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aniversários, datas comemorativas e outras datas dos seus contatos aparecem na agenda, somente leitura, com os anos passados quando o ano é conhecido."
           }
         }
       }
@@ -13656,6 +13897,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Alterações Conflitantes"
+          }
+        }
+      }
+    },
+    "Contacts": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontakte"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contactos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contacts"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連絡先"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contatos"
           }
         }
       }
@@ -47104,6 +47379,74 @@
         }
       }
     },
+    "Show birthdays and dates from Contacts": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geburtstage und Daten aus Kontakte zeigen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar cumpleaños y fechas de Contactos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher les anniversaires et dates de Contacts"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連絡先の誕生日と日付を表示"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar aniversários e datas de Contatos"
+          }
+        }
+      }
+    },
+    "Show birthdays and other dates from Contacts in the agenda, read-only.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geburtstage und andere Daten aus Kontakte schreibgeschützt in der Agenda zeigen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muestra cumpleaños y otras fechas de Contactos en la agenda, de solo lectura."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher les anniversaires et autres dates de Contacts dans l'agenda, en lecture seule."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連絡先の誕生日やその他の日付を読み出し専用でアジェンダに表示します。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar aniversários e outras datas de Contatos na agenda, somente leitura."
+          }
+        }
+      }
+    },
     "Show days without entries": {
       "localizations": {
         "de": {
@@ -47408,6 +47751,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mostrar no Calendário"
+          }
+        }
+      }
+    },
+    "Show in Contacts": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Kontakte zeigen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar en Contactos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher dans Contacts"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連絡先で表示"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar em Contatos"
           }
         }
       }
@@ -64460,6 +64837,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "mostrar fragmentos LaTeX como fórmulas compostas ao abrir um arquivo; #+STARTUP: (no)latexpreview substitui"
+          }
+        }
+      }
+    },
+    "show birthdays and other dates from Contacts in the agenda, read-only": {
+      "comment": "A config.toml setting, as its comment in the file describes it",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geburtstage und andere Daten aus Kontakte in der Agenda zeigen, schreibgeschützt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "mostrar en la agenda los cumpleaños y otras fechas de Contactos, de solo lectura"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "afficher dans l'agenda les anniversaires et autres dates de Contacts, en lecture seule"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連絡先の誕生日やその他の日付をアジェンダに表示、読み出し専用"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "mostrar na agenda aniversários e outras datas de Contatos, somente leitura"
           }
         }
       }

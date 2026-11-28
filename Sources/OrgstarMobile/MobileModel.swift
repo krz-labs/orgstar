@@ -49,6 +49,8 @@ final class MobileModel {
     var watchCaptures = 0
     /// Reminders for the agenda, with `agenda-reminders`.
     let reminderLists = ReminderLists()
+    /// Birthdays and other dates from Contacts for the agenda, with `agenda-contact-dates`.
+    let contactDates = ContactDates()
     /// The file and caret of the editor on screen, advertised for Handoff.
     @ObservationIgnored let handoff = HandoffAdvertiser()
     /// Folders synced through Working Copy.
@@ -189,6 +191,7 @@ final class MobileModel {
             agenda.calendarNames = OrgPreferences.calendarEventCalendars()
             agenda.reminderLists = ProAccess.shared.isUnlocked && OrgPreferences.agendaReminders() ? reminderLists : nil
             agenda.reminderListNames = OrgPreferences.agendaReminderLists()
+            agenda.contactDates = ProAccess.shared.isUnlocked && OrgPreferences.agendaContactDates() ? contactDates : nil
         }
         settingsVersion += 1
     }
@@ -350,6 +353,7 @@ final class MobileModel {
             days.calendarNames = agenda.calendarNames
             days.reminderLists = agenda.reminderLists
             days.reminderListNames = agenda.reminderListNames
+            days.contactDates = agenda.contactDates
         }
         await days.refresh(open: session.openTexts)
         let groups = days.groups()
