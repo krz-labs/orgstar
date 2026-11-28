@@ -12421,6 +12421,40 @@
         }
       }
     },
+    "Code blocks on the network": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Codeblöcke im Netzwerk"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bloques de código en la red"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blocs de code sur le réseau"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ネットワークを使うコードブロック"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blocos de código na rede"
+          }
+        }
+      }
+    },
     "Code blocks that run in orgstar": {
       "localizations": {
         "de": {
@@ -25657,6 +25691,40 @@
         }
       }
     },
+    "JavaScript and Python blocks can fetch from the web, and a JavaScript block that never finishes is stopped at its time limit.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JavaScript- und Python-Blöcke können Daten aus dem Web abrufen, und ein JavaScript-Block, der nie endet, wird nach seinem Zeitlimit gestoppt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los bloques de JavaScript y Python pueden obtener datos de la web, y un bloque de JavaScript que nunca termina se detiene al llegar a su límite de tiempo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les blocs JavaScript et Python peuvent récupérer des données sur le web, et un bloc JavaScript qui ne se termine jamais est arrêté à sa limite de temps."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JavaScript と Python のブロックからウェブのデータを取得できます。終わらない JavaScript のブロックは制限時間で停止します。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blocos de JavaScript e Python podem buscar dados da web, e um bloco de JavaScript que nunca termina é interrompido no seu limite de tempo."
+          }
+        }
+      }
+    },
     "JavaScript stopped: %@": {
       "localizations": {
         "de": {
@@ -27411,6 +27479,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Links e Notas de Rodapé"
+          }
+        }
+      }
+    },
+    "Links for other apps": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Links für andere Apps"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enlaces para otras apps"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Liens pour d'autres apps"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "他のアプリからのリンク"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Links para outros apps"
           }
         }
       }
@@ -44587,6 +44689,40 @@
         }
       }
     },
+    "Settings ▸ General ▸ Install Command-Line Tool… adds an orgstar command for the agenda, capture, clocking and export.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einstellungen ▸ Allgemein ▸ Befehlszeilenwerkzeug installieren … fügt einen orgstar-Befehl für Agenda, Erfassen, Zeiterfassung und Export hinzu."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajustes ▸ General ▸ Instalar herramienta de línea de comandos… añade un comando orgstar para la agenda, la captura, el reloj y la exportación."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages ▸ Général ▸ Installer l’outil en ligne de commande… ajoute une commande orgstar pour l’agenda, la capture, le chronomètre et l’export."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定 ▸ 一般 ▸ コマンドラインツールをインストール… で、アジェンダ、キャプチャ、クロック、書き出し用の orgstar コマンドが追加されます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajustes ▸ Geral ▸ Instalar Ferramenta de Linha de Comando… adiciona um comando orgstar para a agenda, captura, relógio e exportação."
+          }
+        }
+      }
+    },
     "Settings ▸ General ▸ Keep orgstar in the menu bar adds capture, the agenda and today's entries to the menu bar.": {
       "localizations": {
         "de": {
@@ -54841,6 +54977,40 @@
         }
       }
     },
+    "Write commands in JavaScript in commands.toml. They appear with orgstar's own commands, can run them, and can run after a TODO changes or before a capture is filed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schreiben Sie Befehle in JavaScript in commands.toml. Sie erscheinen neben den Befehlen von orgstar, können diese ausführen und nach einer TODO-Änderung oder vor dem Ablegen einer Erfassung laufen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escribe comandos en JavaScript en commands.toml. Aparecen junto a los comandos de orgstar, pueden ejecutarlos y pueden ejecutarse después de un cambio de TODO o antes de archivar una captura."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Écrivez des commandes en JavaScript dans commands.toml. Elles apparaissent avec les commandes d'orgstar, peuvent les exécuter et peuvent s'exécuter après un changement de TODO ou avant l'enregistrement d'une capture."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "commands.toml で JavaScript のコマンドを書けます。orgstar のコマンドと並んで表示され、それらを実行でき、TODO の変更後やキャプチャの保存前に実行することもできます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escreva comandos em JavaScript no commands.toml. Eles aparecem junto aos comandos do orgstar, podem executá-los e podem rodar depois que um TODO muda ou antes de uma captura ser arquivada."
+          }
+        }
+      }
+    },
     "Wrong passphrase": {
       "localizations": {
         "de": {
@@ -55384,6 +55554,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Seus próprios atalhos ficam em %@, por cima da predefinição."
+          }
+        }
+      }
+    },
+    "Your own commands": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eigene Befehle"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tus propios comandos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vos propres commandes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自分で作るコマンド"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seus próprios comandos"
           }
         }
       }
@@ -58307,6 +58511,40 @@
         }
       }
     },
+    "orgstar in Terminal": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar im Terminal"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar en Terminal"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar dans le Terminal"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ターミナルで orgstar"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar no Terminal"
+          }
+        }
+      }
+    },
     "orgstar in the menu bar": {
       "localizations": {
         "de": {
@@ -58508,6 +58746,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "O orgstar+ é uma compra única de $39.99 para este Mac. A edição, a agenda, a captura, o registro de tempo e a busca continuam gratuitos."
+          }
+        }
+      }
+    },
+    "orgstar:// links with x-callback-url let Shortcuts and other apps capture, open a file, clock in and out, and read your agenda, and get the result back.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "orgstar://-Links mit x-callback-url lassen Kurzbefehle und andere Apps erfassen, eine Datei öffnen, die Zeiterfassung starten und stoppen und Ihre Agenda lesen – und das Ergebnis zurückbekommen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los enlaces orgstar:// con x-callback-url permiten a Atajos y a otras apps capturar, abrir un archivo, iniciar y detener el reloj y leer tu agenda, y recibir el resultado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les liens orgstar:// avec x-callback-url permettent à Raccourcis et à d'autres apps de capturer, d'ouvrir un fichier, de démarrer et d'arrêter le chronomètre et de lire votre agenda, puis de récupérer le résultat."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "x-callback-url 付きの orgstar:// リンクで、ショートカットや他のアプリからキャプチャ、ファイルを開く、クロックの開始と停止、アジェンダの読み取りができ、結果を受け取れます。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Links orgstar:// com x-callback-url permitem que o Atalhos e outros apps capturem, abram um arquivo, iniciem e parem o relógio e leiam sua agenda, e recebam o resultado."
           }
         }
       }

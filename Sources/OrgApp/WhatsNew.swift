@@ -38,6 +38,14 @@ public enum WhatsNew {
 
     /// Newest first. A version without an entry shows nothing.
     public static let releases: [ReleaseNotes] = [
+        ReleaseNotes(version: "1.5.0", items: [
+            .init("curlybraces", "Your own commands",
+                  "Write commands in JavaScript in commands.toml. They appear with orgstar's own commands, can run them, and can run after a TODO changes or before a capture is filed."),
+            .init("link", "Links for other apps",
+                  "orgstar:// links with x-callback-url let Shortcuts and other apps capture, open a file, clock in and out, and read your agenda, and get the result back."),
+            .init("network", "Code blocks on the network",
+                  "JavaScript and Python blocks can fetch from the web, and a JavaScript block that never finishes is stopped at its time limit."),
+        ] + commandLine15),
         ReleaseNotes(version: "1.4.0", items: [
             .init("rectangle.on.rectangle.angled", "Presentations",
                   "Present a file one heading at a time, full screen, or export it as a reveal.js deck."),
@@ -89,6 +97,18 @@ public enum WhatsNew {
                   "PDF export typesets math without a network connection."),
         ] + mac),
     ]
+
+    /// Only the download version on the Mac carries the `orgstar` command.
+    private static var commandLine15: [ReleaseNotes.Item] {
+        #if os(macOS)
+        let tool = Bundle.main.bundleURL.appendingPathComponent("Contents/Helpers/orgstar")
+        guard FileManager.default.isExecutableFile(atPath: tool.path) else { return [] }
+        return [.init("terminal", "orgstar in Terminal",
+                      "Settings ▸ General ▸ Install Command-Line Tool… adds an orgstar command for the agenda, capture, clocking and export.")]
+        #else
+        return []
+        #endif
+    }
 
     /// Only the App Store builds run python blocks in Pyodide.
     private static var python14: [ReleaseNotes.Item] {

@@ -15,6 +15,7 @@ cask "orgstar" do
   depends_on macos: :tahoe
 
   app "orgstar.app"
+  binary "#{appdir}/orgstar.app/Contents/Helpers/orgstar"
 
   zap trash: [
     "~/.config/orgstar",

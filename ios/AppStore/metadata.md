@@ -52,18 +52,14 @@ Everyone who downloaded orgstar before orgstar+ keeps all of it.
 
 ## What's New
 
-- A completion list that opens as you type, with words from your files, id links by title, property values and Denote notes.
-- Snippets with tab stops, and templates for new files.
-- One Commands list on every screen, and a key bar above the keyboard you can arrange yourself.
-- iPad: a sidebar layout, the menu bar and keyboard shortcuts.
-- Replace text across your folders, or rename a tag or TODO keyword everywhere.
-- File history: recovery versions and git commits of a file in one list.
-- Lint a file or all your folders with org-lint's rules.
-- Open and save encrypted .org.gpg files, encrypt entries tagged crypt when the file is saved, and unlock saved passphrases with Face ID if you turn it on.
-- Handoff of the open file between iPhone, iPad and Mac; Share Subtree by AirDrop, Mail or Messages.
-- Sync a git folder through Working Copy.
-- Faster opening and styling of large files, and many fixes to layout, wording and accessibility.
-- Fixes: an encrypted entry you didn't change keeps its encrypted text when the file is saved, and the passphrase sheet on iPhone and iPad has larger fields and buttons.
+- Your own commands: write them in JavaScript in commands.toml; they appear in the Commands list and key bar, can run orgstar's own commands, and can run after a TODO changes or before a capture is filed.
+- orgstar:// links with x-callback-url, so Shortcuts and other apps can capture, open a file, clock in and out, and read your agenda.
+- Python blocks run in orgstar itself, with Python's standard library; JavaScript and Python blocks can fetch from the web.
+- Present a file one heading at a time, full screen (with notes and the next slide on iPad when an external display is connected), or export it as a reveal.js deck.
+- Flashcards in org-fc's format, with a review screen, a widget for cards due, and review on Apple Watch.
+- Print the file, a subtree, the selection or the agenda.
+- Markdown and plain-text files open with highlighting, heading folds and an outline; Denote notes in Markdown and text.
+- Citations from your bibliography, and more of org-roam: aliases, refs, tags in the node chooser and capture templates for new nodes.
 
 ## Keywords
 
@@ -134,17 +130,15 @@ org-mode,emacs,outline,todo,agenda,plain text,notes,tasks,gtd,planner,kanban,org
 
 ### What's New
 
-- A completion list that opens as you type, in every preset, with words from your files, id links by title, property values and Denote notes.
-- Keyboard macros in the Emacs and Mac presets, and snippets with tab stops and templates for new files.
-- The command palette lists recent commands first and ranks the ones you use most higher.
-- Replace text across your folders, or rename a tag or TODO keyword everywhere.
-- File ▸ History…: recovery versions and git commits of a file in one list.
-- Lint a file or all your folders with org-lint's rules.
-- Open and save encrypted .org.gpg files, encrypt entries tagged crypt when the file is saved, and unlock saved passphrases with Touch ID if you turn it on.
-- Handoff of the open file between Mac, iPhone and iPad; Share Subtree by AirDrop, Mail or Messages.
-- A customisable toolbar, a grouped Org menu and Help ▸ Manual.
-- Faster opening and styling of large files, and many fixes to layout, wording and accessibility.
-- Fixes: an encrypted entry you didn't change keeps its encrypted text when the file is saved.
+- Your own commands: write them in JavaScript in commands.toml; they appear in the command palette, can be bound to keys, run orgstar's own commands, and can run after a TODO changes or before a capture is filed.
+- orgstar:// links with x-callback-url, so Shortcuts and other apps can capture, open a file, clock in and out, and read your agenda.
+- Python blocks run in orgstar itself, with Python's standard library; JavaScript and Python blocks can fetch from the web.
+- View ▸ Present shows a file one heading at a time, full screen; export to reveal.js slides.
+- Flashcards in org-fc's format, with a review window and a widget for cards due.
+- Print the file, a subtree, the selection or the agenda.
+- File ▸ Import converts Markdown files or an Obsidian vault to org files; Markdown and text files open with highlighting and folds; Denote notes in Markdown and text.
+- Citations from your bibliography, and more of org-roam: aliases, refs, tags in the node chooser and capture templates for new nodes.
+- Settings ▸ Appearance ▸ Size enlarges the agenda and sidebars too.
 
 ### App Review notes
 
