@@ -55,6 +55,8 @@ enum SettingTexts {
         String(localized: "iCalendar export: tasks as VTODOs: nil, t (not done), all, unblocked, or TODO keywords separated by spaces", comment: "A config.toml setting, as its comment in the file describes it"),
         String(localized: "iCalendar export: what SCHEDULED makes, of event-if-not-todo, event-if-todo, event-if-todo-not-done and todo-start", comment: "A config.toml setting, as its comment in the file describes it"),
         String(localized: "iCalendar export: what a DEADLINE makes, of event-if-not-todo, event-if-todo, event-if-todo-not-done and todo-due", comment: "A config.toml setting, as its comment in the file describes it"),
+        String(localized: "iOS: the actions a swipe left on an agenda row shows, before Delete: done, reschedule, refile or none", comment: "A config.toml setting, as its comment in the file describes it"),
+        String(localized: "iOS: the actions a swipe right on an agenda row shows: reschedule, done, refile or none", comment: "A config.toml setting, as its comment in the file describes it"),
         String(localized: "images at http(s) links: skip, download (each run) or cache (kept on disk)", comment: "A config.toml setting, as its comment in the file describes it"),
         String(localized: "indent bodies under their headings (org-indent-mode); #+STARTUP: (no)indent overrides", comment: "A config.toml setting, as its comment in the file describes it"),
         String(localized: "keep orgstar in the menu bar, with capture and today's agenda; off shows it only while a clock runs", comment: "A config.toml setting, as its comment in the file describes it"),

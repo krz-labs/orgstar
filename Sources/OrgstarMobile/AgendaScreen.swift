@@ -839,21 +839,14 @@ struct AgendaScreen: View, Equatable {
             }
         }
         .swipeActions(edge: .trailing) {
-            if let item = row.item, item.todo != nil, !item.isDone, item.doneKeyword != nil {
-                Button(String(localized: "agenda.mark-done", defaultValue: "Done", comment: "Swipe action that marks the entry done"), systemImage: "checkmark") { markDone(item) }.tint(.green)
-                Button("Next State", systemImage: "arrow.right.circle") { run("org.todo.next", on: item) }.tint(.blue)
-            }
+            swipeButtons(AgendaSwipe.trailing(), row)
             // Last, so a full swipe doesn't reach it; it asks first.
             if let item = row.item, item.path != nil, item.headingLine != nil {
                 Button("Delete", systemImage: "trash") { deleting = item }.tint(.red)
             }
         }
         .swipeActions(edge: .leading) {
-            if canReschedule(row), let item = row.item {
-                Button("Tomorrow", systemImage: "sunrise") { reschedule(row, item, to: agenda.today + 1) }.tint(.orange)
-                Button("Next Week", systemImage: "calendar.badge.plus") { reschedule(row, item, to: weekStart(agenda.today) + 7) }.tint(.indigo)
-                Button("Pick Date", systemImage: "calendar") { rescheduling = row }.tint(.gray)
-            }
+            swipeButtons(AgendaSwipe.leading(), row)
         }
         .contextMenu {
             if let event = row.event, !event.isReminder, !event.isContact {
@@ -870,9 +863,13 @@ struct AgendaScreen: View, Equatable {
                         if !marked.contains(mark) { marked.append(mark) }
                     }
                 }
+                if item.markDone != nil {
+                    Button("Mark Done", systemImage: "checkmark") { markDone(item) }
+                }
                 Button("TODO State…", systemImage: "checkmark.circle") { run("org.todo.cycle", on: item) }
-                if canReschedule(row) {
+                if item.canReschedule {
                     Menu("Reschedule", systemImage: "calendar.badge.clock") {
+                        Button("Today") { reschedule(row, item, to: agenda.today) }
                         Button("Tomorrow") { reschedule(row, item, to: agenda.today + 1) }
                         Button("Next Week") { reschedule(row, item, to: weekStart(agenda.today) + 7) }
                         Button("Pick Date…") { rescheduling = row }
@@ -900,22 +897,32 @@ struct AgendaScreen: View, Equatable {
 
     // MARK: - Actions
 
-    /// Entries with a heading, not done, that a schedule or deadline can move.
-    private func canReschedule(_ row: AgendaRow) -> Bool {
-        guard let item = row.item, item.path != nil, item.headingLine != nil, !row.isDone else { return false }
-        return item.todo != nil || row.icon == .scheduled || row.icon == .deadline || row.icon == .habit
+    /// The buttons of one swipe edge, as `agenda-swipe-leading` or `agenda-swipe-trailing` sets it.
+    @ViewBuilder
+    private func swipeButtons(_ swipe: AgendaSwipe, _ row: AgendaRow) -> some View {
+        if let item = row.item {
+            switch swipe {
+            case .done where item.markDone != nil:
+                Button(String(localized: "agenda.mark-done", defaultValue: "Done", comment: "Swipe action that marks the entry done"), systemImage: "checkmark") { markDone(item) }.tint(.green)
+                Button("Next State", systemImage: "arrow.right.circle") { run("org.todo.next", on: item) }.tint(.blue)
+            case .reschedule where item.canReschedule:
+                Button("Today", systemImage: "sun.max") { reschedule(row, item, to: agenda.today) }.tint(.orange)
+                Button("Tomorrow", systemImage: "sunrise") { reschedule(row, item, to: agenda.today + 1) }.tint(.indigo)
+                Button("Pick Date", systemImage: "calendar") { rescheduling = row }.tint(.gray)
+            case .refile where item.path != nil && item.headingLine != nil:
+                Button(String(localized: "Refile", comment: "Swipe action that moves the entry under another heading"), systemImage: "arrow.turn.down.right") { refiling = item }
+                    .tint(.purple)
+            default:
+                EmptyView()
+            }
+        }
     }
 
-    /// Moves the row's deadline (on a deadline row) or schedule to `day`, keeping its times,
-    /// as `org-agenda-schedule` and `org-agenda-deadline` with a date typed.
+    /// Moves the row's deadline (on a deadline row) or schedule to `day`, keeping its time and
+    /// repeater, as `org-agenda-schedule` and `org-agenda-deadline` with a date typed.
     private func reschedule(_ row: AgendaRow, _ item: AgendaItem, to day: Int) {
-        let d = Days.date(day)
-        var answer = String(format: "%04d-%02d-%02d", d.year, d.month, d.day)
-        if let start = row.start {
-            answer += String(format: " %02d:%02d", start / 100 % 24, start % 100)
-            if let end = row.end { answer += String(format: "-%02d:%02d", end / 100 % 24, end % 100) }
-        }
-        run(row.icon == .deadline ? "org.deadline" : "org.schedule", on: item, answers: ["date": answer])
+        let (command, answers) = item.reschedule(to: day)
+        run(command, on: item, answers: answers)
         moved += 1
     }
 
@@ -947,8 +954,7 @@ struct AgendaScreen: View, Equatable {
     }
 
     private func run(_ command: any OrgCommand, on item: AgendaItem, answers: [String: String] = [:]) {
-        guard let (path, offset) = locate(item), let line = item.headingLine else { return }
-        switch session.perform(command, path: path, at: offset, expect: (offset, line), answers: answers) {
+        switch session.perform(command, on: item, answers: answers) {
         case .prompt(let request):
             prompt = EditorScreen.PromptRequest(prompt: request) { answer in
                 guard let answer else { return }
@@ -1011,21 +1017,13 @@ struct AgendaScreen: View, Equatable {
     }
 
     private func markDone(_ item: AgendaItem) {
-        guard let keyword = item.doneKeyword else { return }
-        run(SetTodo(keyword: keyword), on: item)
+        guard let command = item.markDone else { return }
+        run(command, on: item)
         done += 1
     }
 
     private func refile(_ item: AgendaItem, to target: RefileTarget) {
-        guard let (path, offset) = locate(item) else { return }
-        // Targets in the entry's own file come from its text now.
-        let document = session.openDocuments.first { $0.path == path }?.document
-            ?? FileManager.default.contents(atPath: path).map { DocumentState(bytes: [UInt8]($0)) }
-        guard let current = workspace.refileTargets(openPath: path, document: document).first(where: { $0.label == target.label }) else {
-            message = "Can't find \(target.label) any more."
-            return
-        }
-        message = session.refile(to: current, from: (path, offset))
+        message = session.refile(item, to: target.label) { workspace.refileTargets(openPath: $0, document: $1) }
         tick += 1
     }
 

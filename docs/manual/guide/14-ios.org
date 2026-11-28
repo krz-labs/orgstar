@@ -276,9 +276,10 @@ The Agenda tab shows the agenda over all your folders, with the span and start d
 - Filter :: keep or leave out tags and categories of the entries shown, or type a filter as Org's =/= takes it: =+keep= and =-drop= tags or categories, =<0:30= for effort, =/regexp/=. The filter in use shows above the bar.
 - + on a day's header :: captures an entry scheduled on that day (see [[file:08-capture.org][Capture]]).
 - Tap :: an entry to open it in a sheet: its title, TODO state, priority, scheduled date, deadline, tags and notes. Changes use the same commands as the editor and are written to the file together on Save, or dropped on Cancel; Undo and Redo step through them. More ▸ Open in File saves and shows the entry in the reader.
-- Swipe left :: on a TODO entry for Done, which sets the first done keyword of its sequence, or Next State; on any entry with a heading for Delete, which asks first.
-- Swipe right :: for Tomorrow, Next Week (next Monday) or Pick Date, which move the entry's scheduled date, or its deadline on a deadline row.
-- Touch and hold :: an entry for TODO State…, Reschedule, Schedule…, Deadline…, Tags…, Priority…, Clock In, Add to Calendar…, Refile…, Archive…, and Delete…. Delete… removes the heading and every line under it, after asking. Refile… lists each file and the headings in it down to level 3, as the Mac's prompt does; the entry goes to the end of the file, or under the heading, you choose. Search narrows the list by file and heading path.
+- Swipe left :: by default, on a TODO entry for Done, which sets the first done keyword of its sequence, or Next State; on any entry with a heading for Delete, last, which asks first.
+- Swipe right :: by default, for Today, Tomorrow or Pick Date, which move the entry's scheduled date, or its deadline on a deadline row, keeping its time and repeater.
+- Swipe actions :: =agenda-swipe-leading= (right) and =agenda-swipe-trailing= (left) under =[orgstar]= choose which actions each swipe shows: =done=, =reschedule=, =refile= (Refile, which opens the list Refile… does) or =none=. Change them in Settings ▸ All Settings. See The agenda on iOS in [[file:07-agenda.org][The agenda]].
+- Touch and hold :: an entry for Mark Done, TODO State…, Reschedule (Today, Tomorrow, Next Week, Pick Date…), Schedule…, Deadline…, Tags…, Priority…, Clock In, Add to Calendar…, Refile…, Archive…, and Delete…. Delete… removes the heading and every line under it, after asking. Refile… lists each file and the headings in it down to level 3, as the Mac's prompt does; the entry goes to the end of the file, or under the heading, you choose. Search narrows the list by file and heading path.
 
 Commands from the agenda change the file directly when it isn't open, and through the editor when it is. If the heading changed since the agenda was built, nothing runs.
 
@@ -569,6 +570,7 @@ These settings from =config.toml= apply on iOS:
 - =electric-pair-mode=, =spell-check=, =auto-fill-mode=
 - =org-agenda-span=, =org-agenda-start-day=, =org-agenda-start-on-weekday=, =org-deadline-warning-days=, =agenda-include-subfolders=, =agenda-exclude-archives=, =org-agenda-show-all-dates=, =org-agenda-skip-scheduled-if-done=, =org-agenda-skip-deadline-if-done=, =org-habit-show-habits-only-for-today=, =org-agenda-search-view-always-boolean=, =org-agenda-search-view-force-full-words=, =org-agenda-log-mode-items=, the =org-agenda-todo-ignore-= settings, =org-agenda-tags-todo-honor-ignore-options=
 - =calendar-events=, =calendar-event-calendars=, =agenda-reminders=, =agenda-reminder-lists=, =agenda-contact-dates=
+- =agenda-swipe-leading=, =agenda-swipe-trailing=
 - =reminders=, =reminders-snooze-timestamp=, =appt-message-warning-time=
 - =org-clock-history-length=, =org-clock-into-drawer=, =org-clock-rounding-minutes=, =org-clock-out-remove-zero-time-clocks=, =org-clock-in-switch-to-state=, =org-clock-out-when-done=, =org-clock-idle-time=
 - =org-icalendar-combined-agenda-file= (its name) and the other =org-icalendar-= settings, =[[publish]]=

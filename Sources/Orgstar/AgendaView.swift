@@ -579,10 +579,21 @@ struct AgendaView: View {
             if !event.isReminder, !event.isContact {
                 Button("Edit Event…") { eventRequest = EventRequest(draft: EventDraft(event), event: event) }
             }
-        } else if line.row.item != nil {
+        } else if let item = line.row.item {
             Button("Open") { selection = line.id; jump(line.id) }
             Divider()
+            if let done = item.markDone {
+                Button("Mark Done") { selection = line.id; run(done) }
+            }
             Button("Cycle TODO State") { selection = line.id; run(TodoCycle()) }
+            if item.canReschedule {
+                Menu("Reschedule") {
+                    Button("Today") { reschedule(line, item, to: agenda.today) }
+                    Button("Tomorrow") { reschedule(line, item, to: agenda.today + 1) }
+                    // The date prompt, with the time filled in, as org-agenda-schedule asks.
+                    Button("Pick Date…") { selection = line.id; run(SetPlanning(deadline: item.isDeadline)) }
+                }
+            }
             Button("Set Priority…") { selection = line.id; run(SetPriority()) }
             Button("Set Tags…") { selection = line.id; run(SetTags()) }
             Button("Schedule…") { selection = line.id; run(SetPlanning(deadline: false)) }
@@ -598,8 +609,17 @@ struct AgendaView: View {
                 selection = line.id
                 mark(!(EntryRef(line.row.item!).map(marked.contains) ?? false))
             }
+            Button("Refile…") { selection = line.id; refile(marked: false) }
             Button("Archive") { selection = line.id; archive() }
         }
+    }
+
+    /// Moves the line's deadline (on a deadline line) or schedule to `day`, keeping its time and
+    /// repeater.
+    private func reschedule(_ line: Line, _ item: AgendaItem, to day: Int) {
+        selection = line.id
+        let (command, answers) = item.reschedule(to: day)
+        run(command, answers: answers, itemID: line.id)
     }
 
     @AppStorage("reminders") var remindersEnabled = true

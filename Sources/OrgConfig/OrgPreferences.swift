@@ -262,6 +262,9 @@ public enum OrgPreferences {
     }
     /// `agenda-contact-dates`: birthdays and other dates from Contacts show in the agenda.
     public static func agendaContactDates(_ defaults: UserDefaults = .standard) -> Bool { bool("agendaContactDates", defaults) }
+    /// `agenda-swipe-leading` and `agenda-swipe-trailing`: what an agenda row's swipes show.
+    public static func agendaSwipeLeading(_ defaults: UserDefaults = .standard) -> String { string("agendaSwipeLeading", defaults) }
+    public static func agendaSwipeTrailing(_ defaults: UserDefaults = .standard) -> String { string("agendaSwipeTrailing", defaults) }
     public static func reminders(_ defaults: UserDefaults = .standard) -> Bool { bool("reminders", defaults) }
     /// `reminders-snooze-timestamp`: Snooze on a notification moves the entry's timestamp.
     public static func remindersSnoozeTimestamp(_ defaults: UserDefaults = .standard) -> Bool { bool("remindersSnoozeTimestamp", defaults) }

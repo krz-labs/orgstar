@@ -41533,6 +41533,41 @@
         }
       }
     },
+    "Refile": {
+      "comment": "Swipe action that moves the entry under another heading",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verschieben"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reubicar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reclasser"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リファイル"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Realocar"
+          }
+        }
+      }
+    },
     "Refile to": {
       "localizations": {
         "de": {
@@ -62449,6 +62484,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "exportação para iCalendar: o que um DEADLINE gera, entre event-if-not-todo, event-if-todo, event-if-todo-not-done e todo-due"
+          }
+        }
+      }
+    },
+    "iOS: the actions a swipe left on an agenda row shows, before Delete: done, reschedule, refile or none": {
+      "comment": "A config.toml setting, as its comment in the file describes it",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS: die Aktionen, die ein Wischen nach links auf einer Agenda-Zeile vor „Löschen“ zeigt: done, reschedule, refile oder none"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS: las acciones que muestra deslizar a la izquierda una fila de la agenda, antes de Eliminar: done, reschedule, refile o none"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS : les actions qu'un balayage vers la gauche sur une ligne de l'agenda affiche, avant Supprimer : done, reschedule, refile ou none"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS：アジェンダの行を左にスワイプしたときに「削除」の前に表示するアクション：done、reschedule、refile、none"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS: as ações que deslizar para a esquerda em uma linha da agenda mostra, antes de Apagar: done, reschedule, refile ou none"
+          }
+        }
+      }
+    },
+    "iOS: the actions a swipe right on an agenda row shows: reschedule, done, refile or none": {
+      "comment": "A config.toml setting, as its comment in the file describes it",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS: die Aktionen, die ein Wischen nach rechts auf einer Agenda-Zeile zeigt: reschedule, done, refile oder none"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS: las acciones que muestra deslizar a la derecha una fila de la agenda: reschedule, done, refile o none"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS : les actions qu'un balayage vers la droite sur une ligne de l'agenda affiche : reschedule, done, refile ou none"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS：アジェンダの行を右にスワイプしたときに表示するアクション：reschedule、done、refile、none"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS: as ações que deslizar para a direita em uma linha da agenda mostra: reschedule, done, refile ou none"
           }
         }
       }

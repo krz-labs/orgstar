@@ -268,6 +268,7 @@ These settings have no control in the Settings window's other panes; All Setting
 | =org-agenda-log-mode-items=      |                            |
 | =org-clock-into-drawer=          |                            |
 | =reminders-snooze-timestamp=     |                            |
+| =agenda-swipe-leading=, =agenda-swipe-trailing= (iOS) |       |
 | =org-clock-rounding-minutes=, =org-clock-out-remove-zero-time-clocks=, =org-clock-in-switch-to-state=, =org-clock-out-when-done= | |
 | =org-agenda-todo-ignore-with-date=, =org-agenda-todo-ignore-scheduled=, =org-agenda-todo-ignore-deadlines=, =org-agenda-todo-ignore-timestamp=, =org-agenda-tags-todo-honor-ignore-options= | |
 | =org-agenda-search-view-always-boolean= |                     |
@@ -544,6 +545,8 @@ Any other key in =[theme]= is a color; see Themes below.
 | =agenda-reminders=          | boolean | =false=       | Show incomplete reminders with a due date from Reminders in the agenda, read-only.      |
 | =agenda-reminder-lists=     | string  | =""=          | The Reminders lists shown, by title or identifier, separated by commas; =""= for all.  |
 | =agenda-contact-dates=      | boolean | =false=       | Show birthdays and other dates from Contacts in the agenda, read-only.                  |
+| =agenda-swipe-leading=      | string  | ="reschedule"= | iOS: the actions a swipe right on an agenda row shows: =reschedule=, =done=, =refile= or =none=. |
+| =agenda-swipe-trailing=     | string  | ="done"=      | iOS: the actions a swipe left on an agenda row shows, before Delete: =done=, =reschedule=, =refile= or =none=. |
 | =global-capture-hotkey=     | boolean | =true=        | =⌃⌥Space= opens Capture from any app.                                                   |
 | =menu-bar-item=             | boolean | =false=       | Keep orgstar in the menu bar, with capture and today's agenda; off shows it only while a clock runs. |
 
