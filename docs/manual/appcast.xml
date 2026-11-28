@@ -4,6 +4,22 @@
     <title>orgstar</title>
     <link>https://gitbay.org/krz/orgstar</link>
     <item>
+      <title>orgstar 1.5.0</title>
+      <link>https://krz.sh/apps/orgstar/</link>
+      <sparkle:version>925</sparkle:version>
+      <sparkle:shortVersionString>1.5.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+      <pubDate>Fri, 27 Nov 2026 19:04:29 -0600</pubDate>
+      <description><![CDATA[<ul>
+<li>Your own commands: write them in JavaScript in commands.toml. They appear in the command palette, can be bound to keys, run orgstar's own commands, and can run after a TODO changes or before a capture is filed.</li>
+<li>orgstar:// links with x-callback-url, so Shortcuts and other apps can capture, open a file, clock in and out, and read your agenda.</li>
+<li>An <code>orgstar</code> command for Terminal: Settings ▸ General ▸ Install Command-Line Tool… (agenda, capture, clocking, export, tangle).</li>
+<li>JavaScript blocks without node can fetch from the web, and one that never finishes is stopped at its time limit.</li>
+</ul>
+<p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
+      <enclosure url="https://files.krz.sh/orgstar/orgstar-1.5.0.dmg" type="application/octet-stream" sparkle:edSignature="0JG4atnQrgIbW0WDy4F0gUrO6MblrQc40/4IrgcfTe6hgHhmOqEZS1c2CXozjtzscn7Y/vlAcLghkks/A6vQAw==" length="84577699"/>
+    </item>
+    <item>
       <title>orgstar 1.4.0</title>
       <link>https://krz.sh/apps/orgstar/</link>
       <sparkle:version>908</sparkle:version>
