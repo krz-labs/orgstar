@@ -6,9 +6,9 @@ Where the milestone work stands, so a session can pick it up at any point. Read 
 
 - `main` is in sync with gitbay. No worktrees, work branches or open merge requests.
 - Closed milestones and their merge requests: 1 Reviews and cleanup (447–476), 4 Commands and editing speed (479–484), 5 Sync and files (486–492, 494, 495), 6 Formats, import and export (509–512, 516, 517), 7 Notes and knowledge (506, 507, 518). Also merged: 505 (Xcode's recommended project settings), 508 (snapshot runs skip the Keychain prompt).
-- Milestone 8 (Automation and extension): 522 (#173 review, `docs/plans/2026-11-27-user-commands.md`), 523 (#175 x-callback-url), 524 (#174 `orgstar` command-line tool), and user commands: 526 (#244 JavaScript host in a WebKit worker), 527 (#245 `commands.toml`, API 1, trust), 529 (#250 trust prompt), 528 (#246 `org.run` and macros), 530 (#247 `workspace = true`), 531 (#248 hooks). Open: #249 only.
+- Milestone 8 (Automation and extension): 522 (#173 review, `docs/plans/2026-11-27-user-commands.md`), 523 (#175 x-callback-url), 524 (#174 `orgstar` command-line tool), and user commands: 526 (#244 JavaScript host in a WebKit worker), 527 (#245 `commands.toml`, API 1, trust), 529 (#250 trust prompt), 528 (#246 `org.run` and macros), 530 (#247 `workspace = true`), 531 (#248 hooks). 534 (#249: python blocks keep network access, documented) and 535 (#254: js blocks without node run in a WebKit worker with network access; a block that never ends is stopped). Milestone 8 is closed: 11 issues.
 - Released (download, appcast, cask): 1.3.0 (milestones 1, 4 and 5), 1.3.1 (fixes), 1.4.0 (tag 2879e44, 2026-11-27: milestones 6 and 7). App Store builds 884 (1.3.0) and 890 (1.3.1) were uploaded; `ios/AppStore/metadata.md` has no 1.4.0 entry yet. The next release is 1.5.0, with milestone 8.
-- Before 1.5.0: #249 (python blocks in Pyodide reach the network today; a tested fix is on the issue; the owner decides block or document; it matters for any App Store build that carries Pyodide, 1.4.0's included); the Homebrew cask needs `binary "#{appdir}/orgstar.app/Contents/Helpers/orgstar"`; notarize a build with `Contents/Helpers/orgstar`; What's New and App Store notes for 1.5.0.
+- Before 1.5.0: the Homebrew cask needs `binary "#{appdir}/orgstar.app/Contents/Helpers/orgstar"`; notarize a build with `Contents/Helpers/orgstar`; What's New and App Store notes for 1.5.0.
 - On `main` at 71105e5: `swift test`, both Xcode builds and the gates pass. App size: Pyodide adds 13.6 MB installed to the iOS and Mac App Store apps (not the download build or extensions); reveal.js adds 2.7 MB to every app; the command-line helper adds 11 MB to the download app.
 - Gates: the first run after a build has missed the 1 MB open limit in every check on 2026-11-26/27 (109–126 ms at load 5–8) and the rerun has passed (84–94 ms). Rerun before calling a failure real; if the rerun fails too, look at it.
 - Filed to the Backlog during milestones 6–8: #241, #242, #243, #251, #252, #253.
@@ -23,8 +23,8 @@ Where the milestone work stands, so a session can pick it up at any point. Read 
 | 5 Sync and files | 0 | 10 |
 | 6 Formats, import and export | 0 | 6 |
 | 7 Notes and knowledge | 0 | 3 |
-| 8 Automation and extension | 1 | 9 |
-| Backlog | 48 | 0 |
+| 8 Automation and extension | 0 | 11 |
+| Backlog | 50 | 0 |
 
 #109 (code scanning) has no milestone and stays out of scope.
 
@@ -147,6 +147,9 @@ gitbay milestone list
 13. #115: natural-language parsing is a per-template capture option, with one default template using it. #122: snooze moves the notification by default; a setting rewrites the timestamp instead. #129: org-ql syntax (sexp and plain), common predicates, in views.toml and `org-ql` dynamic blocks. #229: no size limit; warn before opening files over 5 MB, dismissable forever.
 
 14. #246: `org.run` refuses `app.*` commands except `app.save`, and commands that need work outside the text (Babel, Emacs tables). #247: a command's capture to its own file is refused; `%c` is empty; a capture stays filed if the command later fails. #248: hooks don't run from the command-line tool (`orgstar capture` files and notes it), from hooks or user commands, Replace in Files or keyword renames; an untrusted hook is skipped where orgstar can't ask (x-callback-url, Shortcuts).
+
+15. #249 and #254: code blocks in the App Store builds may use the network (python through Pyodide, js through a WebKit worker); user commands still may not. In a js session, async requests are refused (synchronous XHR works) and top-level `var`/function declarations aren't global-object properties; CORS applies.
+16. #256: config.toml gets a native settings screen generated from the `UserConfig.Setting` registry, with search, an (i) sheet per option, reset to default, and Edit as Text kept; #255 (font size) with it. After this session's work.
 
 ## Device checks owed
 
