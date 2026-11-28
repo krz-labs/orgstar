@@ -4,6 +4,19 @@
     <title>orgstar</title>
     <link>https://github.com/krz-labs/orgstar</link>
     <item>
+      <title>orgstar 1.6.0</title>
+      <link>https://krz.sh/apps/orgstar/</link>
+      <sparkle:version>932</sparkle:version>
+      <sparkle:shortVersionString>1.6.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+      <pubDate>Sat, 28 Nov 2026 00:25:44 -0600</pubDate>
+      <description><![CDATA[<ul>
+<li>Settings ▸ All Settings: every config.toml option in one searchable list, with a control for each, an explanation of what it does, and reset to the default.</li>
+</ul>
+<p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
+      <enclosure url="https://files.krz.sh/orgstar/orgstar-1.6.0.dmg" type="application/octet-stream" sparkle:edSignature="zFxeCFHUn+NMSEbTfPTdsi7DwVfisNFZWK6Tu5qwij/T85WRh0hQxKZ/omdwQ/z5PVSMqy7Voxot/YQB3UWiBg==" length="85134296"/>
+    </item>
+    <item>
       <title>orgstar 1.5.0</title>
       <link>https://krz.sh/apps/orgstar/</link>
       <sparkle:version>925</sparkle:version>
