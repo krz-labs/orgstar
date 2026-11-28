@@ -60,6 +60,10 @@ public final class AgendaModel {
     /// The settings of the views in `views.toml`, applied while `mode` is theirs.
     public var viewSettings: [AgendaMode: AgendaViewSettings] = [:]
     public private(set) var isComputing = false
+    /// The day agenda also lists the TODO entries without a date in `unscheduled`, for the
+    /// timeline's TODO list.
+    public var listsUnscheduled = false
+    public private(set) var unscheduled: [AgendaItem] = []
     /// Calendar events over the days shown, from `calendarEvents` (nil reads none) and the
     /// calendars in `calendarNames` (all when empty).
     public private(set) var events: [AgendaEvent] = []
@@ -155,8 +159,15 @@ public final class AgendaModel {
                 return result
             }
         }.value
+        var unscheduled: [AgendaItem] = []
+        if listsUnscheduled, case .agenda = mode {
+            var todoOptions = self.options
+            todoOptions.todoIgnoreWithDate = true
+            unscheduled = await Task.detached { Agenda.todoList(all, options: todoOptions, today: today) }.value
+        }
         guard id == generation else { return }
         // Unchanged results leave the views alone: a new value redraws the whole list.
+        if self.unscheduled != unscheduled { self.unscheduled = unscheduled }
         let isBlocks = { if case .blocks = mode { true } else { false } }()
         let single = isBlocks ? AgendaBlockResult(header: "", mode: mode) : results[0]
         let blocks = isBlocks ? results : []

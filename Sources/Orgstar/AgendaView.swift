@@ -66,6 +66,11 @@ struct AgendaView: View {
     @AppStorage("agendaOverdueExpanded") private var overdueShown = true
     /// The month shows as a grid rather than a list of days.
     @AppStorage("agendaMonthGrid") var monthGrid = true
+    /// A day or week shows as a timeline rather than a list.
+    @AppStorage("agendaTimeline") var timelineShown = false
+    @AppStorage("agendaTimelineSnap") var timelineSnap = 15
+    @AppStorage("agendaTimelineDefaultLength") var timelineLength = 60
+    @AppStorage("agendaTimelineSecondZone") var timelineSecondZone = ""
     /// The day a dragged entry is over.
     @State var dropDay: Int?
     @State var hovered: String?
@@ -140,6 +145,7 @@ struct AgendaView: View {
         var prefix: [String]
         var settings: [String]
         var logMode: Bool
+        var timeline: Bool
         var calendars: [String]
         var files: Int
         var changed: Int?
@@ -154,7 +160,7 @@ struct AgendaView: View {
         RefreshKey(
             mode: agenda.mode, start: agenda.start, span: span, startOffset: startOffset, startOnWeekday: startOnWeekday, includeSubfolders: includeSubfolders, hidden: HiddenFolders.shared.all, prefix: [prefixAgenda, prefixTodo, prefixTags],
             settings: [sortAgenda, sortTodo, sortTags, sortSearch, gridWhen, gridTimes, "\(useTimeGrid) \(showCurrentTime)", stuckMatch, stuckTodo, stuckTags, stuckRegexp, agendaFileList],
-            logMode: logMode,
+            logMode: logMode, timeline: showsTimeline,
             calendars: (calendarEventsOn ? [calendarNames] : []) + (remindersOn ? ["reminders", reminderListNames] : []) + (contactDatesOn ? ["contacts"] : []), files: 0, changed: nil, edits: 0, path: nil, tick: tick
         )
     }
@@ -170,6 +176,7 @@ struct AgendaView: View {
         agenda.options.prefixFormat = ["agenda": prefixAgenda, "todo": prefixTodo, "tags": prefixTags]
         agenda.options.logMode = logMode
         agenda.options = OrgPreferences.agendaOptions(agenda.options)
+        agenda.listsUnscheduled = showsTimeline
         agenda.calendarNames = OrgPreferences.calendarEventCalendars()
         if calendarEventsOn, ProAccess.shared.isUnlocked, isAgenda || isBlocks {
             agenda.calendarEvents = await CalendarAccess.events.requestAccess() ? CalendarAccess.events : nil
@@ -229,6 +236,7 @@ struct AgendaView: View {
     var isSearch: Bool { viewName == Self.search || viewName == Self.todoSearch }
     var isQuery: Bool { viewName == Self.query }
     var showsMonthGrid: Bool { isAgenda && spanKind == .month && monthGrid }
+    var showsTimeline: Bool { isAgenda && (spanKind == .day || spanKind == .week) && timelineShown }
 
     @Environment(\.orgTheme) var theme
 
@@ -256,7 +264,7 @@ struct AgendaView: View {
 
     private var listRows: [AgendaRow] { rows(agenda.list) }
 
-    private func rows(_ list: [AgendaItem]) -> [AgendaRow] {
+    func rows(_ list: [AgendaItem]) -> [AgendaRow] {
         list.filter(filter.keeps).compactMap { AgendaRow(item: $0, day: agenda.today, today: agenda.today) }
     }
 
@@ -274,7 +282,7 @@ struct AgendaView: View {
 
     private func dayLines(_ groups: [AgendaDayGroup], prefix: String) -> [Line] {
         groups.flatMap { group in
-            (overdueShown || showsMonthGrid ? group.overdue.enumerated().map { dayLine(group, $0.offset, prefix: prefix, overdue: true) } : [])
+            (overdueShown || showsMonthGrid || showsTimeline ? group.overdue.enumerated().map { dayLine(group, $0.offset, prefix: prefix, overdue: true) } : [])
                 + group.rows.indices.map { dayLine(group, $0, prefix: prefix) }
         }
     }
@@ -300,7 +308,7 @@ struct AgendaView: View {
     var body: some View {
         _ = tick
         return Group {
-            if showsMonthGrid { monthGridView } else { list }
+            if showsMonthGrid { monthGridView } else if showsTimeline { timelineView } else { list }
         }
         .background(theme.color("agenda-background") ?? Color(nsColor: .textBackgroundColor))
         .focusable()

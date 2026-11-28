@@ -51,6 +51,11 @@ extension AgendaView {
                     Button(monthGrid ? LocalizedStringKey("Show as List") : "Show as Grid", systemImage: monthGrid ? "list.bullet" : "calendar") { monthGrid.toggle() }
                         .help("Show the month as a grid or as a list of days")
                 }
+                if spanKind == .day || spanKind == .week {
+                    Button(timelineShown ? LocalizedStringKey("Show as List") : "Show as Timeline",
+                           systemImage: timelineShown ? "list.bullet" : "calendar.day.timeline.left") { timelineShown.toggle() }
+                        .help("Show the days as a timeline or as a list")
+                }
                 ControlGroup {
                     Button("Earlier", systemImage: "chevron.left") { move(forward: false) }
                         .help("Previous days (b)")

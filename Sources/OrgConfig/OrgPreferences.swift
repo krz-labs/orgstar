@@ -265,6 +265,15 @@ public enum OrgPreferences {
     /// `agenda-swipe-leading` and `agenda-swipe-trailing`: what an agenda row's swipes show.
     public static func agendaSwipeLeading(_ defaults: UserDefaults = .standard) -> String { string("agendaSwipeLeading", defaults) }
     public static func agendaSwipeTrailing(_ defaults: UserDefaults = .standard) -> String { string("agendaSwipeTrailing", defaults) }
+    /// `agenda-timeline-snap`: the minutes the timeline moves and resizes entries by.
+    public static func agendaTimelineSnap(_ defaults: UserDefaults = .standard) -> Int { integer("agendaTimelineSnap", defaults) }
+    /// `agenda-timeline-default-length`: the minutes of a timed entry without an end or `Effort`.
+    public static func agendaTimelineDefaultLength(_ defaults: UserDefaults = .standard) -> Int { integer("agendaTimelineDefaultLength", defaults) }
+    /// `agenda-timeline-second-zone`: the second zone on the timeline's scale; nil when unset or unknown.
+    public static func agendaTimelineSecondZone(_ defaults: UserDefaults = .standard) -> TimeZone? {
+        let name = string("agendaTimelineSecondZone", defaults).trimmingCharacters(in: .whitespaces)
+        return name.isEmpty ? nil : TimeZone(identifier: name)
+    }
     /// `triage-view`: the view whose entries Triage goes through; empty for the default capture
     /// template's target.
     public static func triageView(_ defaults: UserDefaults = .standard) -> String {

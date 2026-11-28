@@ -34385,6 +34385,40 @@
         }
       }
     },
+    "No TODO entries without a date.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine TODO-Einträge ohne Datum."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay entradas TODO sin fecha."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune entrée TODO sans date."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日付のないTODO項目はありません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhuma entrada TODO sem data."
+          }
+        }
+      }
+    },
     "No [[publish]] projects in config.toml": {
       "localizations": {
         "de": {
@@ -48418,6 +48452,40 @@
         }
       }
     },
+    "Show as Timeline": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Als Zeitleiste zeigen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar como línea de tiempo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher en chronologie"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "タイムラインで表示"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar como linha do tempo"
+          }
+        }
+      }
+    },
     "Show birthdays and dates from Contacts": {
       "localizations": {
         "de": {
@@ -49377,6 +49445,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mostrar as colunas e o tempo registrado (⌥⌘I)"
+          }
+        }
+      }
+    },
+    "Show the days as a timeline or as a list": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Tage als Zeitleiste oder als Liste zeigen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar los días como línea de tiempo o como lista"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher les jours en chronologie ou en liste"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日をタイムラインまたはリストで表示"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar os dias como linha do tempo ou como lista"
           }
         }
       }
@@ -56314,6 +56416,40 @@
         }
       }
     },
+    "Timeline": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeitleiste"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Línea de tiempo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chronologie"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "タイムライン"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linha do tempo"
+          }
+        }
+      }
+    },
     "Timestamp One Day Earlier": {
       "comment": "Command title",
       "localizations": {
@@ -56482,6 +56618,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Até"
+          }
+        }
+      }
+    },
+    "To Schedule": {
+      "comment": "Agenda timeline: the list of TODO entries without a date, to drag onto the timeline",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zu planen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Por programar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À planifier"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "予定に入れる"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A agendar"
           }
         }
       }
@@ -60973,6 +61144,41 @@
         }
       }
     },
+    "a second time zone on the agenda timeline's hour scale, for display only, as \"Europe/Berlin\"; \"\" for none": {
+      "comment": "A config.toml setting, as its comment in the file describes it",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "eine zweite Zeitzone auf der Stundenskala der Agenda-Zeitleiste, nur zur Anzeige, etwa \"Europe/Berlin\"; \"\" für keine"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "una segunda zona horaria en la escala de horas de la línea de tiempo de la agenda, solo para mostrar, como \"Europe/Berlin\"; \"\" para ninguna"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "un second fuseau horaire sur l'échelle des heures de la chronologie de l'agenda, pour l'affichage seulement, comme \"Europe/Berlin\" ; \"\" pour aucun"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アジェンダのタイムラインの時間目盛りに出す2つ目のタイムゾーン（表示のみ）。例: \"Europe/Berlin\"。\"\" でなし"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "um segundo fuso horário na escala de horas da linha do tempo da agenda, só para exibição, como \"Europe/Berlin\"; \"\" para nenhum"
+          }
+        }
+      }
+    },
     "a tab for each open buffer above the editor (View ▸ Show Tab Bar)": {
       "comment": "A config.toml setting, as its comment in the file describes it",
       "localizations": {
@@ -61191,6 +61397,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "alinhar todas as tabelas ao abrir um arquivo; #+STARTUP: (no)align substitui"
+          }
+        }
+      }
+    },
+    "all-day": {
+      "comment": "Agenda timeline: the strip of entries without a time",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ganztägig"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "todo el día"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "journée"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "終日"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "dia inteiro"
           }
         }
       }
@@ -64434,6 +64675,41 @@
         }
       }
     },
+    "minutes an entry with a start time but no end time or Effort lasts on the agenda timeline": {
+      "comment": "A config.toml setting, as its comment in the file describes it",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minuten, die ein Eintrag mit Anfangszeit, aber ohne Endzeit oder Effort auf der Agenda-Zeitleiste dauert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "minutos que dura en la línea de tiempo de la agenda una entrada con hora de inicio pero sin hora de fin ni Effort"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "minutes que dure sur la chronologie de l'agenda une entrée avec une heure de début mais sans heure de fin ni Effort"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開始時刻があり終了時刻もEffortもない項目がアジェンダのタイムラインで占める分数"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "minutos que dura na linha do tempo da agenda uma entrada com hora de início mas sem hora de término nem Effort"
+          }
+        }
+      }
+    },
     "minutes idle with a clock running before asking what to do with the time; 0 never (nil)": {
       "comment": "A config.toml setting, as its comment in the file describes it",
       "localizations": {
@@ -64500,6 +64776,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "minutos de aviso antes de entradas com horário; APPT_WARNTIME substitui"
+          }
+        }
+      }
+    },
+    "minutes the agenda timeline moves and resizes entries by": {
+      "comment": "A config.toml setting, as its comment in the file describes it",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minuten, in deren Schritten die Agenda-Zeitleiste Einträge verschiebt und in der Länge ändert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "minutos en que la línea de tiempo de la agenda mueve y redimensiona las entradas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "minutes par lesquelles la chronologie de l'agenda déplace et redimensionne les entrées"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アジェンダのタイムラインで項目を移動・伸縮する刻み（分）"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "minutos em que a linha do tempo da agenda move e redimensiona as entradas"
           }
         }
       }
