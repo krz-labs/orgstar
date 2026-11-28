@@ -508,7 +508,9 @@ The iOS app reads its settings from a configuration folder: a folder holding =co
 
 Changes to the files apply as they sync, and again each time you return to the app. Problems in the files show in red under the folder. "No config.toml in /folder/; the defaults apply" means the folder has no =config.toml=, for example because it was removed after you chose the folder.
 
-Edit config.toml opens the folder's =config.toml= as plain text, with smart quotes and dashes off. Save, or going back, writes it and applies it at once; problems show in red below the text.
+All Settings lists every key of =config.toml=, one row each with a switch, number field, menu or text field, grouped by table, as the Mac's Settings ▸ All Settings pane does (see [[file:13-configuration.org::*All Settings][All Settings]]). The search field at the top matches keys, the Emacs variables they mirror and the descriptions. A dot after a key marks a value that differs from the default; swipe the row left, or touch and hold it, for Reset to Default. The (i) button opens a sheet with what the setting does, the values it takes, its default, the Emacs variable and links to the manual. With a configuration folder each change is written into its =config.toml= at once, keeping the other lines and comments; without one it is kept on the device. Settings that apply only on the Mac, such as =global-capture-hotkey=, are listed too, since they are in the file.
+
+Edit as Text, in All Settings' toolbar with a configuration folder, opens the folder's =config.toml= as plain text in the editor's font and size (=[theme]= =font= and =font-size=, scaled with Dynamic Type), with smart quotes and dashes off. Save, or going back, writes it and applies it at once; problems show in red below the text.
 
 Stop Using This Folder returns every setting to its default.
 
@@ -522,7 +524,7 @@ With a configuration folder, settings and structure templates are written to its
 
 Folders from =org-directory= and =org-agenda-files= name the Mac's paths, so the screen lists them under Folders on This Device. Tap each one and choose the folder on this device that holds the same files, such as its synced copy in iCloud Drive. Import adds the chosen folders to the Folders tab; folders not chosen aren't added, and the summary says so. =org-agenda-files= entries in a chosen folder point to the same files in the folder chosen for it, and entries in folders not chosen are left out. Relative entries are kept as written and count from the first folder, as Emacs counts them from =org-directory=; they add no folder of their own. With a configuration folder, =config.toml= keeps the Mac's entries as well, beside the device's; each device skips the files it doesn't have.
 
-The Agenda, TODO Dependencies, Calendar and Reminders sections are the only places the app changes a setting itself, besides Import from Emacs:
+Besides All Settings and Import from Emacs, the Agenda, TODO Dependencies, Calendar and Reminders sections change settings:
 
 - Show days without entries :: turns =org-agenda-show-all-dates= on or off.
 - Habits only today :: turns =org-habit-show-habits-only-for-today= on or off.

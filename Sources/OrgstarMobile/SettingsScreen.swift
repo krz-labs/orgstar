@@ -191,9 +191,7 @@ struct SettingsScreen: View {
             Section {
                 LabeledContent("Folder", value: model.configFolder?.lastPathComponent ?? String(localized: "none.folder", defaultValue: "None", comment: "No configuration folder chosen"))
                 Button(model.configFolder == nil ? "Choose Folder…" : "Choose Another Folder…") { choosing = true }
-                if model.configFolder != nil {
-                    NavigationLink("Edit config.toml") { ConfigFileEditor(model: model) }
-                }
+                NavigationLink("All Settings") { AllSettingsScreen(model: model) }
                 NavigationLink("Import from Emacs") { EmacsImportScreen(model: model) }
                 if model.configFolder != nil {
                     Button("Stop Using This Folder", role: .destructive) { model.setConfigFolder(nil) }
@@ -413,6 +411,26 @@ private struct ProBanner: View {
     }
 }
 
+/// Every setting of `config.toml`, written to the configuration folder's file, or without one
+/// kept on this device; Edit as Text opens the file itself.
+struct AllSettingsScreen: View {
+    let model: MobileModel
+    @State private var editingText = false
+
+    var body: some View {
+        let _ = model.settingsVersion
+        AllSettingsView(problems: model.configProblems) { setting, value in model.set(setting.defaultsKey, to: value) }
+            .navigationTitle("All Settings")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                if model.configFolder != nil {
+                    Button("Edit as Text") { editingText = true }
+                }
+            }
+            .navigationDestination(isPresented: $editingText) { ConfigFileEditor(model: model) }
+    }
+}
+
 /// The configuration folder's `config.toml` as plain text, saved when you tap Save or leave.
 struct ConfigFileEditor: View {
     let model: MobileModel
@@ -420,7 +438,8 @@ struct ConfigFileEditor: View {
     @State private var saved: String?
 
     var body: some View {
-        PlainTextView(text: $text)
+        let _ = model.settingsVersion
+        PlainTextView(text: $text, font: MobileTheme(model.theme).font)
             .navigationTitle("config.toml")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -453,13 +472,16 @@ struct ConfigFileEditor: View {
     }
 }
 
-/// A monospaced text view without smart quotes, dashes or autocorrection, which would break TOML.
+/// A text view in the editor's monospaced font, without smart quotes, dashes or autocorrection,
+/// which would break TOML.
 private struct PlainTextView: UIViewRepresentable {
     @Binding var text: String
+    /// The editor's font, scaled for Dynamic Type.
+    let font: UIFont
 
     func makeUIView(context: Context) -> UITextView {
         let view = UITextView()
-        view.font = .monospacedSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .footnote).pointSize, weight: .regular)
+        view.font = font
         view.adjustsFontForContentSizeCategory = true
         view.autocorrectionType = .no
         view.autocapitalizationType = .none
@@ -474,6 +496,7 @@ private struct PlainTextView: UIViewRepresentable {
 
     func updateUIView(_ view: UITextView, context: Context) {
         if view.text != text { view.text = text }
+        if view.font != font { view.font = font }
     }
 
     func makeCoordinator() -> Coordinator { Coordinator(text: $text) }

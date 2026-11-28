@@ -231,12 +231,8 @@ final class MobileModel {
         if let configFolder {
             problem = Self.updateConfig(in: configFolder) { UserConfig.setting($0, section: setting.section, key: setting.key, to: value) }
         } else {
-            switch value {
-            case .bool(let b): UserDefaults.standard.set(b, forKey: defaultsKey)
-            case .string(let s): UserDefaults.standard.set(s, forKey: defaultsKey)
-            case .integer(let i): UserDefaults.standard.set(i, forKey: defaultsKey)
-            case .array: break
-            }
+            // As the file's value would be stored: a choice by its stored form, a day offset as days.
+            problem = UserConfig.store(value, setting, in: .standard)
         }
         _ = reloadConfig(after: problem)
     }

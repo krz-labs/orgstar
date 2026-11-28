@@ -68,7 +68,7 @@ struct UserConfigTests {
         #expect(UserConfig.setting(text, section: "capture", key: "global-hotkey", to: .bool(false))
             == "# mine\n[editor]\nfill-column = 80  # wide\nline-numbers = true\n\n[agenda]\nspan = 10\n\n[capture]\nglobal-hotkey = false\n")
         #expect(UserConfig.setting("[general]\nkeymap = \"emacs#1\" # c\n", section: "general", key: "keymap", to: .string("doom"))
-            == "[general]\nkeymap = \"doom\"  # c\n")
+            == "[general]\nkeymap = \"doom\" # c\n")
         #expect(UserConfig.setting("# top\n\n[orgstar]\nsave = \"explicit\"\n", section: "", key: "fill-column", to: .integer(70))
             == "# top\nfill-column = 70\n\n[orgstar]\nsave = \"explicit\"\n")
     }

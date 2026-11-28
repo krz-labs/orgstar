@@ -1117,6 +1117,13 @@ struct SettingsView: View {
             Tab("Encryption", systemImage: "lock", value: "encryption") {
                 Form { DecryptSettings() }.formStyle(.grouped).frame(height: 330)
             }
+            Tab("All Settings", systemImage: "list.bullet", value: "all") {
+                AllSettingsView(problems: ConfigSync.shared.problems, editAsText: editConfig) { setting, value in
+                    // ConfigSync writes the change into config.toml.
+                    _ = UserConfig.store(value, setting, in: .standard)
+                }
+                .frame(height: 560)
+            }
             #if !APPSTORE
             Tab(value: "git") { GitSettingsForm(workspace: workspace) } label: {
                 Label { Text("Git", tableName: "DeveloperID") } icon: { Image(systemName: "arrow.triangle.branch") }
@@ -1205,6 +1212,9 @@ struct SettingsView: View {
                         Button("Open with Default App") { NSWorkspace.shared.open(UserConfig.configFile) }
                         Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([UserConfig.configFile]) }
                     }
+                }
+                LabeledContent("Every setting") {
+                    Button("All Settings") { tab = "all" }
                 }
                 #if APPSTORE
                 LabeledContent("Folder") {
