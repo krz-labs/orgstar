@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Working alongside Emacs and other tools &middot; orgstar</title>
+<meta name="description" content="How orgstar reads and writes files shared with Emacs and sync tools, merges outside changes, keeps recovery versions, calls Emacs, and differs from…">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../theme.css">
+<link rel="stylesheet" href="../syntax.css">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="site">
+<a class="site-title" href="../index.html">orgstar</a>
+<nav>
+<a href="../install.html">Install</a>
+<a href="../quickstart.html">Quick start</a>
+<a href="index.html">Manual</a>
+</nav>
+</header>
+<main>
+<h1>Working alongside Emacs and other tools</h1>
+<p class="lede">orgstar works on plain org files in ordinary folders, so Emacs, other apps and sync tools can work on the same files.</p>
+<nav class="toc" aria-label="On this page">
+<h2>On this page</h2>
+<ul>
+<li><a href="#how-orgstar-treats-files">How orgstar treats files</a>
+<ul>
+<li><a href="#bytes-on-disk">Bytes on disk</a></li>
+<li><a href="#encodings">Encodings</a></li>
+<li><a href="#how-a-save-works">How a save works</a></li>
+<li><a href="#automatic-and-explicit-saving">Automatic and explicit saving</a></li>
+</ul></li>
+<li><a href="#changes-made-outside-orgstar">Changes made outside orgstar</a>
+<ul>
+<li><a href="#the-conflict-sheet">The conflict sheet</a></li>
+</ul></li>
+<li><a href="#sync-tools">Sync tools</a>
+<ul>
+<li><a href="#icloud-drive">iCloud Drive</a></li>
+<li><a href="#syncthing">Syncthing</a></li>
+<li><a href="#dropbox-and-other-tools">Dropbox and other tools</a></li>
+<li><a href="#files-orgstar-ignores">Files orgstar ignores</a></li>
+</ul></li>
+<li><a href="#recovery-versions">Recovery versions</a></li>
+<li><a href="#features-that-use-emacs-on-the-mac">Features that use Emacs on the Mac</a>
+<ul>
+<li><a href="#how-emacs-is-found">How Emacs is found</a></li>
+<li><a href="#what-emacs-sees">What Emacs sees</a></li>
+</ul></li>
+<li><a href="#quick-look">Quick Look</a></li>
+<li><a href="#spotlight">Spotlight</a></li>
+<li><a href="#finder">Finder</a></li>
+<li><a href="#org-protocol-and-shortcuts">org-protocol and Shortcuts</a></li>
+<li><a href="#orgstar-links-and-x-callback-url">orgstar:// links and x-callback-url</a>
+<ul>
+<li><a href="#x-callback-url">x-callback-url</a>
+<ul>
+<li><a href="#capture">capture</a></li>
+<li><a href="#open">open</a></li>
+<li><a href="#agenda">agenda</a></li>
+<li><a href="#clock-in-clock-out-and-clock-status">clock-in, clock-out and clock-status</a></li>
+<li><a href="#errors">Errors</a></li>
+<li><a href="#which-links-orgstar-opens">Which links orgstar opens</a></li>
+<li><a href="#allowing-apps">Allowing apps</a></li>
+<li><a href="#shortcuts-or-x-callback-url">Shortcuts or x-callback-url</a></li>
+<li><a href="#examples">Examples</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#compatibility-notes">Compatibility notes</a>
+<ul>
+<li><a href="#defaults-that-differ-from-emacs">Defaults that differ from Emacs</a></li>
+<li><a href="#how-the-agenda-looks">How the agenda looks</a></li>
+<li><a href="#snippets-and-yasnippet">Snippets and yasnippet</a></li>
+<li><a href="#completion-and-dabbrev-corfu-and-org-roam">Completion and dabbrev, corfu and org-roam</a></li>
+<li><a href="#lint-file-and-org-lint">Lint File and org-lint</a></li>
+<li><a href="#known-differences-from-emacs-org">Known differences from Emacs Org</a></li>
+</ul></li>
+</ul>
+</nav>
+<h2 id="how-orgstar-treats-files">How orgstar treats files</h2>
+<h3 id="bytes-on-disk">Bytes on disk</h3>
+<p>orgstar edits the file's text directly; there is no separate document format. When it saves, text you didn't change is written back exactly as it was read:</p>
+<ul>
+<li>A file with no changes is never rewritten.</li>
+<li>Untouched lines keep their bytes, including trailing whitespace, tabs, and the presence or absence of a final newline.</li>
+<li>Line endings are kept as they are. A file with CRLF line endings keeps them, and on the Mac the modeline shows <code class="verbatim">CRLF</code> for such a file. orgstar doesn't convert line endings; new lines that orgstar's commands insert end with LF.</li>
+</ul>
+<h3 id="encodings">Encodings</h3>
+<p>orgstar edits UTF-8 files, with or without a byte order mark. A file that starts with a BOM keeps it.</p>
+<p>A file that isn't valid UTF-8 (UTF-16, Latin-1, or a file with invalid bytes) opens read-only. The window's subtitle says "Read-only: not UTF-8", undecodable bytes show as replacement characters, and commands that would change the file report that it "isn't UTF-8, so it can't be changed". orgstar never converts such a file.</p>
+<h3 id="how-a-save-works">How a save works</h3>
+<p>Saving replaces the file through a temporary file in the same folder (named <code class="verbatim">.name.org.orgstar-…</code>), under the system's file coordination, so iCloud and other coordinating apps see a complete file. The steps are:</p>
+<ol>
+<li>Read the file on disk. If it changed since orgstar last read or wrote it, keep both versions in the recovery folder and merge the change into your edits (see below).</li>
+<li>Read the file again. If it changed in the meantime, start over, up to three times.</li>
+<li>Replace the file. If another program replaced it between the check and the write, its version goes to the recovery folder and is merged into your edits.</li>
+<li>Read the file back. If it changed right after the write, orgstar's version goes to the recovery folder and the new disk version is merged in.</li>
+</ol>
+<p>Emacs and Syncthing don't use file coordination, so these checks can't lock them out. They narrow the window in which two writers can collide, and every version a save displaces is kept in the recovery folder.</p>
+<p>If the file keeps changing through all three attempts, the save fails with an error and your edits stay unsaved.</p>
+<p>In the Mac App Store version, when the folder doesn't let orgstar create the temporary file, orgstar writes the file in place instead.</p>
+<h3 id="automatic-and-explicit-saving">Automatic and explicit saving</h3>
+<p>With <code class="verbatim">save = "automatic"</code> (the default), orgstar saves a file one second after you stop typing. With <code class="verbatim">"explicit"</code>, only <code class="verbatim">⌘S</code> (Save) and <code class="verbatim">⌥⌘S</code> (Save All) save. See <a href="13-configuration.html">Configuration</a>. The iOS app always saves automatically.</p>
+<h2 id="changes-made-outside-orgstar">Changes made outside orgstar</h2>
+<p>orgstar watches your folders. On the Mac it uses FSEvents; on iOS it is told of changes by file coordination and reads the folders again when you return to the app. When a file that is open in orgstar changes on disk:</p>
+<ul>
+<li>If you have no unsaved edits in it, orgstar reloads it. Undo history for the file is cleared.</li>
+<li>If you have unsaved edits, orgstar merges the disk version into them and, with automatic saving, saves the result.</li>
+<li>If the changes conflict, nothing is saved and the conflict sheet opens.</li>
+</ul>
+<p>The merge is a line-based three-way merge between the version orgstar last read or wrote, your edits, and the disk version. A run of lines changed on one side only takes that side; changed the same way on both, it is taken once; changed differently on both, it is a conflict. Lines keep their endings, so CRLF files and a missing final newline survive a merge. A disk version that isn't valid UTF-8 always conflicts.</p>
+<p>After a reload or merge, orgstar also reads the file's setup files again.</p>
+<h3 id="the-conflict-sheet">The conflict sheet</h3>
+<p>The sheet shows what differs, with lines marked - on disk and + in your version, and offers:</p>
+<table>
+<thead>
+<tr><th>Button</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td>Keep Mine</td><td>Writes your version over the disk version. The disk version goes to the recovery folder.</td></tr>
+<tr><td>Use Disk Version</td><td>Loads the disk version. Your version goes to the recovery folder.</td></tr>
+<tr><td>Merge with Markers</td><td>Puts both sets of changes in the buffer, with conflicting lines between <code class="verbatim">&lt;&lt;&lt;&lt;&lt;&lt;&lt; yours</code> and <code class="verbatim">&gt;&gt;&gt;&gt;&gt;&gt;&gt; disk</code> markers, as <code class="verbatim">git merge</code> leaves them. Edit and save. Your version as it was goes to the recovery folder.</td></tr>
+<tr><td>Cancel</td><td>Closes the sheet. Automatic saving stops for the file until you decide; the Conflict button in the toolbar opens the sheet again.</td></tr>
+</tbody>
+</table>
+<p>On the Mac, File ▸ Revert to File on Disk loads the disk version at any time; unsaved changes go to the recovery folder.</p>
+<h2 id="sync-tools">Sync tools</h2>
+<h3 id="icloud-drive">iCloud Drive</h3>
+<p>orgstar reads and writes files under file coordination, which is how iCloud expects apps to work. Files iCloud hasn't downloaded yet (<code class="verbatim">.name.org.icloud</code> placeholders) aren't indexed; orgstar asks iCloud to download them and indexes them when they arrive. On iOS they appear in the Folders tab with a cloud icon until then.</p>
+<h3 id="syncthing">Syncthing</h3>
+<p>Syncthing writes files without file coordination. orgstar sees its changes through file watching and merges them as described above.</p>
+<ul>
+<li>Syncthing's temporary files (<code class="verbatim">.syncthing.*</code>) are ignored.</li>
+<li>Its folders <code class="verbatim">.stfolder</code> and <code class="verbatim">.stversions</code> are in the default <code class="verbatim">ignored-folders</code>.</li>
+<li>Conflict copies (<code class="verbatim">name.sync-conflict-YYYYMMDD-HHMMSS-ID.org</code>) are listed in the sidebar but never indexed, so they don't appear in the agenda, search or ID links.</li>
+</ul>
+<p>When a file with conflict copies opens, a message says how many there are. File ▸ Resolve Sync Conflicts… (on iOS, a toolbar button while there are copies, and in Commands) lists each copy against the file, with lines marked - in the file and + in the copy:</p>
+<table>
+<thead>
+<tr><th>Button</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td>Keep File</td><td>Leaves the file as it is.</td></tr>
+<tr><td>Use Copy</td><td>Replaces the buffer's text with the copy's, as an edit you can undo.</td></tr>
+<tr><td>Merge with Markers</td><td>Puts every difference between the file and the copy between conflict markers in the buffer. There is no common base, so every difference is marked.</td></tr>
+</tbody>
+</table>
+<p>Each choice then moves the copy to the recovery folder and deletes it from the folder.</p>
+<h3 id="dropbox-and-other-tools">Dropbox and other tools</h3>
+<p>Any program that writes files in your folders is treated the same way: orgstar sees the change, reloads or merges, and keeps displaced versions. Programs that write through file coordination (iCloud, File Provider apps on iOS) are seen as they write; others are seen through FSEvents on the Mac and when you return to the app on iOS.</p>
+<h3 id="files-orgstar-ignores">Files orgstar ignores</h3>
+<p>When scanning folders, orgstar skips Emacs lock files (<code class="verbatim">.#name</code>), backups (<code class="verbatim">name~</code>) and auto-save files (<code class="verbatim">#name#</code>), its own temporary and backup files (names containing <code class="verbatim">.orgstar-</code>), <code class="verbatim">.DS_Store</code>, <code class="verbatim">.localized</code>, and the folders in <code class="verbatim">ignored-folders</code>. With <code class="verbatim">show-hidden-files = false</code>, every dotfile and dot folder is skipped. orgstar doesn't create or honour Emacs lock files.</p>
+<h2 id="recovery-versions">Recovery versions</h2>
+<p>Every version a save, a merge or a conflict resolution displaces is kept in the recovery folder, and so is a snapshot of the file before a save, at most once an hour:</p>
+<ul>
+<li>on the Mac, <code class="verbatim">~/Library/Application Support/Orgstar/Recovery</code> (or <code class="verbatim">$ORGSTAR_DATA_DIR/Recovery</code>),</li>
+<li>in the Mac App Store version, <code class="verbatim">~/Library/Containers/sh.krz.orgstar/Data/Library/Application Support/Orgstar/Recovery</code>,</li>
+<li>on iOS, the app's own Application Support folder.</li>
+</ul>
+<p>Each file has a subfolder named from a hash of its path, holding its last 20 replaced versions and, apart from them, its last 10 snapshots. A version's file name has a timestamp, a label and the file's name. The labels are:</p>
+<table>
+<thead>
+<tr><th>Label</th><th>Kept when</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">external</code></td><td>A version written by another program was replaced or merged</td></tr>
+<tr><td><code class="verbatim">local</code></td><td>orgstar's version was replaced, or set aside by Use Disk Version, Merge with Markers or Restore</td></tr>
+<tr><td><code class="verbatim">sync-conflict</code></td><td>A Syncthing conflict copy was resolved</td></tr>
+<tr><td><code class="verbatim">snapshot</code></td><td>A save changed the file and the last snapshot was more than an hour before</td></tr>
+</tbody>
+</table>
+<p>File ▸ History… on the Mac, and Recovery Versions… on iOS (a toolbar button while there are versions, and in Commands), lists the open file's kept versions, newest first, each compared with the buffer (lines marked - in the buffer, + in the kept version). In the download version, History also lists the commits that changed the file when it is in a git repository. Restore puts a version's text in the buffer as an edit you can undo; the buffer as it was goes to the recovery folder first. On the Mac, Show in Finder selects the version's file. See <a href="01-files-and-folders.org::*Recovery versions">Recovery versions</a> and, for committing to git as you save, <a href="01-files-and-folders.org::*Committing to git">Committing to git</a>.</p>
+<h2 id="features-that-use-emacs-on-the-mac">Features that use Emacs on the Mac</h2>
+<p>Some features run Emacs in batch mode on the Mac. Everything else works without Emacs installed. The <a href="../install.html">Mac App Store version</a> never runs Emacs; it does what the download version does without Emacs, described below.</p>
+<table>
+<thead>
+<tr><th>Feature</th><th>What runs</th></tr>
+</thead>
+<tbody>
+<tr><td>Emacs Lisp source blocks (<code class="verbatim">emacs-lisp</code>, <code class="verbatim">elisp</code>)</td><td>The block, in <code class="verbatim">emacs -Q --batch</code></td></tr>
+<tr><td>Table formulas outside what orgstar computes itself</td><td><code class="verbatim">org-table-recalculate</code> on a copy of the file; the table's new text replaces the old one if the table didn't change meanwhile</td></tr>
+<tr><td>Lisp table formulas that orgstar's Emacs Lisp interpreter can't evaluate</td><td>The same; orgstar first asks whether to run Lisp (yes, no, always)</td></tr>
+<tr><td>Export to PDF, and LaTeX and plain text orgstar can't write itself</td><td><code class="verbatim">org-latex-export-to-pdf</code>, <code class="verbatim">org-latex-export-to-latex</code> or <code class="verbatim">org-ascii-export-to-ascii</code></td></tr>
+<tr><td><code class="verbatim">calc</code> source blocks that orgstar's Calc refuses</td><td>The block, in <code class="verbatim">emacs -Q --batch</code></td></tr>
+<tr><td><code class="verbatim">elisp:</code> links</td><td>The form, after asking, in <code class="verbatim">emacs -Q --batch</code> in a copy of the file</td></tr>
+</tbody>
+</table>
+<p>HTML, Markdown, ODT, LaTeX and ASCII export don't use Emacs. See <a href="11-code-blocks.html">Code blocks</a>, <a href="10-tables.html">Tables</a> and <a href="12-export.html">Export</a>.</p>
+<h3 id="how-emacs-is-found">How Emacs is found</h3>
+<p>orgstar uses the first of these that is an executable file:</p>
+<ol>
+<li>the path in the environment variable <code class="verbatim">ORGSTAR_EMACS</code>,</li>
+<li><code class="verbatim">/opt/homebrew/bin/emacs</code>,</li>
+<li><code class="verbatim">/usr/local/bin/emacs</code>,</li>
+<li><code class="verbatim">/Applications/Emacs.app/Contents/MacOS/Emacs</code>,</li>
+<li><code class="verbatim">/run/current-system/sw/bin/emacs</code>,</li>
+<li><code class="verbatim">/usr/bin/emacs</code>.</li>
+</ol>
+<p>An app started from the Dock doesn't see your shell's <code class="verbatim">PATH</code>, which is why orgstar looks in fixed places. Without Emacs, Emacs Lisp blocks and <code class="verbatim">elisp:</code> links run in orgstar's own Emacs Lisp interpreter, and a block or form that uses something the interpreter doesn't have fails with a message. A table is recalculated up to the first formula orgstar can't compute, and the echo area names the formula and the reason. A <code class="verbatim">calc</code> block that orgstar's Calc refuses isn't run. Export to PDF with Emacs, which the Mac App Store version leaves out, reports "Emacs isn't installed, so this format can't be exported.", and a LaTeX or plain text export orgstar can't write itself stops with the reason.</p>
+<h3 id="what-emacs-sees">What Emacs sees</h3>
+<ul>
+<li>Emacs runs with <code class="verbatim">-Q</code>: your <code class="verbatim">init.el</code>, packages and customizations aren't loaded. Org and the exporters are the versions bundled with that Emacs.</li>
+<li>orgstar writes a snapshot of the buffer to a temporary folder and runs Emacs on it, so unsaved edits are included. The working directory is the file's folder.</li>
+<li>File-local variables marked safe apply (<code class="verbatim">enable-local-variables</code> is <code class="verbatim">:safe</code>).</li>
+<li>Export doesn't run source blocks (<code class="verbatim">org-export-use-babel</code> is <code class="verbatim">nil</code>). The exported file is written next to the org file, as Emacs writes it, or moved to the place you chose.</li>
+<li>For export and table recalculation, Emacs gets your <code class="verbatim">PATH</code> with <code class="verbatim">/opt/homebrew/bin</code>, <code class="verbatim">/usr/local/bin</code>, <code class="verbatim">/Library/TeX/texbin</code>, <code class="verbatim">/usr/bin</code> and <code class="verbatim">/bin</code> added, as source blocks do, so the programs it starts, such as <code class="verbatim">pdflatex</code>, are found when orgstar was opened from the Dock.</li>
+<li>PDF export needs a LaTeX installation that Org's LaTeX exporter can run.</li>
+<li>A table recalculation that takes more than 60 seconds, or an export that takes more than 120 seconds, is stopped. Source blocks have a limit of 300 seconds. <code class="verbatim">⌘.</code> (Cancel Running Task) stops a running block, export or table recalculation sooner.</li>
+</ul>
+<h2 id="quick-look">Quick Look</h2>
+<p>orgstar includes a Quick Look extension for org files (<code class="verbatim">.org</code> and <code class="verbatim">.org_archive</code>). Pressing Space on an org file in Finder, or in the Files app on iOS, shows the file as the HTML export renders it, with its <code class="verbatim">#+SETUPFILE</code> keywords applied. The preview reads a file as UTF-8, or as Latin-1 when it isn't valid UTF-8.</p>
+<p>Inside orgstar, selecting a file in the sidebar that isn't text shows a Quick Look preview, with Open with Default App and Show in Finder below it.</p>
+<h2 id="spotlight">Spotlight</h2>
+<p>On the Mac, orgstar includes a Spotlight importer for org files. Spotlight indexes each file's text, its title (<code class="verbatim">#+TITLE</code>, else the file name), <code class="verbatim">#+AUTHOR</code>, <code class="verbatim">#+DESCRIPTION</code>, and its tags (<code class="verbatim">#+FILETAGS</code> and heading tags) and headings as keywords. The importer reads only UTF-8 files.</p>
+<p>On iOS, the app adds the files in your folders to Spotlight itself; see <a href="14-ios.html">iPhone and iPad</a>.</p>
+<h2 id="finder">Finder</h2>
+<p>orgstar declares the <code class="verbatim">org.orgmode.org</code> file type for the extensions <code class="verbatim">.org</code> and <code class="verbatim">.org_archive</code>, and registers as an editor for it, and as an alternate editor for plain text. Double-clicking an org file in Finder, dropping files on orgstar's Dock icon, or running <code class="verbatim">open -a orgstar file.org</code> opens each file as a buffer. Files opened while orgstar is starting open once its window is ready. To make orgstar the app that opens org files, use Finder's Get Info ▸ Open with ▸ Change All.</p>
+<h2 id="org-protocol-and-shortcuts">org-protocol and Shortcuts</h2>
+<p>orgstar registers the <code class="verbatim">org-protocol:</code> URL scheme on the Mac and iOS, and handles two sub-protocols, in both the <code class="verbatim">?key=value</code> form and the older <code class="verbatim">:/a/b/c</code> form:</p>
+<ul>
+<li><code class="verbatim">org-protocol://capture</code> opens Capture with the link's template, URL, title and body.</li>
+<li><code class="verbatim">org-protocol://store-link</code> stores the link for <code class="verbatim">C-c C-l</code> and copies it to the clipboard.</li>
+</ul>
+<p>Other sub-protocols, such as <code class="verbatim">open-source</code>, show "orgstar handles org-protocol capture and store-link".</p>
+<p>The Shortcuts action Capture to orgstar, on the Mac and iOS, files text with a capture template without opening the capture window. See <a href="08-capture.html">Capture</a>.</p>
+<h2 id="orgstar-links-and-x-callback-url">orgstar:// links and x-callback-url</h2>
+<p>orgstar registers the <code class="verbatim">orgstar:</code> URL scheme on the Mac and iOS. These links open part of the app; the widgets and the Live Activity use them, and they work from Shortcuts, a browser, a note or <code class="verbatim">open</code> in Terminal:</p>
+<table>
+<thead>
+<tr><th>Link</th><th>Opens</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">orgstar://agenda</code></td><td>The agenda</td></tr>
+<tr><td><code class="verbatim">orgstar://clock</code></td><td>The entry of the running clock</td></tr>
+<tr><td><code class="verbatim">orgstar://review</code></td><td>Review Flashcards</td></tr>
+<tr><td><code>orgstar://capture?template=t</code></td><td>Capture with that template, or the template list</td></tr>
+<tr><td><code>orgstar://entry?path=/path/file.org&amp;offset=N</code></td><td>The file at offset N</td></tr>
+</tbody>
+</table>
+<h3 id="x-callback-url">x-callback-url</h3>
+<p>Links of the form <code>orgstar://x-callback-url/action?parameters</code> follow <a href="https://x-callback-url.com">x-callback-url 1.0</a>: another app asks orgstar to do something and names links to open afterwards. Besides an action's own parameters, every action takes:</p>
+<table>
+<thead>
+<tr><th>Parameter</th><th>Meaning</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">x-success</code></td><td>Opened when the action succeeds, with the result's parameters added to its query</td></tr>
+<tr><td><code class="verbatim">x-error</code></td><td>Opened when it fails, with <code class="verbatim">errorCode</code> and <code class="verbatim">errorMessage</code> added</td></tr>
+<tr><td><code class="verbatim">x-cancel</code></td><td>Opened when you close the capture window or sheet without filing</td></tr>
+<tr><td><code class="verbatim">x-source</code></td><td>The calling app's name, shown when orgstar asks whether to allow it</td></tr>
+</tbody>
+</table>
+<p>Values are percent-encoded, as in any URL; encode a <code class="verbatim">+</code> in a value as <code class="verbatim">%2B</code>. Without <code class="verbatim">x-error</code>, an error shows in orgstar's message area.</p>
+<h4 id="capture">capture</h4>
+<table>
+<thead>
+<tr><th>Parameter</th><th>Meaning</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">template</code></td><td>A template's <code class="verbatim">key</code> in <code class="verbatim">capture.toml</code></td></tr>
+<tr><td><code class="verbatim">text</code></td><td>The text, inserted as <code class="verbatim">%i</code></td></tr>
+<tr><td><code class="verbatim">url</code>, <code class="verbatim">title</code></td><td>A link, as org-protocol gives one: <code class="verbatim">%a</code>, <code class="verbatim">%:link</code>, <code class="verbatim">%:description</code></td></tr>
+<tr><td><em>prompt name</em></td><td>The answer to the prompt with that text: <code class="verbatim">What</code> for <code class="verbatim">%^{What}</code>, <code class="verbatim">Tags</code> for <code class="verbatim">%^g</code>, <code class="verbatim">Date</code> for <code class="verbatim">%^t</code>, <code class="verbatim">Effort</code> for <code class="verbatim">%^{Effort}p</code></td></tr>
+</tbody>
+</table>
+<p>With <code class="verbatim">template</code> and <code class="verbatim">text</code> given and a parameter for every prompt in the template, orgstar files the entry without showing anything, as Capture to orgstar does in Shortcuts; on iOS the file is saved at once. <code class="verbatim">%^C</code> and <code class="verbatim">%^L</code> insert nothing. Otherwise the capture window (Mac) or sheet (iOS) opens with the template chosen (the template list without <code class="verbatim">template</code>), the text as <code class="verbatim">%i</code> and the link as <code class="verbatim">%a</code>, and asks what is missing; prompt answers given in the link aren't filled in there. Templates that make a Denote note or ask for a date tree's day (<code class="verbatim">time-prompt</code>) always open it. Closing it without filing opens <code class="verbatim">x-cancel</code>.</p>
+<p>Result: <code class="verbatim">template</code> (the key) and <code class="verbatim">file</code> (the target, relative to its folder).</p>
+<h4 id="open">open</h4>
+<table>
+<thead>
+<tr><th>Parameter</th><th>Meaning</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">file</code></td><td>A file relative to one of your folders (the first that has it), or an absolute path inside one</td></tr>
+<tr><td><code class="verbatim">heading</code></td><td>With <code class="verbatim">file</code>: the first heading with this title</td></tr>
+<tr><td><code class="verbatim">id</code></td><td>Instead of <code class="verbatim">file</code>: the heading with this <code class="verbatim">ID</code> property</td></tr>
+</tbody>
+</table>
+<p>Shows the file or heading: in the editor on the Mac, in the reader on iOS. Result: <code class="verbatim">file</code>.</p>
+<h4 id="agenda">agenda</h4>
+<table>
+<thead>
+<tr><th>Parameter</th><th>Meaning</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">view</code></td><td>A view's name: <code class="verbatim">Agenda</code> (the default), <code class="verbatim">TODO List</code>, <code class="verbatim">Stuck Projects</code>, or one in <code class="verbatim">views.toml</code>; case is ignored</td></tr>
+<tr><td><code class="verbatim">limit</code></td><td>How many entries to return: 50 when not given, at most 200</td></tr>
+</tbody>
+</table>
+<p>Runs the view with your agenda settings, as the agenda shows it. Calendar events and reminders are left out. Result:</p>
+<table>
+<thead>
+<tr><th>Parameter</th><th>Meaning</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">view</code></td><td>The view's name</td></tr>
+<tr><td><code class="verbatim">result</code></td><td>The entries, as a JSON array</td></tr>
+<tr><td><code class="verbatim">count</code></td><td>How many entries <code class="verbatim">result</code> holds</td></tr>
+<tr><td><code class="verbatim">total</code></td><td>How many entries the view has; more than <code class="verbatim">count</code> when <code class="verbatim">limit</code> cut it</td></tr>
+</tbody>
+</table>
+<p>Each entry is an object with these keys, those without a value left out:</p>
+<table>
+<thead>
+<tr><th>Key</th><th>Value</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">title</code></td><td>The heading's title</td></tr>
+<tr><td><code class="verbatim">todo</code></td><td>Its TODO keyword</td></tr>
+<tr><td><code class="verbatim">priority</code></td><td>Its priority letter</td></tr>
+<tr><td><code class="verbatim">tags</code></td><td>Its tags, as an array</td></tr>
+<tr><td><code class="verbatim">category</code></td><td>Its category</td></tr>
+<tr><td><code class="verbatim">file</code></td><td>Its file, relative to its folder</td></tr>
+<tr><td><code class="verbatim">status</code></td><td><code class="verbatim">overdue</code>, <code class="verbatim">due-soon</code>, <code class="verbatim">normal</code> or <code class="verbatim">done</code></td></tr>
+<tr><td><code class="verbatim">date</code></td><td>Agenda views: the day it shows on, <code class="verbatim">2026-11-26</code>; overdue entries show on today</td></tr>
+<tr><td><code class="verbatim">time</code>, <code class="verbatim">end</code></td><td>Agenda views: its start and end time, <code class="verbatim">10:00</code></td></tr>
+<tr><td><code class="verbatim">kind</code></td><td>Agenda views: <code class="verbatim">scheduled</code>, <code class="verbatim">deadline</code>, <code class="verbatim">habit</code> or <code class="verbatim">timestamp</code></td></tr>
+<tr><td><code class="verbatim">section</code></td><td>Block views: the header of the block it is in</td></tr>
+</tbody>
+</table>
+<p>To show an entry, pass its <code class="verbatim">file</code> and <code class="verbatim">title</code> to <code class="verbatim">open</code> as <code class="verbatim">file</code> and <code class="verbatim">heading</code>.</p>
+<h4 id="clock-in-clock-out-and-clock-status">clock-in, clock-out and clock-status</h4>
+<p><code class="verbatim">clock-in</code> takes <code class="verbatim">id</code>, or <code class="verbatim">file</code> and <code class="verbatim">heading</code>, as <code class="verbatim">open</code> does, and clocks in to that heading; without them, to the entry clocked last. Dangling clocks are asked about in orgstar first, as Clock In asks. <code class="verbatim">clock-out</code> stops the running clock. <code class="verbatim">clock-status</code> changes nothing.</p>
+<table>
+<thead>
+<tr><th>Action</th><th>Result</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">clock-in</code></td><td>As <code class="verbatim">clock-status</code></td></tr>
+<tr><td><code class="verbatim">clock-out</code></td><td><code class="verbatim">heading</code>, <code class="verbatim">file</code> and <code class="verbatim">minutes</code> clocked</td></tr>
+<tr><td><code class="verbatim">clock-status</code></td><td><code class="verbatim">running</code> (<code class="verbatim">true</code> or <code class="verbatim">false</code>), and while a clock runs <code class="verbatim">heading</code>, <code class="verbatim">file</code>, <code class="verbatim">started</code> (ISO 8601) and <code class="verbatim">minutes</code></td></tr>
+</tbody>
+</table>
+<p>On iOS the file is saved at once.</p>
+<h4 id="errors">Errors</h4>
+<table>
+<thead>
+<tr><th><code class="verbatim">errorCode</code></th><th>When</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">unknown-action</code></td><td>The action isn't one of the above</td></tr>
+<tr><td><code class="verbatim">missing-parameter</code></td><td><code class="verbatim">open</code> without <code class="verbatim">file</code> or <code class="verbatim">id</code></td></tr>
+<tr><td><code class="verbatim">invalid-parameter</code></td><td><code class="verbatim">limit</code> isn't a number above 0</td></tr>
+<tr><td><code class="verbatim">not-found</code></td><td>No such file, heading, ID or view</td></tr>
+<tr><td><code class="verbatim">capture-failed</code></td><td>The template can't be filled or filed; <code class="verbatim">errorMessage</code> says why</td></tr>
+<tr><td><code class="verbatim">clock-failed</code></td><td>Clocking in or out failed; <code class="verbatim">errorMessage</code> says why</td></tr>
+<tr><td><code class="verbatim">no-clock</code></td><td><code class="verbatim">clock-out</code> with no clock running</td></tr>
+<tr><td><code class="verbatim">not-allowed</code></td><td>You chose Don't Allow</td></tr>
+<tr><td><code class="verbatim">needs-orgstar-plus</code></td><td>The action needs orgstar+</td></tr>
+<tr><td><code class="verbatim">not-ready</code></td><td>The Mac app's window isn't open yet</td></tr>
+</tbody>
+</table>
+<h4 id="which-links-orgstar-opens">Which links orgstar opens</h4>
+<p>orgstar opens <code class="verbatim">x-success</code>, <code class="verbatim">x-error</code> and <code class="verbatim">x-cancel</code> only for other apps' schemes. It never opens <code class="verbatim">orgstar:</code> links (a link could call itself), <code class="verbatim">org-protocol:</code> links (they would capture), or <code class="verbatim">http:</code>, <code class="verbatim">https:</code>, <code class="verbatim">file:</code>, <code class="verbatim">ftp:</code>, <code class="verbatim">javascript:</code>, <code class="verbatim">data:</code>, <code class="verbatim">about:</code> and <code class="verbatim">blob:</code> links, which would send results to a web server or open a download. Such a callback is skipped and the action still runs.</p>
+<h4 id="allowing-apps">Allowing apps</h4>
+<p>A link from a web page or another app could write to your files or read them. So capture without the window or sheet, <code class="verbatim">clock-in</code>, <code class="verbatim">clock-out</code>, <code class="verbatim">agenda</code> and <code class="verbatim">clock-status</code> need orgstar+, as Shortcuts actions do, and the first time an app uses one of them orgstar asks: Allow "<em>name</em>" to use orgstar?, with where results go. Allow remembers the app; Don't Allow opens <code class="verbatim">x-error</code> with <code class="verbatim">not-allowed</code>. An app is the <code class="verbatim">x-source</code> name together with the schemes of its callbacks, so a link that gives an allowed name but sends results to another app asks again. <code class="verbatim">x-source</code> is whatever the link says, so allow only names you expect to see.</p>
+<p><code class="verbatim">open</code> and capture through the window or sheet never ask, as <code class="verbatim">org-protocol://capture</code> doesn't: they show what they do and write nothing until you file.</p>
+<p>Allowed apps are listed under Apps Allowed to Use Links, in Settings ▸ Capture on the Mac and the Settings tab on iOS, each with Forget.</p>
+<h4 id="shortcuts-or-x-callback-url">Shortcuts or x-callback-url</h4>
+<p>In Shortcuts, use the Capture to orgstar action: it runs without switching apps and returns its message as a value. Use x-callback-url from apps that support it (Drafts, launchers, Shortcuts' Open X-Callback URL action, <code class="verbatim">open</code> in Terminal), and for opening entries, the agenda and the clock, which have no Shortcuts action.</p>
+<h4 id="examples">Examples</h4>
+<pre><code class="language-text">orgstar://x-callback-url/capture?template=t&amp;text=Call%20Sam&amp;x-source=Drafts&amp;x-success=drafts://
+orgstar://x-callback-url/capture?template=w&amp;url=https%3A%2F%2Fexample.com&amp;title=Example&amp;x-cancel=myapp://cancelled
+orgstar://x-callback-url/open?file=work%2Fprojects.org&amp;heading=Website
+orgstar://x-callback-url/agenda?view=TODO%20List&amp;limit=10&amp;x-source=My%20App&amp;x-success=myapp://agenda
+orgstar://x-callback-url/clock-in?id=5f0c1e2a&amp;x-success=myapp://clocked</code></pre>
+<p>The agenda example opens a link like <code>myapp://agenda?count=1&amp;result=%5B%7B%22title%22…&amp;total=1&amp;view=TODO%20List</code>. On the Mac, try them from Terminal with <code class="verbatim">open '…'</code>.</p>
+<h2 id="compatibility-notes">Compatibility notes</h2>
+<h3 id="defaults-that-differ-from-emacs">Defaults that differ from Emacs</h3>
+<p>orgstar's defaults follow a common Doom Emacs setup rather than plain Emacs in several places. If you use plain Emacs on the same files, set these in <code class="verbatim">config.toml</code> to match your Emacs, or use Import from Emacs; see <a href="13-configuration.html">Configuration</a>.</p>
+<table>
+<thead>
+<tr><th>Setting</th><th>orgstar default</th><th>Plain Emacs default</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">fill-column</code></td><td>80</td><td>70</td></tr>
+<tr><td><code class="verbatim">org-M-RET-may-split-line</code></td><td><code class="verbatim">false</code></td><td><code class="verbatim">t</code></td></tr>
+<tr><td><code class="verbatim">org-list-allow-alphabetical</code></td><td><code class="verbatim">true</code></td><td><code class="verbatim">nil</code></td></tr>
+<tr><td><code class="verbatim">org-hide-emphasis-markers</code></td><td><code class="verbatim">true</code></td><td><code class="verbatim">nil</code></td></tr>
+<tr><td><code class="verbatim">org-pretty-entities</code></td><td><code class="verbatim">true</code></td><td><code class="verbatim">nil</code></td></tr>
+<tr><td><code class="verbatim">org-startup-indented</code></td><td><code class="verbatim">true</code></td><td><code class="verbatim">nil</code></td></tr>
+<tr><td><code class="verbatim">org-startup-truncated</code></td><td><code class="verbatim">false</code></td><td><code class="verbatim">t</code></td></tr>
+<tr><td><code class="verbatim">electric-pair-mode</code></td><td><code class="verbatim">true</code></td><td>off</td></tr>
+<tr><td><code class="verbatim">org-agenda-span</code></td><td>10 days</td><td>a week</td></tr>
+<tr><td><code class="verbatim">org-agenda-show-all-dates</code></td><td><code class="verbatim">false</code></td><td><code class="verbatim">t</code></td></tr>
+</tbody>
+</table>
+<p><code class="verbatim">org-hide-emphasis-markers</code> and <code class="verbatim">org-pretty-entities</code> matter for files you also edit in Emacs: orgstar aligns tags and tables, and fills paragraphs, by the width text has on screen in your Emacs. If they don't match your Emacs, tags and tables that orgstar aligns look misaligned in Emacs.</p>
+<p>These behave as Emacs's defaults and have no setting in <code class="verbatim">config.toml</code>: <code class="verbatim">org-log-repeat</code> is <code class="verbatim">time</code> unless <code class="verbatim">#+STARTUP</code> says otherwise, fast TODO selection is on when keywords have keys, priorities are <code class="verbatim">A</code> to <code class="verbatim">C</code> with <code class="verbatim">B</code> as default unless <code class="verbatim">#+PRIORITIES</code> says otherwise, and <code class="verbatim">org-use-sub-superscripts</code> is <code class="verbatim">{}</code> for display (only <code class="verbatim">x_{1}</code> and <code class="verbatim">x^{2}</code> are lowered and raised).</p>
+<h3 id="how-the-agenda-looks">How the agenda looks</h3>
+<p>The agenda selects the same entries as Org's, but shows them its own way (see <a href="07-agenda.html">The agenda</a>):</p>
+<ul>
+<li>Rows have their own layout: the time or a status such as <code class="verbatim">Due in 2d</code> on the left, the category above the title, and the keyword and priority as badges. <code class="verbatim">org-agenda-prefix-format</code> doesn't change the layout; what the format has besides <code class="verbatim">%c</code>, <code class="verbatim">%t</code>, <code class="verbatim">%s</code> and <code class="verbatim">%i</code>, such as <code class="verbatim">%e</code> or <code class="verbatim">%b</code>, shows after the category, and <code class="verbatim">%t</code> in its <code class="verbatim">agenda</code> entry decides whether a time in the heading text leaves the title.</li>
+<li>Days without entries are hidden unless <code class="verbatim">org-agenda-show-all-dates</code> is <code class="verbatim">true</code>; today always shows.</li>
+<li>Today's past deadlines and past scheduled entries are gathered in an Overdue group, oldest first, rather than sorted among today's entries by urgency.</li>
+<li>The time grid and the now line are drawn as lines among a day's timed entries, where <code class="verbatim">org-agenda-time-grid</code>, <code class="verbatim">org-agenda-use-time-grid</code> and <code class="verbatim">org-agenda-show-current-time-in-grid</code> put them. orgstar draws the lines itself, so the strings in <code class="verbatim">org-agenda-time-grid</code> and <code class="verbatim">org-agenda-current-time-string</code> have no equivalent.</li>
+</ul>
+<h3 id="snippets-and-yasnippet">Snippets and yasnippet</h3>
+<p>orgstar's snippets (see <a href="02-the-editor.html">The editor</a>) read yasnippet's field syntax, and Import from Emacs copies your org-mode snippets into <code class="verbatim">snippets.toml</code> (see <a href="13-configuration.html">Configuration</a>). They are tested against yasnippet's own expansion. Where they differ:</p>
+<ul>
+<li><code class="verbatim">TAB</code> expands a trigger only where it has no other meaning. With yasnippet's minor mode, <code class="verbatim">TAB</code> on a heading or in a table expands a trigger before the caret first; in orgstar it cycles or moves to the next field.</li>
+<li>No Emacs Lisp: backquoted forms, <code class="verbatim">$(…)</code> transformations, <code class="verbatim"># condition:</code> and <code class="verbatim"># expand-env:</code> aren't run. Snippets with the first two aren't imported, and <code class="verbatim">snippets.toml</code> refuses <code class="verbatim">$(…)</code> in a field. Capture's <code class="verbatim">%(…)</code> runs in orgstar's own interpreter instead.</li>
+<li>The default of a field is selected on entering it; typing replaces it, as yasnippet's first keystroke clears it.</li>
+<li>Lines after the first take the indentation of the trigger's line, rather than being indented by the mode (<code class="verbatim">yas-indent-line</code>).</li>
+<li>The trigger is the text back to a blank, or a part of it after a character other than a letter, digit or <code class="verbatim">_</code>; <code class="verbatim">yas-key-syntaxes</code> isn't read.</li>
+<li>One set of snippets for org files. Snippets for other modes, <code class="verbatim">.yas-parents</code>, <code class="verbatim"># group:</code>, <code class="verbatim"># binding:</code> and <code class="verbatim"># uuid:</code> aren't used.</li>
+<li>A field inside another field's default is skipped by yasnippet once the outer field is typed over; orgstar visits it, empty, where it was.</li>
+<li>Capture's escapes for dates and prompts (<code class="verbatim">%t</code>, <code class="verbatim">%U</code>, <code class="verbatim">%&lt;…&gt;</code>, <code class="verbatim">%^{…}</code>) work in bodies, which yasnippet doesn't have.</li>
+</ul>
+<h3 id="completion-and-dabbrev-corfu-and-org-roam">Completion and dabbrev, corfu and org-roam</h3>
+<p>Completion follows Emacs's <code class="verbatim">completion-at-point</code> with corfu's list (see <a href="02-the-editor.html">The editor</a>). Where it differs:</p>
+<ul>
+<li>Expand Word is <code class="verbatim">dabbrev-expand</code> with its defaults, and is tested against it in a buffer of its own. It searches the other open files whatever their mode, rather than only buffers in the same mode, and after them the index of your folders, which Emacs doesn't have. Without a word right before the caret it reports <code class="verbatim">No possible abbreviation preceding point</code> instead of expanding the word before the blank, and <code class="verbatim">dabbrev-abbrev-skip-leading-regexp</code> and <code class="verbatim">dabbrev-case-fold-search</code> aren't read.</li>
+<li>Complete Word (and Doom's <code class="verbatim">C-n</code> and <code class="verbatim">C-p</code>) lists words in the order Expand Word finds them; <code class="verbatim">cape-dabbrev</code> collects the same words, which corfu then sorts by length and history.</li>
+<li>Fuzzy matching scores as the command palette does, which is close to Doom's orderless with <code class="verbatim">orderless-flex</code> but takes no separators: spaces in what's typed are ignored.</li>
+<li>The list that opens by itself reads one pause and one length for every position (<code class="verbatim">corfu-auto-delay</code>, <code class="verbatim">corfu-auto-prefix</code>), with Doom's macOS values as defaults (0.4 seconds, two characters).</li>
+<li><code class="verbatim">[[id:</code> completes every heading in your folders, as <code class="verbatim">org-roam-node-insert</code> completes nodes, but a heading without an <code class="verbatim">ID</code> gets one when chosen, which org-roam leaves to <code class="verbatim">org-id-get-create</code>. The description is the heading's title as written. org-roam's <code class="verbatim">roam:</code> links aren't completed.</li>
+<li>Property values come from the index as well as the buffer; Org's <code class="verbatim">org-read-property-value</code> offers only the buffer's.</li>
+</ul>
+<h3 id="lint-file-and-org-lint">Lint File and org-lint</h3>
+<p>Lint File (see <a href="02-the-editor.html">The editor</a>) runs the checkers of <code class="verbatim">org-lint</code> that have the same meaning in orgstar, with org-lint's names, trust and messages, and finds the same lines; the tests compare the two on the same files. It differs in these ways:</p>
+<ul>
+<li>Lint All Folders checks every file in your folders, which org-lint doesn't do; an orphaned attachment folder is listed once there, not once for each file beside it.</li>
+<li>IDs are found through orgstar's index of all your folders, not <code class="verbatim">org-id-locations</code>. org-lint finds an unknown ID only when <code class="verbatim">org-id-locations</code> is loaded and doesn't have it; Lint File always reports one.</li>
+<li>orgstar's own checkers, which org-lint doesn't have: <code class="verbatim">duplicate-id</code> (across your folders), <code class="verbatim">unknown-todo-keyword</code>, <code class="verbatim">missing-attachment-folder</code>, <code class="verbatim">orphaned-attachment-folder</code> and <code class="verbatim">invalid-file-search</code>. <code class="verbatim">unknown-todo-keyword</code> reports a heading starting with a keyword common in Org configurations (<code class="verbatim">NEXT</code>, <code class="verbatim">WAIT</code>, <code class="verbatim">HOLD</code>, …) or one letter away from a keyword of the file (<code class="verbatim">TODOX</code>), when the file and the configuration don't define it.</li>
+<li>Not checked: Babel header arguments and values and source block languages (<code class="verbatim">wrong-header-argument</code>, <code class="verbatim">wrong-header-value</code>, <code class="verbatim">empty-header-argument</code>, <code class="verbatim">deprecated-header-syntax</code>, <code class="verbatim">named-result</code>, <code class="verbatim">invalid-babel-call-block</code>, <code class="verbatim">suspicious-language-in-src-block</code>), which depend on the languages loaded in Emacs; export options, macros and <code class="verbatim">#+INCLUDE</code> (<code class="verbatim">unknown-options-item</code>, <code class="verbatim">misspelled-export-option</code>, <code class="verbatim">invalid-macro-argument-and-template</code>, <code class="verbatim">wrong-include-link-parameter</code>, <code class="verbatim">obsolete-include-markup</code>, <code class="verbatim">beamer-frame</code>), which depend on the export back-ends loaded; citations (<code class="verbatim">non-existent-bibliography</code>, <code class="verbatim">missing-print-bibliography</code>, <code class="verbatim">invalid-cite-export-declaration</code>, <code class="verbatim">incomplete-citation</code>); <code class="verbatim">item-number</code>, <code class="verbatim">LaTeX-$</code>, <code class="verbatim">trailing-bracket-after-link</code>, <code class="verbatim">unclosed-brackets-in-link-description</code>, <code class="verbatim">percent-encoding-link-escape</code>, <code class="verbatim">extraneous-element-in-footnote-section</code>, <code class="verbatim">invalid-image-alignment</code> and <code class="verbatim">combining-keywords-with-affiliated</code>, where orgstar's reading of lists, LaTeX fragments and links differs from Org's in details these checks depend on.</li>
+<li>Timestamps are checked against English day names, as Emacs writes them with the C locale.</li>
+<li>The panel lists everything; org-lint's <code class="verbatim">h</code> and <code class="verbatim">i</code> (hide or ignore a checker) and its prefix arguments (one category or one checker) aren't there.</li>
+</ul>
+<h3 id="known-differences-from-emacs-org">Known differences from Emacs Org</h3>
+<p>orgstar refuses some things with a message rather than doing something different from Emacs. These are the ones found in the current version.</p>
+<p>Code blocks (see <a href="11-code-blocks.html">Code blocks</a>):</p>
+<ul>
+<li><code class="verbatim">:cmdline</code> is supported only for shells, <code class="verbatim">dot</code>, <code class="verbatim">plantuml</code>, <code class="verbatim">mermaid</code> and C, C++, D, Java, Fortran and Clojure.</li>
+<li><code class="verbatim">:prologue</code> and <code class="verbatim">:epilogue</code> aren't supported for <code class="verbatim">dot</code>, <code class="verbatim">plantuml</code> and <code class="verbatim">mermaid</code>; <code class="verbatim">:stdin</code> and <code class="verbatim">:shebang</code> only for shells.</li>
+<li><code class="verbatim">:post</code> and noweb references that run a block (<code class="verbatim">&lt;&lt;name()&gt;&gt;</code>) take a block in the same file, as <code class="verbatim">name</code> or <code class="verbatim">name(arg=value)</code>. <code class="verbatim">name[header arguments](…)</code>, an index such as <code class="verbatim">name()[0]</code>, and blocks in other files or the Library of Babel are refused: "References like … aren't supported yet."</li>
+<li>A <code class="verbatim">:post</code> reference is resolved once with an empty <code class="verbatim">*this*</code> before the block runs, so one that can't be resolved stops the run before it starts; Org runs the block and then fails.</li>
+<li><code class="verbatim">org-sbe</code> in a table formula doesn't run a block that has <code class="verbatim">:post</code>; on the Mac download version the table is recalculated in Emacs.</li>
+<li><code class="verbatim">:session</code> is supported only for shells, Python, Ruby, JavaScript and R; on iOS and in the Mac App Store version, only for JavaScript and Python. C, C++, D, Java, Fortran and Clojure ignore it, as in Org.</li>
+<li>Clojure runs with babashka or the Clojure CLI only; other <code class="verbatim">:backend</code> values are refused.</li>
+<li>R blocks return their standard output, whatever <code class="verbatim">:results</code> says; ob-R returns the value with <code class="verbatim">:results value</code>.</li>
+<li>Header arguments, <code class="verbatim">:var</code> values and <code class="verbatim">:cache</code> that need Lisp evaluated by Emacs are refused when orgstar's interpreter can't evaluate them: "… is Lisp that only Emacs can evaluate; nothing was run."</li>
+<li>Tangling refuses <code class="verbatim">:var</code> and noweb references that would run a block, tables and lists in a shell block's <code class="verbatim">:var</code>, and <code class="verbatim">:var</code> in languages other than shells, Python, Emacs Lisp, C, C++, D, Java, Fortran and Clojure.</li>
+<li>On iOS and in the Mac App Store version, only Emacs Lisp, JavaScript, Python, calc, sqlite, dot and mermaid blocks run: Emacs Lisp in orgstar's own interpreter, JavaScript in WebKit, Python in Pyodide with the standard library only. A block whose <code class="verbatim">:var</code>, <code class="verbatim">:post</code> or noweb reference runs a block in another language runs nothing.</li>
+</ul>
+<p>Links (see <a href="09-links.html">Links</a>):</p>
+<ul>
+<li><code class="verbatim">shell:</code> links aren't run. <code class="verbatim">elisp:</code> links run a form after asking, in Emacs in the Mac download version when it is installed, otherwise in orgstar's interpreter; command names aren't run.</li>
+</ul>
+<p>Capture templates (see <a href="08-capture.html">Capture</a>):</p>
+<ul>
+<li><code class="verbatim">%(</code> escapes run in orgstar's Emacs Lisp interpreter, not in Emacs. A form that uses something the interpreter doesn't have stops the capture with a message.</li>
+</ul>
+<p>Tables and dynamic blocks (see <a href="10-tables.html">Tables</a> and <a href="06-dates-and-clocking.html">Dates and clocking</a>):</p>
+<ul>
+<li>Formulas outside orgstar's own calculator go to Emacs in the Mac download version, and are refused in the Mac App Store version and on iOS.</li>
+<li>Clock tables ignore <code class="verbatim">:formatter</code> and refuse scopes given as functions.</li>
+<li>Dynamic blocks other than <code class="verbatim">clocktable</code>, <code class="verbatim">columnview</code> and denote-org's aren't supported. A column view of another file doesn't write its summaries into that file.</li>
+</ul>
+<p>Other:</p>
+<ul>
+<li><code class="verbatim">C-c C-q</code> before the first heading (setting file tags) isn't supported.</li>
+<li>The date prompt also reads <code class="verbatim">today</code>, <code class="verbatim">tomorrow</code>, <code class="verbatim">yesterday</code>, <code class="verbatim">next week</code> and <code class="verbatim">last week</code>, which Org's prompt ignores.</li>
+<li>Priority ranges that aren't letters or numbers are refused.</li>
+<li><code class="verbatim">#+SETUPFILE</code> URLs aren't fetched.</li>
+<li>Most <code class="verbatim">#+STARTUP</code> options for footnotes, entities, numbering and odd levels are accepted and ignored; see <a href="13-configuration.html">Configuration</a>.</li>
+<li>Line numbers are on the Mac only. Visual line numbers count the screen lines in view; with the caret scrolled out of view they count lines of the file.</li>
+<li>Incremental search doesn't save the mark where it began, and has no <code class="verbatim">M-e</code> editing, <code class="verbatim">C-w</code> or <code class="verbatim">C-y</code> yanking into the string, or search ring beyond the last search.</li>
+<li><code class="verbatim">auto-fill-mode</code> fills on a typed space only, not on <code class="verbatim">RET</code>.</li>
+<li>Keyboard macros (see <a href="03-keys.html">Keys and commands</a>): the prefix argument counts macros only; <code class="verbatim">C-u</code> before another command does nothing and says so. <code class="verbatim">C-u C-x (</code> and <code class="verbatim">C-u &lt;f3&gt;</code> (append to the last macro), the macro ring (<code class="verbatim">C-x C-k C-n</code>, <code class="verbatim">C-x C-k C-p</code>), the counter commands other than <code class="verbatim">&lt;f3&gt;</code> (<code class="verbatim">C-x C-k C-c</code>, <code class="verbatim">C-x C-k C-f</code>), <code class="verbatim">C-x C-k e</code> (editing a macro), <code class="verbatim">C-x C-k b</code> (binding a key), <code class="verbatim">C-x C-k r</code> (running on each line of the region) and <code class="verbatim">C-x q</code> (query) aren't supported. A named macro is saved in <code class="verbatim">macros.toml</code> rather than written with <code class="verbatim">insert-kbd-macro</code>. Commands run from a menu or the palette while recording aren't recorded; Emacs records <code class="verbatim">M-x</code> and its answer.</li>
+<li>The agenda's text search (see <a href="07-agenda.html">The agenda</a>) covers the agenda files only: <code class="verbatim">org-agenda-text-search-extra-files</code> and <code class="verbatim">org-agenda-search-view-max-outline-level</code> aren't supported. It runs from the view menu rather than the dispatcher's <code class="verbatim">s</code> and <code class="verbatim">S</code>, and the search view's <code class="verbatim">[</code>, <code class="verbatim">]</code>, <code class="verbatim">{</code> and <code class="verbatim">}</code> keys, which add words and regexps to the search, aren't supported.</li>
+<li>In regexps, <code class="verbatim">\&lt;</code>, <code class="verbatim">\&gt;</code> and <code class="verbatim">\b</code> use Org's word syntax but don't find a word boundary where the script changes between two word characters, as Emacs does (for example between an emoji and a letter).</li>
+<li>org-roam: nodes come from orgstar's index, not org-roam's database; the graph is orgstar's own (see <a href="09-links.html">Links</a>), not org-roam-ui's. Templates are tables in <code class="verbatim">capture.toml</code> rather than Lisp: targets other than <code class="verbatim">file</code>, <code class="verbatim">file+head</code>, <code class="verbatim">file+olp</code> and <code class="verbatim">file+head+olp</code> (such as <code class="verbatim">node</code>), function templates and <code class="verbatim">${…}</code> fields other than <code class="verbatim">title</code>, <code class="verbatim">slug</code>, <code class="verbatim">id</code> and a ref's <code class="verbatim">ref</code> and <code class="verbatim">body</code> aren't supported, and the capture window shows only the template's text, as if every template were narrowed. When an outline path's heading appears twice, the last is used where org-roam reports an error. A template of only <code class="verbatim">%?</code> doesn't leave the empty line Emacs leaves. The go-to daily-note commands ask for a template only when the templates name different files. Cancelling a capture makes nothing, so there's no question about deleting the new file. <code class="verbatim">roam:</code> links aren't rewritten to <code class="verbatim">id:</code> links when followed (<code class="verbatim">org-roam-link-auto-replace</code>), and one to a title no node has reports it rather than making the node. <code class="verbatim">roam-ref</code> with an existing node opens it rather than capturing into it. Refs aren't listed as backlinks (reflinks), and <code class="verbatim">org-roam-node-display-template</code> isn't read: the chooser shows title and tags. The daily date prompt prefers future dates, where org-roam prefers past ones.</li>
+<li>Denote: a note's front matter is read from its first 40 lines. <code class="verbatim">denote-date-format</code>, <code class="verbatim">denote-front-matter-components-present-even-if-empty-value</code> and changes to <code class="verbatim">denote-file-types</code> aren't read; the defaults are used. Keywords are sorted after they are put in lower case, where Denote sorts them as typed, so <code class="verbatim">Zeta</code> and <code class="verbatim">alpha</code> sort differently when they aren't already lower case. Denote's quoting of Markdown values is followed exactly, including that a title with <code class="verbatim">\"</code> in it gains a backslash each time Rename Note from Front Matter rewrites it. See <a href="09-links.html">Links</a>.</li>
+<li>org-timer: <code class="verbatim">org-timer-display</code> is always the mode line. The timer's <code class="verbatim">C-u</code> forms are separate commands bound to <code class="verbatim">C-u C-c C-x 0</code>, <code class="verbatim">C-u C-u C-c C-x 0</code> and <code class="verbatim">C-u C-c C-x ,</code>; Set Countdown Timer… has no prefix-argument forms.</li>
+<li>Radio lists are Org 9.8's <code class="verbatim">#+ATTR_ORG: :radio</code> checkbox lists. The <code class="verbatim">#+ORGLST</code> radio lists of Org 9.1 and earlier, removed in Org 9.2, aren't supported, nor is <code class="verbatim">org-list-checkbox-radio-mode</code>.</li>
+<li>org-attach: <code class="verbatim">org-attach-method</code> is always <code class="verbatim">cp</code> for Attach File… (the other methods have their own commands), <code class="verbatim">org-attach-auto-tag</code> is always <code class="verbatim">ATTACH</code>, <code class="verbatim">org-attach-preferred-new-method</code> is always <code class="verbatim">id</code>, and <code class="verbatim">org-attach-id-to-path-function-list</code> is Org's default. The dispatcher's <code class="verbatim">b</code>, <code class="verbatim">O</code> and <code class="verbatim">F</code> keys and <code class="verbatim">org-attach-archive-delete</code> aren't supported. Delete All Attachments… asks once and deletes the folder with what's in it.</li>
+<li>org-crypt works with symmetric encryption only (<code class="verbatim">org-crypt-key</code> nil); public keys aren't supported. <code class="verbatim">org-crypt-tag-matcher</code> is a single tag. <code class="verbatim">org-crypt-use-before-save-magic</code> is a setting in <code class="verbatim">config.toml</code> rather than a function to call; with it, entries stay decrypted in the editor after a save, where Emacs's buffer holds the messages, and a file whose entries can't be encrypted isn't saved, where Emacs asks for the passphrase. Emacs Import doesn't read the call. <code class="verbatim">org-crypt-disable-auto-save</code> has no counterpart: orgstar keeps no auto-save files.</li>
+<li>EasyPG's <code class="verbatim">.gpg</code> files are read and written with a passphrase only (symmetric); files encrypted to public keys aren't supported. orgstar keeps no passphrase cache beyond the open file; <code class="verbatim">epa-file-cache-passphrase-for-symmetric-encryption</code> has no counterpart.</li>
+<li>When TODO dependencies refuse a change on a <code class="verbatim">COMMENT</code> heading, the heading keeps <code class="verbatim">COMMENT</code>. Org removes it before the check and doesn't put it back.</li>
+<li>org-fc: only the default SM2 algorithm and parameters, review over every folder, no dashboard, audio or vocab cards, and a text-input answer compared as a whole; see Differences from org-fc in <a href="16-flashcards.html">Flashcards</a>.</li>
+</ul>
+</main>
+<footer class="site">
+© 2026 Christian Cleberg · <a href="https://krz.sh/apps/orgstar/">krz.sh/apps/orgstar</a> · <a href="/orgstar/third-party.html">third-party notices</a>
+</footer>
+</body>
+</html>

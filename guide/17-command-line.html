@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The command line &middot; orgstar</title>
+<meta name="description" content="The orgstar command: the agenda as text or JSON, capture, clocking in and out, export, tangling and opening a file in the app, from Terminal and…">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../theme.css">
+<link rel="stylesheet" href="../syntax.css">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="site">
+<a class="site-title" href="../index.html">orgstar</a>
+<nav>
+<a href="../install.html">Install</a>
+<a href="../quickstart.html">Quick start</a>
+<a href="index.html">Manual</a>
+</nav>
+</header>
+<main>
+<h1>The command line</h1>
+<p class="lede">The download version comes with an orgstar command that works on your files with the app&#x27;s configuration, whether or not the app is running.</p>
+<nav class="toc" aria-label="On this page">
+<h2>On this page</h2>
+<ul>
+<li><a href="#installing-the-command">Installing the command</a></li>
+<li><a href="#what-it-reads">What it reads</a></li>
+<li><a href="#commands">Commands</a>
+<ul>
+<li><a href="#agenda">agenda</a></li>
+<li><a href="#capture">capture</a></li>
+<li><a href="#clock">clock</a></li>
+<li><a href="#export-and-tangle">export and tangle</a></li>
+<li><a href="#open">open</a></li>
+</ul></li>
+<li><a href="#how-files-are-written">How files are written</a></li>
+<li><a href="#exit-status">Exit status</a></li>
+</ul>
+</nav>
+<h2 id="installing-the-command">Installing the command</h2>
+<p>The command is inside the app, at <code class="verbatim">orgstar.app/Contents/Helpers/orgstar</code>. To run it as <code class="verbatim">orgstar</code>:</p>
+<ul>
+<li>Settings ▸ General ▸ Install Command-Line Tool… asks for a folder on your <code class="verbatim">PATH</code> and puts a link to the command there. <code class="verbatim">~/.local/bin</code> needs no administrator password; <code class="verbatim">/usr/local/bin</code> works when you can write to it. When orgstar can't write in the folder, the alert gives the <code class="verbatim">sudo ln -sf …</code> line to run in Terminal instead.</li>
+<li>The Homebrew cask links it as <code class="verbatim">orgstar</code> when it installs the app.</li>
+<li>A build from source has it at <code class="verbatim">.build/app/orgstar.app/Contents/Helpers/orgstar</code>.</li>
+</ul>
+<p>The link points into the app, so updating the app updates the command. The Mac App Store version has no command: its sandbox can't reach your files from another program.</p>
+<h2 id="what-it-reads">What it reads</h2>
+<p>The command reads the files the app reads and changes them the way the app does:</p>
+<ul>
+<li>The configuration folder (see <a href="13-configuration.html">Configuration</a>): <code class="verbatim">config.toml</code> for the settings, <code class="verbatim">capture.toml</code> for capture templates and <code class="verbatim">views.toml</code> for agenda views. Problems in them are printed as warnings.</li>
+<li>The folders added in the app (File ▸ Add Folder…), from the app's data folder, <code class="verbatim">~/Library/Application Support/Orgstar</code>. <code class="verbatim">org-agenda-files</code> in <code class="verbatim">config.toml</code> chooses the agenda files as in the app.</li>
+<li>Each file's own settings and <code class="verbatim">#+SETUPFILE:</code>.</li>
+</ul>
+<p>It doesn't need the app to be running. Choices kept only in the app are not read: folders hidden from the agenda, Calendar events and Reminders in the agenda, and each file's export choices.</p>
+<table>
+<thead>
+<tr><th>Variable</th><th>What it sets</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">ORGSTAR_CONFIG_DIR</code></td><td>The configuration folder, instead of <code class="verbatim">$XDG_CONFIG_HOME/orgstar</code> or <code class="verbatim">~/.config/orgstar</code></td></tr>
+<tr><td><code class="verbatim">ORGSTAR_DATA_DIR</code></td><td>The data folder, which holds the folder list, the running clock and recovery versions</td></tr>
+<tr><td><code class="verbatim">ORGSTAR_ROOT</code></td><td>A folder to read besides those added in the app</td></tr>
+</tbody>
+</table>
+<h2 id="commands">Commands</h2>
+<p><code class="verbatim">orgstar --help</code> lists the commands, and <code class="verbatim">orgstar &lt;command&gt; --help</code> describes one. <code class="verbatim">orgstar --version</code> prints the app's version.</p>
+<h3 id="agenda">agenda</h3>
+<pre><code class="language-sh highlight"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">orgstar</span></span><span class="meta function-call arguments shell"> agenda</span>
+<span class="meta function-call shell"><span class="variable function shell">orgstar</span></span><span class="meta function-call arguments shell"> agenda <span class="string quoted double shell"><span class="punctuation definition string begin shell">&quot;</span>TODO List<span class="punctuation definition string end shell">&quot;</span></span></span>
+<span class="meta function-call shell"><span class="variable function shell">orgstar</span></span><span class="meta function-call arguments shell"> agenda Work<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>json</span></span></span></code></pre>
+<p>Prints the agenda as Emacs's agenda buffer shows it, with the span and start of Settings ▸ Agenda, the prefix format, sorting and time grid of <code class="verbatim">config.toml</code>. A name prints that view instead: TODO List, Stuck Projects, or a <code class="verbatim">[[view]]</code> of <code class="verbatim">views.toml</code>, block views included.</p>
+<pre>Week-agenda (W48):
+Friday     27 November 2026
+               8:00...... ----------------
+  tasks:      14:00-15:00 Meeting with Sam
+  tasks:      Scheduled:  TODO Write report
+  tasks:      In   3 d.:  TODO Pay rent :home:</pre>
+<p><code class="verbatim">--json</code> prints the view's blocks, each with its header and its days and entries. An entry has its file, line and offset, category, keyword, title, tags, time and leader (<code class="verbatim">extra</code>), and the line as the text shows it.</p>
+<h3 id="capture">capture</h3>
+<pre><code class="language-sh highlight"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">orgstar</span></span><span class="meta function-call arguments shell"> capture t <span class="string quoted double shell"><span class="punctuation definition string begin shell">&quot;</span>Buy milk<span class="punctuation definition string end shell">&quot;</span></span></span>
+<span class="meta function-call shell"><span class="variable function shell">pbpaste</span></span> <span class="keyword operator logical pipe shell">|</span> <span class="meta function-call shell"><span class="variable function shell">orgstar</span></span><span class="meta function-call arguments shell"> capture n</span>
+<span class="meta function-call shell"><span class="variable function shell">orgstar</span></span><span class="meta function-call arguments shell"> capture m <span class="string quoted double shell"><span class="punctuation definition string begin shell">&quot;</span>Agenda for Monday<span class="punctuation definition string end shell">&quot;</span></span><span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>set</span> Who=Sam</span></span></code></pre>
+<p>Files an entry with the template of <code class="verbatim">capture.toml</code> that has that key, at once, as Shortcuts' Capture to Orgstar does. The text is <code class="verbatim">%i</code>: the argument, or standard input when there is none. <code class="verbatim">%?</code> is dropped.</p>
+<p>Questions are answered with <code class="verbatim">--set Prompt=value</code>, by the prompt's text: <code class="verbatim">%^{Who}</code> by <code class="verbatim">--set Who=…</code>. A question with a default (<code class="verbatim">%^{Room|Office}</code>) takes it when not set. A question with neither stops the capture with exit status 4 and names what to set, and nothing is written. Unset, <code class="verbatim">%^g</code> and <code class="verbatim">%^G</code> add no tags and the date questions take today; set them with <code class="verbatim">--set Tags=work:urgent</code> or <code class="verbatim">--set Date=+2d</code>. <code class="verbatim">%a</code>, <code class="verbatim">%c</code>, <code class="verbatim">%x</code> and <code class="verbatim">%f</code> are empty, since there's no buffer or clipboard. <code class="verbatim">%k</code> and <code class="verbatim">%K</code> are the running clock's entry.</p>
+<p>Targets work as in the app: a file is made when missing, <code class="verbatim">id</code> finds the heading in your folders, <code class="verbatim">clock</code> files under the running clock. <code class="verbatim">clock-in</code> with <code class="verbatim">clock-keep</code> starts the clock on the new entry; without <code class="verbatim">clock-keep</code> there's nothing to time, since the capture finishes at once. Templates with <code class="verbatim">denote = true</code> are refused; use them in the app.</p>
+<p><code class="verbatim">capture-before-finalize</code> hooks (see <a href="18-user-commands.org::*Hooks">Hooks</a>) run only in the app. When <code class="verbatim">commands.toml</code> has one, the tool files the entry without it and says so on standard error: "capture-before-finalize hooks in commands.toml run only in the app; captured without them". No command of the tool runs <code class="verbatim">after-todo-state-change</code> hooks, including <code class="verbatim">clock in</code> with <code class="verbatim">org-clock-in-switch-to-state</code>.</p>
+<h3 id="clock">clock</h3>
+<pre><code class="language-sh highlight"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">orgstar</span></span><span class="meta function-call arguments shell"> clock in work.org::<span class="string quoted double shell"><span class="punctuation definition string begin shell">&quot;</span>Write report<span class="punctuation definition string end shell">&quot;</span></span></span>
+<span class="meta function-call shell"><span class="variable function shell">orgstar</span></span><span class="meta function-call arguments shell"> clock in id:0F3C2A1E-6B8D-4E3A-9B4F-2D1C0A9E8B7F</span>
+<span class="meta function-call shell"><span class="variable function shell">orgstar</span></span><span class="meta function-call arguments shell"> clock status</span>
+<span class="meta function-call shell"><span class="variable function shell">orgstar</span></span><span class="meta function-call arguments shell"> clock out</span></span></code></pre>
+<p><code class="verbatim">clock in</code> starts the clock on a heading, named by its title (with or without a leading <code class="verbatim">*</code>), <code class="verbatim">#custom-id</code> or <code class="verbatim">id:ID</code>, after the file and <code class="verbatim">::</code>; <code class="verbatim">id:ID</code> alone looks in every folder. A running clock is clocked out first, as <code class="verbatim">org-clock-in</code> does. <code class="verbatim">clock out</code> stops the running clock. <code class="verbatim">clock status</code> prints the running clock, or with <code class="verbatim">--json</code> an object whose <code class="verbatim">running</code> is the clock or <code class="verbatim">null</code>; it exits with 3 when no clock runs.</p>
+<p>The command writes only the org file: the <code class="verbatim">CLOCK:</code> line, in the <code class="verbatim">LOGBOOK</code> drawer when <code class="verbatim">org-clock-into-drawer</code> says so, with the switch to <code class="verbatim">org-clock-in-switch-to-state</code> and the rounding and zero-time settings of <code class="verbatim">config.toml</code>. The running clock is the one the app shows when its line is still open, else the most recently started open <code class="verbatim">CLOCK:</code> line in the agenda files. The app watches your folders, so a clock started or stopped from the command line shows in the app as one started or stopped in Emacs does; the app's own record of the clock is never written by the command, so the two never write the same file.</p>
+<h3 id="export-and-tangle">export and tangle</h3>
+<pre><code class="language-sh highlight"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">orgstar</span></span><span class="meta function-call arguments shell"> export notes.org<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>to</span> html</span>
+<span class="meta function-call shell"><span class="variable function shell">orgstar</span></span><span class="meta function-call arguments shell"> export notes.org<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>to</span> md<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> -</span>o</span> -</span>
+<span class="meta function-call shell"><span class="variable function shell">orgstar</span></span><span class="meta function-call arguments shell"> export notes.org<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> --</span>to</span> odt<span class="variable parameter option shell"><span class="punctuation definition parameter shell"> -</span>o</span> <span class="meta group expansion tilde"><span class="variable language tilde shell">~</span></span>/Desktop/notes.odt</span>
+<span class="meta function-call shell"><span class="variable function shell">orgstar</span></span><span class="meta function-call arguments shell"> tangle init.org</span></span></code></pre>
+<p>Exports the whole file as File ▸ Export does, to <code class="verbatim">html</code>, <code class="verbatim">md</code>, <code class="verbatim">latex</code>, <code class="verbatim">txt</code>, <code class="verbatim">odt</code>, <code class="verbatim">reveal</code> or <code class="verbatim">pdf</code>, beside the file and named by <code class="verbatim">#+EXPORT_FILE_NAME</code> or the file's name, or to the path <code class="verbatim">-o</code> gives; <code class="verbatim">-o -</code> writes to standard output. Code in the HTML export isn't coloured. <code class="verbatim">pdf</code> runs the LaTeX export through <code class="verbatim">latexmk</code>, or <code class="verbatim">pdflatex</code> three times, as Emacs's <code class="verbatim">org-latex-export-to-pdf</code> does, so it needs TeX, such as MacTeX; the app's own PDF export doesn't.</p>
+<p><code class="verbatim">tangle</code> writes the file's code blocks with <code class="verbatim">:tangle</code> to their files, as Tangle File (<code class="verbatim">C-c C-v t</code>) does, from the file as saved.</p>
+<h3 id="open">open</h3>
+<pre><code class="language-sh highlight"><span class="source shell bash"><span class="meta function-call shell"><span class="variable function shell">orgstar</span></span><span class="meta function-call arguments shell"> open notes.org</span>
+<span class="meta function-call shell"><span class="variable function shell">orgstar</span></span><span class="meta function-call arguments shell"> open notes.org::<span class="string quoted double shell"><span class="punctuation definition string begin shell">&quot;</span>Reading list<span class="punctuation definition string end shell">&quot;</span></span></span>
+<span class="meta function-call shell"><span class="variable function shell">orgstar</span></span><span class="meta function-call arguments shell"> open id:0F3C2A1E-6B8D-4E3A-9B4F-2D1C0A9E8B7F</span></span></code></pre>
+<p>Opens the file in orgstar, at the heading when one is named, through the app's <code class="verbatim">orgstar://entry</code> link. It starts orgstar when it isn't running.</p>
+<h2 id="how-files-are-written">How files are written</h2>
+<p>The command saves a file the way the app saves one that isn't open: through a temporary file that replaces it, merged with any change made since it was read, and with the version it replaces kept for File ▸ History… as the app keeps them. Encrypted <code class="verbatim">.org.gpg</code> files and files that aren't UTF-8 are refused.</p>
+<p>There's no lock between the app and the command. A file open in orgstar takes in the command's change as it takes in one from Emacs: merged into the buffer, unsaved edits included, or shown as a conflict to resolve when both changed the same lines.</p>
+<h2 id="exit-status">Exit status</h2>
+<table>
+<thead>
+<tr><th>Status</th><th>Meaning</th></tr>
+</thead>
+<tbody>
+<tr><td>0</td><td>Done</td></tr>
+<tr><td>1</td><td>Failed: a file couldn't be read, written or exported, or it changed while being written</td></tr>
+<tr><td>2</td><td>Usage: an unknown command or option, or a missing argument</td></tr>
+<tr><td>3</td><td>Not found: no such file, heading, view or template; no running clock</td></tr>
+<tr><td>4</td><td>Refused: a capture question without an answer, or a file or command that needs the app</td></tr>
+</tbody>
+</table>
+<p>Messages go to standard error, prefixed with <code class="verbatim">orgstar:</code>.</p>
+</main>
+<footer class="site">
+© 2026 Christian Cleberg · <a href="https://krz.sh/apps/orgstar/">krz.sh/apps/orgstar</a> · <a href="/orgstar/third-party.html">third-party notices</a>
+</footer>
+</body>
+</html>

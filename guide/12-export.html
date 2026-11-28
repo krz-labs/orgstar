@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Export &middot; orgstar</title>
+<meta name="description" content="Exporting Org files from orgstar to HTML, Markdown, PDF, Word, RTF, plain text, ODT, iCalendar, LaTeX, ASCII and reveal.js slides, and to PDF through…">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../theme.css">
+<link rel="stylesheet" href="../syntax.css">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="site">
+<a class="site-title" href="../index.html">orgstar</a>
+<nav>
+<a href="../install.html">Install</a>
+<a href="../quickstart.html">Quick start</a>
+<a href="index.html">Manual</a>
+</nav>
+</header>
+<main>
+<h1>Export</h1>
+<p class="lede">orgstar exports HTML, Markdown, PDF, Word, RTF, plain text, ODT, iCalendar, LaTeX, ASCII and reveal.js slides itself, and the Mac download version hands LaTeX-made PDF to Emacs.</p>
+<nav class="toc" aria-label="On this page">
+<h2>On this page</h2>
+<ul>
+<li><a href="#exporting-a-file">Exporting a file</a>
+<ul>
+<li><a href="#on-the-mac">On the Mac</a></li>
+<li><a href="#the-export-dialog">The export dialog</a></li>
+<li><a href="#on-ios">On iOS</a></li>
+</ul></li>
+<li><a href="#html-export">HTML export</a>
+<ul>
+<li><a href="#title-author-and-date">Title, author and date</a></li>
+<li><a href="#options">#+OPTIONS</a></li>
+<li><a href="#which-headings-are-exported">Which headings are exported</a></li>
+<li><a href="#the-page-head">The page head</a></li>
+<li><a href="#math">Math</a></li>
+<li><a href="#includes">Includes</a></li>
+<li><a href="#macros">Macros</a></li>
+<li><a href="#footnotes">Footnotes</a></li>
+<li><a href="#tables">Tables</a></li>
+<li><a href="#images-and-links">Images and links</a></li>
+<li><a href="#source-blocks-and-their-results">Source blocks and their results</a></li>
+<li><a href="#other-blocks-and-elements">Other blocks and elements</a></li>
+<li><a href="#citations">Citations</a></li>
+</ul></li>
+<li><a href="#reveal-js-export">reveal.js export</a></li>
+<li><a href="#presenting">Presenting</a></li>
+<li><a href="#pdf-export">PDF export</a></li>
+<li><a href="#printing">Printing</a></li>
+<li><a href="#latex-export">LaTeX export</a></li>
+<li><a href="#word-rtf-and-plain-text">Word, RTF and plain text</a>
+<ul>
+<li><a href="#copying-as-rich-text">Copying as rich text</a></li>
+</ul></li>
+<li><a href="#odt-export">ODT export</a></li>
+<li><a href="#ascii-export">ASCII export</a></li>
+<li><a href="#markdown-export">Markdown export</a></li>
+<li><a href="#icalendar-export">iCalendar export</a></li>
+<li><a href="#publishing">Publishing</a></li>
+<li><a href="#exporting-through-emacs">Exporting through Emacs</a></li>
+<li><a href="#citations">Citations</a>
+<ul>
+<li><a href="#bibliography-files">Bibliography files</a></li>
+<li><a href="#cite-export">#+cite_export:</a></li>
+<li><a href="#citation-styles">Citation styles</a></li>
+<li><a href="#the-bibliography">The bibliography</a></li>
+</ul></li>
+<li><a href="#what-export-does-not-do">What export does not do</a></li>
+</ul>
+</nav>
+<h2 id="exporting-a-file">Exporting a file</h2>
+<p>Export works on the file in the current editor, using its text as it is now, saved or not. It applies to Org files only; in any other file the command says "Not an org file". Source blocks are never run during export. Results already in the file are exported as they are; see <a href="11-code-blocks.html">Code blocks</a>.</p>
+<h3 id="on-the-mac">On the Mac</h3>
+<table>
+<thead>
+<tr><th>Format</th><th>Command</th><th>Emacs preset</th><th>Doom</th><th>Needs Emacs</th></tr>
+</thead>
+<tbody>
+<tr><td>HTML</td><td>Export to HTML</td><td><code class="verbatim">C-c C-e h h</code></td><td><code class="verbatim">SPC m e h h</code>, <code class="verbatim">C-c C-e h h</code></td><td>no</td></tr>
+<tr><td>HTML, then open it</td><td>Export to HTML and Open</td><td><code class="verbatim">C-c C-e h o</code></td><td><code class="verbatim">SPC m e h o</code>, <code class="verbatim">C-c C-e h o</code></td><td>no</td></tr>
+<tr><td>Markdown</td><td>Export to Markdown</td><td><code class="verbatim">C-c C-e m m</code></td><td><code class="verbatim">SPC m e m m</code>, <code class="verbatim">C-c C-e m m</code></td><td>no</td></tr>
+<tr><td>PDF</td><td>Export to PDF</td><td>—</td><td>—</td><td>no</td></tr>
+<tr><td>Word</td><td>Export to Word</td><td>—</td><td>—</td><td>no</td></tr>
+<tr><td>RTF</td><td>Export to RTF</td><td>—</td><td>—</td><td>no</td></tr>
+<tr><td>Plain text</td><td>Export to Plain Text</td><td>—</td><td>—</td><td>no</td></tr>
+<tr><td>PDF through LaTeX</td><td>Export to PDF with Emacs</td><td><code class="verbatim">C-c C-e l p</code></td><td><code class="verbatim">SPC m e l p</code>, <code class="verbatim">C-c C-e l p</code></td><td>yes</td></tr>
+<tr><td>LaTeX</td><td>Export to LaTeX</td><td><code class="verbatim">C-c C-e l l</code></td><td><code class="verbatim">C-c C-e l l</code></td><td>no</td></tr>
+<tr><td>ODT</td><td>Export to ODT</td><td><code class="verbatim">C-c C-e o o</code></td><td><code class="verbatim">C-c C-e o o</code></td><td>no</td></tr>
+<tr><td>ASCII text</td><td>Export to Plain Text (ASCII)</td><td><code class="verbatim">C-c C-e t u</code></td><td><code class="verbatim">C-c C-e t u</code></td><td>no</td></tr>
+<tr><td>reveal.js slides</td><td>Export to reveal.js</td><td><code class="verbatim">C-c C-e v v</code></td><td><code class="verbatim">C-c C-e v v</code></td><td>no</td></tr>
+<tr><td>reveal.js slides, then open them</td><td>Export to reveal.js and Open</td><td><code class="verbatim">C-c C-e v b</code></td><td><code class="verbatim">C-c C-e v b</code></td><td>no</td></tr>
+<tr><td>iCalendar</td><td>Export to iCalendar</td><td><code class="verbatim">C-c C-e c f</code></td><td><code class="verbatim">C-c C-e c f</code></td><td>no</td></tr>
+<tr><td>iCalendar, every agenda file</td><td>Export Agenda Files to iCalendar</td><td><code class="verbatim">C-c C-e c a</code></td><td><code class="verbatim">C-c C-e c a</code></td><td>no</td></tr>
+<tr><td>iCalendar, agenda files in one</td><td>Combine Agenda Files into iCalendar</td><td><code class="verbatim">C-c C-e c c</code></td><td><code class="verbatim">C-c C-e c c</code></td><td>no</td></tr>
+</tbody>
+</table>
+<p>The keys follow Emacs's export dispatcher (<code class="verbatim">org-export-dispatch</code>). <code class="verbatim">C-c C-e</code> on its own is only a prefix: pause after it and the key hints list the formats. The <code class="verbatim">SPC m e</code> keys work in normal state; the <code class="verbatim">C-c C-e</code> keys work in every Doom state. The Mac preset has no keys for the single formats; its <code class="verbatim">⇧⌘E</code> opens the export dialog.</p>
+<p>All sixteen commands are in File ▸ Export and in the command palette. They write the export beside the Org file, with the same name and the format's extension: <code class="verbatim">.html</code>, <code class="verbatim">.md</code>, <code class="verbatim">.pdf</code>, <code class="verbatim">.docx</code>, <code class="verbatim">.rtf</code>, <code class="verbatim">.tex</code>, <code class="verbatim">.odt</code>, <code class="verbatim">.txt</code> or <code class="verbatim">.ics</code> (<code class="verbatim">.html</code> for reveal.js). The two agenda-file commands are the exceptions; see <a href="#icalendar-export">iCalendar export</a>. <code class="verbatim">#+EXPORT_FILE_NAME:</code> names it instead, as in Org: relative to the Org file's folder (or absolute, or starting with <code class="verbatim">~</code>), with its extension replaced by the format's, so <code class="verbatim">#+EXPORT_FILE_NAME: out/report</code> writes <code class="verbatim">out/report.html</code>. A file already there is replaced. The message area shows "Exported to <em>name</em>", or "Exported the subtree to <em>name</em>", "Exported the body to <em>name</em>" or "Exported the subtree's body to <em>name</em>" when the export was not the whole file as a whole document.</p>
+<p>The fourteen commands that export the current file export the whole file as a whole document, unless the file is set otherwise. Two commands set it, as <code class="verbatim">C-s</code> and <code class="verbatim">C-b</code> do in Org's dispatcher:</p>
+<table>
+<thead>
+<tr><th>Command</th><th>Emacs preset and Doom</th><th>Effect on the file's export commands</th></tr>
+</thead>
+<tbody>
+<tr><td>Turn Subtree Export On or Off</td><td><code class="verbatim">C-c C-e C-s</code></td><td>They export the subtree at the caret; see <em>Scope</em> below.</td></tr>
+<tr><td>Turn Body-Only Export On or Off</td><td><code class="verbatim">C-c C-e C-b</code></td><td>They leave out the title and the page; see <em>Body only</em> below.</td></tr>
+</tbody>
+</table>
+<p>Both are in the command palette, and the message area says what is now on. The choice is kept for the file, and it is the same one the export dialog shows as <em>Scope</em> and <em>Body only</em>, so setting it in the dialog sets it for the commands too. With subtree export on and the caret before the first heading, a command says "Not in a subtree" and writes nothing. With body-only export on, a command for PDF, Word, RTF, plain text, ODT, iCalendar or reveal.js says "This format has no body-only export. Turn body-only export off for this file first." and writes nothing. The two agenda-file commands follow neither.</p>
+<p>The <a href="../install.html">Mac App Store version</a> has the fifteen commands that don't need Emacs; File ▸ Export, the export dialog and the command palette leave out Export to PDF with Emacs, and a key bound to it runs Export to PDF. When the export file, or an <code class="verbatim">#+INCLUDE:</code> or <code class="verbatim">#+SETUPFILE:</code>, is outside your folders, orgstar first asks for access to its folder; for the export file, Save Elsewhere… instead picks another place. See <a href="../install.html">Install</a>.</p>
+<h3 id="the-export-dialog">The export dialog</h3>
+<p><strong>Export…</strong> in the command palette, or <code class="verbatim">⇧⌘E</code> in the Mac preset, opens a dialog. The Emacs and Doom presets have no key for it; bind <code class="verbatim">app.export-dialog</code> in <code class="verbatim">keymap.toml</code> if you want one (see <a href="03-keys.html">Keys and commands</a>). The dialog has:</p>
+<ul>
+<li><strong>Format</strong>: HTML, Markdown, PDF, Word, Rich Text (RTF), Plain text, PDF via LaTeX (Emacs), ODT, LaTeX, Plain text, ASCII, iCalendar or reveal.js slides. The App Store version lists LaTeX, Plain text, ASCII and reveal.js slides last.</li>
+<li><strong>Scope</strong>: the whole file, or the subtree at the caret (Org's <code class="verbatim">C-s</code> in the dispatcher). A subtree is exported as a document of its own: its heading is the title, its text the body, and its child headings move up a level. iCalendar is the exception: there the subtree's heading is an entry like any other. The file's <code class="verbatim">#+</code> keywords still apply, and the heading's <code class="verbatim">EXPORT_TITLE</code>, <code class="verbatim">EXPORT_AUTHOR</code>, <code class="verbatim">EXPORT_DATE</code>, <code class="verbatim">EXPORT_EMAIL</code>, <code class="verbatim">EXPORT_OPTIONS</code>, <code class="verbatim">EXPORT_SELECT_TAGS</code>, <code class="verbatim">EXPORT_EXCLUDE_TAGS</code>, <code class="verbatim">EXPORT_HTML_HEAD</code> and <code class="verbatim">EXPORT_HTML_HEAD_EXTRA</code> properties override them. Its planning line and property drawer are left out. The choice is available when the caret is under a heading.</li>
+<li><strong>Body only</strong>: leave out the title and the page around the text (Org's <code class="verbatim">C-b</code>). HTML is then the table of contents, the text and the footnotes, without <code class="verbatim">&lt;html&gt;</code>, <code class="verbatim">&lt;head&gt;</code> or the title; Markdown has no title heading; ASCII has no title block or table of contents. Not available for PDF, Word, RTF, plain text, ODT, iCalendar and reveal.js slides.</li>
+<li><strong>Destination</strong>: where <code class="verbatim">#+EXPORT_FILE_NAME:</code> says, or the subtree's <code class="verbatim">EXPORT_FILE_NAME</code> property for a subtree, else beside the Org file. <strong>Choose…</strong> picks another place and name. Changing the format changes the extension.</li>
+<li><strong>Margins</strong>, <strong>Font</strong> and <strong>Page numbers</strong>, for PDF: see <em>PDF export</em>.</li>
+<li><strong>Open after export</strong>: opens the file in its default app when the export finishes.</li>
+</ul>
+<p>The dialog keeps the format, scope, body-only and <strong>Open after export</strong> settings for each file, by the file's path, in orgstar's preferences; nothing is written to the Org file, and a renamed or moved file starts again. They are saved when you click Export. A file exported for the first time starts with the format and <strong>Open after export</strong> setting last used, the whole file, and body only off. When the kept scope is the subtree and the caret is before the first heading, the dialog exports the whole file. The destination is not kept. The PDF settings are <code class="verbatim">config.toml</code> settings, and apply to every PDF export.</p>
+<h3 id="on-ios">On iOS</h3>
+<p>The Export menu offers HTML, Markdown, PDF, Word, Rich Text (RTF), Plain Text, ODT, iCalendar, LaTeX, Plain Text (ASCII) and reveal.js, and Copy as Rich Text. It is under More in the editor, and in the toolbar in the reader. Choosing one opens the share sheet with the exported file, named after the Org file or its <code class="verbatim">#+EXPORT_FILE_NAME:</code>. Send it to another app, or use Save to Files to keep it. The export is the same as on the Mac, except that LaTeX, ODT and ASCII have no author unless the file has <code class="verbatim">#+AUTHOR:</code>. PDF through LaTeX is not available on iOS.</p>
+<p>Body Only in the Export menu leaves out the title and the page around the text, as in the Mac's export dialog, and is kept for each file. While it is on, PDF, Word, Rich Text (RTF), Plain Text, ODT, iCalendar and reveal.js say "This format has no body-only export. Turn body-only export off for this file first." Turn Body-Only Export On or Off, in Commands or on <code class="verbatim">C-c C-e C-b</code> with a hardware keyboard, changes the same setting. Export Subtree…, in the editor's Export menu, lists the formats for the subtree at the caret, and follows Body Only too. There is no subtree setting on iOS: the menu's formats always export the whole file.</p>
+<p>Print… in the Export menu prints the file; see <a href="#printing">Printing</a>. The Export menu also has Export Agenda Files to iCalendar and Combine Agenda Files into iCalendar (see <a href="#icalendar-export">iCalendar export</a>). Export to HTML and Open, in Commands or on <code class="verbatim">C-c C-e h o</code> with a hardware keyboard, shows the HTML export in Quick Look, with the file's images in the page; nothing is written beside the Org file; it follows Body Only. Copy as Rich Text is in Commands too.</p>
+<h2 id="html-export">HTML export</h2>
+<p>orgstar writes a complete HTML page: a small built-in stylesheet that follows the system's light or dark appearance, the title, an author and date line, the table of contents, then the document. It does not use Emacs, and its output is close to, but not the same as, <code class="verbatim">ox-html</code>.</p>
+<h3 id="title-author-and-date">Title, author and date</h3>
+<table>
+<thead>
+<tr><th>Keyword</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">#+TITLE:</code></td><td>The page title and a top heading. Without one, the file's name is used.</td></tr>
+<tr><td><code class="verbatim">#+AUTHOR:</code></td><td>Shown under the title.</td></tr>
+<tr><td><code class="verbatim">#+DATE:</code></td><td>Shown under the title, after the author, as written.</td></tr>
+<tr><td><code class="verbatim">#+LANGUAGE:</code></td><td>The page's <code class="verbatim">lang</code>, and the language of the words the export writes: the table of contents heading, <code class="verbatim">Figure N:</code> captions and the footnotes' label, as Org's <code class="verbatim">org-export-dictionary</code> translates them. Without one, <code class="verbatim">org-export-default-language</code> (<code class="verbatim">en</code>).</td></tr>
+</tbody>
+</table>
+<p>Keywords in files named by <code class="verbatim">#+SETUPFILE:</code> count, as they do in Org.</p>
+<h3 id="options"><code class="verbatim">#+OPTIONS</code></h3>
+<table>
+<thead>
+<tr><th>Option</th><th>Values</th><th>Default</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">toc</code></td><td><code class="verbatim">t</code>, <code class="verbatim">nil</code>, a number</td><td><code class="verbatim">t</code></td><td>Table of contents, to the given depth. <code class="verbatim">t</code> goes to <code class="verbatim">H</code>.</td></tr>
+<tr><td><code class="verbatim">num</code></td><td><code class="verbatim">t</code>, <code class="verbatim">nil</code>, a number</td><td><code class="verbatim">t</code></td><td>Section numbers, to the given depth. <code class="verbatim">t</code> goes to <code class="verbatim">H</code>.</td></tr>
+<tr><td><code class="verbatim">H</code></td><td>a number</td><td><code class="verbatim">3</code></td><td>The deepest heading level the table of contents and numbering count.</td></tr>
+<tr><td><code class="verbatim">tags</code></td><td><code class="verbatim">t</code>, <code class="verbatim">nil</code>, <code class="verbatim">not-in-toc</code></td><td><code class="verbatim">t</code></td><td>Heading tags; <code class="verbatim">not-in-toc</code> leaves them out of the table of contents.</td></tr>
+<tr><td><code class="verbatim">todo</code></td><td><code class="verbatim">t</code>, <code class="verbatim">nil</code></td><td><code class="verbatim">t</code></td><td>TODO keywords in headings.</td></tr>
+<tr><td><code class="verbatim">pri</code></td><td><code class="verbatim">t</code>, <code class="verbatim">nil</code></td><td><code class="verbatim">nil</code></td><td>Priority cookies in headings.</td></tr>
+<tr><td><code class="verbatim">tex</code></td><td><code class="verbatim">t</code>, <code class="verbatim">nil</code></td><td><code class="verbatim">t</code></td><td>LaTeX fragments and environments; <code class="verbatim">nil</code> drops them.</td></tr>
+<tr><td><code class="verbatim">title</code></td><td><code class="verbatim">t</code>, <code class="verbatim">nil</code></td><td><code class="verbatim">t</code></td><td>The title heading.</td></tr>
+<tr><td><code class="verbatim">author</code></td><td><code class="verbatim">t</code>, <code class="verbatim">nil</code></td><td><code class="verbatim">t</code></td><td>The author.</td></tr>
+<tr><td><code class="verbatim">date</code></td><td><code class="verbatim">t</code>, <code class="verbatim">nil</code></td><td><code class="verbatim">t</code></td><td>The date.</td></tr>
+</tbody>
+</table>
+<p>A depth for <code class="verbatim">toc</code> or <code class="verbatim">num</code> larger than <code class="verbatim">H</code> is cut to <code class="verbatim">H</code>. Any value other than <code class="verbatim">nil</code> turns an option on. Other <code class="verbatim">#+OPTIONS</code> keys are ignored by HTML export. iCalendar export also reads <code class="verbatim">&lt;</code> (see <em>iCalendar</em> below) and <code class="verbatim">-</code>, which is on by default and turns <code class="verbatim">---</code>, <code class="verbatim">--</code> and <code class="verbatim">...</code> into dashes and an ellipsis in the text it writes.</p>
+<pre><code class="language-org highlight"><span class="text org"><span class="keyword other keyword org">#+TITLE:</span><span class="string unquoted org"> Field notes</span>
+<span class="keyword other keyword org">#+AUTHOR:</span><span class="string unquoted org"> Sam</span>
+<span class="keyword other keyword org">#+OPTIONS:</span><span class="string unquoted org"> toc:2 num:nil pri:t ^:{}</span></span></code></pre>
+<h3 id="which-headings-are-exported">Which headings are exported</h3>
+<ul>
+<li>A heading tagged with one of <code class="verbatim">#+EXCLUDE_TAGS</code> (<code class="verbatim">noexport</code> by default) is left out, with everything under it.</li>
+<li>A heading whose title starts with <code class="verbatim">COMMENT</code> is left out.</li>
+<li>A heading tagged <code class="verbatim">ARCHIVE</code> is exported as the heading alone, without its contents.</li>
+<li>If any heading has one of <code class="verbatim">#+SELECT_TAGS</code> (<code class="verbatim">export</code> by default), only those headings, their ancestors and everything under them are exported.</li>
+</ul>
+<p>Each heading gets an <code class="verbatim">id</code> for links: its <code class="verbatim">CUSTOM_ID</code> property, or a slug made from its title. Headings are one level down from Org's: a top-level heading is an <code class="verbatim">&lt;h2&gt;</code>, since the title is the <code class="verbatim">&lt;h1&gt;</code>.</p>
+<h3 id="the-page-head">The page head</h3>
+<p>Each <code class="verbatim">#+HTML_HEAD:</code> and <code class="verbatim">#+HTML_HEAD_EXTRA:</code> line goes into the page's <code class="verbatim">&lt;head&gt;</code> as written, in order. Use them for stylesheets and scripts:</p>
+<pre><code class="language-org highlight"><span class="text org"><span class="keyword other keyword org">#+HTML_HEAD:</span><span class="string unquoted org"> &lt;link rel=&quot;stylesheet&quot; href=&quot;notes.css&quot;&gt;</span></span></code></pre>
+<p>The built-in stylesheet is always included first. Other <code class="verbatim">#+HTML_…</code> keywords are not used.</p>
+<h3 id="math">Math</h3>
+<p>LaTeX fragments (<code class="verbatim">\(…\)</code>, <code class="verbatim">\[…\]</code>, <code class="verbatim">$…$</code>, <code class="verbatim">$$…$$</code>) and LaTeX environments are left in the page for MathJax. When the page has any, orgstar adds MathJax 3 from <code class="verbatim">cdn.jsdelivr.net</code>, so the page needs a network connection to show math. PDF export uses a copy of MathJax that comes with orgstar instead, so math in a PDF needs no network connection. Entities such as <code class="verbatim">\alpha</code> become their characters.</p>
+<h3 id="includes">Includes</h3>
+<p><code class="verbatim">#+INCLUDE:</code> inserts another file before export, as <code class="verbatim">org-export-expand-include-keyword</code> does. Paths are relative to the Org file.</p>
+<table>
+<thead>
+<tr><th>Form</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">#+INCLUDE: "part.org"</code></td><td>The file's contents, read as Org; its includes are expanded too, up to eight levels.</td></tr>
+<tr><td><code class="verbatim">#+INCLUDE: "part.org::*Heading"</code></td><td>Only the subtree with that heading.</td></tr>
+<tr><td><code class="verbatim">#+INCLUDE: "part.org::#custom-id"</code></td><td>Only the subtree with that <code class="verbatim">CUSTOM_ID</code>.</td></tr>
+<tr><td><code class="verbatim">#+INCLUDE: "code.sh" src sh</code></td><td>The file in a source block.</td></tr>
+<tr><td><code class="verbatim">#+INCLUDE: "log.txt" example</code></td><td>The file in an example block.</td></tr>
+<tr><td><code class="verbatim">#+INCLUDE: "page.html" export html</code></td><td>The file in an export block.</td></tr>
+<tr><td><code class="verbatim">quote</code>, <code class="verbatim">verse</code>, <code class="verbatim">center</code>, <code class="verbatim">comment</code></td><td>The file in a block of that kind.</td></tr>
+<tr><td><code class="verbatim">:lines "5-10"</code></td><td>Only those lines; either end may be left out.</td></tr>
+<tr><td><code class="verbatim">:minlevel 2</code></td><td>Shift the included headings so the shallowest is at that level.</td></tr>
+</tbody>
+</table>
+<p>A file that cannot be read is replaced by an empty line. In a file included as Org from another folder, relative <code class="verbatim">file:</code> links are rewritten relative to the Org file, as Org does: <code class="verbatim">[[file:pic.png]]</code> in <code class="verbatim">sub/part.org</code> becomes <code class="verbatim">[[file:sub/pic.png]]</code>. A link written without <code class="verbatim">file:</code>, such as <code class="verbatim">[[./pic.png]]</code>, comes back as <code class="verbatim">[[sub/pic.png]]</code>, which Org then reads as a link to a heading.</p>
+<h3 id="macros">Macros</h3>
+<p><code class="verbatim">{{{name(arguments)}}}</code> is replaced before export (<code class="verbatim">org-macro-replace-all</code>).</p>
+<table>
+<thead>
+<tr><th>Macro</th><th>Replaced by</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">#+MACRO: name text</code></td><td><code class="verbatim">text</code>, with <code class="verbatim">$1</code>, =$2=… replaced by the arguments.</td></tr>
+<tr><td><code class="verbatim">{{{title}}}</code>, <code class="verbatim">{{{author}}}</code>, <code class="verbatim">{{{date}}}</code>, <code class="verbatim">{{{email}}}</code></td><td>That keyword's value.</td></tr>
+<tr><td><code class="verbatim">{{{keyword(NAME)}}}</code></td><td>The value of <code class="verbatim">#+NAME:</code>.</td></tr>
+<tr><td><code class="verbatim">{{{input-file}}}</code></td><td>The Org file's name.</td></tr>
+<tr><td><code class="verbatim">{{{property(NAME)}}}</code></td><td>The value of property <code class="verbatim">NAME</code> of the entry the macro is in; <code class="verbatim">ITEM</code> gives the heading's title. Empty before the first heading.</td></tr>
+<tr><td><code class="verbatim">{{{property(NAME,SEARCH)}}}</code></td><td>The same for the entry <code class="verbatim">SEARCH</code> finds in this file: <code class="verbatim">*Title</code>, <code class="verbatim">#custom-id</code> or a title.</td></tr>
+<tr><td><code class="verbatim">{{{n}}}</code>, <code class="verbatim">{{{n(name)}}}</code></td><td>A counter, increased at each use. <code class="verbatim">n(name,-)</code> repeats the current value; <code class="verbatim">n(name,5)</code> sets it to 5.</td></tr>
+<tr><td><code class="verbatim">{{{time(format)}}}</code></td><td>The current time, formatted as <code class="verbatim">format-time-string</code> does.</td></tr>
+</tbody>
+</table>
+<p>Arguments are separated by commas; write <code class="verbatim">\,</code> for a literal comma. Macros defined with <code class="verbatim">(eval …)</code>, and macros orgstar does not know, become empty. <code class="verbatim">#+MACRO:</code> definitions in setup files count.</p>
+<h3 id="footnotes">Footnotes</h3>
+<p>Footnote references, named or inline (<code class="verbatim">[fn:: text]</code>), become numbered superscript links. The notes are collected in a Footnotes section at the end, numbered in the order they are first referenced, each with a link back. A reference without a definition is exported as written.</p>
+<h3 id="tables">Tables</h3>
+<p>An Org table becomes an HTML <code class="verbatim">&lt;table&gt;</code>. If it has rules, the rows before the first rule are the header (<code class="verbatim">&lt;thead&gt;</code>) and the rest the body. <code class="verbatim">#+CAPTION:</code> gives the table a caption. <code class="verbatim">#+TBLFM:</code> lines are not exported.</p>
+<p>A table.el table (one drawn with <code class="verbatim">+</code>, <code class="verbatim">-</code> and <code class="verbatim">|</code>) becomes a table with each cell's <code class="verbatim">colspan</code> and <code class="verbatim">rowspan</code>, and the lines in a cell joined with line breaks. If its drawing is not a well-formed table, it is exported as preformatted text.</p>
+<h3 id="images-and-links">Images and links</h3>
+<p>A link to an image file without a description becomes an <code class="verbatim">&lt;img&gt;</code>. The image types are <code class="verbatim">png</code>, <code class="verbatim">jpg</code>, <code class="verbatim">jpeg</code>, <code class="verbatim">gif</code>, <code class="verbatim">svg</code>, <code class="verbatim">webp</code>, <code class="verbatim">bmp</code>, <code class="verbatim">tif</code>, <code class="verbatim">tiff</code> and <code class="verbatim">avif</code>. <code class="verbatim">#+ATTR_HTML:</code> before the paragraph adds attributes (<code class="verbatim">:width 300 :alt "Map"</code>); without an <code class="verbatim">:alt</code>, the file name is used.</p>
+<p>An <code class="verbatim">attachment:</code> link is exported as a <code class="verbatim">file:</code> link to the file in its entry's attachment folder, with its full path, as Org's <code class="verbatim">org-attach-expand-links</code> does; when the entry has no attachment folder, to that name in the Org file's folder. An attached image therefore shows as an image.</p>
+<p>An image paragraph with <code class="verbatim">#+CAPTION:</code> or <code class="verbatim">#+ATTR_HTML:</code> becomes a <code class="verbatim">&lt;figure&gt;</code>; a caption is numbered "Figure 1:", "Figure 2:" and so on.</p>
+<p>Links to <code class="verbatim">.org</code> files point to the <code class="verbatim">.html</code> file of the same name. Links to headings (<code class="verbatim">[[*Heading]]</code>), to <code class="verbatim">CUSTOM_ID</code> targets and to radio targets point to the heading's or target's <code class="verbatim">id</code> on the page. <code class="verbatim">id:</code> links point to <code class="verbatim">#</code> and the ID. Other links are written as they are.</p>
+<h3 id="source-blocks-and-their-results">Source blocks and their results</h3>
+<p>A source block is exported as <code class="verbatim">&lt;pre&gt;&lt;code class</code>"language-LANG"&gt;=, with the code escaped and its common indentation removed. Code in a language the editor highlights is colored as the editor colors it: each token is a <code class="verbatim">&lt;span&gt;</code> with the class Emacs's htmlize gives its face (<code class="verbatim">org-keyword</code>, <code class="verbatim">org-string</code>, <code class="verbatim">org-comment</code>, <code class="verbatim">org-function-name</code>, <code class="verbatim">org-type</code>, <code class="verbatim">org-constant</code>, <code class="verbatim">org-property-name</code>, <code class="verbatim">org-variable-name</code>), and the page's stylesheet colors them with the theme's <code class="verbatim">syntax-</code> colors, light and dark. Other languages are exported plain; the <code class="verbatim">language-</code> class lets a script or stylesheet in <code class="verbatim">#+HTML_HEAD</code> highlight them. Noweb references are shown as written. Code references are covered in <a href="09-links.html">Links</a>: labels come off the lines, <code class="verbatim">-n</code> and <code class="verbatim">+n</code> number them, and <code class="verbatim">[[(name)]]</code> links to the labelled line.</p>
+<p>The block's <code class="verbatim">:exports</code> header argument decides what appears. orgstar resolves it as running the block would: from the <code class="verbatim">#+begin_src</code> line, <code class="verbatim">#+HEADER:</code> lines, <code class="verbatim">header-args</code> properties and <code class="verbatim">#+PROPERTY:</code> lines (see <a href="11-code-blocks.html">Code blocks</a>). Without one, it is <code class="verbatim">results</code> for <code class="verbatim">dot</code>, <code class="verbatim">plantuml</code>, <code class="verbatim">ditaa</code>, <code class="verbatim">gnuplot</code>, <code class="verbatim">latex</code> and <code class="verbatim">lilypond</code> blocks, as their Org defaults set it, and <code class="verbatim">code</code> for other languages.</p>
+<table>
+<thead>
+<tr><th><code class="verbatim">:exports</code></th><th>Exported</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">code</code></td><td>The code.</td></tr>
+<tr><td><code class="verbatim">results</code></td><td>The block's existing <code class="verbatim">#+RESULTS:</code>.</td></tr>
+<tr><td><code class="verbatim">both</code></td><td>The code, then the results.</td></tr>
+<tr><td><code class="verbatim">none</code></td><td>Nothing.</td></tr>
+</tbody>
+</table>
+<p>A <code class="verbatim">#+CALL:</code> line exports its existing results, never the call itself; <code class="verbatim">:exports code</code> or <code class="verbatim">none</code> on the call, or in the <code class="verbatim">header-args</code> properties where the call is, exports nothing. An inline <code class="verbatim">src_</code> block has <code class="verbatim">:exports results</code> by default: the <code class="verbatim">{{{results(…)}}}</code> after it is exported and its code is not. With <code class="verbatim">:exports code</code> the code is exported in <code class="verbatim">&lt;code&gt;</code> and the results are not; with <code class="verbatim">both</code>, both. An inline <code class="verbatim">call_</code> never appears itself, and the <code class="verbatim">{{{results(…)}}}</code> after it is always exported, whatever <code class="verbatim">:exports</code> says, as in Org.</p>
+<h3 id="other-blocks-and-elements">Other blocks and elements</h3>
+<table>
+<thead>
+<tr><th>Org</th><th>HTML</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">#+begin_example</code></td><td><code class="verbatim">&lt;pre&gt;</code></td></tr>
+<tr><td>=: = lines</td><td><code class="verbatim">&lt;pre class</code>"example"&gt;=</td></tr>
+<tr><td><code class="verbatim">#+begin_quote</code></td><td><code class="verbatim">&lt;blockquote&gt;</code></td></tr>
+<tr><td><code class="verbatim">#+begin_center</code></td><td><code class="verbatim">&lt;div class</code>"center"&gt;=</td></tr>
+<tr><td><code class="verbatim">#+begin_verse</code></td><td><code class="verbatim">&lt;p class</code>"verse"&gt;=, lines and indentation kept</td></tr>
+<tr><td><code class="verbatim">#+begin_export html</code></td><td>Its contents, as they are</td></tr>
+<tr><td><code class="verbatim">#+begin_export</code> other formats</td><td>Nothing</td></tr>
+<tr><td><code class="verbatim">#+begin_comment</code></td><td>Nothing</td></tr>
+<tr><td><code class="verbatim">#+begin_NAME</code>, any other name</td><td><code class="verbatim">&lt;div class</code>"NAME"&gt;= (a special block)</td></tr>
+<tr><td><code class="verbatim">@@html:…@@</code></td><td>Its contents, as they are; other back-ends' snippets are dropped</td></tr>
+<tr><td>Plain, numbered and description lists</td><td><code class="verbatim">&lt;ul&gt;</code>, <code class="verbatim">&lt;ol&gt;</code>, <code class="verbatim">&lt;dl&gt;</code>; checkboxes as <code class="verbatim">[X]</code>, <code class="verbatim">[-]</code>, <code class="verbatim">[ ]</code></td></tr>
+<tr><td>Timestamps</td><td><code class="verbatim">&lt;time datetime</code>"…"&gt;=</td></tr>
+<tr><td>Inline tasks</td><td><code class="verbatim">&lt;div class</code>"inlinetask"&gt;= with the title in bold</td></tr>
+<tr><td>Dynamic blocks</td><td>Their contents</td></tr>
+<tr><td><code class="verbatim">-----</code></td><td><code class="verbatim">&lt;hr&gt;</code></td></tr>
+</tbody>
+</table>
+<p>Comments, drawers, property drawers, planning lines, clock lines and keywords are not exported.</p>
+<h3 id="citations">Citations</h3>
+<p>HTML and Markdown export handle citations the same way; see Citations below.</p>
+<h2 id="reveal-js-export">reveal.js export</h2>
+<p>Export to reveal.js writes a slide deck for <a href="https://revealjs.com">reveal.js</a>, as Emacs's org-re-reveal package writes one (<code class="verbatim">org-re-reveal-export-to-html</code>), without Emacs, on the Mac and iOS. It writes a <code class="verbatim">.html</code> file, like HTML export, so the two replace each other unless <code class="verbatim">#+EXPORT_FILE_NAME:</code> tells them apart. Like PDF export, it needs <a href="../install.html">orgstar+</a>.</p>
+<p>The deck is one file that works without a network connection: reveal.js 6.0.2, its stylesheet, the theme and the plugins come with orgstar and are put in the page, and so are the images the file links to and the slides' background images. Open it in a browser and share it as it is. With <code class="verbatim">#+REVEAL_ROOT:</code>, the deck links to reveal.js there instead, as org-re-reveal does, and images stay links: <code class="verbatim">#+REVEAL_ROOT: https://cdn.jsdelivr.net/npm/reveal.js@6.0.2</code> uses a CDN, and a relative path a copy of reveal.js beside the deck. The files are read from reveal.js 6's <code class="verbatim">dist</code> folder (<code class="verbatim">dist/reveal.js</code>, <code class="verbatim">dist/theme/black.css</code>, <code class="verbatim">dist/plugin/notes.js</code>).</p>
+<p>The slides:</p>
+<ul>
+<li>A title slide first, with the title, <code class="verbatim">#+SUBTITLE:</code>, the author and the date (<code class="verbatim">#+OPTIONS: author:nil</code> and the rest leave them out).</li>
+<li>A table of contents slide, as for HTML export; <code class="verbatim">#+OPTIONS: toc:nil</code> leaves it out, as most decks do. Section numbers are as for HTML export; <code class="verbatim">num:nil</code> leaves them out.</li>
+<li>A slide for each heading down to <code class="verbatim">H</code> (3 unless <code class="verbatim">#+OPTIONS: H:n</code> says otherwise). First-level headings go across; their children go down from them, as reveal.js's vertical slides. <code class="verbatim">#+REVEAL_HLEVEL: 2</code> puts second-level headings across too. Deeper headings are part of their slide, as HTML export writes them.</li>
+<li>Text before the first heading, other than keywords, on a slide of its own after the title.</li>
+<li>The footnotes on a last slide.</li>
+</ul>
+<p>Inside a slide, everything is as HTML export writes it: lists, tables, colored code, images, links, math (MathJax, put in the page when reveal.js is), and <code class="verbatim">#+BEGIN_EXPORT html</code> and <code class="verbatim">@@html:…@@</code> with their <code class="verbatim">reveal</code> forms. Headings tagged <code class="verbatim">noexport</code> and COMMENT headings are left out.</p>
+<table>
+<thead>
+<tr><th>In the file</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">#+BEGIN_NOTES</code> … <code class="verbatim">#+END_NOTES</code></td><td>Speaker notes, which reveal.js shows on <code class="verbatim">S</code>.</td></tr>
+<tr><td><code class="verbatim">#+ATTR_REVEAL: :frag appear</code></td><td>The next paragraph, list, table or block appears on its own step; any reveal.js fragment style, or <code class="verbatim">t</code> for <code class="verbatim">#+REVEAL_DEFAULT_FRAG_STYLE:</code> (plain <code class="verbatim">fragment</code> without one).</td></tr>
+<tr><td><code class="verbatim">#+ATTR_REVEAL: :frag (appear)</code></td><td>Before a list: each item on its own step. Several styles, <code class="verbatim">(grow shrink none)</code>, go to the items in order, the last one for the rest; <code class="verbatim">none</code> is no step.</td></tr>
+<tr><td><code class="verbatim">:frag_idx 2</code>, <code class="verbatim">:frag_idx (3 2 1)</code></td><td>The step's <code class="verbatim">data-fragment-index</code>; <code class="verbatim">-</code> is none.</td></tr>
+<tr><td><code class="verbatim">#+REVEAL: split</code></td><td>Starts a new slide with the same heading's settings.</td></tr>
+<tr><td><code class="verbatim">#+REVEAL_HTML: …</code></td><td>HTML put in the slide as written.</td></tr>
+<tr><td><code class="verbatim">#+REVEAL_ROOT:</code></td><td>Links to reveal.js there instead of putting it in the page.</td></tr>
+<tr><td><code class="verbatim">#+REVEAL_THEME:</code></td><td>One of reveal.js's themes (<code class="verbatim">black</code>, the default, <code class="verbatim">white</code>, <code class="verbatim">league</code>, <code class="verbatim">beige</code>, <code class="verbatim">night</code>, <code class="verbatim">serif</code>, <code class="verbatim">simple</code>, <code class="verbatim">sky</code>, <code class="verbatim">solarized</code>, <code class="verbatim">blood</code>, <code class="verbatim">moon</code>, <code class="verbatim">dracula</code>, <code class="verbatim">black-contrast</code>, <code class="verbatim">white-contrast</code>), or a stylesheet's path or URL ending in <code class="verbatim">.css</code>.</td></tr>
+<tr><td><code class="verbatim">#+REVEAL_TRANS:</code>, <code class="verbatim">#+REVEAL_SPEED:</code></td><td>The transition (<code class="verbatim">convex</code> by default) and its speed.</td></tr>
+<tr><td><code class="verbatim">#+REVEAL_PLUGINS:</code></td><td>The plugins, as a list: <code class="verbatim">(notes search zoom)</code> is the default. In a deck with reveal.js in the page, notes, search, zoom and math are available; others (markdown, highlight) need <code class="verbatim">#+REVEAL_ROOT:</code>.</td></tr>
+<tr><td><code class="verbatim">#+REVEAL_INIT_OPTIONS:</code></td><td>Options for <code class="verbatim">Reveal.initialize</code>, as JavaScript: <code class="verbatim">width: 1200, height: 800, margin: 0.1</code>. Several lines add up; they win over the defaults.</td></tr>
+<tr><td><code class="verbatim">#+REVEAL_MARGIN:</code>, <code class="verbatim">#+REVEAL_MIN_SCALE:</code>, <code class="verbatim">#+REVEAL_MAX_SCALE:</code></td><td>The same reveal.js options, as numbers.</td></tr>
+<tr><td><code class="verbatim">#+REVEAL_TITLE_SLIDE:</code></td><td><code class="verbatim">nil</code> for no title slide, or HTML with <code class="verbatim">%t</code> (title), <code class="verbatim">%s</code> (subtitle), <code class="verbatim">%a</code> (author), <code class="verbatim">%e</code> (email, with <code class="verbatim">email:t</code>), <code class="verbatim">%d</code> (date), <code class="verbatim">%A</code> (<code class="verbatim">#+REVEAL_ACADEMIC_TITLE:</code>), <code class="verbatim">%m</code> (<code class="verbatim">#+REVEAL_MISCINFO:</code>) and <code class="verbatim">%%</code>. <code class="verbatim">#+OPTIONS: reveal_title_slide:nil</code> leaves it out too.</td></tr>
+<tr><td><code class="verbatim">#+REVEAL_TITLE_SLIDE_BACKGROUND:</code></td><td>Its background: a color, an image or a URL; <code class="verbatim">_SIZE</code>, <code class="verbatim">_POSITION</code>, <code class="verbatim">_REPEAT</code> and <code class="verbatim">_TRANSITION</code> variants as in org-re-reveal.</td></tr>
+<tr><td><code class="verbatim">#+REVEAL_EXTRA_CSS:</code></td><td>A stylesheet of one's own, put in the page when it can be read, else linked.</td></tr>
+<tr><td><code class="verbatim">#+REVEAL_HEAD_PREAMBLE:</code>, <code class="verbatim">#+REVEAL_PREAMBLE:</code>, <code class="verbatim">#+REVEAL_POSTAMBLE:</code></td><td>HTML in the head, before the slides and after them.</td></tr>
+<tr><td><code class="verbatim">#+OPTIONS: reveal_control:nil</code></td><td>Also <code class="verbatim">reveal_progress</code>, <code class="verbatim">reveal_history</code>, <code class="verbatim">reveal_center</code>, <code class="verbatim">reveal_slide_number</code> (<code class="verbatim">nil</code>, <code class="verbatim">t</code> or a format such as <code class="verbatim">c/t</code>), <code class="verbatim">reveal_rolling_links</code>, <code class="verbatim">reveal_keyboard</code>, <code class="verbatim">reveal_mousewheel</code>, <code class="verbatim">reveal_fragmentinurl</code>, <code class="verbatim">reveal_overview</code> and <code class="verbatim">reveal_pdfseparatefragments</code>, with org-re-reveal's defaults.</td></tr>
+</tbody>
+</table>
+<p>A heading's properties set its slide: <code class="verbatim">REVEAL_BACKGROUND</code> (a color, an image or a URL), <code class="verbatim">REVEAL_BACKGROUND_SIZE</code>, <code class="verbatim">REVEAL_BACKGROUND_POSITION</code>, <code class="verbatim">REVEAL_BACKGROUND_REPEAT</code>, <code class="verbatim">REVEAL_BACKGROUND_TRANS</code>, <code class="verbatim">REVEAL_BACKGROUND_OPACITY</code>, <code class="verbatim">REVEAL_BACKGROUND_IFRAME</code>, <code class="verbatim">REVEAL_BACKGROUND_VIDEO</code>, <code class="verbatim">REVEAL_DATA_TRANSITION</code>, <code class="verbatim">REVEAL_DATA_STATE</code>, <code class="verbatim">HTML_CONTAINER_CLASS</code> (its <code class="verbatim">class</code>) and <code class="verbatim">REVEAL_EXTRA_ATTR</code> (attributes as written).</p>
+<p>Code keeps the editor theme's colors: the dark ones on a dark reveal.js theme (black, league, night, moon, blood, dracula, black-contrast), the light ones on the others.</p>
+<p>On the Mac, Export to reveal.js (<code class="verbatim">C-c C-e v v</code> in the Emacs preset and Doom) and Export to reveal.js and Open (<code class="verbatim">C-c C-e v b</code>) are in File ▸ Export and the command palette, and the export dialog has <em>reveal.js slides</em>. On iOS, reveal.js is in the Export menu. Publishing writes decks with <code class="verbatim">publishing-function = "org-re-reveal-publish-to-reveal"</code>.</p>
+<p>Differences from org-re-reveal:</p>
+<ul>
+<li>Without <code class="verbatim">#+REVEAL_ROOT:</code> the deck has reveal.js in it, where org-re-reveal links to <code class="verbatim">./reveal.js</code> (or puts it in the page with <code class="verbatim">reveal_single_file:t</code>).</li>
+<li>The files linked under <code class="verbatim">#+REVEAL_ROOT:</code> are reveal.js 6's (<code class="verbatim">dist/plugin/notes.js</code>), not reveal.js 4's (<code class="verbatim">plugin/notes/notes.js</code>).</li>
+<li>The default plugins are notes, search and zoom; org-re-reveal's list also has markdown.</li>
+<li>Slide ids are <code class="verbatim">slide-</code> and the heading's id as HTML export makes it (<code class="verbatim">slide-introduction</code>), not <code class="verbatim">slide-org…</code> ids that change with each export. Links to headings go to their slides.</li>
+<li>Headings below <code class="verbatim">H</code> are headings, as in orgstar's HTML export, not list items.</li>
+<li>Not read: <code class="verbatim">#+REVEAL_EXTRA_JS:</code>, <code class="verbatim">#+REVEAL_SLIDE_HEADER:</code> and <code class="verbatim">#+REVEAL_SLIDE_FOOTER:</code>, <code class="verbatim">#+REVEAL_INIT_SCRIPT:</code>, <code class="verbatim">#+REVEAL_HIGHLIGHT_CSS:</code>, <code class="verbatim">#+REVEAL_MULTIPLEX_…</code>, <code class="verbatim">#+REVEAL_TOC_SLIDE_…</code>, <code class="verbatim">:code_attribs</code> and other <code class="verbatim">#+ATTR_REVEAL</code> attributes than <code class="verbatim">:frag</code> and <code class="verbatim">:frag_idx</code>, and <code class="verbatim">org-re-reveal</code>'s customizable variables.</li>
+</ul>
+<h2 id="presenting">Presenting</h2>
+<p>Present shows the file one heading at a time, full screen, as org-present and org-tree-slide show it in Emacs. Each slide is a heading's line, without its stars and tags, and its text, in the editor's theme at a size that fills the screen; its children are the slides after it. A title slide comes first when the file has <code class="verbatim">#+TITLE:</code>, <code class="verbatim">#+AUTHOR:</code> or <code class="verbatim">#+DATE:</code>, or text before the first heading. Planning lines, drawers, keywords and comments don't show; image links on lines of their own show as images; <code class="verbatim">#+BEGIN_NOTES</code> blocks are the slide's notes. Headings tagged <code class="verbatim">noexport</code> and COMMENT headings are left out, with their children. A slide too long for the screen scrolls. Present needs no orgstar+, and nothing is written.</p>
+<p>On the Mac, View ▸ Present (<code class="verbatim">⌃⌘P</code>), also in the command palette, opens the slides in a full-screen window at the heading the caret is in.</p>
+<table>
+<thead>
+<tr><th>Key</th><th>Does</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">→</code>, <code class="verbatim">↓</code>, Space, Page Down, Return</td><td>Next slide</td></tr>
+<tr><td><code class="verbatim">←</code>, <code class="verbatim">↑</code>, Delete, Page Up</td><td>Previous slide</td></tr>
+<tr><td>Home, End</td><td>First and last slide</td></tr>
+<tr><td>Escape</td><td>Leave, as Done does</td></tr>
+</tbody>
+</table>
+<p>On iOS, Present is in the editor's Commands, starting at the caret's heading, and in the reader's, starting at the beginning. Tap the right two thirds of the screen or swipe left for the next slide, tap the left third or swipe right for the previous one, and tap Done to leave. With a hardware keyboard the keys above work too.</p>
+<p>On an iPad with an external display and Stage Manager off, the slide shows on the display, and the iPad shows the next slide, the current slide's notes, the slide number, Previous and Next. With Stage Manager on, the display is an extended desktop and shows windows, not the slide.</p>
+<h2 id="pdf-export">PDF export</h2>
+<p>Export to PDF makes the HTML export into a PDF, laid out and split into pages by the system's web engine as printing does. It needs neither Emacs nor TeX, and works on iOS. The PDF has what the HTML export has: the title, the byline, the table of contents, colored code, tables, images and math (MathJax, which comes with orgstar and needs no network connection). For the page:</p>
+<ul>
+<li>Colors are always the light ones, whatever the system's appearance.</li>
+<li>Pages are US Letter where that is the usual size and A4 elsewhere; on the Mac, the paper size set for printing.</li>
+<li>Code blocks, tables, figures and quotes are kept on one page when they fit, and a heading is not left at the bottom of a page.</li>
+<li>Margins are 50 points on every side (<code class="verbatim">pdf-margin</code> under <code class="verbatim">[orgstar]</code> in <code class="verbatim">config.toml</code>; Margins in the Export dialog).</li>
+<li>The text is in the export's own font, or the family <code class="verbatim">pdf-font</code> names (Font in the dialog). Code stays monospaced.</li>
+<li>Each page's number is centred in its bottom margin (<code class="verbatim">pdf-page-numbers</code>; Page numbers in the dialog). The numbers are annotations on the pages, so the table of contents and other links keep working.</li>
+</ul>
+<p>For typeset output with LaTeX's classes and packages, use Export to PDF with Emacs instead (see <em>Exporting through Emacs</em>).</p>
+<h2 id="printing">Printing</h2>
+<p>Printing makes the same pages as Export to PDF, with its margins, font and page numbers, and hands them to the system's print panel, which shows a preview and the printer's own choices. Pages that don't fit the paper chosen there are scaled down to fit. Like PDF export, printing a file needs <a href="../install.html">orgstar+</a>, since the print panel can save a PDF; printing the agenda doesn't (see <a href="07-agenda.html">Agenda</a>).</p>
+<table>
+<thead>
+<tr><th>Command</th><th>Prints</th></tr>
+</thead>
+<tbody>
+<tr><td>Print…</td><td>The whole file.</td></tr>
+<tr><td>Print Subtree…</td><td>The subtree at the caret, as a document of its own, as the export dialog's <em>Scope</em> exports it. "Not in a subtree" before the first heading.</td></tr>
+<tr><td>Print Selection…</td><td>The selected text, under the file's title and with its <code class="verbatim">#+</code> keywords. "No text is selected" without a selection.</td></tr>
+</tbody>
+</table>
+<p>On the Mac the three are in the File menu and the command palette; Print… is <code class="verbatim">⌥⌘P</code>, since <code class="verbatim">⌘P</code> is Quick Open. File ▸ Page Setup… sets the paper size and orientation the pages are laid out for. Body Only and the file's subtree export setting don't apply to printing.</p>
+<p>On iOS, Print… is in the Export menu and prints the whole file; Export Subtree… has Print… for the subtree; all three commands are in Commands, where Print Selection… is greyed without a selection. The pages are US Letter or A4, as for PDF export, and the system's print sheet scales them to the paper.</p>
+<p>The text printed is the editor's, saved or not, as for export. An entry encrypted with <code class="verbatim">crypt</code> prints as its encrypted message unless it has been decrypted in the file (Decrypt Entry in File…); one only opened with Decrypt Entry… stays encrypted in the print. See <a href="04-outlines.html">Outlines</a>.</p>
+<h2 id="latex-export">LaTeX export</h2>
+<p>Export to LaTeX writes the <code class="verbatim">.tex</code> file that Emacs's <code class="verbatim">org-latex-export-to-latex</code> writes under <code class="verbatim">emacs -Q</code> (Org 9.8.7), without Emacs, on the Mac and iOS. It has the same preamble, sectioning, lists, tables, verbatim source blocks, figures, footnotes, links and escaping. Two things differ: the <code class="verbatim">\label</code> keys are made from the document, so they stay the same between exports, where Emacs picks new random ones each time; and <code class="verbatim">\author</code> is the name of the Mac's user account, which is what <code class="verbatim">user-full-name</code> usually is, unless the file has <code class="verbatim">#+AUTHOR:</code>.</p>
+<p>It reads:</p>
+<table>
+<thead>
+<tr><th>Keyword</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">#+LATEX_CLASS:</code></td><td><code class="verbatim">article</code> (the default), <code class="verbatim">report</code> or <code class="verbatim">book</code>, with Org's default sectioning</td></tr>
+<tr><td><code class="verbatim">#+LATEX_CLASS_OPTIONS:</code></td><td>Replaces <code class="verbatim">[11pt]</code> in <code class="verbatim">\documentclass</code></td></tr>
+<tr><td><code class="verbatim">#+LATEX_HEADER:</code></td><td>Lines added after the packages</td></tr>
+<tr><td><code class="verbatim">#+LATEX_HEADER_EXTRA:</code></td><td>Lines added after those</td></tr>
+<tr><td><code class="verbatim">#+LATEX_COMPILER:</code></td><td><code class="verbatim">pdflatex</code> (the default), <code class="verbatim">xelatex</code> or <code class="verbatim">lualatex</code>: the packages for that engine</td></tr>
+<tr><td><code class="verbatim">#+ATTR_LATEX:</code></td><td>On tables (<code class="verbatim">:environment</code>, <code class="verbatim">:align</code>, <code class="verbatim">:width</code>, <code class="verbatim">:float</code>, <code class="verbatim">:placement</code>, <code class="verbatim">:center</code>, <code class="verbatim">:font</code>, <code class="verbatim">:caption</code>, <code class="verbatim">:options</code>), images (<code class="verbatim">:width</code>, <code class="verbatim">:height</code>, <code class="verbatim">:scale</code>, <code class="verbatim">:options</code>, <code class="verbatim">:float</code>, <code class="verbatim">:placement</code>, <code class="verbatim">:center</code>), lists, quote, example and special blocks</td></tr>
+</tbody>
+</table>
+<p><code class="verbatim">#+TITLE</code>, <code class="verbatim">#+SUBTITLE</code>, <code class="verbatim">#+AUTHOR</code>, <code class="verbatim">#+DATE</code>, <code class="verbatim">#+KEYWORDS</code>, <code class="verbatim">#+DESCRIPTION</code>, <code class="verbatim">#+LANGUAGE</code> and <code class="verbatim">#+OPTIONS</code> work as in Emacs, as do the tags and <code class="verbatim">COMMENT</code> that leave headings out (see <em>Which headings are exported</em>). Body-only and subtree export are in the export dialog. In a subtree export, the heading's <code class="verbatim">EXPORT_LATEX_CLASS</code>, <code class="verbatim">EXPORT_LATEX_CLASS_OPTIONS</code>, <code class="verbatim">EXPORT_LATEX_HEADER</code>, <code class="verbatim">EXPORT_LATEX_HEADER_EXTRA</code>, <code class="verbatim">EXPORT_LATEX_COMPILER</code>, <code class="verbatim">EXPORT_SUBTITLE</code>, <code class="verbatim">EXPORT_KEYWORDS</code>, <code class="verbatim">EXPORT_DESCRIPTION</code> and <code class="verbatim">EXPORT_LANGUAGE</code> properties replace the file's keywords. As in Emacs, a <code class="verbatim">PROPERTY+</code> line adds its value to the property's, after a space.</p>
+<p>A file with something this export doesn't handle stops with "Can't export to LaTeX: " and what it was, rather than giving a <code class="verbatim">.tex</code> that differs from Emacs's: a LaTeX class other than the three, Babel or Polyglossia in the header, citations, radio targets, inline tasks, table.el tables, inline source blocks and calls, <code class="verbatim">#+CALL</code>, source blocks exported with their results, footnote definitions of several paragraphs, footnotes in headings, tables or item tags, <code class="verbatim">:mode math</code> and long tables, <code class="verbatim">UNNUMBERED</code> and <code class="verbatim">ALT_TITLE</code>, <code class="verbatim">tex:verbatim</code>, a quote or center block whose first line holds only spaces and whose second line is not blank, a keyword such as <code class="verbatim">#+SUBTITLE</code> repeated with an empty value, plain (unbracketed) links of types it doesn't write, such as <code class="verbatim">id:</code> and <code class="verbatim">info:</code>, plain links to images, a plain link that runs on into markup such as <code class="verbatim">shell:a_b</code>, and <code class="verbatim">#+OPTIONS</code> items other than <code class="verbatim">toc</code>, <code class="verbatim">num</code>, <code class="verbatim">H</code>, <code class="verbatim">tags</code>, <code class="verbatim">todo</code>, <code class="verbatim">pri</code>, <code class="verbatim">^</code>, <code class="verbatim">tex</code>, <code class="verbatim">title</code>, <code class="verbatim">author</code>, <code class="verbatim">date</code>, <code class="verbatim">-</code> and <code class="verbatim">timestamp</code> set to something other than Org's default. A link Emacs can't resolve stops the export in both, including a link to a heading, target or named element the export leaves out. On iOS the share sheet stops and the message shows at the bottom of the screen. Publishing to LaTeX stops with the file's name in the message. In the download version, when Emacs is installed, such a file is exported by Emacs instead (see <em>Exporting through Emacs</em>).</p>
+<h2 id="word-rtf-and-plain-text">Word, RTF and plain text</h2>
+<p>Export to Word, Export to RTF and Export to Plain Text make the HTML export into a document of that kind, as the system reads HTML: headings, emphasis, links, colored keywords and code, lists, and tables. Word files (<code class="verbatim">.docx</code>) are written by orgstar itself, so tables come through as Word tables; RTF keeps them too on the Mac. On iOS, where the system's HTML reader keeps no tables, Word's tables are made from the HTML export's tables, with header cells bold and the cells' text without its styles; RTF and plain text there have the cells' text but no table. Plain text is the same text without its styles: list bullets and table cells are kept, separated by tabs. Fonts are Helvetica Neue for text and Menlo for code, and the colors are the light ones.</p>
+<p>In Word files, the title has Word's Title style and headings have its Heading 1 to Heading 6 styles, so Word's navigation pane, outline view and contents fields find them. Images from <code class="verbatim">file:</code> links come through as pictures, as wide as their pixels at 96 to the inch, scaled to <code class="verbatim">#+ATTR_HTML: :width</code> when it is set, and no wider than the page. PNG, JPEG and GIF go in as they are; other formats the system can read, such as HEIC, WebP and TIFF, go in as PNG. SVG and images at web addresses are left out. RTF and plain text have no images.</p>
+<p>For Org's own ASCII layout, with underlined headings and drawn tables, use Export to Plain Text (ASCII); see <em>ASCII export</em>.</p>
+<h3 id="copying-as-rich-text">Copying as rich text</h3>
+<p><strong>Copy as Rich Text</strong> (the command palette on the Mac, the Export menu on iOS) puts the selection, or the whole file when nothing is selected, on the clipboard as HTML, RTF and plain text. Paste it into Mail, Pages, Word or a web form to get the formatted text. On iOS it copies the whole file.</p>
+<h2 id="odt-export">ODT export</h2>
+<p>Export to ODT writes an OpenDocument text file (<code class="verbatim">.odt</code>) for LibreOffice, Pages or Word. orgstar writes it itself, on the Mac and on iOS, the way Emacs's <code class="verbatim">ox-odt</code> does under <code class="verbatim">emacs -Q</code>: the same headings, paragraphs, lists, tables, links, notes and images, with ox-odt's style names, so a template that restyles ox-odt's output restyles this one too.</p>
+<ul>
+<li>The title, subtitle (<code class="verbatim">#+SUBTITLE:</code>), author and date come first, then the table of contents and the text. On the Mac, without <code class="verbatim">#+AUTHOR:</code>, the author is your account's full name, as <code class="verbatim">user-full-name</code> is in Emacs. Without <code class="verbatim">#+TITLE:</code> there is no title.</li>
+<li>Headings are numbered by the word processor, to the depth <code class="verbatim">num</code> gives (<code class="verbatim">num:t</code> numbers every level). Headings deeper than <code class="verbatim">H</code> become list items. <code class="verbatim">#+TOC: headlines</code> puts a table of contents where it is; <code class="verbatim">local</code> limits it to the section, counts the depth from there and leaves out the title.</li>
+<li>Footnotes are the word processor's own notes, numbered as ox-odt numbers them: those referred to in the text first, then those referred to only from other notes. A note referred to again shows its number.</li>
+<li>Tables keep their header rows, alignment cookies, column groups and cell borders. A table inside a list item ends the list, sits indented below it, and the list carries on after it, as in ox-odt.</li>
+<li>Images from <code class="verbatim">file:</code> links (PNG, JPEG, GIF and SVG) are put inside the file. Their size is their pixels at 96 to the inch, or <code class="verbatim">#+ATTR_ODT: :width</code>, <code class="verbatim">:length</code> (the height) or <code class="verbatim">:scale</code>, and no more than 17 by 20 cm. A caption or <code class="verbatim">#+NAME:</code> numbers figures, tables and source blocks, and a link to the name shows the number.</li>
+<li>LaTeX fragments and environments are kept as written, in code style, as ox-odt does without a MathML converter. Source blocks are not colored; a language Emacs has no mode for gets ox-odt's plain code style.</li>
+<li>Without <code class="verbatim">:exports</code>, every source block exports its code, <code class="verbatim">dot</code>, <code class="verbatim">plantuml</code>, <code class="verbatim">ditaa</code>, <code class="verbatim">gnuplot</code>, <code class="verbatim">latex</code> and <code class="verbatim">lilypond</code> included: <code class="verbatim">emacs -Q</code> loads no Babel library to give them <code class="verbatim">results</code>, so their <code class="verbatim">#+RESULTS:</code> are left out, with or without <code class="verbatim">:file</code>. With <code class="verbatim">:exports results</code> or <code class="verbatim">both</code>, the <code class="verbatim">#+RESULTS:</code> already in the file are exported as they are. A line of only spaces in a source block is exported empty, unless <code class="verbatim">-i</code> keeps the indentation.</li>
+<li>Of the <code class="verbatim">#+OPTIONS</code>, <code class="verbatim">\n</code>, <code class="verbatim">f</code>, <code class="verbatim">|</code>, <code class="verbatim">e</code> and <code class="verbatim">d</code> (<code class="verbatim">t</code> or <code class="verbatim">nil</code>) are read, along with those every export reads.</li>
+<li><code class="verbatim">#+ODT:</code> lines, <code class="verbatim">#+BEGIN_EXPORT odt</code> blocks and <code class="verbatim">@@odt:...@@</code> snippets go in as they are.</li>
+<li>The styles (<code class="verbatim">styles.xml</code>) are orgstar's own: A4 pages with 2 cm margins. <code class="verbatim">#+ODT_STYLES_FILE:</code> is not read.</li>
+</ul>
+<p>The export stops with a message, instead of writing something different from ox-odt, for: a link that leads nowhere, an image file that can't be read, inline tasks, table templates (<code class="verbatim">#+ATTR_ODT: :style</code>), a link without a description to a <code class="verbatim">&lt;&lt;target&gt;&gt;</code> or to a code line that isn't numbered, an inline source block exported as code, a table in a quote or other block inside a list, an annotation in a dated document, <code class="verbatim">#+TOC:</code> with <code class="verbatim">:target</code>, and these <code class="verbatim">#+OPTIONS</code> at other than their default: <code class="verbatim">p</code>, <code class="verbatim">c</code>, <code class="verbatim">prop</code>, <code class="verbatim">broken-links</code>, <code class="verbatim">:</code>, <code class="verbatim">*</code>, <code class="verbatim">stat</code>, <code class="verbatim">tasks</code>, <code class="verbatim">&lt;</code>, <code class="verbatim">arch</code>, <code class="verbatim">email</code>, <code class="verbatim">'</code>, <code class="verbatim">tex</code> other than <code class="verbatim">t</code> or <code class="verbatim">nil</code>, and <code class="verbatim">d</code> with a list of drawers. ODT export is always the whole document: the export dialog's <strong>Body only</strong> doesn't apply.</p>
+<h2 id="ascii-export">ASCII export</h2>
+<p>Export to Plain Text (ASCII) writes the <code class="verbatim">.txt</code> file that Emacs's <code class="verbatim">org-ascii-export-to-ascii</code> writes under <code class="verbatim">emacs -Q</code> (Org 9.8.7), without Emacs, on the Mac and iOS: a centered title block, a table of contents, numbered headings underlined by level, paragraphs filled to 72 columns, links listed at the end of their section, and footnotes at the end. It uses Org's default <code class="verbatim">ascii</code> charset (<code class="verbatim">org-ascii-charset</code>), so bullets, rules and table borders are plain ASCII characters. Without <code class="verbatim">#+AUTHOR:</code>, the author on the Mac is your account's full name, as <code class="verbatim">user-full-name</code> is in Emacs.</p>
+<p><code class="verbatim">#+TITLE</code>, <code class="verbatim">#+SUBTITLE</code>, <code class="verbatim">#+AUTHOR</code>, <code class="verbatim">#+DATE</code>, <code class="verbatim">#+LANGUAGE</code>, <code class="verbatim">#+TOC: headlines</code>, <code class="verbatim">#+ASCII:</code> lines, <code class="verbatim">#+BEGIN_EXPORT ascii</code> blocks, <code class="verbatim">@@ascii:...@@</code> snippets, <code class="verbatim">#+ATTR_ASCII: :width</code> on horizontal rules, and the <code class="verbatim">center</code>, <code class="verbatim">justifyleft</code> and <code class="verbatim">justifyright</code> blocks work as in Emacs, as do the tags and <code class="verbatim">COMMENT</code> that leave headings out (see <em>Which headings are exported</em>). Body-only and subtree export are in the export dialog. In a subtree export, the heading's <code class="verbatim">EXPORT_TITLE</code>, <code class="verbatim">EXPORT_SUBTITLE</code>, <code class="verbatim">EXPORT_AUTHOR</code>, <code class="verbatim">EXPORT_DATE</code>, <code class="verbatim">EXPORT_LANGUAGE</code>, <code class="verbatim">EXPORT_OPTIONS</code>, <code class="verbatim">EXPORT_SELECT_TAGS</code> and <code class="verbatim">EXPORT_EXCLUDE_TAGS</code> properties replace the file's keywords. Leading tabs in a source block become spaces, as in Emacs.</p>
+<p>A file with something this export doesn't handle stops with "Can't export to plain text: " and what it was, rather than giving a <code class="verbatim">.txt</code> that differs from Emacs's: citations and <code class="verbatim">#+BIBLIOGRAPHY</code>, radio targets, inline tasks, table.el tables, diary sexps, inline source blocks and calls, <code class="verbatim">#+CALL</code>, source blocks exported with their results, <code class="verbatim">#+RESULTS</code> without a source block, wide or combining characters (such as CJK text, emoji and combining accents), also in the <code class="verbatim">#+LANGUAGE</code> words for captions, for section references in footnotes, and for a link's note when they take a line past the text width, tabs outside source and example blocks or in the indentation of an indented source block, footnote definitions of several paragraphs, footnotes in headings, keywords, captions or other footnotes, <code class="verbatim">UNNUMBERED</code> and <code class="verbatim">ALT_TITLE</code>, tables with special columns or column groups, empty list items, alphabetical counters, affiliated keywords in list items, blocks whose first line is blank, headings inside blocks, numbered source blocks inside other blocks, verse blocks with more than text, links inside link descriptions, <code class="verbatim">doi</code>, <code class="verbatim">info</code>, <code class="verbatim">irc</code>, <code class="verbatim">attachment</code>, <code class="verbatim">docview</code>, <code class="verbatim">bbdb</code>, <code class="verbatim">bibtex</code>, <code class="verbatim">gnus</code>, <code class="verbatim">rmail</code>, <code class="verbatim">mhe</code>, <code class="verbatim">w3m</code> and <code class="verbatim">eww</code> links, plain links other than <code class="verbatim">http</code>, <code class="verbatim">https</code>, <code class="verbatim">mailto</code> and <code class="verbatim">file</code> in any case, links to <code class="verbatim">&lt;&lt;targets&gt;&gt;</code> and named elements, short or repeated captions, unknown entities, a keyword such as <code class="verbatim">#+SUBTITLE</code> repeated with an empty value, <code class="verbatim">#+TOC:</code> other than <code class="verbatim">headlines</code> or with <code class="verbatim">local</code> or <code class="verbatim">:target</code>, and <code class="verbatim">#+OPTIONS</code> items other than <code class="verbatim">toc</code>, <code class="verbatim">num</code>, <code class="verbatim">H</code>, <code class="verbatim">tags</code>, <code class="verbatim">todo</code>, <code class="verbatim">pri</code>, <code class="verbatim">^</code>, <code class="verbatim">tex</code>, <code class="verbatim">title</code>, <code class="verbatim">author</code>, <code class="verbatim">date</code>, <code class="verbatim">-</code>, <code class="verbatim">&lt;</code> and <code class="verbatim">timestamp</code> set to something other than Org's default. A link Emacs can't resolve stops the export in both, including a link to a heading the export leaves out, as does a described link to a heading with <code class="verbatim">#+LANGUAGE: sl</code>. On iOS the share sheet stops and the message shows at the bottom of the screen. Publishing to plain text stops with the file's name in the message. In the download version, when Emacs is installed, such a file is exported by Emacs instead (see <em>Exporting through Emacs</em>).</p>
+<h2 id="markdown-export">Markdown export</h2>
+<p>Markdown export writes GitHub-flavored Markdown:</p>
+<ul>
+<li><code class="verbatim">#+TITLE:</code> becomes a top <code class="verbatim">#</code> heading. Org headings are one level down: <code class="verbatim">*</code> is <code class="verbatim">##</code>. TODO keywords stay in the heading text, and tags are shown as inline code. Priority cookies are left out unless <code class="verbatim">#+OPTIONS</code> has <code class="verbatim">pri:t</code>.</li>
+<li>Source blocks become fenced code blocks with the language; example blocks, =: = lines and table.el tables become fenced blocks without one.</li>
+<li>Tables become pipe tables. A rule after the first row makes it the header; otherwise the header row is empty.</li>
+<li>Checkboxes become task-list items (<code class="verbatim">- [x]</code>, <code class="verbatim">- [ ]</code>).</li>
+<li>Footnotes become <code class="verbatim">[^1]</code> references with the notes at the end.</li>
+<li>Quotes become <code class="verbatim">&gt;</code> blocks. Verse lines end with two spaces.</li>
+<li>Images become <code class="verbatim">![](path)</code>. Links to <code class="verbatim">.org</code> files, with or without <code class="verbatim">file:</code>, point to the <code class="verbatim">.md</code> file of the same name; a search option after <code class="verbatim">::</code> is dropped.</li>
+<li><code class="verbatim">#+begin_export</code> blocks for <code class="verbatim">markdown</code>, <code class="verbatim">md</code> or <code class="verbatim">html</code>, and <code class="verbatim">@@html:…@@</code> snippets, are copied as they are.</li>
+<li>Underline, subscripts and superscripts are written as HTML tags.</li>
+<li><code class="verbatim">:exports</code> is handled as in HTML export.</li>
+<li>Citations are handled as in HTML export.</li>
+</ul>
+<p>As in HTML export, <code class="verbatim">#+INCLUDE:</code> lines are expanded and macros replaced first, and <code class="verbatim">#+EXCLUDE_TAGS</code>, <code class="verbatim">#+SELECT_TAGS</code>, <code class="verbatim">COMMENT</code> headings and <code class="verbatim">ARCHIVE</code> tags decide which headings are exported (see <em>Which headings are exported</em>). Of the <code class="verbatim">#+OPTIONS</code>, Markdown export reads <code class="verbatim">todo</code>, <code class="verbatim">pri</code>, <code class="verbatim">tags</code>, <code class="verbatim">^</code> and <code class="verbatim">title</code>; the others do not apply. It writes no author or date.</p>
+<h2 id="icalendar-export">iCalendar export</h2>
+<p>iCalendar export writes the <code class="verbatim">.ics</code> file <code class="verbatim">org-icalendar-export-to-ics</code> writes, for calendar apps to read or subscribe to. Each heading can give:</p>
+<ul>
+<li>a <code class="verbatim">VEVENT</code> for its <code class="verbatim">DEADLINE</code> and one for its <code class="verbatim">SCHEDULED</code> date, as <code class="verbatim">org-icalendar-use-deadline</code> and <code class="verbatim">org-icalendar-use-scheduled</code> say. Their summaries start with =DL: = and =S: =;</li>
+<li>a <code class="verbatim">VEVENT</code> for each other timestamp in its title and text, active ones only unless <code class="verbatim">#+OPTIONS</code> has <code class="verbatim">&lt;:t</code> or <code class="verbatim">&lt;:inactive</code>;</li>
+<li>a <code class="verbatim">VTODO</code> for a task, as <code class="verbatim">org-icalendar-include-todo</code> says. Its <code class="verbatim">DTSTART</code> is the scheduled date (with <code class="verbatim">todo-start</code> in <code class="verbatim">org-icalendar-use-scheduled</code>), its <code class="verbatim">DUE</code> the deadline (with <code class="verbatim">todo-due</code> in <code class="verbatim">org-icalendar-use-deadline</code>); without a scheduled date, a deadline with a <code class="verbatim">+</code> repeater starts its warning period before it. <code class="verbatim">STATUS</code> is <code class="verbatim">NEEDS-ACTION</code> or <code class="verbatim">COMPLETED</code>, and <code class="verbatim">PRIORITY</code> maps <code class="verbatim">A</code> to 1, <code class="verbatim">B</code> to 5 and <code class="verbatim">C</code> to 9.</li>
+</ul>
+<table>
+<thead>
+<tr><th>Setting</th><th>Values</th><th>Default</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">org-icalendar-use-deadline</code></td><td><code class="verbatim">event-if-not-todo</code>, <code class="verbatim">event-if-todo</code>, <code class="verbatim">event-if-todo-not-done</code>, <code class="verbatim">todo-due</code>, separated by spaces</td><td><code class="verbatim">"event-if-not-todo todo-due"</code></td></tr>
+<tr><td><code class="verbatim">org-icalendar-use-scheduled</code></td><td>the same, with <code class="verbatim">todo-start</code> for <code class="verbatim">todo-due</code></td><td><code class="verbatim">"todo-start"</code></td></tr>
+<tr><td><code class="verbatim">org-icalendar-include-todo</code></td><td><code class="verbatim">nil</code>, <code class="verbatim">t</code> (tasks not done), <code class="verbatim">all</code>, <code class="verbatim">unblocked</code> (not done, without unfinished children, and not after an unfinished sibling under an <code class="verbatim">ORDERED</code> parent), or TODO keywords separated by spaces</td><td><code class="verbatim">"nil"</code></td></tr>
+<tr><td><code class="verbatim">org-icalendar-combined-agenda-file</code></td><td>the file Combine Agenda Files into iCalendar writes</td><td><code class="verbatim">"~/org.ics"</code></td></tr>
+</tbody>
+</table>
+<p>The summary is the heading's title, or its <code class="verbatim">SUMMARY</code> property. The description is the heading's text as Org's ASCII export writes it, filled to 70 columns, or its <code class="verbatim">DESCRIPTION</code> property; <code class="verbatim">LOCATION</code>, <code class="verbatim">CLASS</code>, <code class="verbatim">TIMEZONE</code> and <code class="verbatim">APPT_WARNTIME</code> (an alarm, minutes before a timed event) are read too. <code class="verbatim">CATEGORIES</code> lists the heading's tags and its category. An <code class="verbatim">ID</code> property is the <code class="verbatim">UID</code>; a heading without one gets a new random <code class="verbatim">UID</code> each time, as in Org with <code class="verbatim">org-icalendar-store-UID</code> nil. Repeaters become <code class="verbatim">RRULE</code> lines. Times are local times without a zone, as Org writes them by default; a <code class="verbatim">TIMEZONE</code> property of <code class="verbatim">UTC</code> writes them in UTC, and any other value names the zone (<code class="verbatim">TZID</code>).</p>
+<p><code class="verbatim">#+ICALENDAR_EXCLUDE_TAGS:</code> lists tags whose subtrees are left out; <code class="verbatim">#+EXCLUDE_TAGS:</code> doesn't apply, so <code class="verbatim">noexport</code> subtrees are exported unless listed. <code class="verbatim">#+SELECT_TAGS</code>, <code class="verbatim">COMMENT</code> headings and <code class="verbatim">ARCHIVE</code> tags apply as in the other exports. <code class="verbatim">#+ICAL-TTL:</code> sets <code class="verbatim">X-PUBLISHED-TTL</code>, the refresh period, such as <code class="verbatim">PT1H</code>. The calendar is named after the file, its description is <code class="verbatim">#+TITLE:</code>, and its owner <code class="verbatim">#+AUTHOR:</code> or your full name. Lines longer than 75 characters are folded and lines end in CRLF, as RFC 5545 asks.</p>
+<p>Export Agenda Files to iCalendar writes an <code class="verbatim">.ics</code> beside each agenda file (see <a href="07-agenda.html">The agenda</a>). Combine Agenda Files into iCalendar writes all their entries to one calendar named <code class="verbatim">OrgMode</code> at <code class="verbatim">org-icalendar-combined-agenda-file</code>. On iOS, the Export menu's iCalendar shares the current file's calendar, Export Agenda Files to iCalendar writes beside each agenda file as on the Mac, and Combine Agenda Files into iCalendar opens the share sheet with the combined calendar, named as <code class="verbatim">org-icalendar-combined-agenda-file</code> is; from Commands it opens in Quick Look, whose share button saves or sends it.</p>
+<p>Differences from Org: diary sexps (<code class="verbatim">%%(…)</code> lines and <code class="verbatim">&lt;%%(…)&gt;</code> timestamps) are left out, as they need Emacs's <code class="verbatim">icalendar.el</code>. The other <code class="verbatim">org-icalendar-*</code> variables keep Org's defaults: alarms only from <code class="verbatim">APPT_WARNTIME</code>, categories <code class="verbatim">(local-tags category)</code>, the whole body as the description, and local times. Descriptions of tables with column groups or alignment cookies, center blocks and links to targets can differ from Org's in layout.</p>
+<h2 id="publishing">Publishing</h2>
+<p>Publishing (<code class="verbatim">org-publish</code>) exports a folder of Org files to a folder of HTML, Markdown, LaTeX, ODT, plain text or reveal.js files, copies other files beside them, and can write a sitemap. Projects are <code class="verbatim">[[publish]]</code> tables in <code class="verbatim">config.toml</code>, as <code class="verbatim">org-publish-project-alist</code> entries are in Emacs:</p>
+<pre><code class="language-toml highlight"><span class="source toml"><span class="punctuation definition table array toml">[[</span><span class="entity name section toml">publish</span><span class="punctuation definition table array toml">]]</span>
+<span class="variable other key toml">name</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>notes<span class="punctuation definition string end toml">&quot;</span></span>
+<span class="variable other key toml">base-directory</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>~/notes<span class="punctuation definition string end toml">&quot;</span></span>
+<span class="variable other key toml">publishing-directory</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>~/public_html<span class="punctuation definition string end toml">&quot;</span></span>
+<span class="variable other key toml">recursive</span> <span class="keyword operator assignment toml">=</span> <span class="constant language toml">true</span>
+<span class="variable other key toml">auto-sitemap</span> <span class="keyword operator assignment toml">=</span> <span class="constant language toml">true</span>
+<span class="variable other key toml">sitemap-title</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>Notes<span class="punctuation definition string end toml">&quot;</span></span>
+
+<span class="punctuation definition table array toml">[[</span><span class="entity name section toml">publish</span><span class="punctuation definition table array toml">]]</span>
+<span class="variable other key toml">name</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>static<span class="punctuation definition string end toml">&quot;</span></span>
+<span class="variable other key toml">base-directory</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>~/notes<span class="punctuation definition string end toml">&quot;</span></span>
+<span class="variable other key toml">base-extension</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>css<span class="constant character escape toml">\\</span>|png<span class="constant character escape toml">\\</span>|jpg<span class="punctuation definition string end toml">&quot;</span></span>
+<span class="variable other key toml">recursive</span> <span class="keyword operator assignment toml">=</span> <span class="constant language toml">true</span>
+<span class="variable other key toml">publishing-directory</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>~/public_html<span class="punctuation definition string end toml">&quot;</span></span>
+<span class="variable other key toml">publishing-function</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>org-publish-attachment<span class="punctuation definition string end toml">&quot;</span></span>
+
+<span class="punctuation definition table array toml">[[</span><span class="entity name section toml">publish</span><span class="punctuation definition table array toml">]]</span>
+<span class="variable other key toml">name</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>site<span class="punctuation definition string end toml">&quot;</span></span>
+<span class="variable other key toml">components</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>notes static<span class="punctuation definition string end toml">&quot;</span></span></span></code></pre>
+<table>
+<thead>
+<tr><th>Key</th><th>Value</th><th>Default</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">name</code></td><td>The project's name</td><td>required</td></tr>
+<tr><td><code class="verbatim">base-directory</code></td><td>The folder of files to publish: absolute, <code class="verbatim">~/…</code>, or relative to the first folder in the sidebar</td><td>required</td></tr>
+<tr><td><code class="verbatim">publishing-directory</code></td><td>Where the published files go, the same way</td><td>required</td></tr>
+<tr><td><code class="verbatim">base-extension</code></td><td>The extension of the files to publish, an Emacs regexp such as ="css\\</td><td>png"<code class="verbatim">, or =any</code></td><td><code class="verbatim">"org"</code></td></tr>
+<tr><td><code class="verbatim">recursive</code></td><td>Files in subfolders too</td><td><code class="verbatim">false</code></td></tr>
+<tr><td><code class="verbatim">exclude</code></td><td>An Emacs regexp on the file's path under <code class="verbatim">base-directory</code>; matching files are left out</td><td></td></tr>
+<tr><td><code class="verbatim">include</code></td><td>More files, relative to <code class="verbatim">base-directory</code>, separated by spaces</td><td></td></tr>
+<tr><td><code class="verbatim">publishing-function</code></td><td><code class="verbatim">org-html-publish-to-html</code>, <code class="verbatim">org-md-publish-to-md</code>, <code class="verbatim">org-latex-publish-to-latex</code>, <code class="verbatim">org-odt-publish-to-odt</code>, <code class="verbatim">org-ascii-publish-to-ascii</code>, <code class="verbatim">org-re-reveal-publish-to-reveal</code> or <code class="verbatim">org-publish-attachment</code> (copied as they are), several separated by spaces</td><td><code class="verbatim">org-html-publish-to-html</code></td></tr>
+<tr><td><code class="verbatim">body-only</code></td><td>The export's body only</td><td><code class="verbatim">false</code></td></tr>
+<tr><td><code class="verbatim">auto-sitemap</code></td><td>Write a sitemap into <code class="verbatim">base-directory</code> and publish it with the rest</td><td><code class="verbatim">false</code></td></tr>
+<tr><td><code class="verbatim">sitemap-filename</code></td><td>The sitemap's name</td><td><code class="verbatim">"sitemap.org"</code></td></tr>
+<tr><td><code class="verbatim">sitemap-title</code></td><td>Its <code class="verbatim">#+TITLE</code></td><td><code class="verbatim">"Sitemap for project NAME"</code></td></tr>
+<tr><td><code class="verbatim">sitemap-style</code></td><td><code class="verbatim">tree</code> (folders nest) or <code class="verbatim">list</code></td><td><code class="verbatim">"tree"</code></td></tr>
+<tr><td><code class="verbatim">sitemap-sort-files</code></td><td><code class="verbatim">alphabetically</code> (by title), <code class="verbatim">chronologically</code> or <code class="verbatim">anti-chronologically</code> (by <code class="verbatim">#+DATE</code>, else the file's date), or <code class="verbatim">nil</code></td><td><code class="verbatim">"alphabetically"</code></td></tr>
+<tr><td><code class="verbatim">sitemap-sort-folders</code></td><td>In a <code class="verbatim">list</code> sitemap: <code class="verbatim">ignore</code> (no folders), <code class="verbatim">first</code>, <code class="verbatim">last</code> or <code class="verbatim">nil</code> (mixed)</td><td><code class="verbatim">"ignore"</code></td></tr>
+<tr><td><code class="verbatim">sitemap-ignore-case</code></td><td>Sort titles ignoring case</td><td><code class="verbatim">false</code></td></tr>
+<tr><td><code class="verbatim">components</code></td><td>For a project of projects: the projects' names, separated by spaces</td><td></td></tr>
+</tbody>
+</table>
+<p>Files whose names start with a dot are left out. An Org file publishes to the same path under <code class="verbatim">publishing-directory</code>, named by <code class="verbatim">#+EXPORT_FILE_NAME</code> when it has one, with links to other <code class="verbatim">.org</code> files pointing to their <code class="verbatim">.html</code>. The sitemap lists each file as a link with its <code class="verbatim">#+TITLE</code> (or its name), as Org's default sitemap does.</p>
+<p>On the Mac, File ▸ Publish has the commands, which are also in the command palette. On iOS they are in Commands in the editor; Publish Project… lists the projects to choose from. As with the iOS share sheet, LaTeX, ODT and plain text published on iOS have no author unless the file has <code class="verbatim">#+AUTHOR:</code>.</p>
+<table>
+<thead>
+<tr><th>Command</th><th>Emacs preset</th><th>What it does</th></tr>
+</thead>
+<tbody>
+<tr><td>Publish Project…</td><td><code class="verbatim">C-c C-e P x</code></td><td>Asks for a project and publishes it (<code class="verbatim">org-publish</code>)</td></tr>
+<tr><td>Publish All Projects</td><td><code class="verbatim">C-c C-e P a</code></td><td><code class="verbatim">org-publish-all</code></td></tr>
+<tr><td>Publish Current File</td><td><code class="verbatim">C-c C-e P f</code></td><td>The current file, in the first project that has it (<code class="verbatim">org-publish-current-file</code>)</td></tr>
+<tr><td>Publish Current Project</td><td><code class="verbatim">C-c C-e P p</code></td><td>The first project that has the current file (<code class="verbatim">org-publish-current-project</code>)</td></tr>
+</tbody>
+</table>
+<p>A file whose published copy is newer than it is skipped, as Org skips files that haven't changed; delete the copy to publish it again. The message area says how many files were published and how many were up to date. Differences from Org: preparation and completion functions, <code class="verbatim">:makeindex</code>, custom sitemap functions and the export options a project can set (<code class="verbatim">:with-toc</code>, <code class="verbatim">:html-head</code> and the rest) aren't read; set those with <code class="verbatim">#+OPTIONS</code> and the other keywords in the files, or a <code class="verbatim">#+SETUPFILE</code>.</p>
+<p>On iOS, orgstar can write only inside the folders you added. A relative <code class="verbatim">base-directory</code> or <code class="verbatim">publishing-directory</code> is read from the first folder. For a project whose <code class="verbatim">publishing-directory</code> is outside your folders, orgstar asks for a folder the first time it publishes the project ("Choose the folder <em>name</em> publishes to"), and publishes there from then on. A project whose <code class="verbatim">base-directory</code> can't be read stops with "Can't read <em>name</em>'s base-directory".</p>
+<h2 id="exporting-through-emacs">Exporting through Emacs</h2>
+<p>On the Mac, PDF through LaTeX is done by Emacs, with <code class="verbatim">org-latex-export-to-pdf</code>, the function Emacs's dispatcher uses.</p>
+<p>LaTeX and plain text go to Emacs (<code class="verbatim">org-latex-export-to-latex</code>, <code class="verbatim">org-ascii-export-to-ascii</code>) only for a file orgstar's own export can't write as Emacs would; see <em>LaTeX export</em> and <em>ASCII export</em>. The <a href="../install.html">Mac App Store version</a> doesn't run Emacs and has none of these exports.</p>
+<p>orgstar runs <code class="verbatim">emacs -Q --batch</code> in the Org file's folder. It opens the file, replaces its contents with the editor's current text without saving, and calls the function. Emacs writes the result beside the file, as it would itself; with a destination chosen in the export dialog, orgstar then moves it there. The message area shows "Exporting with Emacs…" and then "Exported to <em>name</em>".</p>
+<p>What you need:</p>
+<ul>
+<li>Emacs, at <code class="verbatim">ORGSTAR_EMACS</code> or one of <code class="verbatim">/opt/homebrew/bin/emacs</code>, <code class="verbatim">/usr/local/bin/emacs</code>, <code class="verbatim">/Applications/Emacs.app/Contents/MacOS/Emacs</code>, <code class="verbatim">/run/current-system/sw/bin/emacs</code> or <code class="verbatim">/usr/bin/emacs</code>. Without it the export fails with "Emacs isn't installed, so this format can't be exported."</li>
+<li>For PDF, a TeX installation that Emacs's LaTeX export can run. Emacs runs with your <code class="verbatim">PATH</code> plus <code class="verbatim">/opt/homebrew/bin</code>, <code class="verbatim">/usr/local/bin</code>, <code class="verbatim">/Library/TeX/texbin</code>, <code class="verbatim">/usr/bin</code> and <code class="verbatim">/bin</code>, the same as code blocks get, so <code class="verbatim">latexmk</code> and <code class="verbatim">pdflatex</code> from MacTeX or Homebrew are found when orgstar was opened from the Dock.</li>
+</ul>
+<p>Things to know:</p>
+<ul>
+<li><code class="verbatim">-Q</code> means Emacs does not load your init file. Your LaTeX classes, export settings and packages from it are not used; the export uses Org's defaults and what the file itself sets.</li>
+<li>File-local variables are applied only when Emacs considers them safe.</li>
+<li><code class="verbatim">org-export-use-babel</code> is off, so no source blocks run.</li>
+<li>An export that takes more than two minutes is stopped with "Emacs took too long to export."</li>
+<li>Edit ▸ Cancel Running Task (<code class="verbatim">⌘.</code>) stops the export and shows "Export canceled". Starting another export or table recalculation in Emacs cancels the one that is running.</li>
+<li>If Emacs fails, the message area shows the last line of its error output.</li>
+</ul>
+<p>To use your own Emacs configuration, or formats orgstar does not list, export from Emacs itself; see <a href="15-alongside-emacs.html">Alongside Emacs</a>.</p>
+<h2 id="citations">Citations</h2>
+<p>HTML and Markdown export process citations as Org's <code class="verbatim">basic</code> citation processor does (<code class="verbatim">oc-basic</code>).</p>
+<pre><code class="language-org highlight"><span class="text org"><span class="keyword other keyword org">#+bibliography:</span><span class="string unquoted org"> refs.bib</span>
+<span class="keyword other keyword org">#+cite_export:</span><span class="string unquoted org"> basic author-year</span>
+
+As shown in [cite:@smith2020], and again [cite/t:@smith2020; see @lee2019 p. 4].
+
+<span class="keyword other keyword org">#+print_bibliography:</span></span></code></pre>
+<h3 id="bibliography-files">Bibliography files</h3>
+<p>Each <code class="verbatim">#+bibliography:</code> line names one file, relative to the Org file, optionally in quotes. A file ending in <code class="verbatim">.json</code> is read as CSL-JSON; anything else is read as BibTeX, with <code class="verbatim">@string</code> abbreviations expanded and <code class="verbatim">@comment</code> and <code class="verbatim">@preamble</code> skipped. You can have several <code class="verbatim">#+bibliography:</code> lines; for a key in more than one file, the first file wins. The files of <code class="verbatim">org-cite-global-bibliography</code> (see <a href="13-configuration.html">Configuration</a>) come after the file's own. Inserting and following citations are in <a href="09-links.html">Links</a>.</p>
+<h3 id="cite-export"><code class="verbatim">#+cite_export:</code></h3>
+<p><code class="verbatim">#+cite_export: PROCESSOR [BIBLIOGRAPHY-STYLE [CITATION-STYLE]]</code>.</p>
+<ul>
+<li>With no <code class="verbatim">#+cite_export:</code>, or with <code class="verbatim">basic</code>, citations are processed.</li>
+<li>With any other processor, such as <code class="verbatim">csl</code> or <code class="verbatim">biblatex</code>, orgstar leaves citations as they are written.</li>
+<li>The citation style, which may include a variant (<code class="verbatim">text/bare</code>), is the default for citations that do not name one.</li>
+</ul>
+<h3 id="citation-styles">Citation styles</h3>
+<p>A citation is <code class="verbatim">[cite:…]</code> or <code class="verbatim">[cite/style:…]</code> or <code class="verbatim">[cite/style/variant:…]</code>, holding one or more <code class="verbatim">@key</code> references separated by <code class="verbatim">;</code>. Each reference may have its own prefix and suffix, and the whole citation a common prefix and suffix.</p>
+<table>
+<thead>
+<tr><th>Style</th><th>Output</th></tr>
+</thead>
+<tbody>
+<tr><td>default (none given)</td><td><code class="verbatim">(Author, Year)</code></td></tr>
+<tr><td><code class="verbatim">author</code>, <code class="verbatim">a</code></td><td><code class="verbatim">Author</code></td></tr>
+<tr><td><code class="verbatim">noauthor</code>, <code class="verbatim">na</code></td><td><code class="verbatim">(Year)</code></td></tr>
+<tr><td><code class="verbatim">text</code>, <code class="verbatim">t</code></td><td><code class="verbatim">Author (Year)</code></td></tr>
+<tr><td><code class="verbatim">note</code>, <code class="verbatim">ft</code></td><td>A footnote holding the <code class="verbatim">text</code> form</td></tr>
+<tr><td><code class="verbatim">numeric</code>, <code class="verbatim">nb</code></td><td><code class="verbatim">(1)</code>, numbered by the cited works sorted by author; three or more in a row as <code class="verbatim">1-3</code></td></tr>
+<tr><td><code class="verbatim">nocite</code>, <code class="verbatim">n</code></td><td>Nothing; the work is still listed in the bibliography</td></tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr><th>Variant</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">bare</code>, <code class="verbatim">b</code></td><td>No parentheses</td></tr>
+<tr><td><code class="verbatim">caps</code>, <code class="verbatim">c</code></td><td>Capitalized author</td></tr>
+<tr><td><code class="verbatim">bare-caps</code>, <code class="verbatim">bc</code></td><td>Both</td></tr>
+</tbody>
+</table>
+<p>Works by the same author in the same year get <code class="verbatim">a</code>, <code class="verbatim">b</code>, … after the year. A key not found in any bibliography file shows as <code class="verbatim">??</code> and <code class="verbatim">????</code>. Citations in the title are dropped.</p>
+<p>For <code class="verbatim">note</code> citations, the blank before the citation is removed and punctuation right after it moves in front of the footnote mark, as <code class="verbatim">org-cite-adjust-note</code> does.</p>
+<h3 id="the-bibliography">The bibliography</h3>
+<p><code class="verbatim">#+print_bibliography:</code> is replaced by an entry for every cited work, sorted by author. The bibliography style from <code class="verbatim">#+cite_export:</code> sets the form:</p>
+<table>
+<thead>
+<tr><th>Bibliography style</th><th>Entry</th></tr>
+</thead>
+<tbody>
+<tr><td>default</td><td><code class="verbatim">Author (Year). /Title/, Publisher.</code></td></tr>
+<tr><td><code class="verbatim">plain</code></td><td><code class="verbatim">Surnames. Title, Publisher, Year.</code></td></tr>
+<tr><td><code class="verbatim">numeric</code></td><td><code class="verbatim">[1] Author, /Title/, Publisher, Year.</code></td></tr>
+</tbody>
+</table>
+<p>The publisher part comes from the <code class="verbatim">publisher</code>, <code class="verbatim">journal</code>, <code class="verbatim">institution</code> or <code class="verbatim">school</code> field. Without <code class="verbatim">#+print_bibliography:</code> no bibliography is written.</p>
+<h2 id="what-export-does-not-do">What export does not do</h2>
+<ul>
+<li>There is no asynchronous export.</li>
+<li>Source blocks are not run, and noweb references are not expanded.</li>
+</ul>
+</main>
+<footer class="site">
+© 2026 Christian Cleberg · <a href="https://krz.sh/apps/orgstar/">krz.sh/apps/orgstar</a> · <a href="/orgstar/third-party.html">third-party notices</a>
+</footer>
+</body>
+</html>

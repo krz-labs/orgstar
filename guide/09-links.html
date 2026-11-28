@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Links &middot; orgstar</title>
+<meta name="description" content="Link syntax, the link types orgstar follows, storing and inserting links, IDs, backlinks and inline images.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../theme.css">
+<link rel="stylesheet" href="../syntax.css">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="site">
+<a class="site-title" href="../index.html">orgstar</a>
+<nav>
+<a href="../install.html">Install</a>
+<a href="../quickstart.html">Quick start</a>
+<a href="index.html">Manual</a>
+</nav>
+</header>
+<main>
+<h1>Links</h1>
+<p class="lede">Write links as Org does, follow them with a key or a click, and see which headings link to the one you are reading.</p>
+<nav class="toc" aria-label="On this page">
+<h2>On this page</h2>
+<ul>
+<li><a href="#link-syntax">Link syntax</a></li>
+<li><a href="#how-links-display">How links display</a></li>
+<li><a href="#following-links">Following links</a>
+<ul>
+<li><a href="#what-each-link-type-does">What each link type does</a></li>
+<li><a href="#file-links">File links</a></li>
+<li><a href="#attachment-links">Attachment links</a></li>
+<li><a href="#id-links">id links</a></li>
+<li><a href="#denote-links">denote links</a></li>
+<li><a href="#emacs-lisp-links">Emacs Lisp links</a></li>
+<li><a href="#timestamps">Timestamps</a></li>
+</ul></li>
+<li><a href="#inserting-and-editing-links">Inserting and editing links</a>
+<ul>
+<li><a href="#file-paths-in-inserted-links">File paths in inserted links</a></li>
+<li><a href="#completion-while-typing">Completion while typing</a></li>
+</ul></li>
+<li><a href="#storing-links">Storing links</a></li>
+<li><a href="#ids">IDs</a></li>
+<li><a href="#targets-and-radio-targets">Targets and radio targets</a></li>
+<li><a href="#link-abbreviations">Link abbreviations</a></li>
+<li><a href="#the-backlinks-pane">The backlinks pane</a></li>
+<li><a href="#nodes-and-daily-notes">Nodes and daily notes</a>
+<ul>
+<li><a href="#denote">Denote</a>
+<ul>
+<li><a href="#renaming">Renaming</a></li>
+<li><a href="#markdown-and-text-notes">Markdown and text notes</a></li>
+<li><a href="#query-links">Query links</a></li>
+<li><a href="#silos">Silos</a></li>
+<li><a href="#capture">Capture</a></li>
+<li><a href="#dynamic-blocks">Dynamic blocks</a></li>
+<li><a href="#sequences">Sequences</a></li>
+<li><a href="#importing-and-limits">Importing and limits</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#inline-images">Inline images</a>
+<ul>
+<li><a href="#pasting-and-dropping-images">Pasting and dropping images</a></li>
+<li><a href="#remote-images">Remote images</a></li>
+<li><a href="#sizing">Sizing</a></li>
+<li><a href="#showing-images-when-a-file-opens">Showing images when a file opens</a></li>
+</ul></li>
+<li><a href="#org-protocol-store-link">org-protocol store-link</a></li>
+<li><a href="#citations">Citations</a>
+<ul>
+<li><a href="#inserting-citations">Inserting citations</a></li>
+<li><a href="#completing-keys">Completing keys</a></li>
+<li><a href="#following-citations">Following citations</a></li>
+<li><a href="#zotero">Zotero</a></li>
+</ul></li>
+<li><a href="#on-ios">On iOS</a></li>
+<li><a href="#code-references">Code references</a></li>
+</ul>
+</nav>
+<h2 id="link-syntax">Link syntax</h2>
+<p>orgstar reads links the way <code class="verbatim">org-element-link-parser</code> does. There are three forms.</p>
+<table>
+<thead>
+<tr><th>Form</th><th>Example</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td>Bracket link</td><td><code class="verbatim">[[https://orgmode.org][Org website]]</code></td><td>Any link type. The description after <code class="verbatim">][</code> is optional.</td></tr>
+<tr><td>Angle link</td><td><code class="verbatim">&lt;https://orgmode.org&gt;</code></td><td>For <code class="verbatim">http</code>, <code class="verbatim">https</code>, <code class="verbatim">mailto</code>, <code class="verbatim">file</code>, <code class="verbatim">id</code>, <code class="verbatim">doi</code>, <code class="verbatim">ftp</code>, <code class="verbatim">news</code>, <code class="verbatim">shell</code>, <code class="verbatim">elisp</code>, <code class="verbatim">info</code>, <code class="verbatim">help</code> and <code class="verbatim">attachment</code>.</td></tr>
+<tr><td>Plain link</td><td><code class="verbatim">https://orgmode.org</code></td><td>Only <code class="verbatim">https://</code>, <code class="verbatim">http://</code>, <code class="verbatim">mailto:</code> and <code class="verbatim">file:</code> are recognized in running text.</td></tr>
+</tbody>
+</table>
+<p>Inside a bracket link, a target that starts with <code class="verbatim">/</code>, <code class="verbatim">~</code>, <code class="verbatim">./</code> or <code class="verbatim">../</code> is a file link. A target in parentheses, <code class="verbatim">(name)</code>, is a coderef. One that starts with <code class="verbatim">#</code> is a custom ID. Anything without a known <code class="verbatim">type:</code> prefix is a search for text in the current file (a "fuzzy" link). A link may run over a line break; the break and surrounding blanks read as one space.</p>
+<p>Backslashes before brackets are escaped as in <code class="verbatim">org-link-escape</code>: when orgstar writes a link it doubles backslashes that come before a bracket or the end, and it reads them back the same way.</p>
+<h2 id="how-links-display">How links display</h2>
+<p>With View ▸ Show Markup off (the default, <code class="verbatim">⇧⌘M</code> toggles it), a link with a description shows only its description, and its brackets and target are hidden. This is <code class="verbatim">org-link-descriptive</code>. The full text appears on the line that holds the caret, so you can edit it. With Show Markup on, every link shows as written. The setting is <code class="verbatim">show-markup</code> under <code class="verbatim">[orgstar]</code> in the config file (see <a href="13-configuration.html">Configuration</a>).</p>
+<p>Links without a description show their target, with the brackets hidden in the same way. Radio targets (<code class="verbatim">&lt;&lt;&lt;words&gt;&gt;&gt;</code>) turn every other occurrence of those words in the file into a link, matched case-insensitively, as in Org.</p>
+<h2 id="following-links">Following links</h2>
+<p><code class="verbatim">org-open-at-point</code> follows the link at the caret, shows the entry of a citation (see <em>Citations</em> below), or opens the agenda for a timestamp.</p>
+<table>
+<thead>
+<tr><th>Preset</th><th>Key</th></tr>
+</thead>
+<tbody>
+<tr><td>Emacs</td><td><code class="verbatim">C-c C-o</code></td></tr>
+<tr><td>Mac</td><td><code class="verbatim">⌃⌘O</code></td></tr>
+<tr><td>Doom</td><td><code class="verbatim">C-c C-o</code> in any state; <code class="verbatim">RET</code> in normal state follows a link before doing anything else</td></tr>
+<tr><td>All</td><td><code class="verbatim">⌘</code>-click on the link; <code class="verbatim">o</code> at the start of a heading line when speed commands are on</td></tr>
+</tbody>
+</table>
+<p>A message in the echo area explains a link that can't be followed.</p>
+<h3 id="what-each-link-type-does">What each link type does</h3>
+<table>
+<thead>
+<tr><th>Link</th><th>Example</th><th>Result</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">http</code>, <code class="verbatim">https</code>, <code class="verbatim">ftp</code>, <code class="verbatim">news</code>, <code class="verbatim">mailto</code></td><td><code class="verbatim">[[mailto:me@example.com]]</code></td><td>Opened by macOS in your default browser or mail app.</td></tr>
+<tr><td><code class="verbatim">doi</code></td><td><code class="verbatim">[[doi:10.1000/182]]</code></td><td>Opens <code class="verbatim">https://doi.org/</code> followed by the DOI.</td></tr>
+<tr><td><code class="verbatim">file</code> (also <code class="verbatim">file+sys:</code>, <code class="verbatim">file+emacs:</code>)</td><td><code class="verbatim">[[file:notes.org::*Ideas]]</code></td><td>See <em>File links</em> below.</td></tr>
+<tr><td><code class="verbatim">id</code></td><td><code class="verbatim">[[id:6a3c…]]</code></td><td>Opens the file with the heading whose <code class="verbatim">ID</code> property matches, and moves to the heading.</td></tr>
+<tr><td><code class="verbatim">roam</code></td><td><code class="verbatim">[[roam:Field Notes]]</code></td><td>Opens the org-roam node with that title or alias; see <em>Nodes and daily notes</em> below.</td></tr>
+<tr><td>Custom ID</td><td><code class="verbatim">[[#setup]]</code></td><td>Moves to the heading in this file whose <code class="verbatim">CUSTOM_ID</code> property is <code class="verbatim">setup</code>.</td></tr>
+<tr><td>Heading</td><td><code class="verbatim">[[*Weekly review]]</code></td><td>Moves to the heading in this file with that title.</td></tr>
+<tr><td>Text</td><td><code class="verbatim">[[budget table]]</code></td><td>Searches this file: a <code class="verbatim">&lt;&lt;budget table&gt;&gt;</code> target, then <code class="verbatim">#+NAME: budget table</code>, then a heading.</td></tr>
+<tr><td>Coderef</td><td><code class="verbatim">[[(ref)]]</code></td><td>Moves to the label <code class="verbatim">(ref:ref)</code> in a src or example block; see <em>Code references</em> below.</td></tr>
+<tr><td>Regexp</td><td><code class="verbatim">[[/TODO.*soon/]]</code></td><td>Shows a sparse tree of the regular expression's matches, as <code class="verbatim">org-occur</code>; iOS moves to the first match.</td></tr>
+<tr><td><code class="verbatim">zotero</code></td><td><code class="verbatim">[[zotero://select/items/@doe2020]]</code></td><td>Opens Zotero at the item. Org has no <code class="verbatim">zotero</code> link type, so write it in brackets.</td></tr>
+<tr><td><code class="verbatim">shell</code></td><td><code class="verbatim">[[shell:ls]]</code></td><td>Not run. orgstar never executes these links.</td></tr>
+<tr><td><code class="verbatim">elisp</code></td><td><code class="verbatim">[[elisp:(+ 1 2)]]</code></td><td>Runs the form once you agree; see <em>Emacs Lisp links</em> below.</td></tr>
+<tr><td><code class="verbatim">attachment</code></td><td><code class="verbatim">[[attachment:scan.pdf]]</code></td><td>Opens the file in the entry's attachment folder; see <em>Attachment links</em> below.</td></tr>
+<tr><td>Radio link</td><td>Text matching a <code class="verbatim">&lt;&lt;&lt;radio target&gt;&gt;&gt;</code></td><td>Moves to the radio target.</td></tr>
+<tr><td><code class="verbatim">info</code>, <code class="verbatim">help</code>, others</td><td></td><td>Not followed. The echo area says orgstar can't open the type.</td></tr>
+</tbody>
+</table>
+<p>The text search follows <code class="verbatim">org-link-search</code>. A dedicated <code class="verbatim">&lt;&lt;target&gt;&gt;</code> matches its words case-insensitively, with any run of blanks between them. A heading matches when its title, with statistics cookies such as <code class="verbatim">[2/5]</code> and a leading <code class="verbatim">COMMENT</code> removed, has the same words as the link, ignoring case. A search that starts with <code class="verbatim">*</code> looks at headings only. A regular-expression search (<code class="verbatim">/re/</code>) shows a sparse tree of its matches on the Mac, as <code class="verbatim">org-occur</code> does, and moves to the first match on iOS.</p>
+<p>Following a radio link moves to its <code class="verbatim">&lt;&lt;&lt;radio target&gt;&gt;&gt;</code>, matching the words without regard to case, as <code class="verbatim">org-link--search-radio-target</code> does. When the target is gone, the echo area shows <code class="verbatim">No match for radio target:</code> and the text.</p>
+<h3 id="file-links">File links</h3>
+<p>A relative path is resolved against the folder of the file that holds the link, as Org does; <code class="verbatim">~</code> is your home folder; an absolute path is used as written. Links between files in different sidebar folders work the same way, for example <code class="verbatim">[[file:../work/projects.org]]</code> or <code class="verbatim">[[file:~/Documents/org/inbox.org]]</code>.</p>
+<p>What happens depends on the file:</p>
+<ul>
+<li>An <code class="verbatim">.org</code> or <code class="verbatim">.org_archive</code> file opens as a buffer in orgstar.</li>
+<li>Another text file opens in orgstar as a plain buffer.</li>
+<li>Anything else (images, PDFs, archives, media) is handed to macOS, which opens it in the default app for that type.</li>
+</ul>
+<p>If the file doesn't exist, the echo area shows <code class="verbatim">No file</code> and the path.</p>
+<p>After <code class="verbatim">::</code>, a file link can carry a search option:</p>
+<table>
+<thead>
+<tr><th>Option</th><th>Example</th><th>Moves to</th></tr>
+</thead>
+<tbody>
+<tr><td>A number</td><td><code class="verbatim">[[file:log.txt::120]]</code></td><td>Line 120.</td></tr>
+<tr><td><code class="verbatim">*Title</code></td><td><code class="verbatim">[[file:notes.org::*Ideas]]</code></td><td>The heading with that title.</td></tr>
+<tr><td><code class="verbatim">#custom-id</code></td><td><code class="verbatim">[[file:notes.org::#setup]]</code></td><td>The heading with that <code class="verbatim">CUSTOM_ID</code>.</td></tr>
+<tr><td>Other text</td><td><code class="verbatim">[[file:notes.org::budget]]</code></td><td>A target, a <code class="verbatim">#+NAME</code> or a heading, as above.</td></tr>
+</tbody>
+</table>
+<h3 id="attachment-links">Attachment links</h3>
+<p>An <code class="verbatim">attachment:</code> link names a file in the attachment folder of the entry that holds the link (see <a href="04-outlines.html">Outlines</a> for the attachment commands). Relative folders are resolved against the folder of the file that holds the link:</p>
+<ol>
+<li>When the entry has a <code class="verbatim">DIR</code> property, or the older <code class="verbatim">ATTACH_DIR</code>, that folder.</li>
+<li>Otherwise, for an entry with an <code class="verbatim">ID</code>, the first of these folders that exists: <code class="verbatim">org-attach-id-dir</code> (<code class="verbatim">data/</code>) followed by the ID's first two characters, <code class="verbatim">/</code> and the rest of the ID; followed by its first six characters, <code class="verbatim">/</code> and the rest; <code class="verbatim">__/</code>, the ID's first character, <code class="verbatim">/</code> and the whole ID. When <code class="verbatim">org-attach-id-dir</code> is something else, the same folders under <code class="verbatim">data/</code> are found too.</li>
+</ol>
+<p><code class="verbatim">org-attach-use-inheritance</code> decides whether <code class="verbatim">DIR</code> and <code class="verbatim">ID</code> may come from an ancestor.</p>
+<p>When the folder does not exist, the path is relative to the file's own folder. The file then opens as a <code class="verbatim">file:</code> link would, and a search option after <code class="verbatim">::</code> works the same way.</p>
+<h3 id="id-links">id links</h3>
+<p><code class="verbatim">id:</code> links are resolved through the index, so the target heading must be in a file under one of your sidebar folders. An <code class="verbatim">ID</code> in the property drawer before a file's first heading names the file, as org-roam's file nodes do, and the link opens the file. A link to an ID that isn't indexed shows <code class="verbatim">No heading has the ID</code> followed by the ID.</p>
+<h3 id="denote-links">denote links</h3>
+<p><code class="verbatim">denote:</code> links name a Denote note by its identifier, as in <code class="verbatim">[[denote:20261119T120000][A note]]</code>. The note is the indexed file whose name has the identifier, at its start or after <code class="verbatim">@@</code>; an Org file comes before others with the same identifier, such as a PDF. A search after <code class="verbatim">::</code>, such as <code class="verbatim">::#custom-id</code> or <code class="verbatim">::*Heading</code>, works as in a <code class="verbatim">file:</code> link. Backlinks list <code class="verbatim">denote:</code> links to a file, and to a heading when the link searches for it.</p>
+<p>In Denote's Markdown and text notes, Open Link (or a <code class="verbatim">⌘</code>-click on the Mac) follows <code class="verbatim">[[denote:ID]]</code> and <code class="verbatim">[[denote:ID][Title]]</code>, and in Markdown also Denote's own <code class="verbatim">[Title](denote:ID)</code>; other links there aren't followed. Backlinks list these notes too.</p>
+<h3 id="emacs-lisp-links">Emacs Lisp links</h3>
+<p>Following an <code class="verbatim">elisp:</code> link whose path starts with <code class="verbatim">(</code> asks <code class="verbatim">Execute (form) as Elisp? (yes, no, always)</code>, as <code class="verbatim">org-link-elisp-confirm-function</code> does. <code class="verbatim">always</code> trusts the link's form in this file, so the question isn't asked again until it changes. The echo area then shows <code class="verbatim">(form) =&gt; value</code>, or the error's message.</p>
+<ul>
+<li>On the Mac with Emacs installed, the form runs in <code class="verbatim">emacs -Q --batch</code> in a copy of the file, with point at the caret, so Org functions see the file's text. Changes the form makes to the buffer or to files in Emacs's session are not kept.</li>
+<li>On iOS, in the Mac App Store version, and on the Mac without Emacs, the form runs in orgstar's Emacs Lisp interpreter, with the functions listed under Lisp formulas in <a href="10-tables.html">Tables</a>. A form that uses anything else, or a variable it doesn't bind itself, such as <code class="verbatim">fill-column</code>, shows <code class="verbatim">This link uses Emacs Lisp that runs only in Emacs.</code></li>
+</ul>
+<p>A path that names a command, such as <code class="verbatim">elisp:org-agenda</code>, isn't run. The reader view on iOS doesn't run <code class="verbatim">elisp:</code> links; open the file in the editor.</p>
+<h3 id="timestamps">Timestamps</h3>
+<p><code class="verbatim">C-c C-o</code> (Mac <code class="verbatim">⌃⌘O</code>) or <code class="verbatim">⌘</code>-click on a timestamp opens the agenda on that day, as <code class="verbatim">org-follow-timestamp-link</code> does. On a date range such as <code class="verbatim">&lt;2026-10-05 Mon&gt;--&lt;2026-10-09 Fri&gt;</code>, the agenda shows the whole span. See <a href="07-agenda.html">Agenda</a>.</p>
+<h2 id="inserting-and-editing-links">Inserting and editing links</h2>
+<p><code class="verbatim">org-insert-link</code> asks for a link and a description in the echo area.</p>
+<table>
+<thead>
+<tr><th>Preset</th><th>Key</th></tr>
+</thead>
+<tbody>
+<tr><td>Emacs</td><td><code class="verbatim">C-c C-l</code></td></tr>
+<tr><td>Mac</td><td><code class="verbatim">⌘K</code></td></tr>
+<tr><td>Doom</td><td><code class="verbatim">SPC m l l</code>, or <code class="verbatim">C-c C-l</code></td></tr>
+</tbody>
+</table>
+<p>The first prompt reads <code class="verbatim">Insert link:</code>, or <code class="verbatim">Insert link (default …):</code> when you have stored links. It completes from:</p>
+<ul>
+<li>your stored links, most recent first, and their descriptions;</li>
+<li>the link abbreviations defined in the file (see <em>Link abbreviations</em>);</li>
+<li>the link types <code class="verbatim">attachment</code>, <code class="verbatim">id</code>, <code class="verbatim">eww</code>, <code class="verbatim">rmail</code>, <code class="verbatim">mhe</code>, <code class="verbatim">irc</code>, <code class="verbatim">info</code>, <code class="verbatim">gnus</code>, <code class="verbatim">docview</code>, <code class="verbatim">bibtex</code>, <code class="verbatim">bbdb</code>, <code class="verbatim">w3m</code>, <code class="verbatim">doi</code>, <code class="verbatim">file+sys</code>, <code class="verbatim">file+emacs</code>, <code class="verbatim">shell</code>, <code class="verbatim">news</code>, <code class="verbatim">mailto</code>, <code class="verbatim">https</code>, <code class="verbatim">http</code>, <code class="verbatim">ftp</code>, <code class="verbatim">shortdoc</code>, <code class="verbatim">help</code>, <code class="verbatim">file</code> and <code class="verbatim">elisp</code>, each followed by <code class="verbatim">:</code>.</li>
+</ul>
+<p>Pressing Return on an empty answer inserts the most recent stored link. Choosing a description inserts the link it belongs to. If you choose a bare type such as <code class="verbatim">https:</code>, a second prompt, <code class="verbatim">Link (no completion support):</code>, asks for the rest.</p>
+<p>The next prompt, <code class="verbatim">Description:</code>, offers the stored link's description, or the selected text if you selected some before running the command. An empty description inserts a link without one. With text selected, the link replaces the selection.</p>
+<p>When the caret is on an existing link, the same command edits it: the <code class="verbatim">Link:</code> prompt starts with the current target and <code class="verbatim">Description:</code> with the current description.</p>
+<p>A stored link that you insert is removed from the stored list, as with <code class="verbatim">org-link-keep-stored-after-insertion</code> set to nil.</p>
+<h3 id="file-paths-in-inserted-links">File paths in inserted links</h3>
+<p>When the inserted link is a <code class="verbatim">file:</code> link, orgstar rewrites it as <code class="verbatim">org-link-make-string-for-buffer</code> does:</p>
+<ul>
+<li>A link to a heading or target in the file you are editing loses its <code class="verbatim">file:</code> part and keeps only the search, for example <code class="verbatim">[[*Ideas]]</code>.</li>
+<li>A path under the current file's folder becomes relative to it.</li>
+<li>Any other path is written with <code class="verbatim">~</code> for your home folder.</li>
+</ul>
+<h3 id="completion-while-typing">Completion while typing</h3>
+<p>You can also type a link by hand. With the caret right after <code class="verbatim">[[</code>, completion at point offers <code class="verbatim">attachment:</code>, <code class="verbatim">doi:</code>, <code class="verbatim">file:</code>, <code class="verbatim">http:</code>, <code class="verbatim">https:</code>, <code class="verbatim">id:</code> and <code class="verbatim">mailto:</code>, plus the file's link abbreviations. After <code class="verbatim">[[*</code>, it offers the headings of the current file. After <code class="verbatim">@</code> in a citation, it offers the keys of the file's bibliographies (see <em>Citations</em>). Completion at point is <code class="verbatim">C-M-i</code> in the Emacs preset and <code class="verbatim">C-SPC</code> in Doom's insert state; see <a href="02-the-editor.html">The editor</a>.</p>
+<h2 id="storing-links">Storing links</h2>
+<p><code class="verbatim">org-store-link</code> remembers a link to where the caret is, for a later Insert Link.</p>
+<table>
+<thead>
+<tr><th>Preset</th><th>Key</th></tr>
+</thead>
+<tbody>
+<tr><td>Emacs</td><td><code class="verbatim">C-c l</code></td></tr>
+<tr><td>Mac</td><td><code class="verbatim">⌃⌘L</code></td></tr>
+<tr><td>Doom</td><td><code class="verbatim">SPC m l s</code> or <code class="verbatim">SPC n l</code></td></tr>
+</tbody>
+</table>
+<p>The stored link is a <code class="verbatim">file:</code> link to the current file, written with <code class="verbatim">~</code> for your home folder, followed by a search option chosen as Org does with <code class="verbatim">org-link-context-for-files</code> on:</p>
+<ol>
+<li>If the caret touches a <code class="verbatim">&lt;&lt;target&gt;&gt;</code> on its line, the link points at the target.</li>
+<li>Otherwise, if text is selected, the link searches for that text.</li>
+<li>Otherwise, if the caret is in an element with a <code class="verbatim">#+NAME</code>, the link uses the name.</li>
+<li>Otherwise, inside a heading's entry, the link uses <code class="verbatim">#custom-id</code> if the heading has a <code class="verbatim">CUSTOM_ID</code> property, and <code class="verbatim">*Title</code> if not. The title becomes the description.</li>
+<li>Before the first heading, the link searches for the text of the current line.</li>
+</ol>
+<p>The echo area shows <code class="verbatim">Stored:</code> and the description or link. Storing the same link again moves it to the front of the list. Stored links last until you quit orgstar; they aren't saved between sessions, as in Emacs.</p>
+<h2 id="ids">IDs</h2>
+<p>Org identifies headings across files with an <code class="verbatim">ID</code> property. Two commands manage it.</p>
+<table>
+<thead>
+<tr><th>Command</th><th>Org function</th><th>Keys</th></tr>
+</thead>
+<tbody>
+<tr><td>Org ▸ Create ID</td><td><code class="verbatim">org-id-get-create</code></td><td>No default key</td></tr>
+<tr><td>Org ▸ Store ID Link</td><td><code class="verbatim">org-id-get-create</code> + <code class="verbatim">org-id-store-link</code></td><td>Doom <code class="verbatim">SPC m l i</code>; no key in Emacs or Mac</td></tr>
+</tbody>
+</table>
+<p>Create ID gives the heading at the caret an <code class="verbatim">ID</code> property if it doesn't have one. The ID is a new UUID in lower case, for example <code class="verbatim">6a3c2f9e-…</code>, as <code class="verbatim">org-id-uuid</code> makes them. Before the first heading, the property goes into the file-level property drawer.</p>
+<p>Store ID Link does the same, then stores an <code class="verbatim">id:</code> link to the heading with its title as the description. Before the first heading, the description is the <code class="verbatim">#+TITLE</code>, or the file name. If the caret is on a target or named element inside the entry, the link carries that search, as <code class="verbatim">id:…::search</code>, which mirrors <code class="verbatim">org-id-link-use-context</code>.</p>
+<p><code class="verbatim">CUSTOM_ID</code> is a property you set yourself, with the property commands in <a href="04-outlines.html">Outlines</a>. Link to it with <code class="verbatim">[[#name]]</code> in the same file or <code class="verbatim">[[file:other.org::#name]]</code> from another. Store Link uses it when the heading has one.</p>
+<h2 id="targets-and-radio-targets">Targets and radio targets</h2>
+<p><code class="verbatim">&lt;&lt;target&gt;&gt;</code> marks a place in the text that a link with the same words reaches: <code class="verbatim">[[target]]</code>. Store Link with the caret on a target stores a link to it.</p>
+<p><code class="verbatim">&lt;&lt;&lt;radio target&gt;&gt;&gt;</code> makes every other occurrence of its words in the file a link, matched case-insensitively and between non-word characters. Radio links are highlighted as links and exported as links to the target (see <a href="12-export.html">Export</a>). Following one moves to the radio target.</p>
+<h2 id="link-abbreviations">Link abbreviations</h2>
+<p>A <code class="verbatim">#+LINK:</code> line defines an abbreviation, as <code class="verbatim">org-link-abbrev-alist-local</code> does:</p>
+<pre><code class="language-org highlight"><span class="text org"><span class="keyword other keyword org">#+LINK:</span><span class="string unquoted org"> gh https://github.com/%s</span>
+<span class="keyword other keyword org">#+LINK:</span><span class="string unquoted org"> search https://duckduckgo.com/?q=%h</span>
+<span class="keyword other keyword org">#+LINK:</span><span class="string unquoted org"> wiki https://en.wikipedia.org/wiki/</span>
+
+<span class="punctuation definition link org">[[</span><span class="markup underline link org">gh:orgmode/org-mode</span><span class="punctuation definition link org">]</span><span class="punctuation definition link org">]</span>   → https:/<span class="markup italic org">/github.com/</span>orgmode/org-mode
+<span class="punctuation definition link org">[[</span><span class="markup underline link org">search:org tables</span><span class="punctuation definition link org">]</span><span class="punctuation definition link org">]</span>     → https:/<span class="markup italic org">/duckduckgo.com/</span>?q=org%20tables
+<span class="punctuation definition link org">[[</span><span class="markup underline link org">wiki:Org-mode</span><span class="punctuation definition link org">]</span><span class="punctuation definition link org">]</span>         → https:/<span class="markup italic org">/en.wikipedia.org/</span>wiki/Org-mode</span></code></pre>
+<p>In the template, <code class="verbatim">%s</code> is replaced by the text after the colon, <code class="verbatim">%h</code> by the same text percent-encoded, and a template with neither has the text appended. Function templates (<code class="verbatim">%(…)</code>) are not supported. Abbreviations from a <code class="verbatim">#+SETUPFILE</code> count too. When a key is defined twice, the first definition wins.</p>
+<h2 id="the-backlinks-pane">The backlinks pane</h2>
+<p>View ▸ Show Backlinks shows a pane under the outline pane of an org file. It has two sections:</p>
+<ul>
+<li><strong>Links to</strong> the heading at the caret, named after that heading.</li>
+<li><strong>Links to This File</strong>.</li>
+</ul>
+<p>Each row shows the linking heading, the line the link is on with links shown as they read and this one in bold, and the file name; a link in the text before a file's first heading is listed under the file's name. Click a row to open it. When nothing links to the file or the heading, the pane shrinks to one line, <code class="verbatim">Links to This File</code> <code class="verbatim">None</code>. The pane is shown by default, orgstar remembers whether it is shown, and it updates as you move the caret and edit.</p>
+<p>The pane looks at every org file in your sidebar folders, including unsaved changes in open buffers. A link counts when following it would lead to the heading or the file:</p>
+<ul>
+<li><code class="verbatim">id:</code> links to the heading's <code class="verbatim">ID</code>, or to the file's own <code class="verbatim">ID</code> for the file section;</li>
+<li><code class="verbatim">file:</code> links and plain paths (<code class="verbatim">./</code>, <code class="verbatim">../</code>, <code class="verbatim">/</code>, <code class="verbatim">~/</code>) to the file, with no search option for the file section, or with <code class="verbatim">::*Title</code>, <code class="verbatim">::#custom-id</code> or <code class="verbatim">::Title</code> for a heading;</li>
+<li>within the same file, <code class="verbatim">[[*Title]]</code>, <code class="verbatim">[[#custom-id]]</code> and <code class="verbatim">[[Title]]</code>.</li>
+</ul>
+<p>Links to targets, names and line numbers are not counted. A heading's links to itself are left out.</p>
+<h2 id="nodes-and-daily-notes">Nodes and daily notes</h2>
+<p>orgstar works with notes kept the org-roam way: headings and files with an <code class="verbatim">ID</code> are <em>nodes</em>, linked with <code class="verbatim">id:</code> links, and a daily note is a file a day. It reads them from the index, without org-roam's database.</p>
+<table>
+<thead>
+<tr><th>Command</th><th>Emacs</th><th>Doom</th><th>What it does</th></tr>
+</thead>
+<tbody>
+<tr><td>Find Node…</td><td><code class="verbatim">C-c n f</code></td><td><code class="verbatim">SPC n r f</code></td><td>Asks for a node by title or alias and opens it (<code class="verbatim">org-roam-node-find</code>).</td></tr>
+<tr><td>Find Ref…</td><td>—</td><td><code class="verbatim">SPC n r F</code></td><td>Asks for one of the nodes' refs and opens its node (<code class="verbatim">org-roam-ref-find</code>).</td></tr>
+<tr><td>Insert Node Link…</td><td><code class="verbatim">C-c n i</code></td><td><code class="verbatim">SPC n r i</code></td><td>Asks for a node and inserts <code class="verbatim">[[id:…][Title]]</code>, with the alias as the description when an alias was chosen; with a selection, the selection is the description (<code class="verbatim">org-roam-node-insert</code>).</td></tr>
+<tr><td>Show Node Graph</td><td><code class="verbatim">C-c n g</code></td><td><code class="verbatim">SPC n r g</code></td><td>Opens the graph of nodes and their links; see <em>The graph</em> below.</td></tr>
+<tr><td>Go to Today's, Yesterday's, Tomorrow's Daily Note</td><td><code class="verbatim">C-c n d d</code>, <code class="verbatim">y</code>, <code class="verbatim">t</code></td><td><code class="verbatim">SPC n r d t</code>, <code class="verbatim">y</code>, <code class="verbatim">m</code></td><td>Opens the day's note, making it if missing (<code class="verbatim">org-roam-dailies-goto-today</code> and the others).</td></tr>
+<tr><td>Go to Daily Note for Date…</td><td><code class="verbatim">C-c n d c</code></td><td><code class="verbatim">SPC n r d d</code></td><td>Asks for a date, then opens its note.</td></tr>
+<tr><td>Capture to Today's Daily Note (and Yesterday's, Tomorrow's, for Date…)</td><td><code class="verbatim">C-c n j</code>, <code class="verbatim">C-c n d n</code>, <code class="verbatim">C-c n d v</code></td><td><code class="verbatim">SPC n r d n</code>, <code class="verbatim">T</code>, <code class="verbatim">Y</code>, <code class="verbatim">M</code>, <code class="verbatim">D</code></td><td>Files the entry template at the end of the day's note and opens it at <code class="verbatim">%?</code> (<code class="verbatim">org-roam-dailies-capture-today</code> and the others).</td></tr>
+<tr><td>Next Daily Note, Previous Daily Note</td><td><code class="verbatim">C-c n d f</code>, <code class="verbatim">b</code></td><td><code class="verbatim">SPC n r d f</code>, <code class="verbatim">b</code></td><td>From a daily note, opens the next or previous one there is (<code class="verbatim">org-roam-dailies-goto-next-note</code>).</td></tr>
+</tbody>
+</table>
+<p>The keys are the ones org-roam's manual suggests for Emacs and Doom's. A file node's title is its <code class="verbatim">#+TITLE</code>, or its name. The node properties are read as org-roam 2.3 reads them:</p>
+<ul>
+<li><code class="verbatim">ROAM_ALIASES</code>: other titles for the node, separated by spaces, with quotes around one that has spaces (<code class="verbatim">"Alias One" two</code>). Each alias is listed in the chooser as a title of its own.</li>
+<li><code class="verbatim">ROAM_REFS</code>: links and citation keys the node stands for, such as <code class="verbatim">https://example.com @key2020 [cite:@key2021]</code>. Find Ref… lists them.</li>
+<li><code class="verbatim">ROAM_EXCLUDE</code>: with any value but <code class="verbatim">nil</code>, the heading or file isn't a node. It isn't inherited: the headings under an excluded one with an <code class="verbatim">ID</code> are still nodes.</li>
+<li>Tags: a file node's are its <code class="verbatim">#+FILETAGS</code>; a heading's are its own and those it inherits. The chooser shows them after the title, as <code class="verbatim">#tag</code>, as Doom's chooser does, and typing a tag finds its nodes.</li>
+</ul>
+<p>Names that repeat show their file's name. A <code class="verbatim">[[roam:Title]]</code> link opens the node with that title or alias, as <code class="verbatim">org-roam-link-follow-link</code> does.</p>
+<p>A title that no node has opens the capture window with the <code class="verbatim">[[roam-template]]</code> templates from <code class="verbatim">capture.toml</code>, as <code class="verbatim">org-roam-capture-</code> does: choose one when there are several, answer its prompts, edit the text, and press Capture (<code class="verbatim">⌘Return</code> on the Mac) to make the node, or Cancel to make nothing. Find Node… then opens the node; Insert Node Link… links to it. Without templates, org-roam's default is used:</p>
+<pre><code class="language-toml highlight"><span class="source toml"><span class="punctuation definition table array toml">[[</span><span class="entity name section toml">roam-template</span><span class="punctuation definition table array toml">]]</span>
+<span class="variable other key toml">key</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>d<span class="punctuation definition string end toml">&quot;</span></span>
+<span class="variable other key toml">name</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>default<span class="punctuation definition string end toml">&quot;</span></span>
+<span class="variable other key toml">type</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>plain<span class="punctuation definition string end toml">&quot;</span></span>                          <span class="comment line number-sign toml"><span class="punctuation definition comment toml">#</span> entry, item, checkitem, plain or table-line
+</span><span class="variable other key toml">template</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>%?<span class="punctuation definition string end toml">&quot;</span></span>
+<span class="variable other key toml">file</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>%&lt;%Y%m%d%H%M%S&gt;-${slug}.org<span class="punctuation definition string end toml">&quot;</span></span>    <span class="comment line number-sign toml"><span class="punctuation definition comment toml">#</span> in org-roam-directory
+</span><span class="variable other key toml">head</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>#+title: ${title}<span class="constant character escape toml">\n</span><span class="punctuation definition string end toml">&quot;</span></span>            <span class="comment line number-sign toml"><span class="punctuation definition comment toml">#</span> at the top of a new file</span></span></code></pre>
+<p><code class="verbatim">olp = "Projects/Active"</code> files the text under that outline path, making the headings that are missing (<code class="verbatim">file+head+olp</code>). A new file starts with an <code class="verbatim">ID</code> property drawer and the head; a file that's there gets an <code class="verbatim">ID</code> when it has none, and is the node. <code class="verbatim">${title}</code>, <code class="verbatim">${slug}</code> and <code class="verbatim">${id}</code> are the node's title, slug and <code class="verbatim">ID</code>; <code class="verbatim">%&lt;…&gt;</code> and the other escapes are org-capture's (see <a href="08-capture.html">Capture</a>), and <code class="verbatim">immediate-finish</code>, <code class="verbatim">prepend</code> and the other template properties apply. The slug is the title in lower case, accents dropped, with everything but letters and digits as one <code class="verbatim">_</code>, as <code class="verbatim">org-roam-node-slugify</code> makes it.</p>
+<p>org-protocol's <code class="verbatim">roam-ref</code> opens the node whose <code class="verbatim">ROAM_REFS</code> has the <code class="verbatim">ref</code>, and otherwise makes one in the capture window with <code class="verbatim">[[roam-ref-template]]</code> (only the one keyed <code class="verbatim">template</code> when the link names one), with the ref in its <code class="verbatim">ROAM_REFS</code>. Without templates, org-roam's default makes <code class="verbatim">${slug}.org</code> with <code class="verbatim">#+title: ${title}</code>; <code class="verbatim">${ref}</code> and <code class="verbatim">${body}</code> are the link's <code class="verbatim">ref</code> and <code class="verbatim">body</code>. <code class="verbatim">roam-node</code> opens the node with the <code class="verbatim">node</code> ID:</p>
+<pre><code class="language-text">org-protocol://roam-ref?template=r&amp;ref=https%3A%2F%2Fexample.com&amp;title=Example
+org-protocol://roam-node?node=5f0c1e2a-…</code></pre>
+<p><strong>The graph.</strong> Show Node Graph, or Window ▸ Node Graph on the Mac and Commands on iOS, draws every node as a dot and every <code class="verbatim">id:</code> link between two nodes as a line. It is part of orgstar+.</p>
+<ul>
+<li>A link belongs to the innermost heading with an ID around it, else to its file's node; a link written where there is no node, or to an ID no node has, isn't drawn. Several links between the same two nodes are one line.</li>
+<li>A dot is larger the more links its node has. The node the caret is in is orange. Titles are drawn where they have room, the most-linked nodes first; zooming in shows more.</li>
+<li>Drag to move the picture, pinch or use the buttons to zoom, and click or tap a node to open it.</li>
+<li>Only the Open Note's Links keeps the node the caret is in and the nodes linked with it.</li>
+<li>Unsaved text counts, as it does for Find Node….</li>
+</ul>
+<p>Daily notes are in <code class="verbatim">org-roam-dailies-directory</code> (<code class="verbatim">daily/</code>) under <code class="verbatim">org-roam-directory</code>, which is the first sidebar folder unless set. A new note is named and started as org-roam's default daily template does it, with an <code class="verbatim">ID</code> like every new org-roam file:</p>
+<pre><code class="language-org highlight"><span class="text org">,:PROPERTIES:
+,:ID:       5f0c1e2a-…
+,:END:
+<span class="keyword other keyword org">#+title:</span><span class="string unquoted org"> 2026-10-11</span></span></code></pre>
+<p><code class="verbatim">org-roam-dailies-file</code> (<code class="verbatim">"%&lt;%Y-%m-%d&gt;.org"</code>), <code class="verbatim">org-roam-dailies-head</code> (<code class="verbatim">"#+title: %&lt;%Y-%m-%d&gt;\n"</code>) and <code class="verbatim">org-roam-dailies-entry</code> (<code class="verbatim">"* %?"</code>) change the file name, what a new note starts with, and what capturing adds; <code class="verbatim">%&lt;…&gt;</code> formats the note's date as <code class="verbatim">format-time-string</code> does. The entry is an org-capture template; its date escapes (<code class="verbatim">%t</code>, <code class="verbatim">%U</code> and the like) use the note's day. See <a href="13-configuration.html">Configuration</a>.</p>
+<p>For several daily templates, <code class="verbatim">[[roam-dailies-template]]</code> tables in <code class="verbatim">capture.toml</code> take the place of those three settings, as <code class="verbatim">org-roam-dailies-capture-templates</code> does. They have the keys of <code class="verbatim">[[roam-template]]</code>; <code class="verbatim">type</code> is <code class="verbatim">entry</code> unless set, and <code class="verbatim">file</code> is in the daily-notes folder. Capturing opens the capture window with them: choose one, edit the entry, and Capture files it in the day's note, making the note with the template's head when it's new. The go-to commands ask which template only when the templates name different files. Import from Emacs reads one <code class="verbatim">(file+head NAME HEAD)</code> template into the three settings, and several into tables.</p>
+<h3 id="denote">Denote</h3>
+<p>With <code class="verbatim">notes-package = "denote"</code> in <code class="verbatim">config.toml</code>, the same commands follow Denote:</p>
+<ul>
+<li>The graph draws the notes with a Denote identifier and their <code class="verbatim">denote:</code> links to each other.</li>
+<li>Find Node… and Insert Node Link… list the Org, Markdown (<code class="verbatim">.md</code>) and text (<code class="verbatim">.txt</code>) files whose names have a Denote identifier, titled by their front matter's title, and Insert Node Link… inserts <code class="verbatim">[[denote:…][Title]]</code>, or <code class="verbatim">[Title](denote:…)</code> in a Markdown note.</li>
+<li><p>A title no note has makes a note in <code class="verbatim">denote-directory</code> (the first folder unless set), after the questions <code class="verbatim">denote-prompts</code> lists, in its order. The default is <code class="verbatim">"title keywords"</code>; the title is always the one typed.</p>
+<ul>
+<li><code class="verbatim">keywords</code>: separated by commas or spaces, offering the keywords in existing file names.</li>
+<li><code class="verbatim">subdirectory</code>: a folder under <code class="verbatim">denote-directory</code> (<code class="verbatim">.</code> for itself) to put the note in.</li>
+<li><code class="verbatim">date</code>: the note's date, read as <code class="verbatim">org-read-date</code> reads one; without a time, the time is now's.</li>
+<li><code class="verbatim">template</code>: a key of <code class="verbatim">[denote-templates]</code>, whose text goes after the front matter.</li>
+<li><code class="verbatim">signature</code>: put in the name after <code>==</code>, in lower case with <code>=</code> between words, and in a <code class="verbatim">#+signature:</code> line.</li>
+</ul>
+<p><code class="verbatim">file-type</code> and <code class="verbatim">identifier</code> are not asked: a note is in the file type <code class="verbatim">denote-file-type</code> sets (Org unless set; see <em>Markdown and text notes</em> below), and the identifier is the date's, or the first second after it no file under <code class="verbatim">denote-directory</code> has. With the default prompts:</p>
+<pre><code class="language-org highlight"><span class="text org"><span class="keyword other keyword org">#+title:</span><span class="string unquoted org">      Field Notes</span>
+<span class="keyword other keyword org">#+date:</span><span class="string unquoted org">       [2026-11-19 Thu 12:00]</span>
+<span class="keyword other keyword org">#+filetags:</span><span class="string unquoted org">   :ideas:work:</span>
+<span class="keyword other keyword org">#+identifier:</span><span class="string unquoted org"> 20261119T120000</span></span></code></pre>
+<p>named <code class="verbatim">20261119T120000--field-notes__ideas_work.org</code>: the title in lower case without punctuation, words joined by <code class="verbatim">-</code>; the keywords sorted, each one word, joined by <code class="verbatim">_</code>.</p>
+</li>
+<li>The daily-note commands work on denote-journal's entries: notes in <code class="verbatim">denote-journal-directory</code> (<code class="verbatim">journal</code>, under <code class="verbatim">denote-directory</code>) with the <code class="verbatim">denote-journal-keyword</code> (<code class="verbatim">journal</code>). With <code class="verbatim">denote-journal-interval</code> (<code class="verbatim">daily</code>), one entry lasts a day, a week (Monday to Sunday), a month or a year, and the entry for a date is the one whose identifier's date is in that stretch. denote-journal itself takes a date outside the current week, month or year as today; orgstar uses the date's own. A new entry is titled by <code class="verbatim">denote-journal-title-format</code> (<code class="verbatim">"%A %-e %B %Y %H:%M"</code>). Capturing adds <code class="verbatim">org-roam-dailies-entry</code> as for org-roam.</li>
+<li>Store Link in a Denote note stores <code class="verbatim">[[denote:ID][Title]]</code>, or <code class="verbatim">denote:ID::#custom-id</code> in an entry with a <code class="verbatim">CUSTOM_ID</code>, as Denote does with <code class="verbatim">denote-org-store-link-to-heading</code> nil.</li>
+</ul>
+<p><code class="verbatim">denote-directory</code> can hold several folders, separated by <code class="verbatim">:</code>. New notes go in the first; the <code class="verbatim">subdirectory</code> question offers all of them and their folders, and identifiers are kept unique across them.</p>
+<h4 id="renaming">Renaming</h4>
+<ul>
+<li>Rename Note… (<code class="verbatim">denote-rename-file</code>) asks the questions <code class="verbatim">denote-prompts</code> has among <code class="verbatim">title</code>, <code class="verbatim">keywords</code>, <code class="verbatim">signature</code> and <code class="verbatim">date</code>, each starting with the current value, then renames the file in its folder and rewrites its front matter. Empty answers remove a part. A file without an identifier gets one from its modification time; a file without front matter gets it added at the top.</li>
+<li>Rename Note from Front Matter renames the open file from its <code class="verbatim">#+title:</code>, <code class="verbatim">#+filetags:</code> and <code class="verbatim">#+signature:</code>, keeping its identifier, as <code class="verbatim">denote-rename-file-using-front-matter</code> does. A missing line leaves that part out of the name. The keywords are sorted, and the front matter is rewritten from what was read: keywords sorted and in lower case, the signature as it is in the name, and an <code class="verbatim">#+identifier:</code> line added when there was none.</li>
+<li>Rename Notes in Folder from Front Matter… does that for every Denote note in a folder of <code class="verbatim">denote-directory</code>, as <code class="verbatim">denote-dired-rename-marked-files-using-front-matter</code> does with them all marked.</li>
+</ul>
+<p>Links keep working after a rename, as they use the identifier.</p>
+<h4 id="markdown-and-text-notes">Markdown and text notes</h4>
+<p>Denote's <code class="verbatim">markdown-yaml</code>, <code class="verbatim">markdown-toml</code> and <code class="verbatim">text</code> file types are read and written with their own front matter. With <code class="verbatim">denote-file-type = "markdown-yaml"</code> in <code class="verbatim">config.toml</code>, a new note is <code class="verbatim">20261119T120000--field-notes__ideas_work.md</code> and starts:</p>
+<pre><code class="language-yaml highlight"><span class="source yaml"><span class="entity other document begin yaml">---</span>
+<span class="string unquoted plain out yaml"><span class="entity name tag yaml">title</span></span><span class="punctuation separator key-value mapping yaml">:</span>      <span class="string quoted double yaml"><span class="punctuation definition string begin yaml">&quot;</span>Field Notes<span class="punctuation definition string end yaml">&quot;</span></span>
+<span class="string unquoted plain out yaml"><span class="entity name tag yaml">date</span></span><span class="punctuation separator key-value mapping yaml">:</span>       <span class="constant other timestamp yaml">2026-11-19T12:00:00+01:00</span>
+<span class="string unquoted plain out yaml"><span class="entity name tag yaml">tags</span></span><span class="punctuation separator key-value mapping yaml">:</span>       <span class="meta flow-sequence yaml"><span class="punctuation definition sequence begin yaml">[</span><span class="string quoted double yaml"><span class="punctuation definition string begin yaml">&quot;</span>ideas<span class="punctuation definition string end yaml">&quot;</span></span><span class="punctuation separator sequence yaml">,</span> <span class="string quoted double yaml"><span class="punctuation definition string begin yaml">&quot;</span>work<span class="punctuation definition string end yaml">&quot;</span></span><span class="punctuation definition sequence end yaml">]</span></span>
+<span class="string unquoted plain out yaml"><span class="entity name tag yaml">identifier</span></span><span class="punctuation separator key-value mapping yaml">:</span> <span class="string quoted double yaml"><span class="punctuation definition string begin yaml">&quot;</span>20261119T120000<span class="punctuation definition string end yaml">&quot;</span></span>
+<span class="entity other document begin yaml">---</span></span></code></pre>
+<p><code class="verbatim">markdown-toml</code> writes the same lines between <code class="verbatim">+++</code> lines, as <code class="verbatim">title      = "Field Notes"</code> and so on. <code class="verbatim">text</code> makes a <code class="verbatim">.txt</code> note:</p>
+<pre><code class="language-text">title:      Field Notes
+date:       2026-11-19
+tags:       ideas  work
+identifier: 20261119T120000
+---------------------------</code></pre>
+<p>A <code class="verbatim">signature:</code> line follows the identifier when the note has one. A <code class="verbatim">.md</code> file is YAML when it starts with <code class="verbatim">---</code> and TOML when it starts with <code class="verbatim">+++</code>; one with neither takes <code class="verbatim">denote-file-type</code> when that is a Markdown type, else YAML.</p>
+<p>In these notes:</p>
+<ul>
+<li>Find Node…, Insert Node Link…, the graph and backlinks work as for Org notes; on the Mac the backlinks pane shows under the outline for them too. Insert Node Link… writes <code class="verbatim">[Title](denote:ID)</code> in Markdown and <code class="verbatim">[[denote:ID][Title]]</code> in text, as Denote's <code class="verbatim">denote-md-link-format</code> and <code class="verbatim">denote-org-link-format</code> do; <code class="verbatim">[[denote:ID]]</code> when there is no title.</li>
+<li>Open Link follows <code class="verbatim">denote:</code> links (see <em>denote links</em> above).</li>
+<li>Rename Note…, Rename Note from Front Matter and Rename Notes in Folder from Front Matter… rename them and rewrite their front matter in its own format: Markdown values in double quotes, keywords as <code class="verbatim">["a", "b"]</code> in Markdown and separated by two spaces in text, the date as RFC 3339 (<code class="verbatim">2026-11-19T12:00:00+01:00</code>) in Markdown and <code class="verbatim">2026-11-19</code> in text. A line that is there keeps its key and spacing. A file without front matter gets it at the top.</li>
+</ul>
+<p>Otherwise they are Markdown and text files as described in <a href="01-files-and-folders.html">Files and folders</a>: org's commands, Store Link, the sequence commands and denote-org's blocks aren't available in them. Capture templates with <code class="verbatim">denote = true</code> and denote-journal's entries are always Org notes, since they file org entries, as Denote's <code class="verbatim">denote-org-capture</code> does.</p>
+<h4 id="query-links">Query links</h4>
+<p><code class="verbatim">[[denote:query-contents:REGEXP]]</code> and <code class="verbatim">[[denote:query-filenames:REGEXP]]</code> offer the notes whose text, or name, the Emacs regexp matches, ignoring case, and open the one chosen. In the iOS reader they list the matches.</p>
+<h4 id="silos">Silos</h4>
+<p>New Note in Silo… and Find Note in Silo… (denote-silo) ask for a folder of <code class="verbatim">denote-silo-directories</code> (<code class="verbatim">denote-directory</code>'s folders unless set, separated by <code class="verbatim">:</code>) and work as if it were <code class="verbatim">denote-directory</code>. Find Note in Silo… lists the notes in the sidebar folders that are under it.</p>
+<h4 id="capture">Capture</h4>
+<p>A capture template with <code class="verbatim">denote = true</code> and no <code class="verbatim">file</code> puts its entry in a new note, as <code class="verbatim">denote-org-capture</code> does: it asks for the title and the <code class="verbatim">denote-prompts</code> questions before its own. See <a href="08-capture.html">Capture</a>.</p>
+<pre><code class="language-toml highlight"><span class="source toml"><span class="punctuation definition table array toml">[[</span><span class="entity name section toml">template</span><span class="punctuation definition table array toml">]]</span>
+<span class="variable other key toml">key</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>n<span class="punctuation definition string end toml">&quot;</span></span>
+<span class="variable other key toml">name</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>New note<span class="punctuation definition string end toml">&quot;</span></span>
+<span class="variable other key toml">denote</span> <span class="keyword operator assignment toml">=</span> <span class="constant language toml">true</span>
+<span class="variable other key toml">type</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>plain<span class="punctuation definition string end toml">&quot;</span></span>
+<span class="variable other key toml">template</span> <span class="keyword operator assignment toml">=</span> <span class="string quoted double toml"><span class="punctuation definition string begin toml">&quot;</span>%i<span class="constant character escape toml">\n</span>%?<span class="punctuation definition string end toml">&quot;</span></span></span></code></pre>
+<h4 id="dynamic-blocks">Dynamic blocks</h4>
+<p>denote-org's dynamic blocks update with <code class="verbatim">C-c C-c</code> on their <code class="verbatim">#+BEGIN:</code> line or Update Dynamic Block, over the files in <code class="verbatim">denote-directory</code>:</p>
+<table>
+<thead>
+<tr><th>Block</th><th>What it lists</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">denote-links</code></td><td>Links to the notes whose names (relative to <code class="verbatim">denote-directory</code>) match <code class="verbatim">:regexp</code></td></tr>
+<tr><td><code class="verbatim">denote-missing-links</code></td><td>The same, without the notes this file links to already</td></tr>
+<tr><td><code class="verbatim">denote-backlinks</code></td><td>Links to the notes that link to this one</td></tr>
+<tr><td><code class="verbatim">denote-files</code></td><td>The text of the notes matching <code class="verbatim">:regexp</code></td></tr>
+<tr><td><code class="verbatim">denote-files-as-headings</code></td><td>The same, each note's title a heading and its headings one level down</td></tr>
+<tr><td><code class="verbatim">denote-sequence</code></td><td>A note's descendants, <code class="verbatim">:depth</code> levels deep, indented; with <code class="verbatim">:sequence ""</code> every note with a sequence</td></tr>
+</tbody>
+</table>
+<p>Insert Denote Links Block, Insert Denote Missing Links Block, Insert Denote Backlinks Block, Insert Denote Files Block, Insert Denote Files as Headings Block and Insert Denote Sequence Block (<code class="verbatim">denote-org-dblock-insert-links</code> and the others) ask what denote-org asks (the regexp; for files, the sort component; for a sequence, the note and the depth, 2 by default), then insert the block with all its parameters and fill it.</p>
+<p>They take denote-org's parameters: <code class="verbatim">:not-regexp</code>, <code class="verbatim">:sort-by-component</code> (<code class="verbatim">title</code>, <code class="verbatim">keywords</code>, <code class="verbatim">signature</code>, <code class="verbatim">identifier</code>, <code class="verbatim">last-modified</code>, <code class="verbatim">random</code>), <code class="verbatim">:reverse-sort</code>, <code class="verbatim">:id-only</code>, <code class="verbatim">:include-date</code>, <code class="verbatim">:block-name</code>, and for <code class="verbatim">denote-files</code> <code class="verbatim">:no-front-matter</code>, <code class="verbatim">:add-links</code> and <code class="verbatim">:file-separator</code>, for <code class="verbatim">denote-files-as-headings</code> <code class="verbatim">:add-links</code> and <code class="verbatim">:exclude-tags</code>. <code class="verbatim">:excluded-dirs-regexp</code>, <code class="verbatim">:this-heading-only</code> and <code class="verbatim">rx</code> forms aren't supported.</p>
+<pre><code class="language-org highlight"><span class="text org"><span class="keyword other keyword org">#+BEGIN:</span><span class="string unquoted org"> denote-links :regexp &quot;_emacs&quot; :sort-by-component title</span>
+<span class="keyword other keyword org">#+END:</span></span></code></pre>
+<h4 id="sequences">Sequences</h4>
+<p>denote-sequence numbers notes in a hierarchy through their signatures, in the scheme <code class="verbatim">denote-sequence-scheme</code> sets: <code class="verbatim">numeric</code> (<code>1</code>, <code>1=1</code>, <code>1=1=2</code>), <code class="verbatim">alphanumeric</code> (<code>1</code>, <code>1a</code>, <code>1a2</code>) or <code class="verbatim">alphanumeric-delimited</code> (<code>1</code>, <code>1=a</code>, <code>1=a2</code>). New sequences come out as denote-sequence 0.3 gives them.</p>
+<table>
+<thead>
+<tr><th>Command</th><th>denote-sequence</th></tr>
+</thead>
+<tbody>
+<tr><td>New Sequence Note…</td><td><code class="verbatim">denote-sequence-new-parent</code></td></tr>
+<tr><td>New Child Sequence Note…, New Sibling Sequence Note…</td><td><code class="verbatim">denote-sequence-new-child</code>, <code class="verbatim">-new-sibling</code></td></tr>
+<tr><td>New Child of This Note…, New Sibling of This Note…</td><td><code class="verbatim">denote-sequence-new-child-of-current</code>, <code class="verbatim">-new-sibling-of-current</code></td></tr>
+<tr><td>Find Sequence Relatives…</td><td><code class="verbatim">denote-sequence-find</code>: all parents, the parent, siblings, children or all children</td></tr>
+<tr><td>Next Sibling Note, Previous Sibling Note</td><td><code class="verbatim">denote-sequence-find-next-sibling</code>, <code class="verbatim">-previous-sibling</code></td></tr>
+<tr><td>Reparent Note…, Reparent Note with Descendants…</td><td><code class="verbatim">denote-sequence-reparent</code>, <code class="verbatim">-reparent-recursive</code></td></tr>
+<tr><td>Rename Note as Sequence Parent</td><td><code class="verbatim">denote-sequence-rename-as-parent</code></td></tr>
+<tr><td>Convert Note Sequence Scheme</td><td><code class="verbatim">denote-sequence-convert</code> to <code class="verbatim">denote-sequence-scheme</code></td></tr>
+<tr><td>Insert Sequence Link…</td><td><code class="verbatim">denote-sequence-link</code></td></tr>
+<tr><td>Sequence Hierarchy…</td><td><code class="verbatim">denote-sequence-view-hierarchy</code>, as a list to open a note from</td></tr>
+</tbody>
+</table>
+<p>A new sequence note asks for its title and the <code class="verbatim">denote-prompts</code> questions other than <code class="verbatim">signature</code>, which is the sequence.</p>
+<h4 id="importing-and-limits">Importing and limits</h4>
+<p>Import from Emacs reads <code class="verbatim">denote-directory</code> (a folder or a list), <code class="verbatim">denote-file-type</code>, <code class="verbatim">denote-prompts</code>, <code class="verbatim">denote-templates</code>, <code class="verbatim">denote-silo-directories</code>, <code class="verbatim">denote-sequence-scheme</code>, <code class="verbatim">denote-journal-directory</code>, <code class="verbatim">denote-journal-keyword</code>, <code class="verbatim">denote-journal-interval</code> and <code class="verbatim">denote-journal-title-format</code>. Templates that are functions, file types added to <code class="verbatim">denote-file-types</code>, <code class="verbatim">denote-date-format</code> and the <code class="verbatim">file-type</code> prompt are not supported.</p>
+<h2 id="inline-images">Inline images</h2>
+<p><code class="verbatim">org-toggle-inline-images</code> shows image links as images.</p>
+<table>
+<thead>
+<tr><th>Preset</th><th>Key</th></tr>
+</thead>
+<tbody>
+<tr><td>Emacs</td><td><code class="verbatim">C-c C-x C-v</code></td></tr>
+<tr><td>Mac</td><td>Org ▸ Show or Hide Inline Images</td></tr>
+<tr><td>Doom</td><td><code class="verbatim">C-c C-x C-v</code></td></tr>
+</tbody>
+</table>
+<p>The echo area reports how many images are shown, or that inline display is off.</p>
+<p>A link without a description shows an image when it points to a file ending in <code class="verbatim">.png</code>, <code class="verbatim">.jpg</code>, <code class="verbatim">.jpeg</code>, <code class="verbatim">.gif</code>, <code class="verbatim">.svg</code>, <code class="verbatim">.webp</code>, <code class="verbatim">.tif</code>, <code class="verbatim">.tiff</code>, <code class="verbatim">.bmp</code>, <code class="verbatim">.heic</code> or <code class="verbatim">.avif</code> (in any case), on a line of its own or in a line's text:</p>
+<pre><code class="language-org highlight"><span class="text org"><span class="punctuation definition link org">[[</span><span class="markup underline link org">file:images/diagram.png</span><span class="punctuation definition link org">]</span><span class="punctuation definition link org">]</span>
+<span class="punctuation definition link org">[[</span><span class="markup underline link org">./photo.jpg</span><span class="punctuation definition link org">]</span><span class="punctuation definition link org">]</span>
+See <span class="punctuation definition link org">[[</span><span class="markup underline link org">file:images/plot.png</span><span class="punctuation definition link org">]</span><span class="punctuation definition link org">]</span> and file:images/detail.png here.</span></code></pre>
+<p>Relative paths are resolved against the file's folder, and <code class="verbatim">attachment:</code> links against the entry's attachment folder. The link text is hidden while the image is shown, except on the line that holds the caret, where the image is drawn under the link or under its paragraph.</p>
+<p>A link with a description shows an image when the description is one <code class="verbatim">file:</code> or <code class="verbatim">attachment:</code> link to an image, as in <code class="verbatim">[[https://example.com][file:thumbnail.png]]</code>. Show or Hide Inline Images, Including Described Links (<code class="verbatim">C-u C-c C-x C-v</code> in the Emacs preset) shows the image any described link points to. See <a href="02-the-editor.org::*Inline images">Inline images</a>.</p>
+<h3 id="pasting-and-dropping-images">Pasting and dropping images</h3>
+<p>Paste (⌘V, or Edit ▸ Paste on iOS) with an image on the clipboard and no text runs <code class="verbatim">yank-media</code>, as in Emacs 29 and later: the image is saved as <code class="verbatim">org-yank-image-save-method</code> says and a link to it is inserted at the caret; with the caret on a heading's line, under the heading, after its planning line and drawers. M-x <code class="verbatim">yank-media</code> does the same on the Mac.</p>
+<table>
+<thead>
+<tr><th><code class="verbatim">org-yank-image-save-method</code></th><th>Where the image goes</th><th>Link</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">attach</code> (the default)</td><td>The entry's attachment folder, as <code class="verbatim">org-attach-attach</code> puts it</td><td><code class="verbatim">[[attachment:NAME]]</code></td></tr>
+<tr><td>a folder, such as <code class="verbatim">"images/"</code></td><td>That folder, relative to the file's folder unless absolute; made if missing</td><td><code class="verbatim">[[file:images/NAME]]</code></td></tr>
+</tbody>
+</table>
+<p>The name is Org's: <code class="verbatim">clipboard-</code> and the time, as in <code class="verbatim">clipboard-20261011T232238.png</code>; a second image in the same second gets <code class="verbatim">-2</code>. PNG, JPEG and GIF are saved as they are, and other image types as PNG. Before the first heading, <code class="verbatim">attach</code> gives the file a file-level <code class="verbatim">ID</code>, as Emacs does.</p>
+<p>Files dropped on the editor on the Mac, or pasted after copying them in Finder, are handled as <code class="verbatim">org-yank-dnd-method</code> says: <code class="verbatim">attach</code> copies them into the entry's attachment folder (an image goes to the <code class="verbatim">org-yank-image-save-method</code> folder when that is a folder), <code class="verbatim">file-link</code> links to them where they are, <code class="verbatim">open</code> opens them, and <code class="verbatim">ask</code>, the default, asks which. An image dragged in without a file, such as one from a browser, is pasted as above. On iOS, dropped files are always attached, since what a drop hands over is a copy. Attach Photo or Video… and Take Photo… also insert their links at the caret.</p>
+<p>Two things differ from Emacs, so that a pasted image shows at once: the link has no description (Org writes <code class="verbatim">[[attachment:NAME][NAME]]</code>, which inline display skips), and it goes on a line of its own, breaking the line around the caret when it holds text.</p>
+<h3 id="remote-images">Remote images</h3>
+<p>Images at <code class="verbatim">http</code> and <code class="verbatim">https</code> links show as <code class="verbatim">org-display-remote-inline-images</code> in <code class="verbatim">config.toml</code> says:</p>
+<table>
+<thead>
+<tr><th>Value</th><th>Remote images</th></tr>
+</thead>
+<tbody>
+<tr><td><code class="verbatim">skip</code></td><td>Not shown; the default</td></tr>
+<tr><td><code class="verbatim">download</code></td><td>Fetched the first time they're shown, and kept until orgstar quits</td></tr>
+<tr><td><code class="verbatim">cache</code></td><td>Fetched once and kept on disk, in the app's cache folder, for later launches</td></tr>
+</tbody>
+</table>
+<pre><code class="language-org highlight"><span class="text org"><span class="punctuation definition link org">[[</span><span class="markup underline link org">https://example.com/chart.png</span><span class="punctuation definition link org">]</span><span class="punctuation definition link org">]</span></span></code></pre>
+<p>An image is fetched in the background; the link shows as text until it arrives. A link that can't be fetched stays text, and isn't tried again until orgstar starts again. This applies to the editor on the Mac and iOS and to the iOS reader. Emacs's <code class="verbatim">download</code> fetches the image each time it's displayed; orgstar keeps it for the session instead.</p>
+<h3 id="sizing">Sizing</h3>
+<p>An image is drawn at its own width, up to the width of the text area. To set a width, put <code class="verbatim">#+ATTR_ORG: :width</code> with a number of points among the keywords above the link:</p>
+<pre><code class="language-org highlight"><span class="text org"><span class="keyword other keyword org">#+CAPTION:</span><span class="string unquoted org"> Network layout</span>
+<span class="keyword other keyword org">#+ATTR_ORG:</span><span class="string unquoted org"> :width 300</span>
+<span class="punctuation definition link org">[[</span><span class="markup underline link org">file:images/network.png</span><span class="punctuation definition link org">]</span><span class="punctuation definition link org">]</span></span></code></pre>
+<p>The height follows the image's proportions. <code class="verbatim">#+ATTR_HTML</code> and other exporters' attributes don't affect the editor.</p>
+<h3 id="showing-images-when-a-file-opens">Showing images when a file opens</h3>
+<p>The config key <code class="verbatim">org-startup-with-inline-images</code> (default <code class="verbatim">false</code>) shows images in every file when it opens. In a file, <code class="verbatim">#+STARTUP: inlineimages</code> or <code class="verbatim">#+STARTUP: noinlineimages</code> overrides it.</p>
+<h2 id="org-protocol-store-link">org-protocol store-link</h2>
+<p>orgstar handles <code class="verbatim">org-protocol://store-link</code> URLs, in the new form <code>org-protocol://store-link?url=…&amp;title=…</code> and the old form <code class="verbatim">org-protocol://store-link:/URL/TITLE</code>. The URL is added to your stored links with the title as its description, and is also copied to the clipboard. Insert it with Insert Link. Setting up a browser bookmarklet, and <code class="verbatim">org-protocol://capture</code>, are in <a href="08-capture.html">Capture</a>.</p>
+<h2 id="citations">Citations</h2>
+<p>A citation, <code class="verbatim">[cite:@key]</code>, names an entry of the bibliography files the file lists with <code class="verbatim">#+bibliography:</code> lines, or of those <code class="verbatim">org-cite-global-bibliography</code> lists for every file (see <a href="13-configuration.html">Configuration</a>). The citation syntax and how citations export are in <a href="12-export.html">Export</a>. A file ending in <code class="verbatim">.json</code> is read as CSL-JSON; anything else as BibTeX or BibLaTeX, with <code class="verbatim">@string</code> abbreviations expanded and the fields an entry lacks taken from the entry its <code class="verbatim">crossref</code> field names (whose <code class="verbatim">title</code> becomes the <code class="verbatim">booktitle</code>). Bibliography files are read in the background, and read again only when they change. In the Mac App Store version, a bibliography outside your sidebar folders asks for access to its folder the first time.</p>
+<h3 id="inserting-citations">Inserting citations</h3>
+<p>Insert Citation… (Org ▸ Links and Footnotes on the Mac, Commands on iOS) is <code class="verbatim">org-cite-insert</code> with the basic processor.</p>
+<table>
+<thead>
+<tr><th>Preset</th><th>Key</th></tr>
+</thead>
+<tbody>
+<tr><td>Emacs</td><td><code class="verbatim">C-c C-x @</code></td></tr>
+<tr><td>Mac</td><td>none; Org menu or palette</td></tr>
+<tr><td>Doom</td><td><code class="verbatim">SPC m @</code></td></tr>
+</tbody>
+</table>
+<p>What it does depends on where the caret is:</p>
+<ul>
+<li>Outside a citation, it asks for an entry (<code class="verbatim">Key:</code>, each key with its authors, year and title), then a prefix, a suffix and a style (<code class="verbatim">author</code>, <code class="verbatim">noauthor</code>, <code class="verbatim">nocite</code>, <code class="verbatim">note</code>, <code class="verbatim">numeric</code>, <code class="verbatim">text</code> or <code class="verbatim">nil</code>), and inserts <code class="verbatim">[cite/style:prefix @key suffix]</code>. An empty answer leaves out the prefix, the suffix or the style.</li>
+<li>On a citation's <code class="verbatim">[cite/style</code> part, it asks only for a style and puts it in place of the old one; an empty answer removes it.</li>
+<li>On the citation's common prefix or before a reference's <code class="verbatim">@</code>, it adds the chosen key, with the prefix and suffix around it, before that reference; on a reference's suffix or the common suffix, after it. References are separated by <code class="verbatim">;</code>.</li>
+<li>Inside a key, the chosen key replaces it; the reference's prefix and suffix stay.</li>
+</ul>
+<p>Without bibliography files, the echo area says <code class="verbatim">No bibliography set</code>. Where orgstar differs from Emacs:</p>
+<ul>
+<li>It inserts one key at a time. Run it again inside the citation to add another; Emacs asks for keys until an empty answer.</li>
+<li>It always asks for a style for a new citation; Emacs asks only after <code class="verbatim">C-u</code>. The prefix and suffix questions are orgstar's.</li>
+<li><code class="verbatim">C-u</code> doesn't delete the citation or reference at the caret.</li>
+</ul>
+<h3 id="completing-keys">Completing keys</h3>
+<p>Inside a citation, completion at point after <code class="verbatim">@</code> offers the keys of the file's bibliographies, each with its authors, year and title.</p>
+<h3 id="following-citations">Following citations</h3>
+<p><code class="verbatim">C-c C-o</code> (Mac <code class="verbatim">⌃⌘O</code>), <code class="verbatim">⌘</code>-click, and <code class="verbatim">RET</code> in Doom's normal state show a citation's entry: its authors, year, title and where it was published. Its buttons open the files in the entry's <code class="verbatim">file</code> field, its DOI and its URL, and Show in Bibliography opens the bibliography file at the entry, which is what <code class="verbatim">org-cite-basic-goto</code> does in Emacs. On a reference the entry is that key's; elsewhere in a citation with several keys, you choose a key first. A key no bibliography has shows <code class="verbatim">Cannot find citation key:</code> and the key.</p>
+<p>The <code class="verbatim">file</code> field may list several files, separated by <code class="verbatim">;</code>. Each is a path or JabRef's and Zotero's <code class="verbatim">description:path:type</code>, relative to the bibliography's folder unless absolute.</p>
+<h3 id="zotero">Zotero</h3>
+<p>Better BibTeX for Zotero can keep a <code class="verbatim">.bib</code> file exported from your library up to date (Export Library, with Keep updated). List that file in <code class="verbatim">#+bibliography:</code> or <code class="verbatim">org-cite-global-bibliography</code> like any other; orgstar reads it again when Zotero rewrites it. <code class="verbatim">[[zotero://select/items/@key]]</code> links, with Better BibTeX's citation keys, open the item in Zotero on the Mac; on iOS the link is handed to the system, which opens the Zotero app if it is installed and handles the address.</p>
+<h2 id="on-ios">On iOS</h2>
+<p>The iOS app follows links: tap a link in the reader. Org files open in the app, and web, mail and other files go to the system. The iOS editor shows inline images as the Mac does, and so does the reader, except in headings. In the editor, Store Link, Store ID Link, Insert Link… and Insert Citation… are in Commands, and on a hardware keyboard the Emacs keys run them; they work as described above, and stored links last until the app quits. Open Link in Commands shows the entry of the citation at the caret. The app reads only bibliography files in its folders. <code class="verbatim">org-protocol://store-link</code> links opened on the device are stored and copied too. Show Backlinks in Commands lists the same links as the Mac's backlinks pane, for the heading at the caret and the file. See <a href="14-ios.html">iOS</a>.</p>
+<h2 id="code-references">Code references</h2>
+<p>A label at the end of a line in a src or example block, <code class="verbatim">(ref:name)</code> by default, is a code reference, and <code class="verbatim">[[(name)]]</code> links to it. Following the link moves to the label. A block's <code class="verbatim">-l "&lt;&lt;%s&gt;&gt;"</code> switch changes the label's form for that block; <code class="verbatim">%s</code> is the name.</p>
+<p>In export, the label is taken off the line. A block with <code class="verbatim">-n</code> numbers its lines from 1, or <code class="verbatim">-n 10</code> from 10; <code class="verbatim">+n</code> goes on from the numbers of the blocks before it. <code class="verbatim">-r</code> leaves the label out of the exported line, and then the link shows the line's number instead of the name; <code class="verbatim">-k</code> with <code class="verbatim">-n</code> keeps the label while the link still shows the number. A link's description may contain <code class="verbatim">%s</code> for the name or number: <code class="verbatim">[[(call)][line %s]]</code>. In HTML, the line with the label is the link's target, <code class="verbatim">coderef-name</code>.</p>
+<p>A regexp link, or a <code class="verbatim">file:…::/regexp/</code> search, exports as its description, or its text when it has none.</p>
+</main>
+<footer class="site">
+© 2026 Christian Cleberg · <a href="https://krz.sh/apps/orgstar/">krz.sh/apps/orgstar</a> · <a href="/orgstar/third-party.html">third-party notices</a>
+</footer>
+</body>
+</html>

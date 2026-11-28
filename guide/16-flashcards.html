@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flashcards &middot; orgstar</title>
+<meta name="description" content="Spaced repetition with org-fc&#x27;s cards: making cards, reviewing them on the Mac, iPhone, iPad and Apple Watch, and the due count widget.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../theme.css">
+<link rel="stylesheet" href="../syntax.css">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="site">
+<a class="site-title" href="../index.html">orgstar</a>
+<nav>
+<a href="../install.html">Install</a>
+<a href="../quickstart.html">Quick start</a>
+<a href="index.html">Manual</a>
+</nav>
+</header>
+<main>
+<h1>Flashcards</h1>
+<p class="lede">orgstar reviews flashcards written in org-fc&#x27;s format, so the same cards and their schedule work in Emacs.</p>
+<nav class="toc" aria-label="On this page">
+<h2>On this page</h2>
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#making-cards">Making cards</a>
+<ul>
+<li><a href="#the-back-of-a-card">The back of a card</a></li>
+<li><a href="#cloze-holes">Cloze holes</a></li>
+</ul></li>
+<li><a href="#reviewing">Reviewing</a>
+<ul>
+<li><a href="#scheduling">Scheduling</a></li>
+<li><a href="#the-review-history">The review history</a></li>
+</ul></li>
+<li><a href="#widgets-and-apple-watch">Widgets and Apple Watch</a></li>
+<li><a href="#differences-from-org-fc">Differences from org-fc</a></li>
+</ul>
+</nav>
+<h2 id="overview">Overview</h2>
+<p>A flashcard is a heading. orgstar reads and writes the format of <a href="https://github.com/l3kn/org-fc">org-fc</a>, an Emacs package, so a card made in either one can be reviewed in the other, and a review in either one moves the card's schedule for both. A card is a heading with:</p>
+<ul>
+<li>the tag <code class="verbatim">fc</code>;</li>
+<li>the properties <code class="verbatim">FC_CREATED</code> (when it was made), <code class="verbatim">FC_TYPE</code> (its type), <code class="verbatim">FC_ALGO</code> (<code class="verbatim">sm2</code>), and an <code class="verbatim">ID</code>;</li>
+<li>a <code class="verbatim">REVIEW_DATA</code> drawer after the property drawer, with a table row for each side or hole that is reviewed (a <em>position</em>): its ease, box, interval in days and when it is next due.</li>
+</ul>
+<pre><code class="language-org highlight"><span class="text org"><span class="markup heading org"><span class="punctuation definition heading org">*</span> Capital of France                                                    <span class="entity name tag org">:fc:
+</span></span>:PROPERTIES:
+:FC_CREATED: 2026-11-18T11:06:40Z
+:FC_TYPE:  normal
+:FC_ALGO:  sm2
+:ID:       0F3C2A1E-6B8D-4E3A-9B4F-2D1C0A9E8B7F
+:END:
+:REVIEW_DATA:
+<span class="markup other table org">| position | ease | box | interval | due                  |</span>
+<span class="markup other table org">|----------+------+-----+----------+----------------------|</span>
+<span class="markup other table org">| front    | 2.50 |   0 |     0.00 | 2026-11-18T11:06:40Z |</span>
+:END:
+Paris</span></code></pre>
+<p>Times are in UTC, as org-fc writes them. You don't write any of this by hand: the commands below add it to a heading.</p>
+<h2 id="making-cards">Making cards</h2>
+<p>Put the caret in a heading and run one of these commands from the command palette (<code class="verbatim">⇧⌘P</code>) on the Mac, or Commands in the editor on iOS. Each does what the org-fc command of the same name does.</p>
+<table>
+<thead>
+<tr><th>Command</th><th>org-fc</th><th>The card</th></tr>
+</thead>
+<tbody>
+<tr><td>Make Normal Flashcard</td><td><code class="verbatim">org-fc-type-normal-init</code></td><td>The heading is the question, the text under it the answer. One position, <code class="verbatim">front</code>.</td></tr>
+<tr><td>Make Double Flashcard</td><td><code class="verbatim">org-fc-type-double-init</code></td><td>Reviewed both ways: the heading asks for the text, and the text for the heading. Positions <code class="verbatim">front</code> and <code class="verbatim">back</code>.</td></tr>
+<tr><td>Make Cloze Flashcard…</td><td><code class="verbatim">org-fc-type-cloze-init</code></td><td>Holes in the text, each reviewed on its own. Asks for the cloze type.</td></tr>
+<tr><td>Make Text-Input Flashcard</td><td><code class="verbatim">org-fc-type-text-input-init</code></td><td>You type the answer, which is compared with the first line of the text. One position.</td></tr>
+<tr><td>Update Flashcard</td><td><code class="verbatim">org-fc-update</code></td><td>A cloze card's new holes get numbers and review data; holes removed lose theirs.</td></tr>
+<tr><td>Suspend Flashcard</td><td><code class="verbatim">org-fc-suspend-card</code></td><td>Tags the card <code class="verbatim">suspended</code>, which leaves it out of reviews.</td></tr>
+<tr><td>Unsuspend Flashcard</td><td><code class="verbatim">org-fc-unsuspend-card</code></td><td>Removes the <code class="verbatim">suspended</code> tag.</td></tr>
+</tbody>
+</table>
+<p>A heading that is already a card is refused, and so is a text-input card with nothing to compare with (a heading followed directly by a subheading).</p>
+<h3 id="the-back-of-a-card">The back of a card</h3>
+<p>A subheading titled <code class="verbatim">Back</code> holds the answer instead of the text under the heading. With one, the front of a normal card shows the heading and its text, and the back adds the <code class="verbatim">Back</code> subheading. A double card's back position shows the <code class="verbatim">Back</code> text as the question.</p>
+<pre><code class="language-org highlight"><span class="text org"><span class="markup heading org"><span class="punctuation definition heading org">*</span> Two sided                                                             <span class="entity name tag org">:fc:
+</span></span>...
+Front text
+<span class="markup heading org"><span class="punctuation definition heading org">**</span> Back
+</span>Back text</span></code></pre>
+<h3 id="cloze-holes">Cloze holes</h3>
+<p>A hole is <code class="verbatim">{{text}}</code>, or <code class="verbatim">{{text}{hint}}</code> with a hint shown while it is hidden. Make Cloze Flashcard… and Update Flashcard number the holes: <code class="verbatim">{{text}@0}</code>, <code class="verbatim">{{text}{hint}@1}</code>. Holes may contain LaTeX between <code class="verbatim">$</code> signs. The cloze type decides which other holes are hidden while one is reviewed:</p>
+<table>
+<thead>
+<tr><th>Type</th><th>While one hole is reviewed</th><th>Positions reviewed in one session</th></tr>
+</thead>
+<tbody>
+<tr><td>deletion</td><td>the other holes show</td><td>one</td></tr>
+<tr><td>enumeration</td><td>the holes before it show, the ones after it are hidden</td><td>every due one</td></tr>
+<tr><td>context</td><td>the holes next to it show, the others are hidden</td><td>one</td></tr>
+<tr><td>single</td><td>every other hole is hidden</td><td>every due one</td></tr>
+</tbody>
+</table>
+<p>A hidden hole shows as <code class="verbatim">...</code>; the one being reviewed as <code class="verbatim">[...]</code>, or <code class="verbatim">[...hint]</code>.</p>
+<h2 id="reviewing">Reviewing</h2>
+<p>Review Flashcards shows the positions due across all your folders, one at a time, in random order (<code class="verbatim">org-fc-review</code> with <code class="verbatim">org-fc-shuffle-positions</code>). As in org-fc, suspended cards are left out, and of a normal or double card, or a deletion or context cloze card, only one position is shown per review.</p>
+<ul>
+<li>On the Mac: Window ▸ Review Flashcards, or Review Flashcards in the command palette.</li>
+<li>On iPhone and iPad: Review Flashcards in the agenda's Views menu or in Commands, Go ▸ Review Flashcards in the iPad menu bar, or the Flashcards widget.</li>
+</ul>
+<p>Each card shows its front. Show Answer flips it; a text-input card has a field for your answer and Check instead, then shows whether it matched. Then rate how well you knew it:</p>
+<table>
+<thead>
+<tr><th>Button</th><th>Key on the Mac</th><th>Means</th></tr>
+</thead>
+<tbody>
+<tr><td>Again</td><td><code class="verbatim">a</code></td><td>You didn't know it</td></tr>
+<tr><td>Hard</td><td><code class="verbatim">h</code></td><td>You knew it with effort</td></tr>
+<tr><td>Good</td><td><code class="verbatim">g</code></td><td>You knew it</td></tr>
+<tr><td>Easy</td><td><code class="verbatim">e</code></td><td>You knew it at once</td></tr>
+</tbody>
+</table>
+<p>Return also shows the answer. A card rated Again comes back at the end of the review. The menu at the top of the card has Open in Editor, which shows the card's heading, and Suspend Card, which tags it <code class="verbatim">suspended</code> and takes its other positions out of the review.</p>
+<p>Rating writes the position's new row into the card's <code class="verbatim">REVIEW_DATA</code> table. In a file that is open, the change is an edit like any other, which Undo takes back; a file that isn't open is saved at once.</p>
+<h3 id="scheduling">Scheduling</h3>
+<p>orgstar schedules as org-fc does by default (<code class="verbatim">org-fc-algorithm</code> <code class="verbatim">sm2-v1</code>, a variant of SM-2):</p>
+<ul>
+<li>A new position starts in box 0 with ease 2.50, due at once.</li>
+<li>Again sends a position back to box 0. Every other rating moves it up one box; Easy in box 0 moves it straight to box 2.</li>
+<li>Boxes 0 to 3 have fixed intervals: 0, 0.01, 1 and 6 days.</li>
+<li>From box 2 on, each rating changes the ease, by −0.30 (Again), −0.15 (Hard), 0 (Good) or +0.15 (Easy), kept between 1.30 and 5.00.</li>
+<li>From box 4 on, the interval is the ease times the last interval, multiplied by a random factor between 0.9 and 1.1 so that cards made together don't stay together.</li>
+</ul>
+<h3 id="the-review-history">The review history</h3>
+<p>Each rating is also added as a line to the review history, in the tab-separated format org-fc writes to <code class="verbatim">org-fc-review-history-file</code>: the time, the file, the card's ID, the position, its ease, box and interval before the rating, the rating, the seconds the card was shown, and <code class="verbatim">sm2-v1</code>. orgstar writes it to <code class="verbatim">org-fc-reviews.tsv</code> in the configuration folder; set <code class="verbatim">org-fc-review-history-file</code> in <code class="verbatim">config.toml</code> to use another file, such as the one Emacs writes (see <a href="13-configuration.html">Configuration</a>). The history is only written; orgstar doesn't show statistics from it.</p>
+<h2 id="widgets-and-apple-watch">Widgets and Apple Watch</h2>
+<p>The Flashcards widget shows how many positions are due, counting as a review would, and goes up by itself as cards fall due. It comes in small on the Home Screen and the Mac desktop, and circular and inline on the Lock Screen. Tapping it starts a review. Like the other widgets it needs orgstar+, and it counts what the app last wrote: when files or edits change while orgstar is open and when you return to it. See <a href="14-ios.html">iPhone and iPad</a>.</p>
+<p>The watch app reviews normal and double cards. When any are due, its list has Review <em>n</em> cards above today's agenda: tap it for the first card's front, Show Answer for the back, then Again, Hard, Good or Easy. The iPhone writes the rating to the card's file, as a review on the iPhone does. The watch gets up to 30 due positions with the agenda; cloze and text-input cards are left to the iPhone and the Mac.</p>
+<p>Reviewing cards is free. The widget and the watch app need orgstar+, as all widgets and the watch app do.</p>
+<h2 id="differences-from-org-fc">Differences from org-fc</h2>
+<ul>
+<li>Only org-fc's default SM2 algorithm with its default parameters is used. Cards with <code class="verbatim">FC_ALGO</code> set to another algorithm (<code class="verbatim">fsrs</code>, <code class="verbatim">noop</code>) are refused when rated; the <code class="verbatim">FC_SM2_*</code> properties that change the parameters for a card or a subtree are not read, and <code class="verbatim">org-fc-algorithm</code> <code class="verbatim">sm2-v2</code> is not supported.</li>
+<li>Review covers every folder you added; there are no review contexts (<code class="verbatim">org-fc-custom-contexts</code>), filters, <code class="verbatim">org-fc-directories</code> or <code class="verbatim">org-fc-review-early</code>.</li>
+<li>The card is shown on a review screen, not in the file: drawers and planning lines are hidden, the rest shows as written. The <code class="verbatim">noheading</code> and <code class="verbatim">notitle</code> tags, <code class="verbatim">org-fc-drawer-whitelist</code> and LaTeX previews in cards are not supported.</li>
+<li>A text-input answer is compared as a whole, not character by character as <code class="verbatim">org-fc-diff</code> does.</li>
+<li>There is no dashboard, no audio (<code class="verbatim">org-fc-audio</code>), no vocab cards, no <code class="verbatim">org-fc-cloze-dwim</code> and no Edit/Skip during a review; Open in Editor leaves the review where it was.</li>
+<li>Unsuspend Flashcard acts on the card the caret is in, from any of its subheadings, as Suspend Flashcard does; org-fc's acts on the heading at point.</li>
+</ul>
+</main>
+<footer class="site">
+© 2026 Christian Cleberg · <a href="https://krz.sh/apps/orgstar/">krz.sh/apps/orgstar</a> · <a href="/orgstar/third-party.html">third-party notices</a>
+</footer>
+</body>
+</html>
