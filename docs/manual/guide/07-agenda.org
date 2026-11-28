@@ -829,10 +829,10 @@ On the Mac, orgstar's widgets go on the desktop and in Notification Center: righ
 |--------+-------------------------+-----------------------------------------------------------------------------------------|
 | Today  | Small, medium and large | The date, the open count, and what's left of today, as on iOS.                          |
 | Up Next | Small                  | The next entry's time or status and title, or the agenda when nothing is left today.    |
-| Habits | Small, medium and large | Each habit's consistency graph, as on iOS.                                              |
+| Habits | Small, medium and large | Today's habits with their checkboxes and consistency graphs, as on iOS.                 |
 | Flashcards | Small               | How many flashcards are due; clicking it opens Review Flashcards. See [[file:16-flashcards.org][Flashcards]]. |
 
-Click a row in Today, the Up Next widget or a habit to show that entry in orgstar; click elsewhere to open the agenda. The widgets read the next seven days of the agenda and the habits, which the app writes to =~/Library/Application Support/Orgstar/Widgets= (in the Mac App Store version, =~/Library/Group Containers/group.sh.krz.orgstar/Widgets=) when files, edits or settings change and every hour while it runs; see [[file:14-ios.org][iOS]] for what they show and leave out.
+Click a row in Today, the Up Next widget or a habit to show that entry in orgstar; click elsewhere to open the agenda. Click the checkbox of an open TODO entry in Today, or of a habit, to mark it done as on iOS. The widget can't change your files, so it hands the entry to orgstar, which does it without coming to the front, or opens first, in the background, when it isn't running; when the heading has changed or gone, orgstar says so in its window. The widgets read the next seven days of the agenda and the habits, which the app writes to =~/Library/Application Support/Orgstar/Widgets= (in the Mac App Store version, =~/Library/Group Containers/group.sh.krz.orgstar/Widgets=) when files, edits or settings change and every hour while it runs; see [[file:14-ios.org][iOS]] for what they show and leave out.
 
 * The agenda on iOS
 

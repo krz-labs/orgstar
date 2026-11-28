@@ -239,6 +239,8 @@ final class AppCommands {
             case .clock: run("app.clock.goto")
             case .review: run("app.flashcards.review")
             case .entry(let path, let offset): jump(path: path, offset: offset)
+            // The app delegate takes these before they get here.
+            case .done: break
             case .capture(let template):
                 captureSerial += 1
                 captureRequest = (template, [:], nil, captureSerial)
@@ -296,8 +298,15 @@ struct PromptRequest: Identifiable {
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
-    var session: DocumentSession?
+    var session: DocumentSession? {
+        didSet {
+            for done in pendingDone { markDone(done) }
+            pendingDone = []
+        }
+    }
     var commands: AppCommands?
+    /// Widget checkboxes clicked before the window was ready.
+    private var pendingDone: [EntryDone] = []
     #if APPSTORE
     var workspace: WorkspaceModel?
     #else
@@ -363,6 +372,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     static var pendingOpens: [String] = []
 
     func application(_ application: NSApplication, open urls: [URL]) {
+        // A widget's checkbox, opened in the background: orgstar stays where it is.
+        var urls = urls
+        urls.removeAll { url in
+            guard case .done(let done, let key)? = AppLink(url: url) else { return false }
+            if ProAccess.shared.isUnlocked, key == WidgetActionKey.current() { markDone(done) }
+            return true
+        }
+        guard !urls.isEmpty else { return }
         let paths = urls.filter(\.isFileURL).map(\.path)
         let links = urls.filter { $0.scheme == "org-protocol" || $0.scheme == AppLink.scheme }.map(\.absoluteString)
         guard let commands, let session else {
@@ -377,6 +394,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     /// org-protocol and orgstar:// links that arrive before the window is ready.
     static var pendingLinks: [String] = []
+
+    /// Marks the entry done and saves it, as a reminder's Mark Done does; the widgets update
+    /// with the edit. What went wrong shows in the main window.
+    private func markDone(_ done: EntryDone) {
+        guard let session else { return pendingDone.append(done) }
+        switch session.markDone(done) {
+        case .changed, .snoozed: break
+        case .notFound: commands?.show(String(localized: "This entry isn't in \((done.path as NSString).lastPathComponent) as it was."))
+        case .failed(let message): commands?.show(message)
+        }
+    }
 
     /// Files continued from another device before the window is ready.
     static var pendingHandoffs: [HandoffPlace] = []

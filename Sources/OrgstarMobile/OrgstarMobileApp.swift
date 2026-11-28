@@ -656,6 +656,9 @@ struct RootView: View {
             capture = CaptureRequest(template: template)
         case .review:
             model.reviewRequested = true
+        case .done:
+            // The Mac widgets' checkbox; iOS widgets run `CompleteEntryIntent` in the app.
+            break
         }
     }
 

@@ -3,8 +3,8 @@ import OrgCore
 import SwiftUI
 import WidgetKit
 
-/// The agenda's habits with org-habit's consistency graphs: the last week (small) or the last
-/// three weeks and the next one (medium, large).
+/// Today's habits with org-habit's consistency graphs, the last week (small) or the last three
+/// weeks and the next one (medium, large), and a checkbox marking one done.
 struct HabitsWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: "sh.krz.orgstar.habits", provider: HabitProvider()) { entry in
@@ -69,15 +69,22 @@ struct HabitsView: View {
 
     private func content(_ snapshot: HabitSnapshot) -> some View {
         let limit = family == .systemLarge ? 9 : family == .systemMedium ? 4 : 3
-        let done = snapshot.habits.filter { $0.habit.doneDates.contains(today) }.count
+        let habits = snapshot.habits(on: today)
+        let done = habits.filter { $0.isDone(on: today) }.count
         return VStack(alignment: .leading, spacing: family == .systemSmall ? 6 : 8) {
             HStack(alignment: .firstTextBaseline) {
                 Text("Habits").font(.subheadline.weight(.semibold)).widgetAccentable()
                 Spacer(minLength: 0)
-                Text("\(done)/\(snapshot.habits.count) today").font(.caption2.weight(.semibold)).foregroundStyle(.secondary)
+                Text("\(done)/\(habits.count) today").font(.caption2.weight(.semibold)).foregroundStyle(.secondary)
             }
-            ForEach(snapshot.habits.prefix(limit)) { habit in
-                Link(destination: habit.link.url) { row(habit, snapshot) }
+            if habits.isEmpty {
+                Text("No habits due today.").font(.caption).foregroundStyle(.secondary)
+            }
+            ForEach(habits.prefix(limit)) { habit in
+                HStack(spacing: 4) {
+                    Checkbox(done: habit.done, isDone: habit.isDone(on: today))
+                    Link(destination: habit.link.url) { row(habit, snapshot) }
+                }
             }
             Spacer(minLength: 0)
         }

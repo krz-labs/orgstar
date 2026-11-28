@@ -93,8 +93,53 @@ public struct WatchAgenda: Codable, Equatable, Sendable {
         public func rate(_ rating: String) -> WatchAction { .rate(path: path, card: card, position: position, rating: rating) }
     }
 
+    /// A habit of today's, with the last week of its consistency graph.
+    public struct Habit: Codable, Equatable, Sendable, Identifiable {
+        /// A day of the graph: org-habit's face (`clear`, `readyFuture`, …) and whether the
+        /// habit was done that day.
+        public struct Day: Codable, Equatable, Sendable {
+            public var face: String
+            public var isDone: Bool
+
+            public init(face: String, isDone: Bool) {
+                self.face = face
+                self.isDone = isDone
+            }
+        }
+
+        public var path: String
+        public var offset: Int
+        public var headingLine: String
+        public var title: String
+        /// The keyword marking it done takes; nil when it has none.
+        public var doneKeyword: String?
+        /// Oldest first, today last.
+        public var days: [Day]
+
+        public var id: String { "\(path):\(offset)" }
+
+        public init(path: String, offset: Int, headingLine: String, title: String, doneKeyword: String?, days: [Day]) {
+            self.path = path
+            self.offset = offset
+            self.headingLine = headingLine
+            self.title = title
+            self.doneKeyword = doneKeyword
+            self.days = days
+        }
+
+        public var isDoneToday: Bool { days.last?.isDone ?? false }
+
+        /// The action marking it done, while it isn't done today.
+        public var done: WatchAction? {
+            guard !isDoneToday, let doneKeyword else { return nil }
+            return .done(path: path, offset: offset, headingLine: headingLine, keyword: doneKeyword)
+        }
+    }
+
     /// Flashcard positions due, in review order; nil from a phone without them.
     public var cards: [Card]?
+    /// Today's habits; nil from a phone without them.
+    public var habits: [Habit]?
 
     public var generated: Date
     /// Midnight starting today.
@@ -165,6 +210,15 @@ public struct WatchAgenda: Codable, Equatable, Sendable {
         }
         mark(&copy.rows)
         mark(&copy.overdue)
+        return copy
+    }
+
+    /// The habit with `id` marked done here before the phone sends the agenda again.
+    public func markingHabitDone(_ id: String) -> WatchAgenda {
+        var copy = self
+        if let i = copy.habits?.firstIndex(where: { $0.id == id }), let last = copy.habits?[i].days.indices.last {
+            copy.habits?[i].days[last].isDone = true
+        }
         return copy
     }
 

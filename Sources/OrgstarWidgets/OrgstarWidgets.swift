@@ -29,9 +29,7 @@ struct OrgstarWidgets: WidgetBundle {
     }
 }
 
-#if os(iOS)
-/// The App Intents OrgApp declares: the Live Activity's Clock Out button.
+/// The App Intents OrgApp declares: the Live Activity's Clock Out button and the checkboxes.
 struct OrgstarWidgetIntents: AppIntentsPackage {
     static var includedPackages: [any AppIntentsPackage.Type] { [OrgAppIntents.self] }
 }
-#endif

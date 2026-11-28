@@ -90,14 +90,45 @@ struct TodayView: View {
         if rows.isEmpty {
             Text(empty).font(.caption).foregroundStyle(.secondary)
         }
+        let checkboxes = rows.contains { $0.done != nil }
         ForEach(rows) { row in
-            if compact {
-                SmallRow(row: row)
-            } else if let link = row.link {
-                Link(destination: link.url) { WideRow(row: row) }
-            } else {
-                WideRow(row: row)
+            HStack(spacing: 4) {
+                if checkboxes { Checkbox(done: row.done, isDone: false) }
+                if compact {
+                    SmallRow(row: row)
+                } else if let link = row.link {
+                    Link(destination: link.url) { WideRow(row: row) }
+                } else {
+                    WideRow(row: row)
+                }
             }
+        }
+    }
+}
+
+/// An entry's or a habit's checkbox, which marks it done without opening orgstar; a check mark
+/// once done, and an empty space of the same width for a row that can't be marked done.
+struct Checkbox: View {
+    let done: EntryDone?
+    let isDone: Bool
+    @ScaledMetric(relativeTo: .caption) private var size: CGFloat = 14
+
+    var body: some View {
+        if isDone {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.caption)
+                .foregroundStyle(.green)
+                .frame(width: size)
+                .accessibilityHidden(true)
+        } else if let done {
+            Button(intent: CompleteEntryIntent(done)) {
+                Image(systemName: "circle").font(.caption).frame(width: size)
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.secondary)
+            .accessibilityLabel(Text("Mark Done"))
+        } else {
+            Color.clear.frame(width: size, height: 1)
         }
     }
 }

@@ -108,11 +108,12 @@ public struct AgendaSource: Sendable {
     }
 
     /// The file's habits not done and not in skipped trees: their titles, heading offsets and
-    /// what their consistency graphs are drawn from.
-    public var habits: [(title: String, offset: Int, habit: Habit)] {
+    /// lines, the keyword marking them done takes, and what their consistency graphs are drawn
+    /// from.
+    public var habits: [(title: String, offset: Int, line: String, doneKeyword: String?, habit: Habit)] {
         headings.compactMap { heading in
             guard heading.isHabit, !heading.skipped, !heading.isDone, let habit = heading.habit else { return nil }
-            return (heading.title, heading.start, habit)
+            return (heading.title, heading.start, heading.line, heading.todo.flatMap { firstDone[$0] }, habit)
         }
     }
     let stamps: [Stamp]
