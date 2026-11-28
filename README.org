@@ -60,7 +60,7 @@ The Mac app (macOS 26 or later) comes in two versions:
   do itself in Emacs, and updates itself. Install it with Homebrew:
 
   #+begin_src sh
-  brew tap krz/tap https://gitbay.org/krz/homebrew-tap.git
+  brew tap krz-labs/tap
   brew install --cask orgstar
   #+end_src
 

@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
   <channel>
     <title>orgstar</title>
-    <link>https://gitbay.org/krz/orgstar</link>
+    <link>https://github.com/krz-labs/orgstar</link>
     <item>
       <title>orgstar 1.5.0</title>
       <link>https://krz.sh/apps/orgstar/</link>
@@ -133,29 +133,29 @@
     </item>
     <item>
       <title>orgstar 0.9.2</title>
-      <link>https://gitbay.org/krz/orgstar/releases/tag/v0.9.2</link>
+      <link>https://github.com/krz-labs/orgstar/releases/tag/v0.9.2</link>
       <sparkle:version>560</sparkle:version>
       <sparkle:shortVersionString>0.9.2</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
       <pubDate>Mon, 19 Oct 2026 15:13:39 -0500</pubDate>
       <description><![CDATA[<p>Fixes a crash in the Mac app when archiving a subtree (Archive Subtree, <code>org-archive-subtree</code>) in a file with folded headings, such as one with <code>#+STARTUP: overview</code>.</p>
 <p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
-      <enclosure url="https://gitbay.org/krz/orgstar/releases/download/v0.9.2/orgstar-0.9.2.dmg" type="application/octet-stream" sparkle:edSignature="oTGE4ZzrIIHp0F9gsBafLR/AkgHS0pHqPYeJPeSYUeSA1foFvUxZGMNqiypJ80YepW4GmWAOL62Rdx2k6ISJAA==" length="56752788"/>
+      <enclosure url="https://github.com/krz-labs/orgstar/releases/download/v0.9.2/orgstar-0.9.2.dmg" type="application/octet-stream" sparkle:edSignature="oTGE4ZzrIIHp0F9gsBafLR/AkgHS0pHqPYeJPeSYUeSA1foFvUxZGMNqiypJ80YepW4GmWAOL62Rdx2k6ISJAA==" length="56752788"/>
     </item>
     <item>
       <title>orgstar 0.9.1</title>
-      <link>https://gitbay.org/krz/orgstar/releases/tag/v0.9.1</link>
+      <link>https://github.com/krz-labs/orgstar/releases/tag/v0.9.1</link>
       <sparkle:version>557</sparkle:version>
       <sparkle:shortVersionString>0.9.1</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
       <pubDate>Sat, 17 Oct 2026 16:18:41 -0500</pubDate>
       <description><![CDATA[<p>Build fix for the iPhone, iPad and Apple Watch app: the plural forms added in 0.9.0 are now included in the iOS build. No changes to the Mac app.</p>
 <p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
-      <enclosure url="https://gitbay.org/krz/orgstar/releases/download/v0.9.1/orgstar-0.9.1.dmg" type="application/octet-stream" sparkle:edSignature="Vzmsm2VoHtef1P2oVrtrMzeGglsIPI9eBXu0s2T9TpM3Qq94J7qe+J2EBbGysoygImSlm29f7y7vpRc9TtXfBg==" length="56733477"/>
+      <enclosure url="https://github.com/krz-labs/orgstar/releases/download/v0.9.1/orgstar-0.9.1.dmg" type="application/octet-stream" sparkle:edSignature="Vzmsm2VoHtef1P2oVrtrMzeGglsIPI9eBXu0s2T9TpM3Qq94J7qe+J2EBbGysoygImSlm29f7y7vpRc9TtXfBg==" length="56733477"/>
     </item>
     <item>
       <title>orgstar 0.9.0</title>
-      <link>https://gitbay.org/krz/orgstar/releases/tag/v0.9.0</link>
+      <link>https://github.com/krz-labs/orgstar/releases/tag/v0.9.0</link>
       <sparkle:version>554</sparkle:version>
       <sparkle:shortVersionString>0.9.0</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
@@ -167,11 +167,11 @@
 <li><b>Archive and mode line.</b> The archive prompt and the mode line's line and word count are translated.</li>
 </ul>
 <p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
-      <enclosure url="https://gitbay.org/krz/orgstar/releases/download/v0.9.0/orgstar-0.9.0.dmg" type="application/octet-stream" sparkle:edSignature="dslitE37pa5fStMYht1G9kSZGye+1zAWvo/hY0u7yGMMvHImWTM98a7zyUJmaaIyApqP7pl/0cwoog1gMVW9BA==" length="56745704"/>
+      <enclosure url="https://github.com/krz-labs/orgstar/releases/download/v0.9.0/orgstar-0.9.0.dmg" type="application/octet-stream" sparkle:edSignature="dslitE37pa5fStMYht1G9kSZGye+1zAWvo/hY0u7yGMMvHImWTM98a7zyUJmaaIyApqP7pl/0cwoog1gMVW9BA==" length="56745704"/>
     </item>
     <item>
       <title>orgstar 0.8.0</title>
-      <link>https://gitbay.org/krz/orgstar/releases/tag/v0.8.0</link>
+      <link>https://github.com/krz-labs/orgstar/releases/tag/v0.8.0</link>
       <sparkle:version>549</sparkle:version>
       <sparkle:shortVersionString>0.8.0</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
@@ -185,11 +185,11 @@
 <li><b>iOS: About.</b> Settings ends with About orgstar: the version, the manual, release notes, the issue tracker, support email and the privacy policy.</li>
 </ul>
 <p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
-      <enclosure url="https://gitbay.org/krz/orgstar/releases/download/v0.8.0/orgstar-0.8.0.dmg" type="application/octet-stream" sparkle:edSignature="KoXgyNL6aSDjrN0Wu9RKLQRy0su3OrTptr5/tMqGRjNQu3EYycztUGdRNNHfuKPH0tY8uPWg/h1a0YN5Hl+GBQ==" length="56391805"/>
+      <enclosure url="https://github.com/krz-labs/orgstar/releases/download/v0.8.0/orgstar-0.8.0.dmg" type="application/octet-stream" sparkle:edSignature="KoXgyNL6aSDjrN0Wu9RKLQRy0su3OrTptr5/tMqGRjNQu3EYycztUGdRNNHfuKPH0tY8uPWg/h1a0YN5Hl+GBQ==" length="56391805"/>
     </item>
     <item>
       <title>orgstar 0.7.0</title>
-      <link>https://gitbay.org/krz/orgstar/releases/tag/v0.7.0</link>
+      <link>https://github.com/krz-labs/orgstar/releases/tag/v0.7.0</link>
       <sparkle:version>541</sparkle:version>
       <sparkle:shortVersionString>0.7.0</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
@@ -203,11 +203,11 @@
 <li><b>Fix.</b> After a file changed, agenda rows could show another entry's title while opening the right one.</li>
 </ul>
 <p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
-      <enclosure url="https://gitbay.org/krz/orgstar/releases/download/v0.7.0/orgstar-0.7.0.dmg" type="application/octet-stream" sparkle:edSignature="EAjU6aDyTtfrxIYlDOyarmyY4dT5A49bLYaIwOGYxyzFnhJjCEypPGeyzemo44w2uniZ/jPXXc5f0sogRtFUBw==" length="56265203"/>
+      <enclosure url="https://github.com/krz-labs/orgstar/releases/download/v0.7.0/orgstar-0.7.0.dmg" type="application/octet-stream" sparkle:edSignature="EAjU6aDyTtfrxIYlDOyarmyY4dT5A49bLYaIwOGYxyzFnhJjCEypPGeyzemo44w2uniZ/jPXXc5f0sogRtFUBw==" length="56265203"/>
     </item>
     <item>
       <title>orgstar 0.6.1</title>
-      <link>https://gitbay.org/krz/orgstar/releases/tag/v0.6.1</link>
+      <link>https://github.com/krz-labs/orgstar/releases/tag/v0.6.1</link>
       <sparkle:version>531</sparkle:version>
       <sparkle:shortVersionString>0.6.1</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
@@ -218,11 +218,11 @@
 <li><b>Dark mode.</b> In the system's Dark icon style and in the Dock in dark appearance, each icon keeps a darkened version of its own colors instead of turning into the same glyph on gray.</li>
 </ul>
 <p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
-      <enclosure url="https://gitbay.org/krz/orgstar/releases/download/v0.6.1/orgstar-0.6.1.dmg" type="application/octet-stream" sparkle:edSignature="Yju3xlhhaDYDWv3Axv/qiiPzG5ECoIpNNulhcZ3yjgyYfnRcIZkRdE4nb0tM8e3EPFin5zkRL8A6lv/pnIecCA==" length="56193559"/>
+      <enclosure url="https://github.com/krz-labs/orgstar/releases/download/v0.6.1/orgstar-0.6.1.dmg" type="application/octet-stream" sparkle:edSignature="Yju3xlhhaDYDWv3Axv/qiiPzG5ECoIpNNulhcZ3yjgyYfnRcIZkRdE4nb0tM8e3EPFin5zkRL8A6lv/pnIecCA==" length="56193559"/>
     </item>
     <item>
       <title>orgstar 0.6.0</title>
-      <link>https://gitbay.org/krz/orgstar/releases/tag/v0.6.0</link>
+      <link>https://github.com/krz-labs/orgstar/releases/tag/v0.6.0</link>
       <sparkle:version>527</sparkle:version>
       <sparkle:shortVersionString>0.6.0</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
@@ -234,11 +234,11 @@
 <li><b>App icons.</b> Settings ▸ Appearance ▸ App Icon offers thirteen icons, three of them unicorns, shown in the Dock while orgstar runs. The default icon follows the system's Default, Dark and Tinted icon styles.</li>
 </ul>
 <p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
-      <enclosure url="https://gitbay.org/krz/orgstar/releases/download/v0.6.0/orgstar-0.6.0.dmg" type="application/octet-stream" sparkle:edSignature="GHl722oApUUw5sjTU8gwOpwYl0RBGX2WfmEdkIf/lYmfkyThcz5gDurL+V8o/3Vuo+DdPAhg206C+FZfsnMfBA==" length="54797148"/>
+      <enclosure url="https://github.com/krz-labs/orgstar/releases/download/v0.6.0/orgstar-0.6.0.dmg" type="application/octet-stream" sparkle:edSignature="GHl722oApUUw5sjTU8gwOpwYl0RBGX2WfmEdkIf/lYmfkyThcz5gDurL+V8o/3Vuo+DdPAhg206C+FZfsnMfBA==" length="54797148"/>
     </item>
     <item>
       <title>orgstar 0.5.0</title>
-      <link>https://gitbay.org/krz/orgstar/releases/tag/v0.5.0</link>
+      <link>https://github.com/krz-labs/orgstar/releases/tag/v0.5.0</link>
       <sparkle:version>509</sparkle:version>
       <sparkle:shortVersionString>0.5.0</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
@@ -255,67 +255,67 @@
 <li><b>Smaller changes.</b> The date prompt reads today, tomorrow, yesterday, next week and last week. Remove Schedule and Remove Deadline have keys. Recovery Versions, Resolve Sync Conflicts, Revert to File on Disk and Check Spelling While Typing are in the menus.</li>
 </ul>
 <p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
-      <enclosure url="https://gitbay.org/krz/orgstar/releases/download/v0.5.0/orgstar-0.5.0.dmg" type="application/octet-stream" sparkle:edSignature="D6ejdGoS0X14FzjiteFw8zbHPbCIKYPMDEIU1AI0qUgIPVevG8RXS/NFqz5uRxBrwCjG9ai2olLtHW3sqT94Dg==" length="53122632"/>
+      <enclosure url="https://github.com/krz-labs/orgstar/releases/download/v0.5.0/orgstar-0.5.0.dmg" type="application/octet-stream" sparkle:edSignature="D6ejdGoS0X14FzjiteFw8zbHPbCIKYPMDEIU1AI0qUgIPVevG8RXS/NFqz5uRxBrwCjG9ai2olLtHW3sqT94Dg==" length="53122632"/>
     </item>
     <item>
       <title>orgstar 0.4.2</title>
-      <link>https://gitbay.org/krz/orgstar/releases/tag/v0.4.2</link>
+      <link>https://github.com/krz-labs/orgstar/releases/tag/v0.4.2</link>
       <sparkle:version>490</sparkle:version>
       <sparkle:shortVersionString>0.4.2</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
       <pubDate>Mon, 12 Oct 2026 23:31:15 -0500</pubDate>
       <description><![CDATA[<p>A fix for windows with several panes.</p><ul><li>⌘W or the × on a pane's only tab closes the pane instead of leaving it empty, and closes the buffer only when no other pane shows it. ⌘W on an empty pane closes the pane, not the window.</li></ul><p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
-      <enclosure url="https://gitbay.org/krz/orgstar/releases/download/v0.4.2/orgstar-0.4.2.dmg" type="application/octet-stream" sparkle:edSignature="fBFIEB6062S2DWb/KP3cb7Ghb7koQEwVxble7NYi+A8koHm+fCcE2qYbmeqa0nkoO7OZVAxh5fZivSIk4ga9Dw==" length="52794043"/>
+      <enclosure url="https://github.com/krz-labs/orgstar/releases/download/v0.4.2/orgstar-0.4.2.dmg" type="application/octet-stream" sparkle:edSignature="fBFIEB6062S2DWb/KP3cb7Ghb7koQEwVxble7NYi+A8koHm+fCcE2qYbmeqa0nkoO7OZVAxh5fZivSIk4ga9Dw==" length="52794043"/>
     </item>
     <item>
       <title>orgstar 0.4.1</title>
-      <link>https://gitbay.org/krz/orgstar/releases/tag/v0.4.1</link>
+      <link>https://github.com/krz-labs/orgstar/releases/tag/v0.4.1</link>
       <sparkle:version>487</sparkle:version>
       <sparkle:shortVersionString>0.4.1</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
       <pubDate>Mon, 12 Oct 2026 20:25:14 -0500</pubDate>
       <description><![CDATA[<p>Fixes in the editor and in Word export.</p><ul><li>M-RET at the end of a folded heading inserts the new heading after the subtree, as Emacs does with point behind the ellipsis, instead of between the heading and its hidden body.</li><li>Tabs stop every 8 columns from the start of the line, as in Emacs.</li><li>Word export sets a page size, Letter or A4 by region as PDF export does. Quick Look and Pages laid the document out on a narrow page without one.</li><li>iOS: the Schedule and Deadline prompts take a time; arrow keys skip folded text instead of opening it.</li></ul><p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
-      <enclosure url="https://gitbay.org/krz/orgstar/releases/download/v0.4.1/orgstar-0.4.1.dmg" type="application/octet-stream" sparkle:edSignature="Uq1IXSYvkVTMembKtsE8vAgHpaQgjSMShb3Ts2tMC3FSHQFJJQyWDsY5aQjksn7P98o6spapPP/McxIUuSFUBw==" length="52722000"/>
+      <enclosure url="https://github.com/krz-labs/orgstar/releases/download/v0.4.1/orgstar-0.4.1.dmg" type="application/octet-stream" sparkle:edSignature="Uq1IXSYvkVTMembKtsE8vAgHpaQgjSMShb3Ts2tMC3FSHQFJJQyWDsY5aQjksn7P98o6spapPP/McxIUuSFUBw==" length="52722000"/>
     </item>
     <item>
       <title>orgstar 0.4.0</title>
-      <link>https://gitbay.org/krz/orgstar/releases/tag/v0.4.0</link>
+      <link>https://github.com/krz-labs/orgstar/releases/tag/v0.4.0</link>
       <sparkle:version>481</sparkle:version>
       <sparkle:shortVersionString>0.4.0</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
       <pubDate>Mon, 12 Oct 2026 08:48:33 -0500</pubDate>
       <description><![CDATA[<p>Images and files can be pasted and dropped into notes.</p><ul><li>An image on the clipboard is saved as <code>org-yank-image-save-method</code> says and linked on a line of its own at the caret. Pasted or dropped files are handled as <code>org-yank-dnd-method</code> says. With the caret on an image line, the link shows with the image under it.</li><li>iOS: paste, drop and Take Photo in the editor; Attach Photo or Video inserts the link at the caret; Export Subtree… in the Export menu.</li></ul><p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
-      <enclosure url="https://gitbay.org/krz/orgstar/releases/download/v0.4.0/orgstar-0.4.0.dmg" type="application/octet-stream" sparkle:edSignature="2+Po0wxJ1bKcNORuqnCv58Y9fRWw0CD449X0WRQfD/G3Bu43utNnskIHgl+knfpiTYAk2cW0yP3MclnRTXylDA==" length="52770955"/>
+      <enclosure url="https://github.com/krz-labs/orgstar/releases/download/v0.4.0/orgstar-0.4.0.dmg" type="application/octet-stream" sparkle:edSignature="2+Po0wxJ1bKcNORuqnCv58Y9fRWw0CD449X0WRQfD/G3Bu43utNnskIHgl+knfpiTYAk2cW0yP3MclnRTXylDA==" length="52770955"/>
     </item>
     <item>
       <title>orgstar 0.3.2</title>
-      <link>https://gitbay.org/krz/orgstar/releases/tag/v0.3.2</link>
+      <link>https://github.com/krz-labs/orgstar/releases/tag/v0.3.2</link>
       <sparkle:version>467</sparkle:version>
       <sparkle:shortVersionString>0.3.2</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
       <pubDate>Sun, 11 Oct 2026 20:13:45 -0500</pubDate>
       <description><![CDATA[<ul><li>Settings ▸ Agenda ▸ Habits only today (<code>org-habit-show-habits-only-for-today</code>). On by default, as in Org; off, habits also show on the later days they are scheduled for. Also on iOS and in Import from Emacs.</li></ul><p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
-      <enclosure url="https://gitbay.org/krz/orgstar/releases/download/v0.3.2/orgstar-0.3.2.dmg" type="application/octet-stream" sparkle:edSignature="dDZRzSc6GGP0q/5bU41FFXonNf6nlwL09aPg95xYMycRbItGP0PJSjn3j9uLDDFh07vlzwL10993PmGfiCqQAA==" length="52638851"/>
+      <enclosure url="https://github.com/krz-labs/orgstar/releases/download/v0.3.2/orgstar-0.3.2.dmg" type="application/octet-stream" sparkle:edSignature="dDZRzSc6GGP0q/5bU41FFXonNf6nlwL09aPg95xYMycRbItGP0PJSjn3j9uLDDFh07vlzwL10993PmGfiCqQAA==" length="52638851"/>
     </item>
     <item>
       <title>orgstar 0.3.1</title>
-      <link>https://gitbay.org/krz/orgstar/releases/tag/v0.3.1</link>
+      <link>https://github.com/krz-labs/orgstar/releases/tag/v0.3.1</link>
       <sparkle:version>464</sparkle:version>
       <sparkle:shortVersionString>0.3.1</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
       <pubDate>Sun, 11 Oct 2026 19:45:32 -0500</pubDate>
       <description><![CDATA[<ul><li>The agenda sorts timed entries by time before habits: timed habits go among the timed entries, and the now line and calendar events are placed by start time.</li><li>iOS: the string catalog is compiled in a build phase, so the German strings are complete.</li></ul><p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
-      <enclosure url="https://gitbay.org/krz/orgstar/releases/download/v0.3.1/orgstar-0.3.1.dmg" type="application/octet-stream" sparkle:edSignature="I0W+v/dUXzaqvMadCG8t3anaQ2n8mUMEfNPFX4jzSfmXkWIihg0Yi5Oza5PqZ7gVEkdAc/ea22wQzv06S1VMAg==" length="52629700"/>
+      <enclosure url="https://github.com/krz-labs/orgstar/releases/download/v0.3.1/orgstar-0.3.1.dmg" type="application/octet-stream" sparkle:edSignature="I0W+v/dUXzaqvMadCG8t3anaQ2n8mUMEfNPFX4jzSfmXkWIihg0Yi5Oza5PqZ7gVEkdAc/ea22wQzv06S1VMAg==" length="52629700"/>
     </item>
     <item>
       <title>orgstar 0.3.0</title>
-      <link>https://gitbay.org/krz/orgstar/releases/tag/v0.3.0</link>
+      <link>https://github.com/krz-labs/orgstar/releases/tag/v0.3.0</link>
       <sparkle:version>459</sparkle:version>
       <sparkle:shortVersionString>0.3.0</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
       <pubDate>Sun, 11 Oct 2026 19:09:49 -0500</pubDate>
       <description><![CDATA[<p>Updates from the app, windows and panes, a watch app, and the rest of Org's agenda, clocking, capture and table options.</p><ul><li><b>Updates.</b> orgstar ▸ Check for Updates…, and a daily automatic check that the app asks about on its second launch.</li><li><b>Windows and panes.</b> Split Pane Below and Right (C-x 2, C-x 3), Close Pane, Close Other Panes, Next Pane, and New Window (C-x 5 2) for a second window of panes.</li><li><b>Agenda.</b> Reminders from the Reminders app; Add to Calendar… and Edit Event… for calendar events; block agendas, per-view sorting, prefix format and skip conditions in <code>views.toml</code>; a Stuck Projects view; the time grid and now line; <code>org-agenda-sorting-strategy</code>; state changes in log mode; <code>org-agenda-todo-ignore-*</code>, <code>org-agenda-start-on-weekday</code>, <code>org-deadline-warning-days</code> and <code>org-agenda-files</code>; holidays in diary sexps.</li><li><b>Editor.</b> Incremental search (C-s, C-r); relative and visual line numbers; auto-fill mode; LaTeX previews; remote inline images and images for <code>attachment:</code> links; Insert Drawer, Copy to Refile Target, Go to Refile Target, drag element, bullet cycling; configurable structure templates; coderef and regexp links; <code>org-archive-location</code>, refile targets, tag inheritance settings and <code>org-tag-alist</code>.</li><li><b>Capture.</b> <code>regexp</code> targets, template groups, <code>time-prompt</code>, <code>tree-type</code> groupings, Refile… after capture, and the <code>%(…)</code> and <code>%[file]</code> escapes.</li><li><b>Clocking.</b> Clocks started or stopped in Emacs or on another device are followed; rounding, a state switch on clock-in, clock out when done, and a notification when the clock passes the Effort; <code>org-clock-into-drawer</code> and <code>CLOCK_INTO_DRAWER</code>; clock tables over other files with <code>:match</code> and <code>:step</code>; the clock report reads open buffers.</li><li><b>Tables.</b> table.el tables edited in place; formula iteration and automatic recalculation; <code>#+PLOT</code> with gnuplot or Swift Charts.</li><li><b>Code blocks.</b> Ruby, Node and R sessions; <code>:var</code> for Ruby, JavaScript, R and awk; <code>:prologue</code> and <code>:epilogue</code> for interpreted languages.</li><li><b>Column view.</b> Values are edited in the sheet; <code>@min</code>, <code>@max</code> and <code>@mean</code>; <code>columnview</code> blocks from <code>file:</code> and ID sources, with <code>:match</code>.</li><li><b>Export.</b> Word (.docx), iCalendar, and publishing projects.</li><li><b>More of Org.</b> org-attach, org-crypt, radio lists and org-timer, <code>org-track-ordered-property-with-tag</code>, and backlinks and daily notes as in org-roam.</li><li><b>Doom.</b> zz, zt and zb, number increment, replace state, q:.</li><li><b>Mac.</b> Today, Up Next and Habits widgets for the desktop and Notification Center. German localization.</li><li><b>iPhone, iPad and Apple Watch.</b> A watchOS app with today's agenda, the clock and dictated capture; iPad multi-window; <code>keymap.toml</code> and the Doom preset with a hardware keyboard; the board, bulk agenda actions, column view, backlinks, refile from the editor, Word export, table CSV and TSV import and export, and highlighted code in the block editor.</li></ul><p>Universal (Apple silicon and Intel), macOS 26 or later. Notarized.</p>]]></description>
-      <enclosure url="https://gitbay.org/krz/orgstar/releases/download/v0.3.0/orgstar-0.3.0.dmg" type="application/octet-stream" sparkle:edSignature="JMqSTRUAuS1fsuvUaMjZXED7ul6n3hqllJ0TIiFchRoenv8YQMbSBWm6cJWDoE8FxmNiljHqZxV1477LZz7zCw==" length="52689165"/>
+      <enclosure url="https://github.com/krz-labs/orgstar/releases/download/v0.3.0/orgstar-0.3.0.dmg" type="application/octet-stream" sparkle:edSignature="JMqSTRUAuS1fsuvUaMjZXED7ul6n3hqllJ0TIiFchRoenv8YQMbSBWm6cJWDoE8FxmNiljHqZxV1477LZz7zCw==" length="52689165"/>
     </item>
   </channel>
 </rss>

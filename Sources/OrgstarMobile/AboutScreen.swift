@@ -47,11 +47,11 @@ struct AboutScreen: View {
                 link("Website", "globe", "https://krz.sh/apps/orgstar")
             }
             Section {
-                link("Report an Issue", "ladybug", "https://gitbay.org/krz/orgstar-issues/issues/new")
+                link("Report an Issue", "ladybug", "https://github.com/krz-labs/orgstar/issues/new")
                 link("Email Support", "envelope", mail.absoluteString)
                 link("Rate on the App Store", "star", "https://apps.apple.com/app/id6821552018?action=write-review")
             } footer: {
-                Text("Reporting an issue needs a gitbay account. Without one, email \(Self.supportEmail).")
+                Text("Reporting an issue needs a GitHub account. Without one, email \(Self.supportEmail).")
             }
             TipSection()
             Section {
