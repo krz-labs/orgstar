@@ -125,8 +125,7 @@ public struct ReminderActions {
         switch action {
         case .done:
             guard let keyword = reminder.doneKeyword else { return .notFound }
-            // A note `org-log-done` asks for is left empty.
-            outcome = Self.outcome(session.perform(SetTodo(keyword: keyword), path: reminder.path, at: start, expect: (start, line), answers: ["note": ""], now: now))
+            outcome = session.markDone(EntryDone(path: reminder.path, offset: start, headingLine: line, keyword: keyword), now: now)
         case .clockIn:
             // Questions about dangling clocks go unanswered, which leaves those clocks alone.
             let result = await clock.clockIn(session, target: .entry(path: reminder.path, offset: start), paths: paths(), ask: { _ in nil }, now: { now })
@@ -165,7 +164,7 @@ public struct ReminderActions {
         return .snoozed(until)
     }
 
-    private static func outcome(_ step: CommandStep) -> ReminderActionOutcome {
+    static func outcome(_ step: CommandStep) -> ReminderActionOutcome {
         switch step {
         case .commit: .changed
         case .failed(let message): .failed(message)

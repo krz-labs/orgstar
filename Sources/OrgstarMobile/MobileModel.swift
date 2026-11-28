@@ -349,6 +349,23 @@ final class MobileModel {
         await updateWidgets()
     }
 
+    /// A widget's checkbox, which runs with the app in the background, or the watch's: the entry
+    /// is marked done and saved as by a reminder's Mark Done, and when it has changed or gone a
+    /// notification says so. True when it changed the file, and updated the widgets and watch.
+    @discardableResult
+    func markDone(_ done: EntryDone) async -> Bool {
+        let outcome = session.markDone(done)
+        guard outcome == .changed else {
+            let title = String(done.headingLine.drop { $0 == "*" }).trimmingCharacters(in: .whitespaces)
+            let entry = Reminder(id: "", fireDate: Date(), eventDate: Date(), title: title, body: "", path: done.path, offset: done.offset)
+            if let notice = ReminderActions.notice(outcome, for: entry) { try? await SystemReminderCenter().add(notice) }
+            return false
+        }
+        await updateReminders()
+        await updateWidgets()
+        return true
+    }
+
     /// The widgets' agenda: today and the next days in the app group's container, with the
     /// widgets reloaded when it changed; their habits and capture templates; and the icon's
     /// overdue badge.
@@ -384,12 +401,14 @@ final class MobileModel {
             return
         }
         let cards = await FlashcardReview.cards(workspace: workspace, session: session)
+        let habits = await days.habits(open: session.openTexts)
         var watch = WatchAgenda(groups: groups, today: days.today, clock: clock.running, lastClocked: clock.history.first?.title, generated: Date())
         watch.cards = WatchAgenda.Card.review(Flashcards.due(cards, at: Date()))
+        watch.habits = WatchAgenda.Habit.today(habits, today: days.today)
         WatchLink.shared.send(watch)
         if (try? FlashcardSnapshot(cards: cards.map(\.card)).write()) == true { WidgetCenter.shared.reloadTimelines(ofKind: "sh.krz.orgstar.flashcards") }
         await updateBadge(OverdueBadge.counts(groups, today: days.today, days: AgendaSnapshot.dayCount))
-        if (try? HabitSnapshot(habits: await days.habits(open: session.openTexts), theme: theme).write()) == true { WidgetCenter.shared.reloadTimelines(ofKind: "sh.krz.orgstar.habits") }
+        if (try? HabitSnapshot(habits: habits, theme: theme).write()) == true { WidgetCenter.shared.reloadTimelines(ofKind: "sh.krz.orgstar.habits") }
         _ = try? TemplateList(templates: CaptureTemplates.load().templates.map { .init(key: $0.key, name: $0.name) }).write()
         guard let file = AgendaSnapshot.file() else { return }
         let snapshot = AgendaSnapshot(groups: groups, today: days.today, theme: theme, generated: Date())

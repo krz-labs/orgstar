@@ -1387,7 +1387,7 @@ struct ContentView: View {
         await scheduler.reconcile(reminders)
     }
 
-    /// The desktop widgets' agenda and habits, written where the widget extension reads them,
+    /// The desktop widgets' agenda, habits and checkbox key, written where the widget extension reads them,
     /// with the widgets reloaded when they changed; and today's agenda for the menu bar item.
     private func updateWidgets() async {
         let file = ProAccess.shared.isUnlocked ? AgendaSnapshot.file() : nil
@@ -1413,6 +1413,7 @@ struct ContentView: View {
         let snapshot = AgendaSnapshot(groups: days.groups(), today: days.today, theme: theme, generated: Date())
         menuToday = snapshot.days.first.map { $0.overdue + $0.rows } ?? []
         guard let file else { return }
+        _ = try? WidgetActionKey(key: WidgetActionKey.current()).write()
         if (try? HabitSnapshot(habits: await days.habits(open: open), theme: theme).write()) == true {
             WidgetCenter.shared.reloadTimelines(ofKind: "sh.krz.orgstar.habits")
         }

@@ -42,7 +42,4 @@ public struct ClockOutIntent: LiveActivityIntent {
         return .result()
     }
 }
-
-/// OrgApp's App Intents, for the app and the widget extension to include.
-public struct OrgAppIntents: AppIntentsPackage {}
 #endif

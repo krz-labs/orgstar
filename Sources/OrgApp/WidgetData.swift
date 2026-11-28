@@ -37,17 +37,33 @@ public struct HabitSnapshot: WidgetData {
         public var title: String
         public var path: String
         public var offset: Int
+        /// The heading line and the keyword marking the habit done takes, for its checkbox.
+        public var headingLine: String?
+        public var doneKeyword: String?
         public var habit: Habit
         public var id: String { "\(path):\(offset)" }
 
-        public init(title: String, path: String, offset: Int, habit: Habit) {
+        public init(title: String, path: String, offset: Int, headingLine: String? = nil, doneKeyword: String? = nil, habit: Habit) {
             self.title = title
             self.path = path
             self.offset = offset
+            self.headingLine = headingLine
+            self.doneKeyword = doneKeyword
             self.habit = habit
         }
 
         public var link: AppLink { .entry(path: path, offset: offset) }
+
+        public func isDone(on day: Int) -> Bool { habit.doneDates.contains(day) }
+
+        /// In `day`'s habits: scheduled then or before, or done that day, which moved it on.
+        public func isDue(on day: Int) -> Bool { habit.scheduled <= day || isDone(on: day) }
+
+        /// What its checkbox marks done.
+        public var done: EntryDone? {
+            guard let headingLine, let doneKeyword else { return nil }
+            return EntryDone(path: path, offset: offset, headingLine: headingLine, keyword: doneKeyword)
+        }
     }
 
     public var habits: [Entry]
@@ -58,6 +74,9 @@ public struct HabitSnapshot: WidgetData {
         self.habits = habits
         self.colors = colors
     }
+
+    /// The habits of `day` (a `Days` number), as the widget and the watch list them.
+    public func habits(on day: Int) -> [Entry] { habits.filter { $0.isDue(on: day) } }
 
     /// `habits`, colored by `theme`.
     public init(habits: [Entry], theme: ThemeSpec) {

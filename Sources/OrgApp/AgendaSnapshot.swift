@@ -42,6 +42,9 @@ public struct AgendaSnapshot: Codable, Equatable, Sendable {
         /// The Org entry, for a link to it.
         public var path: String?
         public var offset: Int?
+        /// The heading line and the keyword marking the entry done takes, for its checkbox.
+        public var headingLine: String?
+        public var doneKeyword: String?
         public var statusColor: Hex?
         public var todoColor: Hex?
         public var priorityColor: Hex?
@@ -49,8 +52,8 @@ public struct AgendaSnapshot: Codable, Equatable, Sendable {
 
         public init(
             id: String, gutter: String, status: String, title: String, category: String, todo: String?, priority: String?, isDone: Bool,
-            isEvent: Bool, start: Date?, end: Date?, path: String?, offset: Int?, statusColor: Hex?, todoColor: Hex?, priorityColor: Hex?,
-            categoryColor: Hex?
+            isEvent: Bool, start: Date?, end: Date?, path: String?, offset: Int?, headingLine: String? = nil, doneKeyword: String? = nil,
+            statusColor: Hex?, todoColor: Hex?, priorityColor: Hex?, categoryColor: Hex?
         ) {
             self.id = id
             self.gutter = gutter
@@ -65,6 +68,8 @@ public struct AgendaSnapshot: Codable, Equatable, Sendable {
             self.end = end
             self.path = path
             self.offset = offset
+            self.headingLine = headingLine
+            self.doneKeyword = doneKeyword
             self.statusColor = statusColor
             self.todoColor = todoColor
             self.priorityColor = priorityColor
@@ -78,6 +83,12 @@ public struct AgendaSnapshot: Codable, Equatable, Sendable {
 
         /// Not done and not a calendar event.
         public var isOpen: Bool { !isDone && !isEvent }
+
+        /// What its checkbox marks done: an open entry with a TODO keyword, found by its heading.
+        public var done: EntryDone? {
+            guard isOpen, todo != nil, let path, let offset, let headingLine, let doneKeyword else { return nil }
+            return EntryDone(path: path, offset: offset, headingLine: headingLine, keyword: doneKeyword)
+        }
     }
 
     public struct Day: Codable, Equatable, Sendable, Identifiable {
@@ -126,8 +137,8 @@ public struct AgendaSnapshot: Codable, Equatable, Sendable {
             return Row(
                 id: row.id, gutter: row.gutter, status: row.status.rawValue, title: row.title, category: row.category, todo: row.todo,
                 priority: row.priority, isDone: row.isDone, isEvent: row.isEvent, start: at(row.start), end: at(row.end),
-                path: item?.path, offset: item.flatMap { $0.headingOffset ?? $0.markerOffset },
-                statusColor: Hex { theme.statusColor(row.status, dark: $0) },
+                path: item?.path, offset: item.flatMap { $0.headingOffset ?? $0.markerOffset }, headingLine: item?.headingLine,
+                doneKeyword: item?.doneKeyword, statusColor: Hex { theme.statusColor(row.status, dark: $0) },
                 todoColor: row.todo.flatMap { todo in Hex { theme.todoColor(todo, isDone: row.isDone, dark: $0) } },
                 priorityColor: row.priority.flatMap { priority in Hex { theme.priorityColor(priority, dark: $0) } },
                 categoryColor: Hex { dark -> RGBA? in
@@ -274,6 +285,8 @@ public enum AppLink: Equatable, Sendable {
     case capture(template: String?)
     /// The flashcard review.
     case review
+    /// A Mac widget's checkbox, with the key the app wrote for the widgets (`WidgetActionKey`).
+    case done(EntryDone, key: String)
 
     public static let scheme = "orgstar"
 
@@ -293,6 +306,13 @@ public enum AppLink: Equatable, Sendable {
         case .entry(let path, let offset):
             components.host = "entry"
             components.queryItems = [URLQueryItem(name: "path", value: path), URLQueryItem(name: "offset", value: String(offset))]
+        case .done(let done, let key):
+            components.host = "done"
+            components.queryItems = [
+                URLQueryItem(name: "path", value: done.path), URLQueryItem(name: "offset", value: String(done.offset)),
+                URLQueryItem(name: "heading", value: done.headingLine), URLQueryItem(name: "keyword", value: done.keyword),
+                URLQueryItem(name: "key", value: key),
+            ]
         }
         return components.url!
     }
@@ -308,6 +328,10 @@ public enum AppLink: Equatable, Sendable {
         case "entry":
             guard let path = query("path"), let offset = query("offset").flatMap(Int.init) else { return nil }
             self = .entry(path: path, offset: offset)
+        case "done":
+            guard let path = query("path"), let offset = query("offset").flatMap(Int.init), let heading = query("heading"),
+                  let keyword = query("keyword"), let key = query("key") else { return nil }
+            self = .done(EntryDone(path: path, offset: offset, headingLine: heading, keyword: keyword), key: key)
         default: return nil
         }
     }

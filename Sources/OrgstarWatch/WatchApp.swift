@@ -4,7 +4,7 @@ import SwiftUI
 import WatchConnectivity
 import WidgetKit
 
-/// orgstar on the watch: today's agenda from the phone, marking entries done, the running
+/// orgstar on the watch: today's agenda and habits from the phone, marking them done, the running
 /// clock, and dictated capture into the phone's capture inbox.
 @main
 struct OrgstarWatchApp: App {
@@ -42,6 +42,9 @@ final class PhoneLink: NSObject, WCSessionDelegate {
             if case .done(_, let offset, _, _) = action, let agenda,
                let entry = (agenda.rows + agenda.overdue).first(where: { $0.offset == offset && $0.done == action }) {
                 store(agenda.markingDone(entry.id))
+            }
+            if let agenda, let habit = agenda.habits?.first(where: { $0.done == action }) {
+                store(agenda.markingHabitDone(habit.id))
             }
         case .clockOut:
             if var agenda {
@@ -156,6 +159,9 @@ struct AgendaList: View {
                     }
                 }
             }
+            if let habits = link.agenda?.habits, !habits.isEmpty {
+                Section("Habits") { ForEach(habits) { HabitRow(habit: $0, link: link) } }
+            }
             if let agenda = link.agenda {
                 if !agenda.overdue.isEmpty {
                     Section("Overdue") { ForEach(agenda.overdue) { EntryRow(entry: $0, link: link) } }
@@ -214,6 +220,52 @@ struct CardReview: View {
         }
         .tint(tint)
         .buttonStyle(.borderedProminent)
+    }
+}
+
+/// A habit with its last week, today last; a tap marks it done.
+struct HabitRow: View {
+    let habit: WatchAgenda.Habit
+    let link: PhoneLink
+
+    var body: some View {
+        if let done = habit.done {
+            Button { link.send(done) } label: { content }
+                .accessibilityHint("Marks it \(habit.doneKeyword ?? "done")")
+        } else {
+            content
+        }
+    }
+
+    private var content: some View {
+        HStack(alignment: .top, spacing: 6) {
+            Image(systemName: habit.isDoneToday ? "checkmark.circle.fill" : "circle").foregroundStyle(habit.isDoneToday ? .green : .secondary)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(habit.title).lineLimit(2)
+                HStack(spacing: 2) {
+                    ForEach(Array(habit.days.enumerated()), id: \.offset) { _, day in
+                        RoundedRectangle(cornerRadius: 1.5)
+                            .fill(Self.color(day.face))
+                            .frame(width: 12, height: 8)
+                            .overlay { if day.isDone { Circle().fill(.white.opacity(0.9)).frame(width: 5) } }
+                    }
+                }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(Text("Done \(habit.days.filter(\.isDone).count) of \(habit.days.count) days"))
+            }
+        }
+    }
+
+    /// org-habit's faces in the default theme's colors, lighter for days to come.
+    static func color(_ face: String) -> Color {
+        let future = face.hasSuffix("Future")
+        let base: Color = switch face.replacingOccurrences(of: "Future", with: "") {
+        case "ready": .green
+        case "alert": .yellow
+        case "overdue": .red
+        default: .blue
+        }
+        return base.opacity(future ? 0.3 : 0.8)
     }
 }
 

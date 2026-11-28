@@ -23819,6 +23819,40 @@
         }
       }
     },
+    "Heading": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Überschrift"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Encabezado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Titre"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "見出し"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Título"
+          }
+        }
+      }
+    },
     "Heading %@ inside a list or quote became a bold line.": {
       "comment": "Markdown import problem",
       "localizations": {
@@ -30208,6 +30242,40 @@
         }
       }
     },
+    "Marks an agenda entry or a habit done.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markiert einen Agenda-Eintrag oder eine Gewohnheit als erledigt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marca como hecha una entrada de la agenda o un hábito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marque une entrée de l'agenda ou une habitude comme terminée."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アジェンダのエントリまたは習慣を完了にします。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marca uma entrada da agenda ou um hábito como feito."
+          }
+        }
+      }
+    },
     "Marks it %@": {
       "localizations": {
         "de": {
@@ -34133,6 +34201,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nenhuma pasta oculta"
+          }
+        }
+      }
+    },
+    "No habits due today.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heute sind keine Gewohnheiten fällig."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoy no toca ningún hábito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune habitude prévue aujourd'hui."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日予定の習慣はありません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum hábito para hoje."
           }
         }
       }
@@ -38739,6 +38841,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Plotando com o gnuplot…"
+          }
+        }
+      }
+    },
+    "Position": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Position"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Posición"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Position"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "位置"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Posição"
           }
         }
       }
@@ -54368,6 +54504,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Isso não pode ser feito a partir de uma notificação."
+          }
+        }
+      }
+    },
+    "This entry isn't in %@ as it was.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Eintrag ist nicht mehr unverändert in %@."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta entrada ya no está en %@ como estaba."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette entrée n'est plus dans %@ telle qu'elle était."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このエントリは%@で元の状態のままではありません。"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta entrada não está mais em %@ como estava."
           }
         }
       }

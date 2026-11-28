@@ -185,7 +185,9 @@ public final class AgendaModel {
     /// The habits of the agenda files, file by file.
     public func habits(open: [String: String]) async -> [HabitSnapshot.Entry] {
         await sources(open: open).flatMap { source in
-            source.habits.map { HabitSnapshot.Entry(title: $0.title, path: source.path, offset: $0.offset, habit: $0.habit) }
+            source.habits.map {
+                HabitSnapshot.Entry(title: $0.title, path: source.path, offset: $0.offset, headingLine: $0.line, doneKeyword: $0.doneKeyword, habit: $0.habit)
+            }
         }
     }
 

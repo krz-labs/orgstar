@@ -39,7 +39,8 @@ final class WatchLink: NSObject, WCSessionDelegate {
         guard ProAccess.shared.isUnlocked, let model, let workspace = model.workspace else { return }
         switch action {
         case .done(let path, let offset, let headingLine, let keyword):
-            _ = model.session.perform(SetTodo(keyword: keyword), path: path, at: offset, expect: (offset, headingLine))
+            // Updated the widgets and the watch when it changed the file.
+            if await model.markDone(EntryDone(path: path, offset: offset, headingLine: headingLine, keyword: keyword)) { return }
         case .clockOut:
             _ = MobileClock.run("app.clock.out", model: model, workspace: workspace) { _ in }
         case .clockInLast:

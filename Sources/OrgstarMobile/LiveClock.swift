@@ -35,7 +35,8 @@ enum LiveClock {
         if (try? snapshot.write()) == true { ControlCenter.shared.reloadControls(ofKind: "sh.krz.orgstar.clock-control") }
     }
 
-    /// The Clock Out button's work, in the app's process, and the capture and clock controls'.
+    /// The Clock Out button's work, in the app's process, the capture and clock controls', and
+    /// the widgets' checkboxes'.
     static func install() {
         ClockOutIntent.handler = clockOut
         ClockToggleIntent.handler = { on in
@@ -48,6 +49,9 @@ enum LiveClock {
             for path in model.session.dirtyPaths { _ = model.session.save(path) }
             await sync(model.clock.running)
             publish(model.clock)
+        }
+        CompleteEntryIntent.handler = { done in
+            await MobileModel.shared.markDone(done)
         }
         OpenCaptureIntent.handler = { template in
             MobileModel.shared.captureRequest = CaptureRequest(template: template)

@@ -16,6 +16,18 @@ extension WatchAgenda.Card {
     }
 }
 
+extension WatchAgenda.Habit {
+    /// The habits of `today` (a `Days` number), as the Habits widget lists them, each with
+    /// the week ending today, as the small widget draws it.
+    public static func today(_ habits: [HabitSnapshot.Entry], today: Int) -> [WatchAgenda.Habit] {
+        HabitSnapshot(habits: habits, colors: [:]).habits(on: today).compactMap { entry in
+            guard let headingLine = entry.headingLine else { return nil }
+            let days = entry.habit.graph(today: today, preceding: 6, following: 1).map { Day(face: $0.face.rawValue, isDone: $0.glyph == "*") }
+            return WatchAgenda.Habit(path: entry.path, offset: entry.offset, headingLine: headingLine, title: entry.title, doneKeyword: entry.doneKeyword, days: days)
+        }
+    }
+}
+
 extension WatchAgenda {
     /// Today's group of the agenda, for the watch, with the running clock and the entry
     /// Clock In Last would take.
